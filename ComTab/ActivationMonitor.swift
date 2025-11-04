@@ -19,10 +19,10 @@ final class ActivationMonitor: ObservableObject {
 
     @Published var isFeatureEnabled: Bool {
         didSet {
-            guard isFeatureEnabled != oldValue else { return }
-            defaults.set(isFeatureEnabled, forKey: Constants.featureDefaultsKey)
-            updateObservationState()
-            AppLogger.activation.notice("Feature toggled to \(isFeatureEnabled ? "ON" : "OFF")")
+            guard self.isFeatureEnabled != oldValue else { return }
+            defaults.set(self.isFeatureEnabled, forKey: Constants.featureDefaultsKey)
+            self.updateObservationState()
+            AppLogger.activation.notice("Feature toggled to \(self.isFeatureEnabled ? "ON" : "OFF")")
         }
     }
 
