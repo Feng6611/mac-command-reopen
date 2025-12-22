@@ -6,8 +6,11 @@
 //
 
 import os
+import Foundation
 
 enum AppLogger {
-    static let activation = Logger(subsystem: "com.NewWorld.ComTab", category: "Activation")
+    static let activation = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+        category: "Activation"
+    )
 }
-

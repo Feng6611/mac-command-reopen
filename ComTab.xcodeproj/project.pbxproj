@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		74ADB29A2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
+		74ADB29B2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
+		74ADB29C2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		748FCE2E2EB5027D0099C190 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,9 +30,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		748FCE1B2EB5027B0099C190 /* ComTab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComTab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		748FCE1B2EB5027B0099C190 /* Command Reopen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE372EB5027D0099C190 /* ComTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		74ADB2992EF8287D00FA6DAD /* CommandTab.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CommandTab.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -79,13 +86,14 @@
 				748FCE302EB5027D0099C190 /* ComTabTests */,
 				748FCE3A2EB5027D0099C190 /* ComTabUITests */,
 				748FCE1C2EB5027B0099C190 /* Products */,
+				74ADB2992EF8287D00FA6DAD /* CommandTab.icon */,
 			);
 			sourceTree = "<group>";
 		};
 		748FCE1C2EB5027B0099C190 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				748FCE1B2EB5027B0099C190 /* ComTab.app */,
+				748FCE1B2EB5027B0099C190 /* Command Reopen.app */,
 				748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */,
 				748FCE372EB5027D0099C190 /* ComTabUITests.xctest */,
 			);
@@ -95,9 +103,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		748FCE1A2EB5027A0099C190 /* ComTab */ = {
+		748FCE1A2EB5027A0099C190 /* Command Reopen */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "ComTab" */;
+			buildConfigurationList = 748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "Command Reopen" */;
 			buildPhases = (
 				748FCE172EB5027A0099C190 /* Sources */,
 				748FCE182EB5027A0099C190 /* Frameworks */,
@@ -110,11 +118,11 @@
 			fileSystemSynchronizedGroups = (
 				748FCE1D2EB5027B0099C190 /* ComTab */,
 			);
-			name = ComTab;
+			name = "Command Reopen";
 			packageProductDependencies = (
 			);
 			productName = ComTab;
-			productReference = 748FCE1B2EB5027B0099C190 /* ComTab.app */;
+			productReference = 748FCE1B2EB5027B0099C190 /* Command Reopen.app */;
 			productType = "com.apple.product-type.application";
 		};
 		748FCE2C2EB5027D0099C190 /* ComTabTests */ = {
@@ -171,7 +179,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					748FCE1A2EB5027A0099C190 = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -200,7 +208,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				748FCE1A2EB5027A0099C190 /* ComTab */,
+				748FCE1A2EB5027A0099C190 /* Command Reopen */,
 				748FCE2C2EB5027D0099C190 /* ComTabTests */,
 				748FCE362EB5027D0099C190 /* ComTabUITests */,
 			);
@@ -212,6 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74ADB29B2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +228,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74ADB29A2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -226,6 +236,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74ADB29C2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,12 +269,12 @@
 /* Begin PBXTargetDependency section */
 		748FCE2F2EB5027D0099C190 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 748FCE1A2EB5027A0099C190 /* ComTab */;
+			target = 748FCE1A2EB5027A0099C190 /* Command Reopen */;
 			targetProxy = 748FCE2E2EB5027D0099C190 /* PBXContainerItemProxy */;
 		};
 		748FCE392EB5027D0099C190 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 748FCE1A2EB5027A0099C190 /* ComTab */;
+			target = 748FCE1A2EB5027A0099C190 /* Command Reopen */;
 			targetProxy = 748FCE382EB5027D0099C190 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -303,6 +314,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -323,11 +335,13 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = CommandReopen;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -367,6 +381,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -384,7 +399,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = CommandReopen;
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -394,11 +412,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -415,17 +434,17 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Command Tab";
+				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
+				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSAccessibilityUsageDescription = "ComTab 需要辅助功能权限来帮助您在前台 App 无可见窗口时自动还原或显示窗口。您可随时在系统设置中撤回授权。";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandTab;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -442,11 +461,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -463,17 +483,17 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Command Tab";
+				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
+				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSAccessibilityUsageDescription = "ComTab 需要辅助功能权限来帮助您在前台 App 无可见窗口时自动还原或显示窗口。您可随时在系统设置中撤回授权。";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandTab;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -491,9 +511,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.ComTabTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -502,7 +523,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ComTab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ComTab";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Command Reopen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Command Reopen";
 			};
 			name = Debug;
 		};
@@ -512,9 +533,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.ComTabTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -523,7 +545,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ComTab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ComTab";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Command Reopen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Command Reopen";
 			};
 			name = Release;
 		};
@@ -532,8 +554,10 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.ComTabUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -542,7 +566,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = ComTab;
+				TEST_TARGET_NAME = "Command Reopen";
 			};
 			name = Debug;
 		};
@@ -551,8 +575,10 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.ComTabUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -561,7 +587,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = ComTab;
+				TEST_TARGET_NAME = "Command Reopen";
 			};
 			name = Release;
 		};
@@ -577,7 +603,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "ComTab" */ = {
+		748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "Command Reopen" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				748FCE422EB5027D0099C190 /* Debug */,

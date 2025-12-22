@@ -1,0 +1,66 @@
+{
+  "color-space-for-untagged-svg-colors" : "display-p3",
+  "fill" : "system-light",
+  "groups" : [
+    {
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "extended-gray:1.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "icon_com.png",
+          "name" : "icon_com",
+          "opacity" : 1
+        }
+      ],
+      "lighting" : "combined",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode" : "darken",
+          "fill" : "none",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "1 – Layer.png",
+          "name" : "1 – Layer"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "macOS"
+    ]
+  }
+}

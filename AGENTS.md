@@ -1,22 +1,36 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-ComTab is a macOS SwiftUI app. Core sources live in `ComTab/`: the entry point `ComTabApp.swift`, persistence helpers in `Persistence.swift`, and system integrations (`AccessibilityManager.swift`, `ActivationMonitor.swift`, `WindowInspector.swift`). Views sit in `ComTab/UI/`, assets in `Assets.xcassets`, and Core Data models in `ComTab.xcdatamodeld`. Unit tests reside in `ComTabTests/`, UI automation in `ComTabUITests/`. Add new code beside related modules and introduce subfolders only when several files share a concern.
+- **App entry**: `ComTab/ComTabApp.swift` bootstraps the SwiftUI app.
+- **Services**: `AccessibilityManager.swift`, `ActivationMonitor.swift`, `WindowInspector.swift`, and logging helpers in `AppLogger.swift`.
+- **UI**: SwiftUI views live in `ComTab/UI/`; assets in `Assets.xcassets`; Core Data model in `ComTab.xcdatamodeld` (currently unused).
+- **Tests**: Unit tests in `ComTabTests/`; UI automation in `ComTabUITests/`.
+
+## Design & Strategy Log
+- **Single source**: Capture key design decisions and behavioral strategies in `DESIGN_NOTES.md`.
+- **When to update**: Any changes to activation heuristics, permission prompts, launch-at-login behavior, or status bar UX should be recorded there.
 
 ## Build, Test, and Development Commands
-- `open ComTab.xcodeproj`: open the project in Xcode for iterative development.
-- `xcodebuild -scheme ComTab -configuration Debug build`: compile a local debug build; add `-quiet` in CI scripts.
-- `xcodebuild -scheme ComTab -destination 'platform=macOS' test`: execute unit and UI tests. Narrow scope with `-only-testing:ComTabTests` or `ComTabUITests`.
-- `xcodebuild -scheme ComTab -configuration Release build CODE_SIGNING_ALLOWED=NO`: create an unsigned release build for review.
+- **Open in Xcode**: `open ComTab.xcodeproj` for iterative dev.
+- **Debug build**: `xcodebuild -scheme ComTab -configuration Debug build` (add `-quiet` in CI).
+- **Release (unsigned)**: `xcodebuild -scheme ComTab -configuration Release build CODE_SIGNING_ALLOWED=NO`.
+- **Tests**: `xcodebuild -scheme ComTab -destination 'platform=macOS' test`; scope with `-only-testing:ComTabTests` or `ComTabUITests`.
 
 ## Coding Style & Naming Conventions
-Follow Swift API Design Guidelines: four-space indentation, same-line braces, and 120-character lines. Use `UpperCamelCase` for types, `lowerCamelCase` for members, and prefix test doubles with `Mock`. Organize files with `// MARK:` pragmas, and keep side effects inside service classes (e.g., accessibility managers) to preserve SwiftUI view purity.
+- **Swift style**: Four-space indentation, same-line braces, 120-char lines.
+- **Naming**: UpperCamelCase types; lowerCamelCase members; prefix test doubles with `Mock`.
+- **Organization**: Use `// MARK:` pragmas; keep side effects in service classes to keep views pure.
 
 ## Testing Guidelines
-Write unit tests in `ComTabTests/` mirroring the module under test (e.g., `AccessibilityManagerTests`). Name tests `test_WhenCondition_ExpectOutcome` to capture behavior. UI flows live in `ComTabUITests/` using XCTest UI APIs. Cover permission flows and persistence updates, add regression tests for bug fixes, and run the full `xcodebuild ... test` command before opening a pull request.
+- **Frameworks**: XCTest for unit and UI tests.
+- **Naming**: `test_WhenCondition_ExpectOutcome`.
+- **Focus**: Cover permission flows and persistence updates; add regression tests for fixes.
+- **Execution**: Run `xcodebuild ... test` (full suite) before PRs.
 
 ## Commit & Pull Request Guidelines
-Use imperative, ≤72-character summaries (`Add accessibility monitor tests`) and keep changes scoped. Reference issues with `#id` when available. Pull requests should describe intent, list validation steps, and call out user-facing accessibility impacts. Attach screenshots for UI updates and note configuration or entitlement adjustments in the description.
+- **Commits**: Imperative, ≤72 chars (e.g., `Add accessibility monitor tests`); scope tightly; link issues with `#id`.
+- **PRs**: State intent, validation steps (commands run), accessibility impacts; attach screenshots for UI changes; note config/entitlement updates.
 
-## Accessibility & Permission Configuration
-The app depends on macOS accessibility privileges. Keep relevant `Info.plist` capabilities current. Extend `AccessibilityManager` or `ActivationMonitor` instead of duplicating authorization checks, and document new prompts so QA can verify them.
+## Accessibility & Configuration Tips
+- **Permissions**: App relies on macOS accessibility privileges; keep `Info.plist` capabilities accurate.
+- **Extensibility**: Extend `AccessibilityManager` or `ActivationMonitor` for new prompts instead of duplicating checks; document new prompts for QA.

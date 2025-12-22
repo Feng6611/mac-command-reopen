@@ -9,33 +9,27 @@ import SwiftUI
 import AppKit
 
 struct MenuContentView: View {
-    @EnvironmentObject private var activationMonitor: ActivationMonitor
-
-    private var featureBinding: Binding<Bool> {
-        Binding(
-            get: { activationMonitor.isFeatureEnabled },
-            set: { activationMonitor.isFeatureEnabled = $0 }
-        )
-    }
+    @StateObject private var launchAtLogin = LaunchAtLoginManager()
 
     var body: some View {
         Group {
-            Toggle(isOn: featureBinding) {
-                Text("自动重新打开前台应用")
+            Toggle("Launch at Login", isOn: launchAtLogin.binding)
+                .disabled(!isAtLeast13)
+
+            Button("About") {
+                NSApplication.shared.activate(ignoringOtherApps: true)
+                NSApplication.shared.orderFrontStandardAboutPanel(nil)
             }
 
-            Button("立即重新打开前台应用") {
-                activationMonitor.relaunchFrontmostApplication()
-            }
-            .disabled(!activationMonitor.isFeatureEnabled)
-
-            Divider()
-
-            Button("退出 ComTab") {
+            Button("Quit Command Reopen") {
                 NSApplication.shared.terminate(nil)
             }
         }
     }
+}
+
+private var isAtLeast13: Bool {
+    if #available(macOS 13.0, *) { return true } else { return false }
 }
 
 #Preview {

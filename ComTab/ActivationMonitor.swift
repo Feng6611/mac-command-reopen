@@ -12,7 +12,7 @@ import Foundation
 import os
 
 /// Monitors `NSWorkspace.didActivateApplicationNotification` and relaunches
-/// the frontmost (non-ComTab) application via `NSWorkspace.openApplication`.
+/// the frontmost (non-Command Reopen) application via `NSWorkspace.openApplication`.
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
@@ -119,7 +119,7 @@ final class ActivationMonitor: ObservableObject {
 
     private func handleActivation(for app: NSRunningApplication) {
         guard app.bundleIdentifier != Bundle.main.bundleIdentifier else {
-            AppLogger.activation.debug("Ignoring activation of ComTab itself.")
+            AppLogger.activation.debug("Ignoring activation of Command Reopen itself.")
             return
         }
         if NSEvent.pressedMouseButtons != 0 {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2610"
+   LastUpgradeVersion = "2620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-               BuildableName = "ComTab.app"
-               BlueprintName = "ComTab"
+               BuildableName = "Command Reopen.app"
+               BlueprintName = "Command Reopen"
                ReferencedContainer = "container:ComTab.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -69,8 +69,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-            BuildableName = "ComTab.app"
-            BlueprintName = "ComTab"
+            BuildableName = "Command Reopen.app"
+            BlueprintName = "Command Reopen"
             ReferencedContainer = "container:ComTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -86,8 +86,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-            BuildableName = "ComTab.app"
-            BlueprintName = "ComTab"
+            BuildableName = "Command Reopen.app"
+            BlueprintName = "Command Reopen"
             ReferencedContainer = "container:ComTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

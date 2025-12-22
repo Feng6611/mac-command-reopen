@@ -6,7 +6,7 @@
 //
 
 import Testing
-@testable import ComTab
+@testable import Command_Reopen
 
 struct ComTabTests {
 
