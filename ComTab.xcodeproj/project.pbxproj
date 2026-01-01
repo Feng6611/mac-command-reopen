@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		74ADB29A2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
-		74ADB29B2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
-		74ADB29C2EF8287D00FA6DAD /* CommandTab.icon in Resources */ = {isa = PBXBuildFile; fileRef = 74ADB2992EF8287D00FA6DAD /* CommandTab.icon */; };
+		7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
+		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
+		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,10 +30,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7408919C2F0645A90099E62A /* CommandReopenNew.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CommandReopenNew.icon; sourceTree = "<group>"; };
 		748FCE1B2EB5027B0099C190 /* Command Reopen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE372EB5027D0099C190 /* ComTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		74ADB2992EF8287D00FA6DAD /* CommandTab.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CommandTab.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -86,7 +86,7 @@
 				748FCE302EB5027D0099C190 /* ComTabTests */,
 				748FCE3A2EB5027D0099C190 /* ComTabUITests */,
 				748FCE1C2EB5027B0099C190 /* Products */,
-				74ADB2992EF8287D00FA6DAD /* CommandTab.icon */,
+				7408919C2F0645A90099E62A /* CommandReopenNew.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -220,7 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74ADB29B2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
+				7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,7 +228,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74ADB29A2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
+				7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,7 +236,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74ADB29C2EF8287D00FA6DAD /* CommandTab.icon in Resources */,
+				7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,13 +410,13 @@
 		748FCE422EB5027D0099C190 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -459,13 +459,13 @@
 		748FCE432EB5027D0099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;

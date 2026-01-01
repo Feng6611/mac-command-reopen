@@ -19,6 +19,8 @@ final class ActivationMonitor: ObservableObject {
         static let finderSuppressionInterval: TimeInterval = 1.5
         static let finderEvaluationDelay: TimeInterval = 0.2
         static let desktopClearSuppressionInterval: TimeInterval = 2.0
+        static let bundleDebounceInterval: TimeInterval = 0.1
+        static let selfTriggerSuppressInterval: TimeInterval = 0.3
     }
 
     @Published var isFeatureEnabled: Bool {
@@ -37,6 +39,8 @@ final class ActivationMonitor: ObservableObject {
     private var spaceChangeObserver: NSObjectProtocol?
     private var lastSpaceChangeDate: Date?
     private var lastDesktopClearDate: Date?
+    private var lastReopenDates: [String: Date] = [:]
+    private var selfTriggeredSuppressUntil: [String: Date] = [:]
 
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
@@ -126,12 +130,24 @@ final class ActivationMonitor: ObservableObject {
             AppLogger.activation.debug("Ignoring activation triggered by mouse interaction.")
             return
         }
-        if app.bundleIdentifier == "com.apple.finder" {
-            handleFinderActivation(afterDelayFor: app)
-            return
-        }
         guard let bundleID = app.bundleIdentifier else {
             AppLogger.activation.error("Activation without bundle identifier.")
+            return
+        }
+
+        // 硬过滤 Dock
+        if bundleID == "com.apple.dock" {
+            AppLogger.activation.debug("Ignoring Dock activation.")
+            return
+        }
+
+        // 忽略一次因我们刚发起的 openApplication 导致的紧随其后激活
+        if shouldIgnoreSelfTriggeredActivation(bundleID: bundleID) {
+            return
+        }
+
+        if bundleID == "com.apple.finder" {
+            handleFinderActivation(afterDelayFor: app)
             return
         }
         reopenApplication(withBundleIdentifier: bundleID)
@@ -236,6 +252,17 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
+        let now = Date()
+        if let last = lastReopenDates[bundleID],
+           now.timeIntervalSince(last) < Constants.bundleDebounceInterval {
+            AppLogger.activation.debug("Skipping reopen for \(bundleID) due to debounce (\(now.timeIntervalSince(last))s elapsed).")
+            return
+        }
+        lastReopenDates[bundleID] = now
+
+        // 标记一次性自触发抑制窗口
+        selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
+
         AppLogger.activation.notice("Re-opening \(bundleID)")
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
@@ -248,5 +275,20 @@ final class ActivationMonitor: ObservableObject {
                 AppLogger.activation.debug("Re-opened \(bundleID), pid \(openedApp.processIdentifier)")
             }
         }
+    }
+
+    private func shouldIgnoreSelfTriggeredActivation(bundleID: String) -> Bool {
+        if let until = selfTriggeredSuppressUntil[bundleID] {
+            if Date() <= until {
+                // 消耗一次抑制
+                selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
+                AppLogger.activation.debug("Ignoring self-triggered activation for \(bundleID).")
+                return true
+            } else {
+                // 过期清理
+                selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
+            }
+        }
+        return false
     }
 }
