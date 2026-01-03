@@ -32,5 +32,5 @@
 - **PRs**: State intent, validation steps (commands run), accessibility impacts; attach screenshots for UI changes; note config/entitlement updates.
 
 ## Accessibility & Configuration Tips
-- **Permissions**: App relies on macOS accessibility privileges; keep `Info.plist` capabilities accurate.
-- **Extensibility**: Extend `AccessibilityManager` or `ActivationMonitor` for new prompts instead of duplicating checks; document new prompts for QA.
+- **Permissions**: App does NOT require any special system permissions (e.g. Accessibility). It uses standard APIs like `NSWorkspace` and `CGWindowList`.
+- **Extensibility**: Extend `ActivationMonitor` for new heuristics.

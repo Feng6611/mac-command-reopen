@@ -16,8 +16,8 @@
 - Logging is centralized in `AppLogger.activation` for activation-related telemetry.
 
 ## Launch & Permissions
-- Status bar menu exposes About/Quit plus Launch at Login; launch toggle is backed by `SMAppService` on macOS 13+ and is disabled on earlier systems.
-- App relies on Accessibility privileges for window inspection; keep `Info.plist` capabilities accurate and communicate prompt expectations in PRs.
+- Status bar menu exposes About/Quit plus Launch at Login; launch toggle is backed by `SMAppService` on macOS 13+ and is gracefully disabled on earlier systems (macOS 12).
+- App does NOT require Accessibility privileges.
 
 ## Change Log
 - Initial baseline captured to document activation heuristics (Finder delay and suppression windows), feature toggle persistence, and launch-at-login strategy.
