@@ -2,13 +2,21 @@
 
 ## Project Structure & Module Organization
 - **App entry**: `ComTab/ComTabApp.swift` bootstraps the SwiftUI app.
-- **Services**: `AccessibilityManager.swift`, `ActivationMonitor.swift`, `WindowInspector.swift`, and logging helpers in `AppLogger.swift`.
-- **UI**: SwiftUI views live in `ComTab/UI/`; assets in `Assets.xcassets`; Core Data model in `ComTab.xcdatamodeld` (currently unused).
+- **Core services**: `ActivationMonitor.swift`, `LaunchAtLoginManager.swift`, `StatusBarController.swift`, and logging helpers in `AppLogger.swift`.
+- **App lifecycle**: `AppDelegate.swift` manages app-level startup behavior for the menu-bar app.
+- **Assets**: app icons/colors are under `ComTab/Assets.xcassets`.
 - **Tests**: Unit tests in `ComTabTests/`; UI automation in `ComTabUITests/`.
 
 ## Design & Strategy Log
 - **Single source**: Capture key design decisions and behavioral strategies in `DESIGN_NOTES.md`.
 - **When to update**: Any changes to activation heuristics, permission prompts, launch-at-login behavior, or status bar UX should be recorded there.
+
+## Activation Behavior Guardrails
+- **System app filters**: Never trigger reopen for Finder (`com.apple.finder`) or Dock (`com.apple.dock`).
+- **Reopen timing**: Evaluate reopen after a short delay, and only if the same app is still frontmost.
+- **Visible-window check**: Skip reopen when the app already has a visible on-screen window to avoid duplicate windows.
+- **Launch race suppression**: Skip reopen for very recent launches to avoid racing normal startup window creation paths.
+- **Loop prevention**: Keep same-bundle reopen debounce and self-trigger suppression to avoid echo activations.
 
 ## Build, Test, and Development Commands
 - **Open in Xcode**: `open ComTab.xcodeproj` for iterative dev.
@@ -24,7 +32,7 @@
 ## Testing Guidelines
 - **Frameworks**: XCTest for unit and UI tests.
 - **Naming**: `test_WhenCondition_ExpectOutcome`.
-- **Focus**: Cover permission flows and persistence updates; add regression tests for fixes.
+- **Focus**: Cover activation reopen heuristics, launch-at-login persistence, and regressions (especially duplicate-window cases).
 - **Execution**: Run `xcodebuild ... test` (full suite) before PRs.
 
 ## Commit & Pull Request Guidelines

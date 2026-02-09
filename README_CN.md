@@ -1,4 +1,4 @@
-# Command Reopen (中文介绍)
+# Command Reopen
 
 **Command Reopen** 让你可以通过 `Command+Tab` 重新打开已关闭或最小化的窗口。
 

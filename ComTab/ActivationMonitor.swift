@@ -11,14 +11,13 @@ import CoreGraphics
 import Foundation
 import os
 
-/// Monitors `NSWorkspace.didActivateApplicationNotification` and relaunches
-/// the frontmost (non-Command Reopen) application via `NSWorkspace.openApplication`.
+/// Monitors app activation and sends a reopen request only when the activated app
+/// appears to have no visible on-screen window.
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
-        static let finderSuppressionInterval: TimeInterval = 1.5
-        static let finderEvaluationDelay: TimeInterval = 0.2
-        static let desktopClearSuppressionInterval: TimeInterval = 2.0
+        static let reopenEvaluationDelay: TimeInterval = 0.12
+        static let recentLaunchSuppressionInterval: TimeInterval = 0.9
         static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
     }
@@ -36,9 +35,6 @@ final class ActivationMonitor: ObservableObject {
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
     private var activationObserver: NSObjectProtocol?
-    private var spaceChangeObserver: NSObjectProtocol?
-    private var lastSpaceChangeDate: Date?
-    private var lastDesktopClearDate: Date?
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
 
@@ -93,19 +89,6 @@ final class ActivationMonitor: ObservableObject {
             self.handleActivation(for: app)
         }
         AppLogger.activation.notice("Started observing activation notifications.")
-
-        if spaceChangeObserver == nil {
-            spaceChangeObserver = notificationCenter.addObserver(
-                forName: NSWorkspace.activeSpaceDidChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                let now = Date()
-                self?.lastSpaceChangeDate = now
-                AppLogger.activation.notice("Active Space changed at \(now.timeIntervalSince1970).")
-            }
-            AppLogger.activation.notice("Started observing Space change notifications.")
-        }
     }
 
     private func stopObserving() {
@@ -114,11 +97,7 @@ final class ActivationMonitor: ObservableObject {
             self.activationObserver = nil
             AppLogger.activation.notice("Stopped observing activation notifications.")
         }
-        if let spaceChangeObserver {
-            notificationCenter.removeObserver(spaceChangeObserver)
-            self.spaceChangeObserver = nil
-            AppLogger.activation.notice("Stopped observing Space change notifications.")
-        }
+        self.selfTriggeredSuppressUntil.removeAll()
     }
 
     private func handleActivation(for app: NSRunningApplication) {
@@ -135,124 +114,104 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
-        // 硬过滤 Dock
+        // Hard filters for system apps that should never be reopened.
         if bundleID == "com.apple.dock" {
             AppLogger.activation.debug("Ignoring Dock activation.")
             return
         }
+        if bundleID == "com.apple.finder" {
+            AppLogger.activation.debug("Ignoring Finder activation.")
+            return
+        }
 
-        // 忽略一次因我们刚发起的 openApplication 导致的紧随其后激活
         if shouldIgnoreSelfTriggeredActivation(bundleID: bundleID) {
             return
         }
 
-        if bundleID == "com.apple.finder" {
-            handleFinderActivation(afterDelayFor: app)
-            return
-        }
-        reopenApplication(withBundleIdentifier: bundleID)
+        scheduleReopenEvaluation(forBundleIdentifier: bundleID)
     }
 
     deinit {
         stopObserving()
     }
 
-    private func handleFinderActivation(afterDelayFor app: NSRunningApplication) {
-        guard let bundleID = app.bundleIdentifier else {
-            AppLogger.activation.error("Finder activation without bundle identifier.")
-            return
-        }
-        let scheduledAt = Date()
-        AppLogger.activation.debug("Finder activation deferred for \(Constants.finderEvaluationDelay)s evaluation.")
-        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.finderEvaluationDelay) { [weak self] in
+    private func scheduleReopenEvaluation(forBundleIdentifier bundleID: String) {
+        AppLogger.activation.debug("Scheduled reopen evaluation for \(bundleID) in \(Constants.reopenEvaluationDelay)s.")
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.reopenEvaluationDelay) { [weak self] in
             guard let self else { return }
             guard self.isFeatureEnabled else {
-                AppLogger.activation.info("Finder evaluation ignored because feature is disabled.")
+                AppLogger.activation.info("Reopen evaluation ignored because feature is disabled.")
                 return
             }
+            guard let frontApp = self.workspace.frontmostApplication,
+                  frontApp.bundleIdentifier == bundleID else {
+                AppLogger.activation.debug("Reopen evaluation aborted; frontmost app changed.")
+                return
+            }
+
             let now = Date()
-            if let currentApp = self.workspace.frontmostApplication,
-               currentApp.bundleIdentifier != bundleID {
-                AppLogger.activation.debug("Finder evaluation aborted; frontmost app changed to \(currentApp.bundleIdentifier ?? "nil").")
+            if self.shouldSuppressRecentlyLaunchedReopen(for: frontApp, now: now) {
                 return
             }
-            AppLogger.activation.debug("Finder evaluation running \(now.timeIntervalSince(scheduledAt))s after activation.")
-            self.captureDesktopClearStateIfNeeded()
-            if self.shouldSuppressFinderActivation() {
-                AppLogger.activation.notice("Finder activation suppressed.")
+            if self.hasVisibleOnScreenWindow(for: frontApp) {
+                AppLogger.activation.debug("Skipping reopen for \(bundleID); app already has visible windows.")
                 return
             }
-            self.reopenApplication(withBundleIdentifier: bundleID)
+
+            self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
     }
 
-    private func shouldSuppressFinderActivation() -> Bool {
-        let now = Date()
-        if let desktopClearDate = lastDesktopClearDate {
-            let elapsed = now.timeIntervalSince(desktopClearDate)
-            if elapsed <= Constants.desktopClearSuppressionInterval {
-                AppLogger.activation.debug("Finder suppression due to desktop clear (\(elapsed)s ago).")
-                return true
-            } else {
-                AppLogger.activation.debug("Desktop clear suppression expired (\(elapsed)s ago).")
-            }
-        } else {
-            AppLogger.activation.debug("No desktop clear timestamp recorded.")
+    private func shouldSuppressRecentlyLaunchedReopen(for app: NSRunningApplication, now: Date) -> Bool {
+        guard let launchDate = app.launchDate else { return false }
+        let elapsed = now.timeIntervalSince(launchDate)
+        guard elapsed >= 0, elapsed <= Constants.recentLaunchSuppressionInterval else { return false }
+        AppLogger.activation.debug("Skipping reopen for \(app.bundleIdentifier ?? "unknown"); launched \(elapsed)s ago.")
+        return true
+    }
+
+    private func hasVisibleOnScreenWindow(for app: NSRunningApplication) -> Bool {
+        let pid = Int(app.processIdentifier)
+        guard pid > 0 else { return false }
+        guard let windowListInfo = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements],
+            kCGNullWindowID
+        ) as? [[String: Any]] else {
+            AppLogger.activation.error("Failed to obtain window list for visibility check.")
+            return false
         }
 
-        if let lastSpaceChangeDate {
-            let elapsed = now.timeIntervalSince(lastSpaceChangeDate)
-            if elapsed <= Constants.finderSuppressionInterval {
-                AppLogger.activation.debug("Finder suppression window active (\(elapsed)s since Space change).")
-                return true
-            } else {
-                AppLogger.activation.debug("Finder suppression expired (\(elapsed)s since Space change).")
+        for info in windowListInfo {
+            guard let ownerPID = (info[kCGWindowOwnerPID as String] as? NSNumber)?.intValue,
+                  ownerPID == pid else {
+                continue
             }
-        } else {
-            AppLogger.activation.debug("No Space change timestamp recorded.")
+            guard let layer = (info[kCGWindowLayer as String] as? NSNumber)?.intValue,
+                  layer == 0 else {
+                continue
+            }
+            guard let alpha = (info[kCGWindowAlpha as String] as? NSNumber)?.doubleValue,
+                  alpha > 0.01 else {
+                continue
+            }
+            if let bounds = info[kCGWindowBounds as String] as? [String: Any],
+               let width = (bounds["Width"] as? NSNumber)?.doubleValue,
+               let height = (bounds["Height"] as? NSNumber)?.doubleValue,
+               (width < 2 || height < 2) {
+                continue
+            }
+            return true
         }
 
         return false
     }
 
-    private func captureDesktopClearStateIfNeeded() {
-        guard let windowListInfo = CGWindowListCopyWindowInfo(
-            [.optionOnScreenOnly],
-            kCGNullWindowID
-        ) as? [[String: Any]] else {
-            AppLogger.activation.error("Failed to obtain window list for desktop clear detection.")
-            return
-        }
-
-        let hasVisibleNormalWindow = windowListInfo.contains { info in
-            guard
-                let layer = info[kCGWindowLayer as String] as? Int,
-                let alpha = info[kCGWindowAlpha as String] as? Double,
-                layer == 0,
-                alpha > 0.01
-            else {
-                return false
-            }
-            guard let ownerName = info[kCGWindowOwnerName as String] as? String else {
-                return false
-            }
-            let ignoredOwners: Set<String> = ["Dock", "Window Server"]
-            return !ignoredOwners.contains(ownerName)
-        }
-
-        if !hasVisibleNormalWindow {
-            lastDesktopClearDate = Date()
-            AppLogger.activation.notice("Detected empty desktop; suppressing Finder for \(Constants.desktopClearSuppressionInterval)s.")
-        }
-    }
-
-    private func reopenApplication(withBundleIdentifier bundleID: String) {
+    private func reopenApplication(withBundleIdentifier bundleID: String, at now: Date = Date()) {
         guard let appURL = workspace.urlForApplication(withBundleIdentifier: bundleID) else {
             AppLogger.activation.error("Unable to resolve URL for bundle id \(bundleID).")
             return
         }
 
-        let now = Date()
         if let last = lastReopenDates[bundleID],
            now.timeIntervalSince(last) < Constants.bundleDebounceInterval {
             AppLogger.activation.debug("Skipping reopen for \(bundleID) due to debounce (\(now.timeIntervalSince(last))s elapsed).")
@@ -260,7 +219,7 @@ final class ActivationMonitor: ObservableObject {
         }
         lastReopenDates[bundleID] = now
 
-        // 标记一次性自触发抑制窗口
+        // Ignore one immediate echo activation caused by our own reopen request.
         selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
 
         AppLogger.activation.notice("Re-opening \(bundleID)")
@@ -280,14 +239,11 @@ final class ActivationMonitor: ObservableObject {
     private func shouldIgnoreSelfTriggeredActivation(bundleID: String) -> Bool {
         if let until = selfTriggeredSuppressUntil[bundleID] {
             if Date() <= until {
-                // 消耗一次抑制
                 selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
                 AppLogger.activation.debug("Ignoring self-triggered activation for \(bundleID).")
                 return true
-            } else {
-                // 过期清理
-                selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
             }
+            selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
         }
         return false
     }
