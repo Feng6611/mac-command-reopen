@@ -7,12 +7,11 @@
 
 import AppKit
 import Combine
-import CoreGraphics
 import Foundation
 import os
 
-/// Monitors app activation and sends a reopen request only when the activated app
-/// appears to have no visible on-screen window.
+/// Monitors app activation and sends a reopen request when the user switches to an app
+/// via Command+Tab (or other non-mouse activation), unless the app was recently launched.
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
@@ -153,10 +152,6 @@ final class ActivationMonitor: ObservableObject {
             if self.shouldSuppressRecentlyLaunchedReopen(for: frontApp, now: now) {
                 return
             }
-            if self.hasVisibleOnScreenWindow(for: frontApp) {
-                AppLogger.activation.debug("Skipping reopen for \(bundleID); app already has visible windows.")
-                return
-            }
 
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
@@ -168,42 +163,6 @@ final class ActivationMonitor: ObservableObject {
         guard elapsed >= 0, elapsed <= Constants.recentLaunchSuppressionInterval else { return false }
         AppLogger.activation.debug("Skipping reopen for \(app.bundleIdentifier ?? "unknown"); launched \(elapsed)s ago.")
         return true
-    }
-
-    private func hasVisibleOnScreenWindow(for app: NSRunningApplication) -> Bool {
-        let pid = Int(app.processIdentifier)
-        guard pid > 0 else { return false }
-        guard let windowListInfo = CGWindowListCopyWindowInfo(
-            [.optionOnScreenOnly, .excludeDesktopElements],
-            kCGNullWindowID
-        ) as? [[String: Any]] else {
-            AppLogger.activation.error("Failed to obtain window list for visibility check.")
-            return false
-        }
-
-        for info in windowListInfo {
-            guard let ownerPID = (info[kCGWindowOwnerPID as String] as? NSNumber)?.intValue,
-                  ownerPID == pid else {
-                continue
-            }
-            guard let layer = (info[kCGWindowLayer as String] as? NSNumber)?.intValue,
-                  layer == 0 else {
-                continue
-            }
-            guard let alpha = (info[kCGWindowAlpha as String] as? NSNumber)?.doubleValue,
-                  alpha > 0.01 else {
-                continue
-            }
-            if let bounds = info[kCGWindowBounds as String] as? [String: Any],
-               let width = (bounds["Width"] as? NSNumber)?.doubleValue,
-               let height = (bounds["Height"] as? NSNumber)?.doubleValue,
-               (width < 2 || height < 2) {
-                continue
-            }
-            return true
-        }
-
-        return false
     }
 
     private func reopenApplication(withBundleIdentifier bundleID: String, at now: Date = Date()) {
