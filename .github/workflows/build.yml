@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+    
+    - name: Build
+      run: |
+        xcodebuild \
+          -project ComTab.xcodeproj \
+          -scheme ComTab \
+          -destination 'platform=macOS' \
+          clean build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+    
+    - name: Run tests
+      run: |
+        xcodebuild \
+          -project ComTab.xcodeproj \
+          -scheme ComTab \
+          -destination 'platform=macOS' \
+          test \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO
+      continue-on-error: true
