@@ -6,7 +6,7 @@ The app monitors application activation events locally on your Mac to detect whe
 
 ## Permissions
 
-- **Screen Recording** (optional): Used to detect whether an app already has visible windows, avoiding unnecessary reopen actions. No screen content is captured or stored.
+Command Reopen requires **no system permissions**.
 
 ## Contact
 
