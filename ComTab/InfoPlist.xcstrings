@@ -1,0 +1,19 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Command Reopen" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Command Reopen" } }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copyright © 2025 CHEN. All rights reserved." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "版权所有 © 2025 CHEN" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Copyright © 2025 CHEN. All rights reserved." } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

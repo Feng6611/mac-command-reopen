@@ -31,7 +31,7 @@ final class StatusBarController: NSObject {
         let menu = NSMenu()
 
         // Launch at Login
-        let launchItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        let launchItem = NSMenuItem(title: String(localized: "Launch at Login"), action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         launchItem.target = self
         launchItem.state = launchManager.isEnabled ? .on : .off
         if #available(macOS 13.0, *) {
@@ -42,14 +42,14 @@ final class StatusBarController: NSObject {
         menu.addItem(launchItem)
 
         // About
-        let aboutItem = NSMenuItem(title: "About", action: #selector(showAbout), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: String(localized: "About"), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
         menu.addItem(.separator())
 
         // Quit
-        let quitItem = NSMenuItem(title: "Quit Command Reopen", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: String(localized: "Quit Command Reopen"), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 

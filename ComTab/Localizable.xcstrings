@@ -1,0 +1,57 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Auto-reopen windows" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自动重新打开窗口" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ウィンドウを自動で再度開く" } }
+      }
+    },
+    "Launch at Login" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "登录时启动" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ログイン時に起動" } }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "通用" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "一般" } }
+      }
+    },
+    "Rate on App Store" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在 App Store 评分" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "App Store で評価する" } }
+      }
+    },
+    "Contact Developer" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系开发者" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "開発者に連絡" } }
+      }
+    },
+    "GitHub" : {
+      "localizations" : {}
+    },
+    "Feedback & Support" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "反馈与支持" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "フィードバックとサポート" } }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关于" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このアプリについて" } }
+      }
+    },
+    "Quit Command Reopen" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出 Command Reopen" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Command Reopen を終了" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
