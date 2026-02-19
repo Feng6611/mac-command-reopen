@@ -10,6 +10,7 @@ Without this app, the built-in Command+Tab cannot reopen windows that are closed
 
 - Reopen closed windows with `Command+Tab`
 - Reopen minimized windows with `Command+Tab`
-- No system permissions required (including Accessibility)
+- No Accessibility permission required
+- For best visible-window detection reliability, macOS may request Screen Recording permission in System Settings
 - Does not modify or replace the native `Command+Tab` behavior
 - **Requirement:** macOS 12.0+

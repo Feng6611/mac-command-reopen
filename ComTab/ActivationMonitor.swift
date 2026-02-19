@@ -15,11 +15,22 @@ import os
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
-        static let reopenEvaluationDelay: TimeInterval = 0.12
+        static let reopenEvaluationDelay: TimeInterval = 0.2
         static let recentLaunchSuppressionInterval: TimeInterval = 0.9
         static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
     }
+
+    static let ignoredBundleIDs: Set<String> = [
+        "com.apple.dock",
+        "com.apple.finder",
+        "com.apple.Spotlight",
+        "com.apple.notificationcenterui",
+        "com.apple.controlcenter",
+        "com.apple.loginwindow",
+        "com.apple.SecurityAgent",
+        "com.apple.screencaptureui"
+    ]
 
     @Published var isFeatureEnabled: Bool {
         didSet {
@@ -113,13 +124,8 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
-        // Hard filters for system apps that should never be reopened.
-        if bundleID == "com.apple.dock" {
-            AppLogger.activation.debug("Ignoring Dock activation.")
-            return
-        }
-        if bundleID == "com.apple.finder" {
-            AppLogger.activation.debug("Ignoring Finder activation.")
+        if Self.isIgnoredBundleID(bundleID) {
+            AppLogger.activation.debug("Ignoring activation for system bundle id \(bundleID).")
             return
         }
 
@@ -148,6 +154,11 @@ final class ActivationMonitor: ObservableObject {
                 return
             }
 
+            if self.appHasVisibleWindows(pid: frontApp.processIdentifier) {
+                AppLogger.activation.debug("Skipping reopen for \(bundleID); app already has visible windows.")
+                return
+            }
+
             let now = Date()
             if self.shouldSuppressRecentlyLaunchedReopen(for: frontApp, now: now) {
                 return
@@ -158,9 +169,14 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func shouldSuppressRecentlyLaunchedReopen(for app: NSRunningApplication, now: Date) -> Bool {
-        guard let launchDate = app.launchDate else { return false }
-        let elapsed = now.timeIntervalSince(launchDate)
-        guard elapsed >= 0, elapsed <= Constants.recentLaunchSuppressionInterval else { return false }
+        guard Self.shouldSuppressRecentLaunch(
+            launchDate: app.launchDate,
+            now: now,
+            interval: Constants.recentLaunchSuppressionInterval
+        ) else {
+            return false
+        }
+        let elapsed = now.timeIntervalSince(app.launchDate ?? now)
         AppLogger.activation.debug("Skipping reopen for \(app.bundleIdentifier ?? "unknown"); launched \(elapsed)s ago.")
         return true
     }
@@ -171,9 +187,13 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
-        if let last = lastReopenDates[bundleID],
-           now.timeIntervalSince(last) < Constants.bundleDebounceInterval {
-            AppLogger.activation.debug("Skipping reopen for \(bundleID) due to debounce (\(now.timeIntervalSince(last))s elapsed).")
+        if Self.shouldDebounceReopen(
+            lastReopenDate: lastReopenDates[bundleID],
+            now: now,
+            interval: Constants.bundleDebounceInterval
+        ) {
+            let elapsed = now.timeIntervalSince(lastReopenDates[bundleID] ?? now)
+            AppLogger.activation.debug("Skipping reopen for \(bundleID) due to debounce (\(elapsed)s elapsed).")
             return
         }
         lastReopenDates[bundleID] = now
@@ -196,14 +216,54 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func shouldIgnoreSelfTriggeredActivation(bundleID: String) -> Bool {
-        if let until = selfTriggeredSuppressUntil[bundleID] {
-            if Date() <= until {
-                selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
-                AppLogger.activation.debug("Ignoring self-triggered activation for \(bundleID).")
-                return true
-            }
+        defer {
             selfTriggeredSuppressUntil.removeValue(forKey: bundleID)
         }
+        if Self.shouldIgnoreSelfTriggered(until: selfTriggeredSuppressUntil[bundleID], now: Date()) {
+            AppLogger.activation.debug("Ignoring self-triggered activation for \(bundleID).")
+            return true
+        }
         return false
+    }
+
+    private func appHasVisibleWindows(pid: pid_t) -> Bool {
+        guard let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
+            return false
+        }
+        for window in windowList {
+            guard let windowPID = window[kCGWindowOwnerPID as String] as? pid_t,
+                  windowPID == pid,
+                  let layer = window[kCGWindowLayer as String] as? Int,
+                  layer == 0,
+                  let bounds = window[kCGWindowBounds as String] as? [String: CGFloat],
+                  let width = bounds["Width"],
+                  let height = bounds["Height"],
+                  width > 1,
+                  height > 1 else {
+                continue
+            }
+            return true
+        }
+        return false
+    }
+
+    static func isIgnoredBundleID(_ bundleID: String) -> Bool {
+        ignoredBundleIDs.contains(bundleID)
+    }
+
+    static func shouldSuppressRecentLaunch(launchDate: Date?, now: Date, interval: TimeInterval) -> Bool {
+        guard let launchDate else { return false }
+        let elapsed = now.timeIntervalSince(launchDate)
+        return elapsed >= 0 && elapsed <= interval
+    }
+
+    static func shouldDebounceReopen(lastReopenDate: Date?, now: Date, interval: TimeInterval) -> Bool {
+        guard let lastReopenDate else { return false }
+        return now.timeIntervalSince(lastReopenDate) < interval
+    }
+
+    static func shouldIgnoreSelfTriggered(until: Date?, now: Date) -> Bool {
+        guard let until else { return false }
+        return now <= until
     }
 }

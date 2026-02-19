@@ -100,7 +100,7 @@ private struct SettingsView: View {
     }
 
     private func openAppStoreReview() {
-        // Replace APP_ID with actual App Store ID after publishing
+        // TODO: Replace APP_ID with the real App Store ID after first App Store submission.
         let appStoreURL = "macappstore://apps.apple.com/app/idAPP_ID?action=write-review"
         if let url = URL(string: appStoreURL) {
             NSWorkspace.shared.open(url)
