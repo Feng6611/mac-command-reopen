@@ -6,7 +6,7 @@ The app monitors application activation events locally on your Mac to detect whe
 
 ## Permissions
 
-Command Reopen requires **no system permissions**.
+No system permissions required. The app does not use Accessibility, Screen Recording, or any other macOS permission.
 
 ## Contact
 
