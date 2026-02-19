@@ -19,6 +19,30 @@
         "ja" : { "stringUnit" : { "state" : "translated", "value" : "一般" } }
       }
     },
+    "Excluded Apps" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "排除的应用" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "除外するアプリ" } }
+      }
+    },
+    "No excluded apps" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无排除的应用" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "除外アプリなし" } }
+      }
+    },
+    "Select an app..." : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择应用…" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "アプリを選択…" } }
+      }
+    },
+    "Add" : {
+      "localizations" : {
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "追加" } }
+      }
+    },
     "Rate on App Store" : {
       "localizations" : {
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在 App Store 评分" } },

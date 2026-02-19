@@ -25,7 +25,7 @@ struct ComTabApp: App {
 private struct SettingsView: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @StateObject private var launchManager = LaunchAtLoginManager()
-    @State private var newExcludedBundleID = ""
+    @State private var selectedBundleToExclude: String?
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -33,6 +33,24 @@ private struct SettingsView: View {
 
     private var buildNumber: String {
         Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+    }
+
+    private var runningUserApps: [NSRunningApplication] {
+        let excluded = activationMonitor.userExcludedBundleIDs
+        let selfBundleID = Bundle.main.bundleIdentifier
+
+        return NSWorkspace.shared.runningApplications
+            .filter { app in
+                guard app.activationPolicy == .regular,
+                      let bundleID = app.bundleIdentifier else {
+                    return false
+                }
+                return !excluded.contains(bundleID) && bundleID != selfBundleID
+            }
+            .sorted {
+                ($0.localizedName ?? $0.bundleIdentifier ?? "")
+                    .localizedCaseInsensitiveCompare($1.localizedName ?? $1.bundleIdentifier ?? "") == .orderedAscending
+            }
     }
 
     var body: some View {
@@ -47,17 +65,6 @@ private struct SettingsView: View {
             }
 
             Section {
-                HStack {
-                    TextField("Bundle ID (e.g. com.apple.TextEdit)", text: $newExcludedBundleID)
-                        .textFieldStyle(.roundedBorder)
-
-                    Button("Add") {
-                        activationMonitor.addExcludedBundleID(newExcludedBundleID)
-                        newExcludedBundleID = ""
-                    }
-                    .disabled(ActivationMonitor.normalizeBundleID(newExcludedBundleID) == nil)
-                }
-
                 if activationMonitor.sortedUserExcludedBundleIDs.isEmpty {
                     Text("No excluded apps")
                         .foregroundColor(.secondary)
@@ -68,17 +75,37 @@ private struct SettingsView: View {
                                 .font(.caption)
                                 .textSelection(.enabled)
                             Spacer()
-                            Button(role: .destructive) {
+                            Button {
                                 activationMonitor.removeExcludedBundleID(bundleID)
                             } label: {
-                                Image(systemName: "minus.circle")
+                                Image(systemName: "trash")
                             }
                             .buttonStyle(.borderless)
                         }
                     }
                 }
+
+                HStack {
+                    Picker("", selection: $selectedBundleToExclude) {
+                        Text("Select an app...").tag(String?.none)
+                        ForEach(runningUserApps, id: \.bundleIdentifier) { app in
+                            if let bundleID = app.bundleIdentifier {
+                                Text(app.localizedName ?? bundleID)
+                                    .tag(Optional(bundleID))
+                            }
+                        }
+                    }
+
+                    Button("Add") {
+                        if let selectedBundleToExclude {
+                            activationMonitor.addExcludedBundleID(selectedBundleToExclude)
+                            self.selectedBundleToExclude = nil
+                        }
+                    }
+                    .disabled(selectedBundleToExclude == nil)
+                }
             } header: {
-                Text("Exclude Apps")
+                Text("Excluded Apps")
             }
 
             Section {
@@ -122,7 +149,7 @@ private struct SettingsView: View {
         }
         .formStyle(.grouped)
         .padding(20)
-        .frame(width: 420, height: 420)
+        .frame(width: 380, height: 480)
     }
 
     private func requestReview() {
