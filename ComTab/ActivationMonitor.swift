@@ -47,7 +47,7 @@ final class ActivationMonitor: ObservableObject {
         didSet {
             guard userExcludedBundleIDs != oldValue else { return }
             defaults.set(Array(userExcludedBundleIDs).sorted(), forKey: Constants.excludedBundlesDefaultsKey)
-            AppLogger.activation.notice("Updated user exclude list: \(userExcludedBundleIDs.count) bundle IDs")
+            AppLogger.activation.notice("Updated user exclude list: \(self.userExcludedBundleIDs.count) bundle IDs")
         }
     }
 

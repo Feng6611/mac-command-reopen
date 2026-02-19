@@ -22,6 +22,16 @@ struct ComTabApp: App {
     }
 }
 
+private struct GroupedFormStyleModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 13.0, *) {
+            content.formStyle(.grouped)
+        } else {
+            content
+        }
+    }
+}
+
 private struct SettingsView: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @StateObject private var launchManager = LaunchAtLoginManager()
@@ -147,7 +157,7 @@ private struct SettingsView: View {
                 }
             }
         }
-        .formStyle(.grouped)
+        .modifier(GroupedFormStyleModifier())
         .padding(20)
         .frame(width: 380, height: 480)
     }
