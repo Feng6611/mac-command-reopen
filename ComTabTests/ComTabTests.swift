@@ -33,6 +33,13 @@ struct ComTabTests {
         #expect(!ActivationMonitor.isIgnoredBundleID("com.google.Chrome"))
     }
 
+    @Test("Bundle ID normalization for user exclude list")
+    func normalizeBundleID() {
+        #expect(ActivationMonitor.normalizeBundleID(" com.apple.TextEdit ") == "com.apple.TextEdit")
+        #expect(ActivationMonitor.normalizeBundleID("\n\t") == nil)
+        #expect(ActivationMonitor.normalizeBundleID("") == nil)
+    }
+
     @Test("Recent launch suppression helper respects interval bounds")
     func recentLaunchSuppressionLogic() {
         let now = Date()
@@ -102,6 +109,47 @@ struct ComTabTests {
         #expect(!ActivationMonitor.shouldIgnoreSelfTriggered(
             until: nil,
             now: now
+        ))
+    }
+
+    @Test("Rapid-return heuristic suppresses short tab-away-and-back cycles")
+    func rapidReturnSuppressionLogic() {
+        let now = Date()
+
+        #expect(ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.Safari",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.TextEdit",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.Safari",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-3.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: nil,
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
         ))
     }
 }

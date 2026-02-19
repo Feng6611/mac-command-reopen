@@ -15,10 +15,12 @@ import os
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
+        static let excludedBundlesDefaultsKey = "com.comtab.excludedBundleIDs"
         static let reopenEvaluationDelay: TimeInterval = 0.2
         static let recentLaunchSuppressionInterval: TimeInterval = 0.9
         static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
+        static let rapidReturnSuppressionInterval: TimeInterval = 2.0
     }
 
     static let ignoredBundleIDs: Set<String> = [
@@ -41,12 +43,26 @@ final class ActivationMonitor: ObservableObject {
         }
     }
 
+    @Published private(set) var userExcludedBundleIDs: Set<String> {
+        didSet {
+            guard userExcludedBundleIDs != oldValue else { return }
+            defaults.set(Array(userExcludedBundleIDs).sorted(), forKey: Constants.excludedBundlesDefaultsKey)
+            AppLogger.activation.notice("Updated user exclude list: \(userExcludedBundleIDs.count) bundle IDs")
+        }
+    }
+
+    var sortedUserExcludedBundleIDs: [String] {
+        userExcludedBundleIDs.sorted()
+    }
+
     private let notificationCenter: NotificationCenter
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
     private var activationObserver: NSObjectProtocol?
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
+    private var lastActivationDates: [String: Date] = [:]
+    private var lastFrontmostBundleID: String?
 
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
@@ -56,7 +72,9 @@ final class ActivationMonitor: ObservableObject {
         self.defaults = defaults
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
+        let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []
         _isFeatureEnabled = Published(initialValue: storedValue)
+        _userExcludedBundleIDs = Published(initialValue: Set(storedExcluded))
         updateObservationState()
         AppLogger.activation.notice("ActivationMonitor ready. Feature enabled: \(storedValue)")
     }
@@ -72,6 +90,15 @@ final class ActivationMonitor: ObservableObject {
             return
         }
         handleActivation(for: app)
+    }
+
+    func addExcludedBundleID(_ rawBundleID: String) {
+        guard let normalized = Self.normalizeBundleID(rawBundleID) else { return }
+        userExcludedBundleIDs.insert(normalized)
+    }
+
+    func removeExcludedBundleID(_ bundleID: String) {
+        userExcludedBundleIDs.remove(bundleID)
     }
 
     private func updateObservationState() {
@@ -124,12 +151,37 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
+        let now = Date()
+        let previousBundleID = lastFrontmostBundleID
+        let previousBundleLastActivation = previousBundleID.flatMap { lastActivationDates[$0] }
+        defer {
+            lastActivationDates[bundleID] = now
+            lastFrontmostBundleID = bundleID
+        }
+
         if Self.isIgnoredBundleID(bundleID) {
             AppLogger.activation.debug("Ignoring activation for system bundle id \(bundleID).")
             return
         }
 
+        if userExcludedBundleIDs.contains(bundleID) {
+            AppLogger.activation.debug("Ignoring activation for user-excluded bundle id \(bundleID).")
+            return
+        }
+
         if shouldIgnoreSelfTriggeredActivation(bundleID: bundleID) {
+            return
+        }
+
+        if Self.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: previousBundleID,
+            targetBundleID: bundleID,
+            targetLastActivationDate: lastActivationDates[bundleID],
+            previousBundleLastActivationDate: previousBundleLastActivation,
+            now: now,
+            interval: Constants.rapidReturnSuppressionInterval
+        ) {
+            AppLogger.activation.debug("Skipping reopen for \(bundleID); rapid return heuristic matched.")
             return
         }
 
@@ -151,11 +203,6 @@ final class ActivationMonitor: ObservableObject {
             guard let frontApp = self.workspace.frontmostApplication,
                   frontApp.bundleIdentifier == bundleID else {
                 AppLogger.activation.debug("Reopen evaluation aborted; frontmost app changed.")
-                return
-            }
-
-            if self.appHasVisibleWindows(pid: frontApp.processIdentifier) {
-                AppLogger.activation.debug("Skipping reopen for \(bundleID); app already has visible windows.")
                 return
             }
 
@@ -226,29 +273,13 @@ final class ActivationMonitor: ObservableObject {
         return false
     }
 
-    private func appHasVisibleWindows(pid: pid_t) -> Bool {
-        guard let windowList = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
-            return false
-        }
-        for window in windowList {
-            guard let windowPID = window[kCGWindowOwnerPID as String] as? pid_t,
-                  windowPID == pid,
-                  let layer = window[kCGWindowLayer as String] as? Int,
-                  layer == 0,
-                  let bounds = window[kCGWindowBounds as String] as? [String: CGFloat],
-                  let width = bounds["Width"],
-                  let height = bounds["Height"],
-                  width > 1,
-                  height > 1 else {
-                continue
-            }
-            return true
-        }
-        return false
-    }
-
     static func isIgnoredBundleID(_ bundleID: String) -> Bool {
         ignoredBundleIDs.contains(bundleID)
+    }
+
+    static func normalizeBundleID(_ rawValue: String) -> String? {
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 
     static func shouldSuppressRecentLaunch(launchDate: Date?, now: Date, interval: TimeInterval) -> Bool {
@@ -265,5 +296,24 @@ final class ActivationMonitor: ObservableObject {
     static func shouldIgnoreSelfTriggered(until: Date?, now: Date) -> Bool {
         guard let until else { return false }
         return now <= until
+    }
+
+    static func shouldSuppressRapidReturn(
+        previousFrontmostBundleID: String?,
+        targetBundleID: String,
+        targetLastActivationDate: Date?,
+        previousBundleLastActivationDate: Date?,
+        now: Date,
+        interval: TimeInterval
+    ) -> Bool {
+        guard let previousFrontmostBundleID,
+              previousFrontmostBundleID != targetBundleID,
+              let targetLastActivationDate,
+              let previousBundleLastActivationDate else {
+            return false
+        }
+        let targetGap = now.timeIntervalSince(targetLastActivationDate)
+        let previousGap = now.timeIntervalSince(previousBundleLastActivationDate)
+        return targetGap >= 0 && targetGap < interval && previousGap >= 0 && previousGap < interval
     }
 }

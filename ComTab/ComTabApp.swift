@@ -25,6 +25,7 @@ struct ComTabApp: App {
 private struct SettingsView: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @StateObject private var launchManager = LaunchAtLoginManager()
+    @State private var newExcludedBundleID = ""
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -43,6 +44,41 @@ private struct SettingsView: View {
                 }
             } header: {
                 Text("General")
+            }
+
+            Section {
+                HStack {
+                    TextField("Bundle ID (e.g. com.apple.TextEdit)", text: $newExcludedBundleID)
+                        .textFieldStyle(.roundedBorder)
+
+                    Button("Add") {
+                        activationMonitor.addExcludedBundleID(newExcludedBundleID)
+                        newExcludedBundleID = ""
+                    }
+                    .disabled(ActivationMonitor.normalizeBundleID(newExcludedBundleID) == nil)
+                }
+
+                if activationMonitor.sortedUserExcludedBundleIDs.isEmpty {
+                    Text("No excluded apps")
+                        .foregroundColor(.secondary)
+                } else {
+                    ForEach(activationMonitor.sortedUserExcludedBundleIDs, id: \.self) { bundleID in
+                        HStack {
+                            Text(bundleID)
+                                .font(.caption)
+                                .textSelection(.enabled)
+                            Spacer()
+                            Button(role: .destructive) {
+                                activationMonitor.removeExcludedBundleID(bundleID)
+                            } label: {
+                                Image(systemName: "minus.circle")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
+            } header: {
+                Text("Exclude Apps")
             }
 
             Section {
@@ -86,7 +122,7 @@ private struct SettingsView: View {
         }
         .formStyle(.grouped)
         .padding(20)
-        .frame(width: 380, height: 320)
+        .frame(width: 420, height: 420)
     }
 
     private func requestReview() {
