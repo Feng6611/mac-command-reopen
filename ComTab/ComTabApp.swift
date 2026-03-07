@@ -12,7 +12,7 @@ import StoreKit
 @main
 struct ComTabApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var activationMonitor = ActivationMonitor()
+    @StateObject private var activationMonitor = ActivationMonitor.shared
 
     var body: some Scene {
         Settings {
@@ -20,6 +20,12 @@ struct ComTabApp: App {
                 .environmentObject(activationMonitor)
         }
     }
+}
+
+private enum AppStoreLink {
+    static let appID = "6757333924"
+    static let productURL = "macappstore://apps.apple.com/app/id\(appID)"
+    static let reviewURL = "macappstore://apps.apple.com/app/id\(appID)?action=write-review"
 }
 
 private struct GroupedFormStyleModifier: ViewModifier {
@@ -96,7 +102,7 @@ private struct SettingsView: View {
                 }
 
                 HStack {
-                    Picker("", selection: $selectedBundleToExclude) {
+                    Picker(selection: $selectedBundleToExclude) {
                         Text("Select an app...").tag(String?.none)
                         ForEach(runningUserApps, id: \.bundleIdentifier) { app in
                             if let bundleID = app.bundleIdentifier {
@@ -104,7 +110,10 @@ private struct SettingsView: View {
                                     .tag(Optional(bundleID))
                             }
                         }
+                    } label: {
+                        EmptyView()
                     }
+                    .labelsHidden()
 
                     Button("Add") {
                         if let selectedBundleToExclude {
@@ -120,9 +129,9 @@ private struct SettingsView: View {
 
             Section {
                 Button {
-                    requestReview()
+                    openPrimaryStoreAction()
                 } label: {
-                    Label("Rate on App Store", systemImage: "star.fill")
+                    Label(primaryStoreActionTitle, systemImage: "star.fill")
                 }
                 .buttonStyle(.link)
 
@@ -173,10 +182,26 @@ private struct SettingsView: View {
     }
 
     private func openAppStoreReview() {
-        // TODO: Replace APP_ID with the real App Store ID after first App Store submission.
-        let appStoreURL = "macappstore://apps.apple.com/app/idAPP_ID?action=write-review"
-        if let url = URL(string: appStoreURL) {
+        if let url = URL(string: AppStoreLink.reviewURL) {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    private var primaryStoreActionTitle: String {
+#if DIRECT
+        "Support on the Mac App Store"
+#else
+        "Rate on App Store"
+#endif
+    }
+
+    private func openPrimaryStoreAction() {
+#if DIRECT
+        if let url = URL(string: AppStoreLink.productURL) {
+            NSWorkspace.shared.open(url)
+        }
+#else
+        requestReview()
+#endif
     }
 }

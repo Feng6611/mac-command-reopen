@@ -1,0 +1,13 @@
+Command Reopen is a macOS menu bar utility.
+
+How to verify:
+1. Launch the app and leave it running in the menu bar.
+2. Open an app, close its main window while keeping the app running.
+3. Switch away and back with Command+Tab.
+4. Command Reopen will attempt to reopen or restore the app window.
+
+Technical notes:
+- The app uses standard macOS APIs such as NSWorkspace activation notifications.
+- It does not replace the native Command+Tab UI.
+- It does not require Accessibility or Screen Recording permission.
+- Finder and Dock are explicitly ignored.

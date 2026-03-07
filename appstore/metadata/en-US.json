@@ -1,0 +1,8 @@
+{
+  "description": "Reopen closed and minimized windows when switching apps with Command+Tab. Command Reopen stays in your menu bar, uses standard macOS APIs, and avoids replacing the native app switcher.",
+  "keywords": "command tab,window,reopen,menu bar,macos,productivity",
+  "support_url": "https://feng6611.github.io/mac-command-reopen/support/",
+  "marketing_url": "https://github.com/Feng6611/mac-command-reopen",
+  "promotional_text": "A lightweight menu bar utility for fixing the no-window Command+Tab gap on macOS.",
+  "whats_new": ""
+}

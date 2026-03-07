@@ -34,6 +34,8 @@ final class ActivationMonitor: ObservableObject {
         "com.apple.screencaptureui"
     ]
 
+    static let shared = ActivationMonitor()
+
     @Published var isFeatureEnabled: Bool {
         didSet {
             guard self.isFeatureEnabled != oldValue else { return }

@@ -19,7 +19,8 @@
 - Logging is centralized in `AppLogger.activation` for activation-related telemetry.
 
 ## Launch & Permissions
-- Status bar menu exposes About/Quit plus Launch at Login; launch toggle is backed by `SMAppService` on macOS 13+ and is gracefully disabled on earlier systems (macOS 12).
+- Status bar menu exposes an `Enable Reopen` toggle that is backed by the same persisted `ActivationMonitor.isFeatureEnabled` state used by Settings. Turning it off stops activation observation entirely, so reopen logic does not run until re-enabled.
+- Status bar menu also exposes About/Quit plus Launch at Login; launch toggle is backed by `SMAppService` on macOS 13+ and is gracefully disabled on earlier systems (macOS 12).
 - App does NOT require Accessibility privileges.
 
 ## Change Log

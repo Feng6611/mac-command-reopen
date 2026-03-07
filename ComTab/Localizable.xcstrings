@@ -1,81 +1,158 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Auto-reopen windows" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自动重新打开窗口" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ウィンドウを自動で再度開く" } }
+  "sourceLanguage": "en",
+  "strings": {
+    "About": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このアプリについて"
+          }
+        }
       }
     },
-    "Launch at Login" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "登录时启动" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ログイン時に起動" } }
+    "Add": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "追加"
+          }
+        }
       }
     },
-    "General" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "通用" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "一般" } }
+    "Auto-reopen windows": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ウィンドウを自動で再度開く"
+          }
+        }
       }
     },
-    "Excluded Apps" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "排除的应用" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "除外するアプリ" } }
+    "Command Reopen v%@ (%@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command Reopen v%1$@ (%2$@)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command Reopen v%1$@ (%2$@)"
+          }
+        }
       }
     },
-    "No excluded apps" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无排除的应用" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "除外アプリなし" } }
+    "Contact Developer": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開発者に連絡"
+          }
+        }
       }
     },
-    "Select an app..." : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择应用…" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "アプリを選択…" } }
+    "Enable Command Reopen": {
+    },
+    "Excluded Apps": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除外するアプリ"
+          }
+        }
       }
     },
-    "Add" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "追加" } }
+    "Feedback & Support": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィードバックとサポート"
+          }
+        }
       }
     },
-    "Rate on App Store" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在 App Store 评分" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "App Store で評価する" } }
+    "General": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一般"
+          }
+        }
       }
     },
-    "Contact Developer" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系开发者" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "開発者に連絡" } }
+    "GitHub": {
+    },
+    "Launch at Login": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ログイン時に起動"
+          }
+        }
       }
     },
-    "GitHub" : {
-      "localizations" : {}
-    },
-    "Feedback & Support" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "反馈与支持" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "フィードバックとサポート" } }
+    "No excluded apps": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除外アプリなし"
+          }
+        }
       }
     },
-    "About" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关于" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このアプリについて" } }
+    "Quit Command Reopen": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command Reopen を終了"
+          }
+        }
       }
     },
-    "Quit Command Reopen" : {
-      "localizations" : {
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出 Command Reopen" } },
-        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Command Reopen を終了" } }
+    "Rate on App Store": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Store で評価する"
+          }
+        }
+      }
+    },
+    "Select an app...": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリを選択…"
+          }
+        }
+      }
+    },
+    "Support on the Mac App Store": {
+      "extractionState": "stale",
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac App Store で開発を支援"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

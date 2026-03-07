@@ -6,16 +6,22 @@
 //
 
 import AppKit
+import Combine
 
 final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
+    private let activationMonitor: ActivationMonitor
     private let launchManager = LaunchAtLoginManager()
+    private var cancellables: Set<AnyCancellable> = []
+    private var enableReopenItem: NSMenuItem?
 
-    override init() {
+    init(activationMonitor: ActivationMonitor = .shared) {
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.activationMonitor = activationMonitor
         super.init()
         configureButton()
         constructMenu()
+        bindMenuState()
     }
 
     private func configureButton() {
@@ -29,6 +35,16 @@ final class StatusBarController: NSObject {
 
     private func constructMenu() {
         let menu = NSMenu()
+
+        let enableReopenItem = NSMenuItem(
+            title: String(localized: "Enable Command Reopen"),
+            action: #selector(toggleEnableReopen),
+            keyEquivalent: ""
+        )
+        enableReopenItem.target = self
+        enableReopenItem.state = activationMonitor.isFeatureEnabled ? .on : .off
+        menu.addItem(enableReopenItem)
+        self.enableReopenItem = enableReopenItem
 
         // Launch at Login
         let launchItem = NSMenuItem(title: String(localized: "Launch at Login"), action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
@@ -54,6 +70,20 @@ final class StatusBarController: NSObject {
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+    }
+
+    private func bindMenuState() {
+        activationMonitor.$isFeatureEnabled
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isEnabled in
+                self?.enableReopenItem?.state = isEnabled ? .on : .off
+            }
+            .store(in: &cancellables)
+    }
+
+    @objc private func toggleEnableReopen(_ sender: NSMenuItem) {
+        activationMonitor.isFeatureEnabled.toggle()
+        sender.state = activationMonitor.isFeatureEnabled ? .on : .off
     }
 
     @objc private func toggleLaunchAtLogin(_ sender: NSMenuItem) {
