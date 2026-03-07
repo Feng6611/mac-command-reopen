@@ -13,7 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         statusController = StatusBarController(activationMonitor: .shared)
-        // 确保没有窗口露出
+        // Ensure no windows are visible
         NSApp.windows.forEach { $0.orderOut(nil) }
     }
 }

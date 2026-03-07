@@ -33,7 +33,13 @@ playground.xcworkspace
 .DS_Store
 ASC.md
 .asc/config.json
+appstore/
 appstore/.env
+screenshots/
+AGENTS.md
+CHANGELOG.md
+DESIGN_NOTES.md
+PRIVACY.md
 
 # CocoaPods
 #

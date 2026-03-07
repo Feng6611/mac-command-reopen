@@ -13,4 +13,9 @@ enum AppLogger {
         subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
         category: "Activation"
     )
+
+    static let launchAtLogin = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+        category: "LaunchAtLogin"
+    )
 }

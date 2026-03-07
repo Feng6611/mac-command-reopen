@@ -122,7 +122,6 @@
       }
     },
     "Rate on App Store": {
-      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -143,7 +142,6 @@
       }
     },
     "Support on the Mac App Store": {
-      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
