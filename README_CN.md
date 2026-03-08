@@ -4,7 +4,9 @@
 
 macOS 原生的 `Command+Tab` 无法唤起那些已经关闭窗口但仍在后台运行的应用（点击 Dock 图标通常可以），或者已经最小化的窗口。这款小工具完美解决了这个问题。
 
-[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/app/idAPP_ID)
+[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/app/id6757333924)
+
+**临时官网：** https://github.com/Feng6611/mac-command-reopen
 
 **[下载最新版本](https://github.com/Feng6611/mac-command-reopen/releases)**
 
