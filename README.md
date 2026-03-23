@@ -6,13 +6,13 @@ You press Cmd+Tab to switch to an app — nothing happens. The app shows as "act
 
 Command Reopen fixes this. It makes the native Cmd+Tab automatically restore minimized and closed windows — the way you always expected it to work.
 
-[中文介绍](README_CN.md)
+📹 [Watch Demo](https://commandreopen.com/demo.mp4) &nbsp;|&nbsp; [中文介绍](README_CN.md)
 
 ## Install
 
 ### Mac App Store
 
-[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8)
+**[Download on the Mac App Store](macappstore://apps.apple.com/app/id6757333924)**
 
 ### Download Binary
 
