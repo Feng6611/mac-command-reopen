@@ -22,12 +22,6 @@ struct ComTabApp: App {
     }
 }
 
-private enum AppStoreLink {
-    static let appID = "6757333924"
-    static let productURL = "macappstore://apps.apple.com/app/id\(appID)"
-    static let reviewURL = "macappstore://apps.apple.com/app/id\(appID)?action=write-review"
-}
-
 private struct GroupedFormStyleModifier: ViewModifier {
     func body(content: Content) -> some View {
         if #available(macOS 13.0, *) {
@@ -49,6 +43,10 @@ private struct SettingsView: View {
 
     private var buildNumber: String {
         Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+    }
+
+    private var distributionChannel: DistributionChannel {
+        DistributionChannel.current
     }
 
     private var runningUserApps: [NSRunningApplication] {
@@ -129,29 +127,43 @@ private struct SettingsView: View {
 
             Section {
                 Button {
-                    openPrimaryStoreAction()
-                } label: {
-                    Label(primaryStoreActionTitle, systemImage: "star.fill")
-                }
-                .buttonStyle(.link)
-
-                Button {
-                    if let url = URL(string: "mailto:fchen6611@gmail.com") {
-                        NSWorkspace.shared.open(url)
-                    }
+                    openURL(ExternalLinks.contactEmail)
                 } label: {
                     Label("Contact Developer", systemImage: "envelope")
                 }
                 .buttonStyle(.link)
 
-                Button {
-                    if let url = URL(string: "https://github.com/Feng6611/mac-command-reopen") {
-                        NSWorkspace.shared.open(url)
+                switch distributionChannel {
+                case .appStore:
+                    Button {
+                        openURL(ExternalLinks.officialURL)
+                    } label: {
+                        Label("Official", systemImage: "globe")
                     }
-                } label: {
-                    Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    .buttonStyle(.link)
+
+                    Button {
+                        requestReview()
+                    } label: {
+                        Label("Rate on App Store", systemImage: "star.fill")
+                    }
+                    .buttonStyle(.link)
+
+                case .direct:
+                    Button {
+                        openURL(AppStoreLinks.productURL)
+                    } label: {
+                        Label("Get on Mac App Store", systemImage: "bag")
+                    }
+                    .buttonStyle(.link)
+
+                    Button {
+                        openURL(ExternalLinks.githubURL)
+                    } label: {
+                        Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                    .buttonStyle(.link)
                 }
-                .buttonStyle(.link)
             } header: {
                 Text("Feedback & Support")
             }
@@ -182,26 +194,12 @@ private struct SettingsView: View {
     }
 
     private func openAppStoreReview() {
-        if let url = URL(string: AppStoreLink.reviewURL) {
-            NSWorkspace.shared.open(url)
-        }
+        openURL(AppStoreLinks.reviewURL)
     }
 
-    private var primaryStoreActionTitle: String {
-#if DIRECT
-        "Support on the Mac App Store"
-#else
-        "Rate on App Store"
-#endif
-    }
-
-    private func openPrimaryStoreAction() {
-#if DIRECT
-        if let url = URL(string: AppStoreLink.productURL) {
+    private func openURL(_ urlString: String) {
+        if let url = URL(string: urlString) {
             NSWorkspace.shared.open(url)
         }
-#else
-        requestReview()
-#endif
     }
 }

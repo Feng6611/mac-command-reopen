@@ -1,156 +1,179 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "About": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このアプリについて"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "About" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリについて"
           }
         }
       }
     },
-    "Add": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "追加"
+    "Add" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加"
           }
         }
       }
     },
-    "Auto-reopen windows": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウィンドウを自動で再度開く"
+    "Auto-reopen windows" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウィンドウを自動で再度開く"
           }
         }
       }
     },
-    "Command Reopen v%@ (%@)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen v%1$@ (%2$@)"
+    "Command Reopen v%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen v%1$@ (%2$@)"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen v%1$@ (%2$@)"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen v%1$@ (%2$@)"
           }
         }
       }
     },
-    "Contact Developer": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開発者に連絡"
+    "Contact Developer" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発者に連絡"
           }
         }
       }
     },
-    "Enable Command Reopen": {
+    "Enable Command Reopen" : {
+
     },
-    "Excluded Apps": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除外するアプリ"
+    "Excluded Apps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリ"
           }
         }
       }
     },
-    "Feedback & Support": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "フィードバックとサポート"
+    "Feedback & Support" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバックとサポート"
           }
         }
       }
     },
-    "General": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一般"
+    "General" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
           }
         }
       }
     },
-    "GitHub": {
-    },
-    "Launch at Login": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログイン時に起動"
+    "Get on Mac App Store" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac App Store で入手"
           }
         }
       }
     },
-    "No excluded apps": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除外アプリなし"
+    "GitHub" : {
+
+    },
+    "Launch at Login" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に起動"
           }
         }
       }
     },
-    "Quit Command Reopen": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen を終了"
+    "No excluded apps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外アプリなし"
           }
         }
       }
     },
-    "Rate on App Store": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store で評価する"
+    "Official" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公式サイト"
           }
         }
       }
     },
-    "Select an app...": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アプリを選択…"
+    "Quit Command Reopen" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen を終了"
           }
         }
       }
     },
-    "Support on the Mac App Store": {
-      "localizations": {
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac App Store で開発を支援"
+    "Rate on App Store" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store で評価する"
+          }
+        }
+      }
+    },
+    "Select an app..." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリを選択…"
+          }
+        }
+      }
+    },
+    "Support on the Mac App Store" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac App Store で開発を支援"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

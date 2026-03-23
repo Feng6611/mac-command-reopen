@@ -12,6 +12,7 @@ final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
     private let activationMonitor: ActivationMonitor
     private let launchManager = LaunchAtLoginManager()
+    private let distributionChannel = DistributionChannel.current
     private var cancellables: Set<AnyCancellable> = []
     private var enableReopenItem: NSMenuItem?
 
@@ -57,6 +58,17 @@ final class StatusBarController: NSObject {
         }
         menu.addItem(launchItem)
 
+        menu.addItem(.separator())
+
+        switch distributionChannel {
+        case .appStore:
+            menu.addItem(makeMenuItem(title: String(localized: "Official"), action: #selector(openOfficialWebsite)))
+            menu.addItem(makeMenuItem(title: String(localized: "Rate on App Store"), action: #selector(openAppStoreReview)))
+        case .direct:
+            menu.addItem(makeMenuItem(title: String(localized: "Get on Mac App Store"), action: #selector(openMacAppStore)))
+            menu.addItem(makeMenuItem(title: String(localized: "GitHub"), action: #selector(openGitHub)))
+        }
+
         // About
         let aboutItem = NSMenuItem(title: String(localized: "About"), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
@@ -70,6 +82,12 @@ final class StatusBarController: NSObject {
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+    }
+
+    private func makeMenuItem(title: String, action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.target = self
+        return item
     }
 
     private func bindMenuState() {
@@ -94,7 +112,38 @@ final class StatusBarController: NSObject {
 
     @objc private func showAbout() {
         NSApplication.shared.activate(ignoringOtherApps: true)
-        NSApplication.shared.orderFrontStandardAboutPanel(nil)
+        switch distributionChannel {
+        case .appStore:
+            NSApplication.shared.orderFrontStandardAboutPanel(options: [
+                .credits: NSAttributedString(string: "Contact: \(ExternalLinks.contactEmailAddress)")
+            ])
+        case .direct:
+            NSApplication.shared.orderFrontStandardAboutPanel(nil)
+        }
+    }
+
+    @objc private func openOfficialWebsite() {
+        openURL(ExternalLinks.officialURL)
+    }
+
+    @objc private func openAppStoreReview() {
+        openURL(AppStoreLinks.reviewURL)
+    }
+
+    @objc private func openMacAppStore() {
+        openURL(AppStoreLinks.productURL)
+    }
+
+    @objc private func openGitHub() {
+        openURL(ExternalLinks.githubURL)
+    }
+
+    private func openURL(_ urlString: String) {
+        guard let url = URL(string: urlString) else {
+            return
+        }
+
+        NSWorkspace.shared.open(url)
     }
 
     @objc private func quitApp() {
