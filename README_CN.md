@@ -12,7 +12,7 @@ Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已
 
 ### Mac App Store
 
-[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8)
+[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](macappstore://apps.apple.com/app/id6757333924)
 
 ### 下载安装包
 
