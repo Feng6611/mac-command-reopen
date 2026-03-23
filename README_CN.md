@@ -8,17 +8,14 @@ Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已
 
 🌐 [产品主页](https://commandreopen.com) &nbsp;|&nbsp; [English](README.md)
 
-## 安装
+<p align="center">
+  <a href="https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8">🛒 Mac App Store</a> &nbsp;•&nbsp;
+  <a href="https://github.com/Feng6611/mac-command-reopen/releases">📦 下载安装包</a> &nbsp;•&nbsp;
+  <a href="#build">🔨 从源码构建</a>
+</p>
 
-### Mac App Store
-
-[**从 Mac App Store 下载**](https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8)
-
-### 下载安装包
-
-**[下载最新版本](https://github.com/Feng6611/mac-command-reopen/releases)**
-
-### 从源码构建
+<details id="build">
+<summary><b>构建说明</b></summary>
 
 ```bash
 git clone https://github.com/Feng6611/mac-command-reopen.git
@@ -27,6 +24,7 @@ open ComTab.xcodeproj
 # 选择 "ComTab" scheme → Build & Run (⌘R)
 # 需要 Xcode 15+ 和 macOS 12.0+
 ```
+</details>
 
 ## 功能特点
 

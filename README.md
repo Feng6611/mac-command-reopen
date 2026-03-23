@@ -8,17 +8,14 @@ Command Reopen fixes this. It makes the native Cmd+Tab automatically restore min
 
 🌐 [Landing Page](https://commandreopen.com) &nbsp;|&nbsp; [中文介绍](README_CN.md)
 
-## Install
+<p align="center">
+  <a href="https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8">🛒 Mac App Store</a> &nbsp;•&nbsp;
+  <a href="https://github.com/Feng6611/mac-command-reopen/releases">📦 Download</a> &nbsp;•&nbsp;
+  <a href="#build">🔨 Build from Source</a>
+</p>
 
-### Mac App Store
-
-[**Download on the Mac App Store**](https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8)
-
-### Download Binary
-
-**[Download Latest Release](https://github.com/Feng6611/mac-command-reopen/releases)**
-
-### Build from Source
+<details id="build">
+<summary><b>Build Instructions</b></summary>
 
 ```bash
 git clone https://github.com/Feng6611/mac-command-reopen.git
@@ -27,6 +24,7 @@ open ComTab.xcodeproj
 # Select the "ComTab" scheme → Build & Run (⌘R)
 # Requires Xcode 15+ and macOS 12.0+
 ```
+</details>
 
 ## Features
 
