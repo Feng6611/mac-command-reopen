@@ -6,13 +6,13 @@
 
 Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已关闭的窗口会自动恢复。
 
-📹 [观看演示](https://commandreopen.com/demo.mp4) &nbsp;|&nbsp; [English](README.md)
+🌐 [产品主页](https://commandreopen.com) &nbsp;|&nbsp; [English](README.md)
 
 ## 安装
 
 ### Mac App Store
 
-**[从 Mac App Store 下载](macappstore://apps.apple.com/app/id6757333924)**
+[**从 Mac App Store 下载**](https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8)
 
 ### 下载安装包
 
