@@ -71,6 +71,7 @@ final class ActivationMonitor: ObservableObject {
     private let notificationCenter: NotificationCenter
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
+    private let reopenStatsStore: ReopenStatsStore
     private var activationObserver: NSObjectProtocol?
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
@@ -79,10 +80,12 @@ final class ActivationMonitor: ObservableObject {
 
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
-         defaults: UserDefaults = .standard) {
+         defaults: UserDefaults = .standard,
+         reopenStatsStore: ReopenStatsStore = .shared) {
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults
+        self.reopenStatsStore = reopenStatsStore
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
         let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []
@@ -306,11 +309,38 @@ final class ActivationMonitor: ObservableObject {
         configuration.createsNewApplicationInstance = false
 
         workspace.openApplication(at: appURL, configuration: configuration) { openedApp, error in
-            if let error {
-                AppLogger.activation.error("Failed to re-open \(bundleID): \(error.localizedDescription)")
-            } else if let openedApp {
-                AppLogger.activation.debug("Re-opened \(bundleID), pid \(openedApp.processIdentifier)")
-            }
+            self.handleReopenCompletion(
+                requestedBundleID: bundleID,
+                openedBundleID: openedApp?.bundleIdentifier,
+                localizedName: openedApp?.localizedName,
+                openedProcessIdentifier: openedApp?.processIdentifier,
+                error: error
+            )
+        }
+    }
+
+    func handleReopenCompletion(
+        requestedBundleID: String,
+        openedBundleID: String?,
+        localizedName: String?,
+        openedProcessIdentifier: pid_t?,
+        error: Error?
+    ) {
+        if let error {
+            AppLogger.activation.error("Failed to re-open \(requestedBundleID): \(error.localizedDescription)")
+            return
+        }
+
+        let recordedBundleID = openedBundleID ?? requestedBundleID
+        reopenStatsStore.recordSuccessfulReopen(
+            bundleID: recordedBundleID,
+            localizedName: localizedName
+        )
+
+        if let openedProcessIdentifier {
+            AppLogger.activation.debug("Re-opened \(recordedBundleID), pid \(openedProcessIdentifier)")
+        } else {
+            AppLogger.activation.debug("Re-opened \(recordedBundleID)")
         }
     }
 

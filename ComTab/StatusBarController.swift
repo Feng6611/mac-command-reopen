@@ -8,6 +8,7 @@
 import AppKit
 import Combine
 
+@MainActor
 final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
     private let activationMonitor: ActivationMonitor
@@ -58,6 +59,8 @@ final class StatusBarController: NSObject {
         }
         menu.addItem(launchItem)
 
+        menu.addItem(.separator())
+        menu.addItem(makeMenuItem(title: String(localized: "Settings…"), action: #selector(showSettings)))
         menu.addItem(.separator())
 
         switch distributionChannel {
@@ -120,6 +123,10 @@ final class StatusBarController: NSObject {
         case .direct:
             NSApplication.shared.orderFrontStandardAboutPanel(nil)
         }
+    }
+
+    @objc private func showSettings() {
+        SettingsWindowController.shared.show(activationMonitor: activationMonitor)
     }
 
     @objc private func openOfficialWebsite() {

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+
+    },
     "About" : {
       "localizations" : {
         "ja" : {
@@ -123,6 +126,9 @@
         }
       }
     },
+    "No reopen activity yet" : {
+
+    },
     "Official" : {
       "localizations" : {
         "ja" : {
@@ -153,6 +159,9 @@
         }
       }
     },
+    "Reset Statistics" : {
+
+    },
     "Select an app..." : {
       "localizations" : {
         "ja" : {
@@ -162,6 +171,12 @@
           }
         }
       }
+    },
+    "Settings…" : {
+
+    },
+    "Statistics" : {
+
     },
     "Support on the Mac App Store" : {
       "extractionState" : "stale",
@@ -173,6 +188,9 @@
           }
         }
       }
+    },
+    "Total Reopens" : {
+
     }
   },
   "version" : "1.0"

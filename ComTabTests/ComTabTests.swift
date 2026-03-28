@@ -5,12 +5,19 @@
 //  Created by CHEN on 2025/10/31.
 //
 
+import AppKit
 import Foundation
 import Testing
 import CoreGraphics
 @testable import Command_Reopen
 
 struct ComTabTests {
+    @MainActor
+    private func makeStatsStore(suiteName: String = UUID().uuidString) -> (ReopenStatsStore, UserDefaults, String) {
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        return (ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"), defaults, suiteName)
+    }
 
     @Test("Ignored bundle IDs include expected system apps")
     func ignoredBundleIDs() {
@@ -236,4 +243,97 @@ struct ComTabTests {
 
         #expect(ActivationMonitor.windowOwnerPID(from: [:]) == nil)
     }
+
+    @MainActor
+    @Test("Successful reopen stats increment total and per-app counts")
+    func reopenStatsIncrement() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        #expect(store.totalSuccessfulReopens == 1)
+        #expect(store.appStats.count == 1)
+        #expect(store.appStats[0] == .init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1))
+    }
+
+    @MainActor
+    @Test("Successful reopen stats accumulate and sort by count")
+    func reopenStatsSorting() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        store.recordSuccessfulReopen(bundleID: "com.apple.Safari", localizedName: "Safari")
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        #expect(store.totalSuccessfulReopens == 3)
+        #expect(store.appStats.map(\.bundleID) == ["com.apple.TextEdit", "com.apple.Safari"])
+        #expect(store.appStats.map(\.count) == [2, 1])
+    }
+
+    @MainActor
+    @Test("Successful reopen stats persist across store reloads")
+    func reopenStatsPersistence() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let firstStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        firstStore.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        firstStore.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        let secondStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        #expect(secondStore.totalSuccessfulReopens == 2)
+        #expect(secondStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 2)])
+    }
+
+    @MainActor
+    @Test("Reset clears reopen stats")
+    func reopenStatsReset() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        store.reset()
+
+        #expect(store.totalSuccessfulReopens == 0)
+        #expect(store.appStats.isEmpty)
+    }
+
+    @MainActor
+    @Test("Activation monitor records stats only for successful reopen completions")
+    func activationMonitorReopenCompletionStats() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let statsStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: statsStore
+        )
+
+        monitor.handleReopenCompletion(
+            requestedBundleID: "com.apple.TextEdit",
+            openedBundleID: nil,
+            localizedName: nil,
+            openedProcessIdentifier: nil,
+            error: NSError(domain: "Test", code: 1)
+        )
+        #expect(statsStore.totalSuccessfulReopens == 0)
+
+        monitor.handleReopenCompletion(
+            requestedBundleID: "com.apple.TextEdit",
+            openedBundleID: "com.apple.TextEdit",
+            localizedName: "TextEdit",
+            openedProcessIdentifier: 123,
+            error: nil
+        )
+        #expect(statsStore.totalSuccessfulReopens == 1)
+        #expect(statsStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1)])
+    }
+
 }
