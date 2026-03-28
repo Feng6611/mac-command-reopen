@@ -44,9 +44,33 @@ Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已
 
 ## 工作原理
 
-Command Reopen 通过 `NSWorkspace.didActivateApplicationNotification` 监听应用激活事件。当你用 Cmd+Tab 切换到某个应用时，它检测到切换并通过 `NSWorkspace.openApplication(at:configuration:)` 发送恢复请求。这会恢复最小化的窗口并重新创建已关闭的窗口——全部使用标准 macOS API，无需任何特殊权限。
+Command Reopen 通过 `NSWorkspace.didActivateApplicationNotification` 监听应用激活事件。当你用 Cmd+Tab 切换到某个应用时，它会先用公开的 CoreGraphics 窗口列表 API（`CGWindowListCopyWindowInfo`）检查这个应用当前是否已经有可见窗口。只有在没有找到可见窗口时，才会通过 `NSWorkspace.openApplication(at:configuration:)` 发送恢复请求。这会恢复最小化的窗口并重新创建已关闭的窗口——全部使用标准 macOS API，无需任何特殊权限。
 
 核心逻辑约 300 行，集中在一个文件中：[ActivationMonitor.swift](ComTab/ActivationMonitor.swift)。
+
+## 测试与日志
+
+本地验证时请使用共享的 `ComTab` scheme。现在它的 `Run` 动作已经改成 `Debug`，但 `Profile` 和 `Archive` 仍然保持发布配置。
+
+如果你想验证新的“可见窗口判断”是否符合预期，可以先运行应用，然后在终端里观察激活日志：
+
+```bash
+log stream --style compact --level debug --predicate 'subsystem == "com.dev.kkuk.CommandReopen.direct" OR subsystem == "com.dev.kkuk.CommandReopen" OR subsystem == "com.dev.kkuk.CmdReopen"'
+```
+
+你需要重点看这几类日志：
+
+- `Application did finish launching. version=1.1.0 build=9`
+- `Window inspection for com.apple.TextEdit: total=1, onScreen=1, visibleCandidates=1, transparent=0, tiny=0, hasVisibleWindow=true`
+- `Skipping reopen for com.apple.TextEdit; app already has a visible window.`
+- `Re-opening com.apple.TextEdit`
+
+建议你按下面几种场景手测：
+
+1. 让某个应用保持正常可见窗口，然后用 Cmd+Tab 切回去。预期是 `hasVisibleWindow=true`，且不会出现 `Re-opening ...`。
+2. 把应用窗口最小化，再用 Cmd+Tab 切回去。预期是 `hasVisibleWindow=false`，随后出现 `Re-opening ...`。
+3. 把某个支持新建窗口的应用全部关闭窗口，再用 Cmd+Tab 切回去。预期同样是 `hasVisibleWindow=false`，随后出现 `Re-opening ...`。
+4. 找一个会弹出很小浮层或临时面板的应用。日志里有 `tiny=` 统计，方便你判断这类小窗口是否被当前启发式有意忽略了。
 
 ## 常见问题
 

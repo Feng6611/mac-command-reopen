@@ -44,9 +44,33 @@ That's exactly what Command Reopen fixes. Every Cmd+Tab switch restores your win
 
 ## How It Works
 
-Command Reopen listens for app activation events via `NSWorkspace.didActivateApplicationNotification`. When you Cmd+Tab to an app, it detects the switch and sends a restore request through `NSWorkspace.openApplication(at:configuration:)`. This brings back minimized windows and recreates closed ones — all using standard macOS APIs that require no special permissions.
+Command Reopen listens for app activation events via `NSWorkspace.didActivateApplicationNotification`. When you Cmd+Tab to an app, it first checks whether that app already has a visible on-screen window by inspecting the public CoreGraphics window list (`CGWindowListCopyWindowInfo`). Only if no visible window is found does it send a restore request through `NSWorkspace.openApplication(at:configuration:)`. This brings back minimized windows and recreates closed ones — all using standard macOS APIs that require no special permissions.
 
 The core logic is ~300 lines in a single file: [ActivationMonitor.swift](ComTab/ActivationMonitor.swift).
+
+## Testing And Logs
+
+For local verification, use the shared `ComTab` scheme. Its `Run` action now uses `Debug`, while `Profile` and `Archive` remain on release configurations.
+
+If you want to verify the new visible-window check, run the app and watch the activation logs:
+
+```bash
+log stream --style compact --level debug --predicate 'subsystem == "com.dev.kkuk.CommandReopen.direct" OR subsystem == "com.dev.kkuk.CommandReopen" OR subsystem == "com.dev.kkuk.CmdReopen"'
+```
+
+The important lines look like this:
+
+- `Application did finish launching. version=1.1.0 build=9`
+- `Window inspection for com.apple.TextEdit: total=1, onScreen=1, visibleCandidates=1, transparent=0, tiny=0, hasVisibleWindow=true`
+- `Skipping reopen for com.apple.TextEdit; app already has a visible window.`
+- `Re-opening com.apple.TextEdit`
+
+Suggested manual checks:
+
+1. Open an app with a normal visible window, then Cmd+Tab back to it. You should see `hasVisibleWindow=true` and no `Re-opening ...`.
+2. Minimize the app window, then Cmd+Tab back. You should see `hasVisibleWindow=false` followed by `Re-opening ...`.
+3. Close all windows for an app that supports opening a fresh one, then Cmd+Tab back. You should again see `hasVisibleWindow=false` followed by `Re-opening ...`.
+4. Try an app with tiny transient panels or overlays. The log includes `tiny=` so you can confirm whether a small window was intentionally ignored by the heuristic.
 
 ## FAQ
 

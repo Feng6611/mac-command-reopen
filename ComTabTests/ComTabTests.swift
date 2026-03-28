@@ -7,6 +7,7 @@
 
 import Foundation
 import Testing
+import CoreGraphics
 @testable import Command_Reopen
 
 struct ComTabTests {
@@ -151,5 +152,88 @@ struct ComTabTests {
             now: now,
             interval: 2.0
         ))
+    }
+
+    @Test("Visible window detection only matches onscreen windows for the target app")
+    func visibleWindowDetection() {
+        let targetPID: pid_t = 4242
+        let otherPID: pid_t = 8080
+
+        let visibleWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 40,
+                "Y": 80,
+                "Width": 1024,
+                "Height": 768
+            ]
+        ]
+
+        let hiddenWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: false,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 1024,
+                "Height": 768
+            ]
+        ]
+
+        let tinyOverlay: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 12,
+                "Height": 12
+            ]
+        ]
+
+        let otherAppWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: otherPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 1280,
+                "Height": 720
+            ]
+        ]
+
+        #expect(ActivationMonitor.hasVisibleWindow(
+            ownerPID: targetPID,
+            windowInfoList: [visibleWindow, otherAppWindow],
+            minimumDimension: 32
+        ))
+
+        #expect(!ActivationMonitor.hasVisibleWindow(
+            ownerPID: targetPID,
+            windowInfoList: [hiddenWindow, tinyOverlay, otherAppWindow],
+            minimumDimension: 32
+        ))
+    }
+
+    @Test("Window owner PID helper accepts common CoreGraphics number types")
+    func windowOwnerPIDParsing() {
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: NSNumber(value: 123)
+        ]) == 123)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: Int32(456)
+        ]) == 456)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: 789
+        ]) == 789)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [:]) == nil)
     }
 }

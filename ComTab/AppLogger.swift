@@ -9,6 +9,17 @@ import os
 import Foundation
 
 enum AppLogger {
+    static let buildSignature: String = {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+        return "\(version) (\(build))"
+    }()
+
+    static let lifecycle = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+        category: "Lifecycle"
+    )
+
     static let activation = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
         category: "Activation"

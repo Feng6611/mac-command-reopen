@@ -7,12 +7,22 @@
 
 import AppKit
 import Combine
+import CoreGraphics
 import Foundation
 import os
 
 /// Monitors app activation and sends a reopen request when the user switches to an app
 /// via Command+Tab (or other non-mouse activation), unless the app was recently launched.
 final class ActivationMonitor: ObservableObject {
+    private struct WindowInspectionReport {
+        let hasVisibleWindow: Bool
+        let totalWindowsForApp: Int
+        let onScreenWindows: Int
+        let visibleCandidateWindows: Int
+        let transparentWindows: Int
+        let tinyWindows: Int
+    }
+
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
         static let excludedBundlesDefaultsKey = "com.comtab.excludedBundleIDs"
@@ -21,6 +31,7 @@ final class ActivationMonitor: ObservableObject {
         static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
         static let rapidReturnSuppressionInterval: TimeInterval = 2.0
+        static let minimumVisibleWindowDimension: CGFloat = 32
     }
 
     static let ignoredBundleIDs: Set<String> = [
@@ -78,7 +89,7 @@ final class ActivationMonitor: ObservableObject {
         _isFeatureEnabled = Published(initialValue: storedValue)
         _userExcludedBundleIDs = Published(initialValue: Set(storedExcluded))
         updateObservationState()
-        AppLogger.activation.notice("ActivationMonitor ready. Feature enabled: \(storedValue)")
+        AppLogger.activation.debug("ActivationMonitor ready. Feature enabled: \(storedValue)")
     }
 
     /// Attempt to relaunch the current frontmost application immediately.
@@ -127,14 +138,14 @@ final class ActivationMonitor: ObservableObject {
             }
             self.handleActivation(for: app)
         }
-        AppLogger.activation.notice("Started observing activation notifications.")
+        AppLogger.activation.debug("Started observing activation notifications.")
     }
 
     private func stopObserving() {
         if let activationObserver {
             notificationCenter.removeObserver(activationObserver)
             self.activationObserver = nil
-            AppLogger.activation.notice("Stopped observing activation notifications.")
+            AppLogger.activation.debug("Stopped observing activation notifications.")
         }
         self.selfTriggeredSuppressUntil.removeAll()
     }
@@ -195,7 +206,6 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func scheduleReopenEvaluation(forBundleIdentifier bundleID: String) {
-        AppLogger.activation.debug("Scheduled reopen evaluation for \(bundleID) in \(Constants.reopenEvaluationDelay)s.")
         DispatchQueue.main.asyncAfter(deadline: .now() + Constants.reopenEvaluationDelay) { [weak self] in
             guard let self else { return }
             guard self.isFeatureEnabled else {
@@ -213,6 +223,23 @@ final class ActivationMonitor: ObservableObject {
                 return
             }
 
+            let report = self.visibleWindowReport(for: frontApp)
+            if report.hasVisibleWindow {
+                AppLogger.activation.notice(
+                    """
+                    Skip reopen for \(bundleID): visibleWindow=true total=\(report.totalWindowsForApp) \
+                    onScreen=\(report.onScreenWindows) candidates=\(report.visibleCandidateWindows)
+                    """
+                )
+                return
+            }
+
+            AppLogger.activation.notice(
+                """
+                Reopen needed for \(bundleID): visibleWindow=false total=\(report.totalWindowsForApp) \
+                onScreen=\(report.onScreenWindows) candidates=\(report.visibleCandidateWindows)
+                """
+            )
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
     }
@@ -228,6 +255,29 @@ final class ActivationMonitor: ObservableObject {
         let elapsed = now.timeIntervalSince(app.launchDate ?? now)
         AppLogger.activation.debug("Skipping reopen for \(app.bundleIdentifier ?? "unknown"); launched \(elapsed)s ago.")
         return true
+    }
+
+    private func visibleWindowReport(for app: NSRunningApplication) -> WindowInspectionReport {
+        guard let windowInfoList = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements],
+            kCGNullWindowID
+        ) as? [[String: Any]] else {
+            AppLogger.activation.error("Unable to inspect window list for \(app.bundleIdentifier ?? "unknown").")
+            return WindowInspectionReport(
+                hasVisibleWindow: false,
+                totalWindowsForApp: 0,
+                onScreenWindows: 0,
+                visibleCandidateWindows: 0,
+                transparentWindows: 0,
+                tinyWindows: 0
+            )
+        }
+
+        return Self.inspectVisibleWindows(
+            ownerPID: app.processIdentifier,
+            windowInfoList: windowInfoList,
+            minimumDimension: Constants.minimumVisibleWindowDimension
+        )
     }
 
     private func reopenApplication(withBundleIdentifier bundleID: String, at now: Date = Date()) {
@@ -250,7 +300,7 @@ final class ActivationMonitor: ObservableObject {
         // Ignore one immediate echo activation caused by our own reopen request.
         selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
 
-        AppLogger.activation.notice("Re-opening \(bundleID)")
+        AppLogger.activation.notice("Re-opening \(bundleID). build=\(AppLogger.buildSignature)")
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         configuration.createsNewApplicationInstance = false
@@ -298,6 +348,93 @@ final class ActivationMonitor: ObservableObject {
     static func shouldIgnoreSelfTriggered(until: Date?, now: Date) -> Bool {
         guard let until else { return false }
         return now <= until
+    }
+
+    static func hasVisibleWindow(
+        ownerPID: pid_t,
+        windowInfoList: [[String: Any]],
+        minimumDimension: CGFloat = 0
+    ) -> Bool {
+        inspectVisibleWindows(
+            ownerPID: ownerPID,
+            windowInfoList: windowInfoList,
+            minimumDimension: minimumDimension
+        ).hasVisibleWindow
+    }
+
+    private static func inspectVisibleWindows(
+        ownerPID: pid_t,
+        windowInfoList: [[String: Any]],
+        minimumDimension: CGFloat = 0
+    ) -> WindowInspectionReport {
+        var totalWindowsForApp = 0
+        var onScreenWindows = 0
+        var visibleCandidateWindows = 0
+        var transparentWindows = 0
+        var tinyWindows = 0
+
+        for windowInfo in windowInfoList {
+            guard let windowPID = Self.windowOwnerPID(from: windowInfo),
+                  windowPID == ownerPID else {
+                continue
+            }
+            totalWindowsForApp += 1
+
+            let isOnScreen = (windowInfo[kCGWindowIsOnscreen as String] as? Bool) ?? true
+            guard isOnScreen else {
+                continue
+            }
+            onScreenWindows += 1
+
+            let alpha = (windowInfo[kCGWindowAlpha as String] as? NSNumber)?.doubleValue
+                ?? (windowInfo[kCGWindowAlpha as String] as? Double)
+                ?? 1
+            guard alpha > 0 else {
+                transparentWindows += 1
+                continue
+            }
+
+            guard let boundsDictionary = windowInfo[kCGWindowBounds as String] as? NSDictionary else {
+                continue
+            }
+
+            var bounds = CGRect.zero
+            guard CGRectMakeWithDictionaryRepresentation(boundsDictionary, &bounds) else {
+                continue
+            }
+
+            guard bounds.width >= minimumDimension && bounds.height >= minimumDimension else {
+                tinyWindows += 1
+                continue
+            }
+
+            visibleCandidateWindows += 1
+        }
+
+        return WindowInspectionReport(
+            hasVisibleWindow: visibleCandidateWindows > 0,
+            totalWindowsForApp: totalWindowsForApp,
+            onScreenWindows: onScreenWindows,
+            visibleCandidateWindows: visibleCandidateWindows,
+            transparentWindows: transparentWindows,
+            tinyWindows: tinyWindows
+        )
+    }
+
+    static func windowOwnerPID(from windowInfo: [String: Any]) -> pid_t? {
+        if let pidNumber = windowInfo[kCGWindowOwnerPID as String] as? NSNumber {
+            return pid_t(pidNumber.int32Value)
+        }
+        if let pid = windowInfo[kCGWindowOwnerPID as String] as? pid_t {
+            return pid
+        }
+        if let pid = windowInfo[kCGWindowOwnerPID as String] as? Int32 {
+            return pid_t(pid)
+        }
+        if let pid = windowInfo[kCGWindowOwnerPID as String] as? Int {
+            return pid_t(pid)
+        }
+        return nil
     }
 
     static func shouldSuppressRapidReturn(
