@@ -30,6 +30,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7A0A1E022F1A00010099C190 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/BuildNumber.xcconfig; sourceTree = SOURCE_ROOT; };
+		7A0A1E042F1A00010099C190 /* auto_increment_build_number.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = scripts/auto_increment_build_number.sh; sourceTree = SOURCE_ROOT; };
 		7408919C2F0645A90099E62A /* CommandReopenNew.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CommandReopenNew.icon; sourceTree = "<group>"; };
 		748FCE1B2EB5027B0099C190 /* Command Reopen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -82,6 +84,8 @@
 		748FCE122EB5027A0099C190 = {
 			isa = PBXGroup;
 			children = (
+				7A0A1E022F1A00010099C190 /* BuildNumber.xcconfig */,
+				7A0A1E042F1A00010099C190 /* auto_increment_build_number.sh */,
 				748FCE1D2EB5027B0099C190 /* ComTab */,
 				748FCE302EB5027D0099C190 /* ComTabTests */,
 				748FCE3A2EB5027D0099C190 /* ComTabUITests */,
@@ -410,13 +414,13 @@
 		};
 		748FCE422EB5027D0099C190 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* BuildNumber.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -460,13 +464,13 @@
 		};
 		748FCE432EB5027D0099C190 /* Release-MAS */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* BuildNumber.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -657,6 +661,7 @@
 		};
 		74FF0EC92F09581A0007D992 /* Release-Direct */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* BuildNumber.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -665,7 +670,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;

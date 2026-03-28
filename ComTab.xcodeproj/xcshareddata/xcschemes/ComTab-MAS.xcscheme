@@ -6,6 +6,25 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Auto Increment Build Number"
+               scriptText = "/bin/sh &quot;${SRCROOT}/scripts/auto_increment_build_number.sh&quot;
+">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
+                     BuildableName = "Command Reopen.app"
+                     BlueprintName = "Command Reopen"
+                     ReferencedContainer = "container:ComTab.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
