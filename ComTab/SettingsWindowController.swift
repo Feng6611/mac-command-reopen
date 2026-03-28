@@ -15,8 +15,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
 
     func show(
-        activationMonitor: ActivationMonitor = .shared,
-        reopenStatsStore: ReopenStatsStore = .shared
+        activationMonitor: ActivationMonitor? = nil,
+        reopenStatsStore: ReopenStatsStore? = nil
     ) {
         if let window {
             NSApplication.shared.activate(ignoringOtherApps: true)
@@ -24,6 +24,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             return
         }
 
+        let activationMonitor = activationMonitor ?? .shared
+        let reopenStatsStore = reopenStatsStore ?? .shared
         let contentView = SettingsView()
             .environmentObject(activationMonitor)
             .environmentObject(reopenStatsStore)

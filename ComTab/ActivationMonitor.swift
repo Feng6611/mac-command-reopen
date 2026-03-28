@@ -81,11 +81,11 @@ final class ActivationMonitor: ObservableObject {
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
          defaults: UserDefaults = .standard,
-         reopenStatsStore: ReopenStatsStore = .shared) {
+         reopenStatsStore: ReopenStatsStore? = nil) {
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults
-        self.reopenStatsStore = reopenStatsStore
+        self.reopenStatsStore = reopenStatsStore ?? .shared
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
         let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []

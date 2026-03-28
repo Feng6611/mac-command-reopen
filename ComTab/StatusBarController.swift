@@ -17,9 +17,9 @@ final class StatusBarController: NSObject {
     private var cancellables: Set<AnyCancellable> = []
     private var enableReopenItem: NSMenuItem?
 
-    init(activationMonitor: ActivationMonitor = .shared) {
+    init(activationMonitor: ActivationMonitor? = nil) {
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.activationMonitor = activationMonitor
+        self.activationMonitor = activationMonitor ?? .shared
         super.init()
         configureButton()
         constructMenu()
