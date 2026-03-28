@@ -154,6 +154,10 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func handleActivation(for app: NSRunningApplication) {
+        guard ProStatusManager.shared.status.isActive else {
+            AppLogger.activation.debug("Ignoring activation; pro status not active.")
+            return
+        }
         guard app.bundleIdentifier != Bundle.main.bundleIdentifier else {
             AppLogger.activation.debug("Ignoring activation of Command Reopen itself.")
             return

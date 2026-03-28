@@ -12,14 +12,17 @@ import Combine
 final class StatusBarController: NSObject {
     private let statusItem: NSStatusItem
     private let activationMonitor: ActivationMonitor
+    private let proStatusManager: ProStatusManager
     private let launchManager = LaunchAtLoginManager()
     private let distributionChannel = DistributionChannel.current
     private var cancellables: Set<AnyCancellable> = []
     private var enableReopenItem: NSMenuItem?
+    private var upgradeItem: NSMenuItem?
 
-    init(activationMonitor: ActivationMonitor? = nil) {
+    init(activationMonitor: ActivationMonitor? = nil, proStatusManager: ProStatusManager? = nil) {
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.activationMonitor = activationMonitor ?? .shared
+        self.proStatusManager = proStatusManager ?? .shared
         super.init()
         configureButton()
         constructMenu()
@@ -60,7 +63,15 @@ final class StatusBarController: NSObject {
         menu.addItem(launchItem)
 
         menu.addItem(.separator())
-        menu.addItem(makeMenuItem(title: String(localized: "Settings…"), action: #selector(showSettings)))
+
+        // Upgrade to Pro (hidden when already pro)
+        let upgradeItem = NSMenuItem(title: String(localized: "Upgrade to Pro..."), action: #selector(showProSettings), keyEquivalent: "")
+        upgradeItem.target = self
+        upgradeItem.isHidden = proStatusManager.status.isPro
+        menu.addItem(upgradeItem)
+        self.upgradeItem = upgradeItem
+
+        menu.addItem(makeMenuItem(title: String(localized: "Settings..."), action: #selector(showSettings)))
         menu.addItem(.separator())
 
         switch distributionChannel {
@@ -100,9 +111,25 @@ final class StatusBarController: NSObject {
                 self?.enableReopenItem?.state = isEnabled ? .on : .off
             }
             .store(in: &cancellables)
+
+        proStatusManager.$status
+            .receive(on: RunLoop.main)
+            .sink { [weak self] status in
+                self?.upgradeItem?.isHidden = status.isPro
+
+                // Disable feature when expired
+                if !status.isActive {
+                    self?.enableReopenItem?.isEnabled = false
+                    self?.enableReopenItem?.state = .off
+                } else {
+                    self?.enableReopenItem?.isEnabled = true
+                }
+            }
+            .store(in: &cancellables)
     }
 
     @objc private func toggleEnableReopen(_ sender: NSMenuItem) {
+        guard proStatusManager.status.isActive else { return }
         activationMonitor.isFeatureEnabled.toggle()
         sender.state = activationMonitor.isFeatureEnabled ? .on : .off
     }
@@ -127,6 +154,14 @@ final class StatusBarController: NSObject {
 
     @objc private func showSettings() {
         SettingsWindowController.shared.show(activationMonitor: activationMonitor)
+    }
+
+    @objc private func showProSettings() {
+        SettingsWindowController.shared.show(
+            activationMonitor: activationMonitor,
+            proStatusManager: proStatusManager,
+            initialTab: .pro
+        )
     }
 
     @objc private func openOfficialWebsite() {

@@ -9,7 +9,70 @@ import AppKit
 import Foundation
 import Testing
 import CoreGraphics
+import RevenueCat
 @testable import Command_Reopen
+
+@MainActor
+final class MockRevenueCatService: RevenueCatServicing {
+    var cachedEntitlementSnapshot: ProEntitlementSnapshot?
+    var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)?
+
+    var currentOffering: Offering?
+    var fetchedEntitlementSnapshot: ProEntitlementSnapshot?
+    var purchaseSnapshot: ProEntitlementSnapshot?
+    var restoreSnapshot: ProEntitlementSnapshot?
+    var offeringsError: Error?
+    var entitlementError: Error?
+    var purchaseError: Error?
+    var restoreError: Error?
+    var configureCallCount = 0
+    var purchaseDelayNanoseconds: UInt64?
+    var restoreDelayNanoseconds: UInt64?
+
+    func configureIfNeeded() {
+        configureCallCount += 1
+    }
+
+    func fetchCurrentOffering() async throws -> Offering? {
+        if let offeringsError {
+            throw offeringsError
+        }
+
+        return currentOffering
+    }
+
+    func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
+        if let entitlementError {
+            throw entitlementError
+        }
+
+        return fetchedEntitlementSnapshot
+    }
+
+    func purchase(plan: ProPlan, offering: Offering?) async throws -> ProEntitlementSnapshot? {
+        if let purchaseDelayNanoseconds {
+            try? await Task.sleep(nanoseconds: purchaseDelayNanoseconds)
+        }
+
+        if let purchaseError {
+            throw purchaseError
+        }
+
+        return purchaseSnapshot
+    }
+
+    func restorePurchases() async throws -> ProEntitlementSnapshot? {
+        if let restoreDelayNanoseconds {
+            try? await Task.sleep(nanoseconds: restoreDelayNanoseconds)
+        }
+
+        if let restoreError {
+            throw restoreError
+        }
+
+        return restoreSnapshot
+    }
+}
 
 struct ComTabTests {
     @MainActor
@@ -335,5 +398,235 @@ struct ComTabTests {
         #expect(statsStore.totalSuccessfulReopens == 1)
         #expect(statsStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1)])
     }
+}
 
+struct ProStatusManagerTests {
+    @MainActor
+    private func makeDefaults(suiteName: String = UUID().uuidString) -> (UserDefaults, String) {
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        return (defaults, suiteName)
+    }
+
+    @MainActor
+    @Test("Pro status manager starts a seven day trial on first refresh")
+    func proStatusStartsTrial() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mockService = MockRevenueCatService()
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .trial(daysRemaining: 7, expiresAt: now.addingTimeInterval(7 * 24 * 60 * 60)))
+    }
+
+    @MainActor
+    @Test("Pro status manager marks expired trials as inactive")
+    func proStatusExpiresTrial() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .expired)
+        #expect(!manager.status.isActive)
+    }
+
+    @MainActor
+    @Test("Active lifetime entitlement overrides an expired trial")
+    func lifetimeEntitlementOverridesTrial() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let mockService = MockRevenueCatService()
+        mockService.cachedEntitlementSnapshot = .init(plan: .lifetime, expirationDate: nil)
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        manager.configureIfNeeded()
+
+        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil))
+        #expect(manager.status.isActive)
+    }
+
+    @MainActor
+    @Test("Delegate customer info updates are reflected in status")
+    func delegateUpdatesStatus() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        manager.configureIfNeeded()
+        mockService.customerInfoDidChange?(.init(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60)))
+
+        #expect(manager.status == .pro(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60)))
+    }
+
+    @MainActor
+    @Test("Purchase failures surface through lastError")
+    func purchaseFailureUpdatesLastError() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.purchaseError = ProPurchaseError.network
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await #expect(throws: ProPurchaseError.network) {
+            try await manager.purchase(.yearly)
+        }
+        #expect(manager.lastError == .network)
+        #expect(manager.paywallErrorMessage == ProPurchaseError.network.errorDescription)
+    }
+
+    @MainActor
+    @Test("Available plans fall back when offering metadata is unavailable")
+    func availablePlansFallback() {
+        let plans = ProStatusManager.makeAvailablePlans(packageMetadata: nil)
+
+        #expect(plans == ProPlanProduct.fallbackPlans)
+    }
+
+    @MainActor
+    @Test("Available plans mark missing offerings as unavailable")
+    func availablePlansMarkUnavailable() {
+        let plans = ProStatusManager.makeAvailablePlans(packageMetadata: [
+            .yearly: .init(displayPrice: "$5.99", billingDetail: "per year", isAvailable: true)
+        ])
+
+        #expect(plans.first(where: { $0.plan == .yearly })?.isAvailable == true)
+        #expect(plans.first(where: { $0.plan == .yearly })?.displayPrice == "$5.99")
+        #expect(plans.first(where: { $0.plan == .lifetime })?.isAvailable == false)
+    }
+
+    @MainActor
+    @Test("Purchase loading state is set while a purchase is in flight")
+    func purchaseLoadingState() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.purchaseDelayNanoseconds = 100_000_000
+        mockService.purchaseSnapshot = .init(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60))
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        let task = Task {
+            try await manager.purchase(.yearly)
+        }
+
+        await Task.yield()
+
+        #expect(manager.purchaseInProgressPlan == .yearly)
+
+        try await task.value
+
+        #expect(manager.purchaseInProgressPlan == nil)
+        #expect(manager.status.isPro)
+    }
+
+    @MainActor
+    @Test("Restore loading state is set while restore is in flight")
+    func restoreLoadingState() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.restoreDelayNanoseconds = 100_000_000
+        mockService.restoreSnapshot = .init(plan: .lifetime, expirationDate: nil)
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        let task = Task {
+            try await manager.restorePurchases()
+        }
+
+        await Task.yield()
+
+        #expect(manager.isRestoringPurchases)
+
+        try await task.value
+
+        #expect(!manager.isRestoringPurchases)
+        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil))
+    }
+
+    @MainActor
+    @Test("Expired prompt is raised once per app session")
+    func expiredPromptRaisedOncePerSession() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+        #expect(manager.shouldOpenProSettings)
+
+        manager.markExpiredPromptHandled()
+        #expect(!manager.shouldOpenProSettings)
+
+        await manager.refresh()
+        #expect(!manager.shouldOpenProSettings)
+    }
 }
