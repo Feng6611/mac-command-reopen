@@ -17,7 +17,7 @@ enum DistributionChannel {
     case appStore
     case direct
 
-    static var current: Self {
+    nonisolated(unsafe) static var current: Self {
 #if DIRECT
         .direct
 #else

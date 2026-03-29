@@ -6,11 +6,61 @@
 //
 
 import AppKit
+import Combine
 import Foundation
 import Testing
 import CoreGraphics
 import RevenueCat
 @testable import Command_Reopen
+
+@MainActor
+final class MockCommerceStateSource: CommerceStateSource {
+    var entitlementState: AccessEntitlementState
+    var isFirstLaunch: Bool
+    var shouldOpenProSettings: Bool
+
+    private let entitlementSubject: CurrentValueSubject<AccessEntitlementState, Never>
+    private let promptSubject: CurrentValueSubject<Bool, Never>
+
+    init(
+        entitlementState: AccessEntitlementState = .unrestricted,
+        isFirstLaunch: Bool = false,
+        shouldOpenProSettings: Bool = false
+    ) {
+        self.entitlementState = entitlementState
+        self.isFirstLaunch = isFirstLaunch
+        self.shouldOpenProSettings = shouldOpenProSettings
+        self.entitlementSubject = CurrentValueSubject(entitlementState)
+        self.promptSubject = CurrentValueSubject(shouldOpenProSettings)
+    }
+
+    var entitlementStatePublisher: AnyPublisher<AccessEntitlementState, Never> {
+        entitlementSubject.eraseToAnyPublisher()
+    }
+
+    var proSettingsPromptPublisher: AnyPublisher<Bool, Never> {
+        promptSubject.eraseToAnyPublisher()
+    }
+
+    func configureIfNeeded() {}
+
+    func refresh() async {}
+
+    func markPromptHandled() {
+        shouldOpenProSettings = false
+        promptSubject.send(false)
+    }
+
+    func update(entitlementState: AccessEntitlementState) {
+        self.entitlementState = entitlementState
+        entitlementSubject.send(entitlementState)
+    }
+
+    func updatePrompt(_ shouldOpen: Bool) {
+        shouldOpenProSettings = shouldOpen
+        promptSubject.send(shouldOpen)
+    }
+}
 
 @MainActor
 final class MockRevenueCatService: RevenueCatServicing {
@@ -366,7 +416,7 @@ struct ComTabTests {
 
     @MainActor
     @Test("Activation monitor records stats only for successful reopen completions")
-    func activationMonitorReopenCompletionStats() {
+    func activationMonitorReopenCompletionStats() async {
         let suiteName = UUID().uuidString
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }
@@ -376,7 +426,8 @@ struct ComTabTests {
             notificationCenter: NotificationCenter(),
             workspace: .shared,
             defaults: defaults,
-            reopenStatsStore: statsStore
+            reopenStatsStore: statsStore,
+            accessController: AppAccessController(distributionChannel: .direct)
         )
 
         monitor.handleReopenCompletion(
@@ -386,6 +437,7 @@ struct ComTabTests {
             openedProcessIdentifier: nil,
             error: NSError(domain: "Test", code: 1)
         )
+        await Task.yield()
         #expect(statsStore.totalSuccessfulReopens == 0)
 
         monitor.handleReopenCompletion(
@@ -395,6 +447,7 @@ struct ComTabTests {
             openedProcessIdentifier: 123,
             error: nil
         )
+        await Task.yield()
         #expect(statsStore.totalSuccessfulReopens == 1)
         #expect(statsStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1)])
     }
@@ -628,5 +681,93 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
         #expect(!manager.shouldOpenProSettings)
+    }
+}
+
+struct AppAccessControllerTests {
+    @MainActor
+    @Test("Direct access controller keeps core feature unlocked and hides upgrade entry")
+    func directAccessControllerDefaults() {
+        let controller = AppAccessController(distributionChannel: .direct)
+
+        #expect(controller.isCoreFeatureAvailable)
+        #expect(!controller.showsProTab)
+        #expect(!controller.showsUpgradeEntry)
+        #expect(!controller.shouldShowOnboarding)
+    }
+
+    @MainActor
+    @Test("MAS access controller reflects commerce state updates")
+    func masAccessControllerUpdates() {
+        let source = MockCommerceStateSource(
+            entitlementState: .trial,
+            isFirstLaunch: true
+        )
+        let controller = AppAccessController(
+            distributionChannel: .appStore,
+            commerceStateSource: source
+        )
+
+        #expect(controller.isCoreFeatureAvailable)
+        #expect(controller.showsProTab)
+        #expect(controller.showsUpgradeEntry)
+        #expect(controller.shouldShowOnboarding)
+
+        source.update(entitlementState: .expired)
+        #expect(!controller.isCoreFeatureAvailable)
+        #expect(controller.showsUpgradeEntry)
+
+        source.update(entitlementState: .pro)
+        #expect(controller.isCoreFeatureAvailable)
+        #expect(!controller.showsUpgradeEntry)
+    }
+
+    @MainActor
+    @Test("MAS access controller forwards pro settings prompt state")
+    func masAccessControllerPromptHandling() {
+        let source = MockCommerceStateSource(
+            entitlementState: .expired,
+            shouldOpenProSettings: true
+        )
+        let controller = AppAccessController(
+            distributionChannel: .appStore,
+            commerceStateSource: source
+        )
+
+        #expect(controller.shouldOpenProSettings)
+
+        controller.markPromptHandled()
+
+        #expect(!controller.shouldOpenProSettings)
+        #expect(!source.shouldOpenProSettings)
+    }
+}
+
+struct SettingsAndStatusBarPresentationTests {
+    @MainActor
+    @Test("Settings tabs hide Pro for direct channel")
+    func settingsTabsForDirect() {
+        #expect(SettingsTab.visibleTabs(showProTab: false) == [.general, .statistics])
+        #expect(SettingsTab.visibleTabs(showProTab: true) == [.general, .statistics, .pro])
+    }
+
+    @MainActor
+    @Test("Status bar presentation follows access controller state")
+    func statusBarPresentation() {
+        let directController = AppAccessController(distributionChannel: .direct)
+        #expect(StatusBarController.presentation(for: directController) == .init(
+            showsUpgradeItem: false,
+            canToggleAutoReopen: true
+        ))
+
+        let source = MockCommerceStateSource(entitlementState: .expired)
+        let masController = AppAccessController(
+            distributionChannel: .appStore,
+            commerceStateSource: source
+        )
+        #expect(StatusBarController.presentation(for: masController) == .init(
+            showsUpgradeItem: true,
+            canToggleAutoReopen: false
+        ))
     }
 }

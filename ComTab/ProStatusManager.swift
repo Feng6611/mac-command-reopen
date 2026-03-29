@@ -66,7 +66,6 @@ struct ProPlanProduct: Equatable, Identifiable {
 
 enum ProPurchaseError: Error, Equatable {
     case notConfigured
-    case unsupportedDistribution
     case offeringUnavailable
     case packageNotFound(ProPlan)
     case purchaseCancelled
@@ -109,8 +108,6 @@ extension ProPurchaseError: LocalizedError {
         switch self {
         case .notConfigured:
             "Purchases are not configured yet."
-        case .unsupportedDistribution:
-            "Purchases are only available in the Mac App Store version."
         case .offeringUnavailable:
             "No products are currently available."
         case .packageNotFound(let plan):
@@ -225,12 +222,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     func configureIfNeeded() {
-        guard DistributionChannel.current == .appStore else {
-            availablePlans = ProPlanProduct.fallbackPlans
-            applyStatus(.pro(plan: .lifetime, expirationDate: nil), source: .bootstrap)
-            return
-        }
-
         guard !hasConfigured else {
             return
         }
@@ -255,15 +246,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     func refresh() async {
-        guard DistributionChannel.current == .appStore else {
-            currentOffering = nil
-            availablePlans = ProPlanProduct.fallbackPlans
-            lastError = nil
-            paywallErrorMessage = nil
-            applyStatus(.pro(plan: .lifetime, expirationDate: nil), source: .refresh)
-            return
-        }
-
         configureIfNeeded()
         await ensureTrialStartedIfNeeded()
 
@@ -286,12 +268,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     func loadOfferings() async {
-        guard DistributionChannel.current == .appStore else {
-            currentOffering = nil
-            availablePlans = ProPlanProduct.fallbackPlans
-            return
-        }
-
         configureIfNeeded()
 
         do {
@@ -305,13 +281,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     func purchase(_ plan: ProPlan) async throws {
-        guard DistributionChannel.current == .appStore else {
-            let error = ProPurchaseError.unsupportedDistribution
-            lastError = error
-            paywallErrorMessage = error.errorDescription
-            throw error
-        }
-
         configureIfNeeded()
         paywallErrorMessage = nil
         purchaseInProgressPlan = plan
@@ -335,13 +304,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     func restorePurchases() async throws {
-        guard DistributionChannel.current == .appStore else {
-            let error = ProPurchaseError.unsupportedDistribution
-            lastError = error
-            paywallErrorMessage = error.errorDescription
-            throw error
-        }
-
         configureIfNeeded()
         paywallErrorMessage = nil
         isRestoringPurchases = true
@@ -405,10 +367,6 @@ final class ProStatusManager: ObservableObject {
     }
 
     private func refreshEntitlementStateAfterTransaction() async {
-        guard DistributionChannel.current == .appStore else {
-            return
-        }
-
         for attempt in 1...Constants.transactionRefreshAttempts {
             do {
                 let snapshot = try await revenueCatService.fetchEntitlementSnapshot()
@@ -478,10 +436,6 @@ final class ProStatusManager: ObservableObject {
         defaults: UserDefaults,
         now: () -> Date
     ) -> ProStatus {
-        if DistributionChannel.current == .direct {
-            return .pro(plan: .lifetime, expirationDate: nil)
-        }
-
         if let entitlementSnapshot {
             return .pro(plan: entitlementSnapshot.plan, expirationDate: entitlementSnapshot.expirationDate)
         }

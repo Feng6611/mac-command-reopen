@@ -72,7 +72,7 @@ final class ActivationMonitor: ObservableObject {
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
     private let reopenStatsStore: ReopenStatsStore
-    private let proStatusManager: ProStatusManager
+    private let accessController: FeatureAvailabilityProviding
     private var activationObserver: NSObjectProtocol?
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
@@ -83,12 +83,12 @@ final class ActivationMonitor: ObservableObject {
          workspace: NSWorkspace = .shared,
          defaults: UserDefaults = .standard,
          reopenStatsStore: ReopenStatsStore? = nil,
-         proStatusManager: ProStatusManager? = nil) {
+         accessController: FeatureAvailabilityProviding? = nil) {
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults
         self.reopenStatsStore = reopenStatsStore ?? .shared
-        self.proStatusManager = proStatusManager ?? .shared
+        self.accessController = accessController ?? AppAccessController.shared
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
         let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []
@@ -157,7 +157,7 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func handleActivation(for app: NSRunningApplication) {
-        guard proStatusManager.status.isActive else {
+        guard accessController.isCoreFeatureAvailable else {
             AppLogger.activation.debug("Ignoring activation; pro status not active.")
             return
         }

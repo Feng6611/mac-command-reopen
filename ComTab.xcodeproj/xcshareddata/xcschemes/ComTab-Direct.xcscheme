@@ -11,14 +11,13 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Auto Increment Build Number"
-               scriptText = "/bin/sh &quot;${SRCROOT}/scripts/auto_increment_build_number.sh&quot;
-">
+               scriptText = "/bin/sh &quot;${SRCROOT}/scripts/auto_increment_build_number.sh&quot; ">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-                     BuildableName = "Command Reopen.app"
-                     BlueprintName = "Command Reopen"
+                     BlueprintIdentifier = "9B1000062F2000010099C190"
+                     BuildableName = "Command Reopen Direct.app"
+                     BlueprintName = "Command Reopen Direct"
                      ReferencedContainer = "container:ComTab.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
@@ -34,9 +33,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-               BuildableName = "Command Reopen.app"
-               BlueprintName = "Command Reopen"
+               BlueprintIdentifier = "9B1000062F2000010099C190"
+               BuildableName = "Command Reopen Direct.app"
+               BlueprintName = "Command Reopen Direct"
                ReferencedContainer = "container:ComTab.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -87,9 +86,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-            BuildableName = "Command Reopen.app"
-            BlueprintName = "Command Reopen"
+            BlueprintIdentifier = "9B1000062F2000010099C190"
+            BuildableName = "Command Reopen Direct.app"
+            BlueprintName = "Command Reopen Direct"
             ReferencedContainer = "container:ComTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -104,9 +103,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "748FCE1A2EB5027A0099C190"
-            BuildableName = "Command Reopen.app"
-            BlueprintName = "Command Reopen"
+            BlueprintIdentifier = "9B1000062F2000010099C190"
+            BuildableName = "Command Reopen Direct.app"
+            BlueprintName = "Command Reopen Direct"
             ReferencedContainer = "container:ComTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

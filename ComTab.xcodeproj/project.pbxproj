@@ -11,6 +11,7 @@
 		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9A1111112F1000010099C190 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 9A1111132F1000010099C190 /* RevenueCat */; };
+		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		748FCE372EB5027D0099C190 /* ComTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/BuildNumber.xcconfig; sourceTree = SOURCE_ROOT; };
 		7A0A1E042F1A00010099C190 /* scripts/auto_increment_build_number.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = scripts/auto_increment_build_number.sh; sourceTree = SOURCE_ROOT; };
+		9B1000022F2000010099C190 /* Command Reopen Direct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen Direct.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,6 +82,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B1000032F2000010099C190 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -100,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				748FCE1B2EB5027B0099C190 /* Command Reopen.app */,
+				9B1000022F2000010099C190 /* Command Reopen Direct.app */,
 				748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */,
 				748FCE372EB5027D0099C190 /* ComTabUITests.xctest */,
 			);
@@ -178,6 +188,28 @@
 			productReference = 748FCE372EB5027D0099C190 /* ComTabUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		9B1000062F2000010099C190 /* Command Reopen Direct */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B10000A2F2000010099C190 /* Build configuration list for PBXNativeTarget "Command Reopen Direct" */;
+			buildPhases = (
+				9B1000052F2000010099C190 /* Sources */,
+				9B1000032F2000010099C190 /* Frameworks */,
+				9B1000042F2000010099C190 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				748FCE1D2EB5027B0099C190 /* ComTab */,
+			);
+			name = "Command Reopen Direct";
+			packageProductDependencies = (
+			);
+			productName = ComTabDirect;
+			productReference = 9B1000022F2000010099C190 /* Command Reopen Direct.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -195,6 +227,9 @@
 								enabled = 1;
 							};
 						};
+					};
+					9B1000062F2000010099C190 = {
+						CreatedOnToolsVersion = 26.0.1;
 					};
 					748FCE2C2EB5027D0099C190 = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -224,6 +259,7 @@
 			projectRoot = "";
 			targets = (
 				748FCE1A2EB5027A0099C190 /* Command Reopen */,
+				9B1000062F2000010099C190 /* Command Reopen Direct */,
 				748FCE2C2EB5027D0099C190 /* ComTabTests */,
 				748FCE362EB5027D0099C190 /* ComTabUITests */,
 			);
@@ -255,6 +291,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B1000042F2000010099C190 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -273,6 +317,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		748FCE332EB5027D0099C190 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B1000052F2000010099C190 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -471,6 +522,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -480,11 +532,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPSTORE $(inherited)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -522,6 +575,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -722,6 +776,60 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = APPSTORE;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Release-Direct";
+		};
+		9B1000072F2000010099C190 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = ComTab/ComTabDirect.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = Q3DZRXLGA3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				EXCLUDED_SOURCE_FILE_NAMES = "OnboardingView.swift PaywallView.swift ProCommerceStateSource.swift ProStatusManager.swift RevenueCatService.swift";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
+				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -732,10 +840,119 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DIRECT $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9B1000082F2000010099C190 /* Release-MAS */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = ComTab/ComTabDirect.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = Q3DZRXLGA3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				EXCLUDED_SOURCE_FILE_NAMES = "OnboardingView.swift PaywallView.swift ProCommerceStateSource.swift ProStatusManager.swift RevenueCatService.swift";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
+				INFOPLIST_KEY_CFBundleName = "Command Reopen";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
+				PRODUCT_NAME = "Command Reopen Direct";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DIRECT;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = "Release-MAS";
+		};
+		9B1000092F2000010099C190 /* Release-Direct */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CODE_SIGN_ENTITLEMENTS = ComTab/ComTabDirect.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = Q3DZRXLGA3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				EXCLUDED_SOURCE_FILE_NAMES = "OnboardingView.swift PaywallView.swift ProCommerceStateSource.swift ProStatusManager.swift RevenueCatService.swift";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
+				INFOPLIST_KEY_CFBundleName = "Command Reopen";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
+				PRODUCT_NAME = "Command Reopen Direct";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DIRECT;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -829,6 +1046,16 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = "Release-MAS";
+		};
+		9B10000A2F2000010099C190 /* Build configuration list for PBXNativeTarget "Command Reopen Direct" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B1000072F2000010099C190 /* Debug */,
+				9B1000082F2000010099C190 /* Release-MAS */,
+				9B1000092F2000010099C190 /* Release-Direct */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release-Direct";
 		};
 /* End XCConfigurationList section */
 	};

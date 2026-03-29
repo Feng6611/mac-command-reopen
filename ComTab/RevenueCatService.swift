@@ -10,20 +10,78 @@ import RevenueCat
 import os
 
 enum RevenueCatConfiguration {
-    static let apiKey = "appl_dDJatXaPwFuBLAelZfwDtGTNDbs"
-    static let entitlementIdentifier = "command_reopen_pro"
-    static let offeringIdentifier = "default"
-    static let yearlyProductIdentifier = "com.dev.kkuk.CommandReopen.yearly"
-    static let lifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime"
+    nonisolated static let apiKeyInfoKey = "ComTabRevenueCatAPIKey"
+    nonisolated static let bundledAPIKeyFallback = "appl_dDJatXaPwFuBLAelZfwDtGTNDbs"
+    nonisolated static var apiKey: String {
+        let configuredKey = (Bundle.main.object(forInfoDictionaryKey: apiKeyInfoKey) as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let configuredKey, !configuredKey.isEmpty {
+            return configuredKey
+        }
+
+        return bundledAPIKeyFallback
+    }
+    nonisolated static let entitlementIdentifier = "command reopen Pro"
+    nonisolated static let offeringIdentifier = "default"
+    nonisolated static let yearlyProductIdentifier = "com.dev.kkuk.CommandReopen.yearly"
+    nonisolated static let lifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime"
 }
 
 private enum RevenueCatSnapshotParser {
+    nonisolated static func resolveActiveEntitlement(from customerInfo: CustomerInfo, logger: Logger) -> EntitlementInfo? {
+        if let configuredEntitlement = customerInfo.entitlements.all[RevenueCatConfiguration.entitlementIdentifier] {
+            return configuredEntitlement
+        }
+
+        let fallbackEntitlement = customerInfo.entitlements.all.values.first { entitlement in
+            entitlement.isActive && (
+                entitlement.productIdentifier == RevenueCatConfiguration.yearlyProductIdentifier
+                    || entitlement.productIdentifier == RevenueCatConfiguration.lifetimeProductIdentifier
+            )
+        }
+
+        if let fallbackEntitlement {
+            logger.notice(
+                "Falling back to active entitlement product=\(fallbackEntitlement.productIdentifier) because configured entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) was not found."
+            )
+        }
+
+        return fallbackEntitlement
+    }
+
     nonisolated static func makeEntitlementSnapshot(from customerInfo: CustomerInfo?) -> ProEntitlementSnapshot? {
-        guard
-            let customerInfo,
-            let entitlement = customerInfo.entitlements.all[RevenueCatConfiguration.entitlementIdentifier],
-            entitlement.isActive
-        else {
+        let logger = Logger(
+            subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+            category: "Purchase"
+        )
+
+        guard let customerInfo else {
+            return nil
+        }
+
+        guard let entitlement = resolveActiveEntitlement(from: customerInfo, logger: logger) else {
+            let activeEntitlementIdentifiers = customerInfo.entitlements.all
+                .filter { $0.value.isActive }
+                .map(\.key)
+                .sorted()
+                .joined(separator: ", ")
+            let activeSubscriptionIdentifiers = Array(customerInfo.activeSubscriptions)
+                .sorted()
+                .joined(separator: ", ")
+
+            if !activeEntitlementIdentifiers.isEmpty || !activeSubscriptionIdentifiers.isEmpty {
+                logger.error(
+                    "Expected entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) not found. activeEntitlements=[\(activeEntitlementIdentifiers)] activeSubscriptions=[\(activeSubscriptionIdentifiers)]"
+                )
+            }
+            return nil
+        }
+
+        guard entitlement.isActive else {
+            logger.debug(
+                "Entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) present but inactive. product=\(entitlement.productIdentifier)"
+            )
             return nil
         }
 
@@ -36,6 +94,10 @@ private enum RevenueCatSnapshotParser {
         default:
             plan = entitlement.expirationDate == nil ? .lifetime : .yearly
         }
+
+        logger.notice(
+            "Mapped active entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) product=\(entitlement.productIdentifier) plan=\(plan.rawValue)"
+        )
 
         return ProEntitlementSnapshot(plan: plan, expirationDate: entitlement.expirationDate)
     }
@@ -90,6 +152,11 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
             return
         }
 
+        guard !RevenueCatConfiguration.apiKey.isEmpty else {
+            AppLogger.purchase.error("RevenueCat configuration skipped because \(RevenueCatConfiguration.apiKeyInfoKey) is missing.")
+            return
+        }
+
 #if !DEBUG
         guard !RevenueCatConfiguration.apiKey.hasPrefix("test_") else {
             AppLogger.purchase.error("Skipping RevenueCat configuration in non-debug build because the API key is a test key.")
@@ -121,7 +188,20 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         try ensureConfigured()
 
         let offerings = try await Purchases.shared.offerings()
-        return offerings.current ?? offerings.all[RevenueCatConfiguration.offeringIdentifier]
+        let resolvedOffering = offerings.current ?? offerings.all[RevenueCatConfiguration.offeringIdentifier]
+
+        if let resolvedOffering {
+            let packageIdentifiers = resolvedOffering.availablePackages.map(\.identifier).joined(separator: ", ")
+            AppLogger.purchase.notice(
+                "Loaded RevenueCat offering id=\(resolvedOffering.identifier) packages=[\(packageIdentifiers)]"
+            )
+        } else {
+            AppLogger.purchase.error(
+                "RevenueCat returned no current/default offering. current=\(String(describing: offerings.current?.identifier))"
+            )
+        }
+
+        return resolvedOffering
     }
 
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {

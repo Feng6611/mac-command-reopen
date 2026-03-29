@@ -6,8 +6,18 @@
 //
 
 import AppKit
+import Combine
 import SwiftUI
 import os
+
+@MainActor
+final class SettingsNavigationModel: ObservableObject {
+    @Published var selectedTab: SettingsTab
+
+    init(selectedTab: SettingsTab = .general) {
+        self.selectedTab = selectedTab
+    }
+}
 
 @MainActor
 final class SettingsWindowController: NSObject, NSWindowDelegate {
@@ -15,6 +25,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     private var window: NSWindow?
     private var hostingController: NSHostingController<AnyView>?
+    private let navigationModel = SettingsNavigationModel()
 
     var isVisible: Bool {
         window?.isVisible == true
@@ -23,37 +34,29 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     func show(
         activationMonitor: ActivationMonitor? = nil,
         reopenStatsStore: ReopenStatsStore? = nil,
-        proStatusManager: ProStatusManager? = nil,
+        accessController: AppAccessController? = nil,
         initialTab: SettingsTab = .general
     ) {
         let activationMonitor = activationMonitor ?? .shared
         let reopenStatsStore = reopenStatsStore ?? .shared
-        let proStatusManager = proStatusManager ?? .shared
+        let accessController = accessController ?? .shared
+        let resolvedInitialTab: SettingsTab = accessController.showsProTab ? initialTab : .general
 
         if let window {
-            AppLogger.lifecycle.debug("Reusing existing settings window. initialTab=\(initialTab.rawValue)")
-            // Replace the hosting controller to guarantee @State is reset with the new initialTab
-            let newHostingController = NSHostingController(
-                rootView: makeRootView(
-                    activationMonitor: activationMonitor,
-                    reopenStatsStore: reopenStatsStore,
-                    proStatusManager: proStatusManager,
-                    initialTab: initialTab
-                )
-            )
-            window.contentViewController = newHostingController
-            self.hostingController = newHostingController
-            NSApplication.shared.activate(ignoringOtherApps: true)
-            window.makeKeyAndOrderFront(nil)
+            AppLogger.lifecycle.debug("Reusing existing settings window. initialTab=\(resolvedInitialTab.rawValue)")
+            navigationModel.selectedTab = resolvedInitialTab
+            present(window)
             return
         }
+
+        navigationModel.selectedTab = resolvedInitialTab
 
         let hostingController = NSHostingController(
             rootView: makeRootView(
                 activationMonitor: activationMonitor,
                 reopenStatsStore: reopenStatsStore,
-                proStatusManager: proStatusManager,
-                initialTab: initialTab
+                accessController: accessController,
+                navigationModel: navigationModel
             )
         )
         let window = NSWindow(contentViewController: hostingController)
@@ -69,24 +72,38 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         self.window = window
         self.hostingController = hostingController
 
-        AppLogger.lifecycle.notice("Showing settings window. initialTab=\(initialTab.rawValue)")
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-        window.orderFrontRegardless()
+        AppLogger.lifecycle.notice("Showing settings window. initialTab=\(resolvedInitialTab.rawValue)")
+        present(window)
     }
 
     private func makeRootView(
         activationMonitor: ActivationMonitor,
         reopenStatsStore: ReopenStatsStore,
-        proStatusManager: ProStatusManager,
-        initialTab: SettingsTab
+        accessController: AppAccessController,
+        navigationModel: SettingsNavigationModel
     ) -> AnyView {
-        AnyView(
-            SettingsView(initialTab: initialTab)
+        let rootView =
+            SettingsView()
                 .environmentObject(activationMonitor)
                 .environmentObject(reopenStatsStore)
-                .environmentObject(proStatusManager)
-        )
+                .environmentObject(accessController)
+                .environmentObject(navigationModel)
+#if APPSTORE
+                .environmentObject(ProStatusManager.shared)
+#endif
+
+        return AnyView(rootView)
+    }
+
+    private func present(_ window: NSWindow) {
+        if window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
+
+        NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
 
     func windowWillClose(_ notification: Notification) {

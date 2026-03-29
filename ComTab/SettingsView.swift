@@ -15,6 +15,10 @@ enum SettingsTab: Int, CaseIterable {
     case statistics
     case pro
 
+    static func visibleTabs(showProTab: Bool) -> [SettingsTab] {
+        showProTab ? [.general, .statistics, .pro] : [.general, .statistics]
+    }
+
     var title: String {
         switch self {
         case .general: return "General"
@@ -45,9 +49,8 @@ enum SettingsTab: Int, CaseIterable {
 struct SettingsView: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
-    @EnvironmentObject private var proStatusManager: ProStatusManager
-
-    @State private var selectedTab: SettingsTab = .general
+    @EnvironmentObject private var accessController: AppAccessController
+    @EnvironmentObject private var navigationModel: SettingsNavigationModel
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -57,18 +60,14 @@ struct SettingsView: View {
         Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
     }
 
-    init(initialTab: SettingsTab = .general) {
-        _selectedTab = State(initialValue: initialTab)
-    }
-
     var body: some View {
         HStack(spacing: 0) {
             // Sidebar
             VStack(spacing: 2) {
-                ForEach(SettingsTab.allCases, id: \.self) { tab in
-                    SidebarButton(tab: tab, isSelected: selectedTab == tab) {
+                ForEach(SettingsTab.visibleTabs(showProTab: accessController.showsProTab), id: \.self) { tab in
+                    SidebarButton(tab: tab, isSelected: navigationModel.selectedTab == tab) {
                         withAnimation(.easeInOut(duration: 0.15)) {
-                            selectedTab = tab
+                            navigationModel.selectedTab = tab
                         }
                     }
                 }
@@ -89,20 +88,34 @@ struct SettingsView: View {
 
             // Content
             Group {
-                switch selectedTab {
+                switch navigationModel.selectedTab {
                 case .general:
                     SettingsTabContent()
                 case .statistics:
                     ReopenStatsView()
                 case .pro:
+#if APPSTORE
                     ProTabContent()
+#else
+                    EmptyView()
+#endif
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(width: 600, height: 520)
         .task {
-            await proStatusManager.refresh()
+            await accessController.refresh()
+        }
+        .onAppear {
+            if !accessController.showsProTab && navigationModel.selectedTab == .pro {
+                navigationModel.selectedTab = .general
+            }
+        }
+        .onChange(of: accessController.showsProTab) { showsProTab in
+            if !showsProTab && navigationModel.selectedTab == .pro {
+                navigationModel.selectedTab = .general
+            }
         }
     }
 }
@@ -173,6 +186,7 @@ struct SidebarButton: View {
 
 // MARK: - Pro Tab Content
 
+#if APPSTORE
 struct ProTabContent: View {
     var body: some View {
         VStack {
@@ -183,6 +197,7 @@ struct ProTabContent: View {
         .padding(.horizontal, 24)
     }
 }
+#endif
 
 // MARK: - Settings Tab Content
 
@@ -198,16 +213,16 @@ struct GroupedFormStyleModifier: ViewModifier {
 
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
-    @EnvironmentObject private var proStatusManager: ProStatusManager
+    @EnvironmentObject private var accessController: AppAccessController
     @StateObject private var launchManager = LaunchAtLoginManager()
     @State private var selectedBundleToExclude: String?
 
     private var isFeatureLocked: Bool {
-        !proStatusManager.status.isActive
+        !accessController.isCoreFeatureAvailable
     }
 
     private var distributionChannel: DistributionChannel {
-        DistributionChannel.current
+        accessController.distributionChannel
     }
 
     private var runningUserApps: [NSRunningApplication] {
