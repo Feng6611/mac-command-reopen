@@ -7,6 +7,7 @@
 
 import AppKit
 import SwiftUI
+import os
 
 @MainActor
 final class SettingsWindowController: NSObject, NSWindowDelegate {
@@ -30,12 +31,18 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let proStatusManager = proStatusManager ?? .shared
 
         if let window {
-            hostingController?.rootView = makeRootView(
-                activationMonitor: activationMonitor,
-                reopenStatsStore: reopenStatsStore,
-                proStatusManager: proStatusManager,
-                initialTab: initialTab
+            AppLogger.lifecycle.debug("Reusing existing settings window. initialTab=\(initialTab.rawValue)")
+            // Replace the hosting controller to guarantee @State is reset with the new initialTab
+            let newHostingController = NSHostingController(
+                rootView: makeRootView(
+                    activationMonitor: activationMonitor,
+                    reopenStatsStore: reopenStatsStore,
+                    proStatusManager: proStatusManager,
+                    initialTab: initialTab
+                )
             )
+            window.contentViewController = newHostingController
+            self.hostingController = newHostingController
             NSApplication.shared.activate(ignoringOtherApps: true)
             window.makeKeyAndOrderFront(nil)
             return
@@ -53,6 +60,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window.title = "Settings"
         window.delegate = self
         window.styleMask = [.titled, .closable, .miniaturizable]
+        window.collectionBehavior = [.moveToActiveSpace]
         window.isReleasedWhenClosed = false
         window.setContentSize(NSSize(width: 600, height: 520))
         window.center()
@@ -61,8 +69,10 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         self.window = window
         self.hostingController = hostingController
 
+        AppLogger.lifecycle.notice("Showing settings window. initialTab=\(initialTab.rawValue)")
         NSApplication.shared.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
 
     private func makeRootView(

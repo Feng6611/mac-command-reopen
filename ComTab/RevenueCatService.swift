@@ -10,7 +10,7 @@ import RevenueCat
 import os
 
 enum RevenueCatConfiguration {
-    static let apiKey = "test_JMcWXYqTETEunXPsXqWRBtbffYU"
+    static let apiKey = "appl_dDJatXaPwFuBLAelZfwDtGTNDbs"
     static let entitlementIdentifier = "command_reopen_pro"
     static let offeringIdentifier = "default"
     static let yearlyProductIdentifier = "com.dev.kkuk.CommandReopen.yearly"
@@ -19,13 +19,9 @@ enum RevenueCatConfiguration {
 
 private enum RevenueCatSnapshotParser {
     nonisolated static func makeEntitlementSnapshot(from customerInfo: CustomerInfo?) -> ProEntitlementSnapshot? {
-        let entitlementIdentifier = "command_reopen_pro"
-        let yearlyProductIdentifier = "com.dev.kkuk.CommandReopen.yearly"
-        let lifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime"
-
         guard
             let customerInfo,
-            let entitlement = customerInfo.entitlements.all[entitlementIdentifier],
+            let entitlement = customerInfo.entitlements.all[RevenueCatConfiguration.entitlementIdentifier],
             entitlement.isActive
         else {
             return nil
@@ -33,9 +29,9 @@ private enum RevenueCatSnapshotParser {
 
         let plan: ProPlan
         switch entitlement.productIdentifier {
-        case lifetimeProductIdentifier:
+        case RevenueCatConfiguration.lifetimeProductIdentifier:
             plan = .lifetime
-        case yearlyProductIdentifier:
+        case RevenueCatConfiguration.yearlyProductIdentifier:
             plan = .yearly
         default:
             plan = entitlement.expirationDate == nil ? .lifetime : .yearly
@@ -56,7 +52,7 @@ extension ProPlan {
     }
 }
 
-struct ProEntitlementSnapshot: Equatable {
+struct ProEntitlementSnapshot: Equatable, Sendable {
     let plan: ProPlan
     let expirationDate: Date?
 }
@@ -93,6 +89,13 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         guard !isConfigured else {
             return
         }
+
+#if !DEBUG
+        guard !RevenueCatConfiguration.apiKey.hasPrefix("test_") else {
+            AppLogger.purchase.error("Skipping RevenueCat configuration in non-debug build because the API key is a test key.")
+            return
+        }
+#endif
 
 #if DEBUG
         Purchases.logLevel = .debug

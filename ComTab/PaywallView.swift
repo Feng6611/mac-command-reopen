@@ -14,6 +14,7 @@ import os
 struct UpgradeCardView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
     @State private var selectedPlan: ProPlan = .lifetime
+    @State private var isLoadingOfferings = false
 
     private var isExpired: Bool {
         proStatusManager.status == .expired
@@ -28,7 +29,7 @@ struct UpgradeCardView: View {
     }
 
     private var isBusy: Bool {
-        proStatusManager.purchaseInProgressPlan != nil || proStatusManager.isRestoringPurchases
+        proStatusManager.purchaseInProgressPlan != nil || proStatusManager.isRestoringPurchases || isLoadingOfferings
     }
 
     var body: some View {
@@ -45,9 +46,18 @@ struct UpgradeCardView: View {
             Divider()
                 .padding(.horizontal, 16)
 
-            VStack(spacing: 12) {
-                ForEach(proStatusManager.availablePlans) { product in
-                    planRow(product: product)
+            Group {
+                if isLoadingOfferings {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                } else {
+                    VStack(spacing: 12) {
+                        ForEach(proStatusManager.availablePlans) { product in
+                            planRow(product: product)
+                        }
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -141,12 +151,14 @@ struct UpgradeCardView: View {
                 .strokeBorder(cardBorder, lineWidth: 1)
         )
         .task {
+            isLoadingOfferings = true
             await proStatusManager.loadOfferings()
             syncSelectedPlan()
+            isLoadingOfferings = false
         }
-        .onChange(of: proStatusManager.availablePlans) { _ in
+        .modifier(OnChangeCompat(value: proStatusManager.availablePlans) {
             syncSelectedPlan()
-        }
+        })
     }
 
     // MARK: - Status Banner
@@ -370,7 +382,9 @@ struct UpgradeCardView: View {
         do {
             try await proStatusManager.purchase(selectedPlan)
         } catch {
-            AppLogger.purchase.error("Purchase failed: \(error.localizedDescription)")
+            if (error as? ProPurchaseError) != .purchaseCancelled {
+                AppLogger.purchase.error("Purchase failed: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -378,7 +392,9 @@ struct UpgradeCardView: View {
         do {
             try await proStatusManager.restorePurchases()
         } catch {
-            AppLogger.purchase.error("Restore failed: \(error.localizedDescription)")
+            if (error as? ProPurchaseError) != .purchaseCancelled {
+                AppLogger.purchase.error("Restore failed: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -438,6 +454,21 @@ struct ProStatusBadgeView: View {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .strokeBorder(Color(nsColor: .separatorColor).opacity(0.5), lineWidth: 1)
             )
+        }
+    }
+}
+
+// MARK: - onChange backward-compatibility shim (macOS 12+)
+
+private struct OnChangeCompat<V: Equatable>: ViewModifier {
+    let value: V
+    let action: () -> Void
+
+    func body(content: Content) -> some View {
+        if #available(macOS 14.0, *) {
+            content.onChange(of: value) { action() }
+        } else {
+            content.onChange(of: value) { _ in action() }
         }
     }
 }

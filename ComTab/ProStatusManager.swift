@@ -11,7 +11,7 @@ import RevenueCat
 import StoreKit
 import os
 
-enum ProPlan: String, Equatable {
+enum ProPlan: String, Equatable, Sendable {
     case yearly
     case lifetime
 }
@@ -38,21 +38,21 @@ struct ProPlanProduct: Equatable, Identifiable {
         case .yearly:
             return .init(
                 plan: .yearly,
-                title: "Yearly",
+                title: String(localized: "Yearly"),
                 displayPrice: "$5.99",
-                billingDetail: "per year",
-                subtitle: "Auto-renews annually",
+                billingDetail: String(localized: "per year"),
+                subtitle: String(localized: "Auto-renews annually"),
                 badge: nil,
                 isAvailable: isAvailable
             )
         case .lifetime:
             return .init(
                 plan: .lifetime,
-                title: "Lifetime",
+                title: String(localized: "Lifetime"),
                 displayPrice: "$10.99",
-                billingDetail: "once",
-                subtitle: "Pay once, use forever",
-                badge: "Best Value",
+                billingDetail: String(localized: "once"),
+                subtitle: String(localized: "Pay once, use forever"),
+                badge: String(localized: "Best Value"),
                 isAvailable: isAvailable
             )
         }
@@ -168,6 +168,8 @@ final class ProStatusManager: ObservableObject {
         static let trialStartDateKey = "com.comtab.trialStartDate"
         static let hasSeenOnboardingKey = "com.comtab.hasSeenOnboarding"
         static let trialDuration: TimeInterval = 7 * 24 * 60 * 60
+        static let transactionRefreshAttempts = 3
+        static let transactionRefreshDelayNanoseconds: UInt64 = 750_000_000
     }
 
     private enum StatusUpdateSource {
@@ -207,23 +209,19 @@ final class ProStatusManager: ObservableObject {
         now: @escaping () -> Date = Date.init,
         trialStartDateProvider: (() async -> Date?)? = nil
     ) {
+        let service = revenueCatService ?? RevenueCatService.shared
+        let cachedSnapshot = service.cachedEntitlementSnapshot
         self.defaults = defaults
-        self.revenueCatService = revenueCatService ?? RevenueCatService.shared
+        self.revenueCatService = service
         self.now = now
         self.trialStartDateProvider = trialStartDateProvider ?? Self.resolveTrialStartDate
-        self.entitlementSnapshot = self.revenueCatService.cachedEntitlementSnapshot
+        self.entitlementSnapshot = cachedSnapshot
         self.currentOffering = nil
         self.availablePlans = ProPlanProduct.fallbackPlans
         self.lastError = nil
         self.purchaseInProgressPlan = nil
         self.paywallErrorMessage = nil
-
-        if DistributionChannel.current == .direct {
-            self.status = .pro(plan: .lifetime, expirationDate: nil)
-        } else {
-            self.status = .expired
-            self.status = computeStatus()
-        }
+        self.status = Self.computeStatus(entitlementSnapshot: cachedSnapshot, defaults: defaults, now: now)
     }
 
     func configureIfNeeded() {
@@ -275,7 +273,7 @@ final class ProStatusManager: ObservableObject {
             AppLogger.purchase.error("Failed to load offerings: \(error.localizedDescription)")
             currentOffering = nil
         }
-        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering))
+        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering), offeringsAttempted: true)
 
         do {
             entitlementSnapshot = try await revenueCatService.fetchEntitlementSnapshot()
@@ -303,7 +301,7 @@ final class ProStatusManager: ObservableObject {
             currentOffering = nil
         }
 
-        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering))
+        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering), offeringsAttempted: true)
     }
 
     func purchase(_ plan: ProPlan) async throws {
@@ -325,6 +323,9 @@ final class ProStatusManager: ObservableObject {
             paywallErrorMessage = nil
             entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
+            if !status.isPro {
+                await refreshEntitlementStateAfterTransaction()
+            }
         } catch {
             let purchaseError = ProPurchaseError(error: error)
             lastError = purchaseError
@@ -352,6 +353,9 @@ final class ProStatusManager: ObservableObject {
             paywallErrorMessage = nil
             entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
+            if !status.isPro {
+                await refreshEntitlementStateAfterTransaction()
+            }
         } catch {
             let purchaseError = ProPurchaseError(error: error)
             lastError = purchaseError
@@ -368,9 +372,9 @@ final class ProStatusManager: ObservableObject {
         shouldOpenProSettings = false
     }
 
-    static func makeAvailablePlans(packageMetadata: [ProPlan: ProPlanPackageMetadata]?) -> [ProPlanProduct] {
+    static func makeAvailablePlans(packageMetadata: [ProPlan: ProPlanPackageMetadata]?, offeringsAttempted: Bool = false) -> [ProPlanProduct] {
         [ProPlan.yearly, .lifetime].map { plan in
-            let fallback = ProPlanProduct.fallback(for: plan, isAvailable: packageMetadata == nil)
+            let fallback = ProPlanProduct.fallback(for: plan, isAvailable: packageMetadata == nil && !offeringsAttempted)
 
             guard let metadata = packageMetadata?[plan] else {
                 return fallback
@@ -398,6 +402,33 @@ final class ProStatusManager: ObservableObject {
         applyStatus(computeStatus(), source: .stateChange)
 
         AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
+    }
+
+    private func refreshEntitlementStateAfterTransaction() async {
+        guard DistributionChannel.current == .appStore else {
+            return
+        }
+
+        for attempt in 1...Constants.transactionRefreshAttempts {
+            do {
+                let snapshot = try await revenueCatService.fetchEntitlementSnapshot()
+                entitlementSnapshot = snapshot
+                applyStatus(computeStatus(), source: .stateChange)
+
+                if status.isPro {
+                    AppLogger.purchase.notice("Entitlement refresh succeeded after transaction on attempt \(attempt).")
+                    return
+                }
+            } catch {
+                AppLogger.purchase.error("Failed to refresh entitlement after transaction on attempt \(attempt): \(error.localizedDescription)")
+            }
+
+            if attempt < Constants.transactionRefreshAttempts {
+                try? await Task.sleep(nanoseconds: Constants.transactionRefreshDelayNanoseconds)
+            }
+        }
+
+        AppLogger.purchase.error("Entitlement remained inactive after transaction refresh attempts.")
     }
 
     private func applyEntitlementSnapshot(_ snapshot: ProEntitlementSnapshot?, source: StatusUpdateSource) {
@@ -439,6 +470,14 @@ final class ProStatusManager: ObservableObject {
     }
 
     private func computeStatus() -> ProStatus {
+        Self.computeStatus(entitlementSnapshot: entitlementSnapshot, defaults: defaults, now: now)
+    }
+
+    private static func computeStatus(
+        entitlementSnapshot: ProEntitlementSnapshot?,
+        defaults: UserDefaults,
+        now: () -> Date
+    ) -> ProStatus {
         if DistributionChannel.current == .direct {
             return .pro(plan: .lifetime, expirationDate: nil)
         }
@@ -473,7 +512,7 @@ final class ProStatusManager: ObservableObject {
 
             metadata[plan] = .init(
                 displayPrice: package.storeProduct.localizedPriceString,
-                billingDetail: plan == .yearly ? "per year" : "once",
+                billingDetail: plan == .yearly ? String(localized: "per year") : String(localized: "once"),
                 isAvailable: true
             )
         }

@@ -72,6 +72,7 @@ final class ActivationMonitor: ObservableObject {
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
     private let reopenStatsStore: ReopenStatsStore
+    private let proStatusManager: ProStatusManager
     private var activationObserver: NSObjectProtocol?
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
@@ -81,11 +82,13 @@ final class ActivationMonitor: ObservableObject {
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
          defaults: UserDefaults = .standard,
-         reopenStatsStore: ReopenStatsStore? = nil) {
+         reopenStatsStore: ReopenStatsStore? = nil,
+         proStatusManager: ProStatusManager? = nil) {
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults
         self.reopenStatsStore = reopenStatsStore ?? .shared
+        self.proStatusManager = proStatusManager ?? .shared
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
         let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []
@@ -154,7 +157,7 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func handleActivation(for app: NSRunningApplication) {
-        guard ProStatusManager.shared.status.isActive else {
+        guard proStatusManager.status.isActive else {
             AppLogger.activation.debug("Ignoring activation; pro status not active.")
             return
         }
@@ -312,8 +315,8 @@ final class ActivationMonitor: ObservableObject {
         configuration.activates = true
         configuration.createsNewApplicationInstance = false
 
-        workspace.openApplication(at: appURL, configuration: configuration) { openedApp, error in
-            self.handleReopenCompletion(
+        workspace.openApplication(at: appURL, configuration: configuration) { [weak self] openedApp, error in
+            self?.handleReopenCompletion(
                 requestedBundleID: bundleID,
                 openedBundleID: openedApp?.bundleIdentifier,
                 localizedName: openedApp?.localizedName,
@@ -336,10 +339,12 @@ final class ActivationMonitor: ObservableObject {
         }
 
         let recordedBundleID = openedBundleID ?? requestedBundleID
-        reopenStatsStore.recordSuccessfulReopen(
-            bundleID: recordedBundleID,
-            localizedName: localizedName
-        )
+        Task { @MainActor [reopenStatsStore] in
+            reopenStatsStore.recordSuccessfulReopen(
+                bundleID: recordedBundleID,
+                localizedName: localizedName
+            )
+        }
 
         if let openedProcessIdentifier {
             AppLogger.activation.debug("Re-opened \(recordedBundleID), pid \(openedProcessIdentifier)")

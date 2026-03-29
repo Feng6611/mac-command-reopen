@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import os
 
 @MainActor
 final class StatusBarController: NSObject {
@@ -123,6 +124,10 @@ final class StatusBarController: NSObject {
                     self?.enableReopenItem?.state = .off
                 } else {
                     self?.enableReopenItem?.isEnabled = true
+                    // Restore actual toggle state when transitioning back to active
+                    if let self {
+                        self.enableReopenItem?.state = self.activationMonitor.isFeatureEnabled ? .on : .off
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -153,15 +158,21 @@ final class StatusBarController: NSObject {
     }
 
     @objc private func showSettings() {
-        SettingsWindowController.shared.show(activationMonitor: activationMonitor)
+        AppLogger.lifecycle.notice("Status bar requested settings window.")
+        DispatchQueue.main.async { [activationMonitor] in
+            SettingsWindowController.shared.show(activationMonitor: activationMonitor)
+        }
     }
 
     @objc private func showProSettings() {
-        SettingsWindowController.shared.show(
-            activationMonitor: activationMonitor,
-            proStatusManager: proStatusManager,
-            initialTab: .pro
-        )
+        AppLogger.lifecycle.notice("Status bar requested Pro settings window.")
+        DispatchQueue.main.async { [activationMonitor, proStatusManager] in
+            SettingsWindowController.shared.show(
+                activationMonitor: activationMonitor,
+                proStatusManager: proStatusManager,
+                initialTab: .pro
+            )
+        }
     }
 
     @objc private func openOfficialWebsite() {
