@@ -6,7 +6,6 @@
 //
 
 import AppKit
-import StoreKit
 import SwiftUI
 
 // MARK: - Sidebar Tab

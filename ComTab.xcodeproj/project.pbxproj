@@ -11,7 +11,6 @@
 		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9A1111112F1000010099C190 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 9A1111132F1000010099C190 /* RevenueCat */; };
-		9A1111122F1000010099C190 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9A1111142F1000010099C190 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,7 +63,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A1111112F1000010099C190 /* RevenueCat in Frameworks */,
-				9A1111122F1000010099C190 /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,10 +125,9 @@
 				748FCE1D2EB5027B0099C190 /* ComTab */,
 			);
 			name = "Command Reopen";
-			packageProductDependencies = (
-				9A1111132F1000010099C190 /* RevenueCat */,
-				9A1111142F1000010099C190 /* RevenueCatUI */,
-			);
+				packageProductDependencies = (
+					9A1111132F1000010099C190 /* RevenueCat */,
+				);
 			productName = ComTab;
 			productReference = 748FCE1B2EB5027B0099C190 /* Command Reopen.app */;
 			productType = "com.apple.product-type.application";
@@ -313,11 +310,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCat;
-		};
-		9A1111142F1000010099C190 /* RevenueCatUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 
