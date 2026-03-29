@@ -189,10 +189,9 @@ struct SidebarButton: View {
 #if APPSTORE
 struct ProTabContent: View {
     var body: some View {
-        VStack {
-            Spacer()
+        ScrollView(showsIndicators: false) {
             ProSectionView()
-            Spacer()
+                .padding(.vertical, 24)
         }
         .padding(.horizontal, 24)
     }

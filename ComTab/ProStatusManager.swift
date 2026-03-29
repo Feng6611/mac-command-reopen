@@ -211,6 +211,10 @@ final class ProStatusManager: ObservableObject {
     @Published private(set) var lastError: ProPurchaseError?
     @Published private(set) var purchaseInProgressPlan: ProPlan?
     @Published private(set) var isRestoringPurchases = false
+
+    var currentEntitlementSnapshot: ProEntitlementSnapshot? {
+        entitlementSnapshot
+    }
     @Published private(set) var paywallErrorMessage: String?
     @Published private(set) var shouldOpenProSettings = false
 

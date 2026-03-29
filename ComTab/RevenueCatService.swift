@@ -100,7 +100,8 @@ enum RevenueCatSnapshotParser {
         return ProEntitlementSnapshot(
             plan: plan,
             expirationDate: entitlement.expirationDate,
-            willRenew: plan == .yearly && entitlement.willRenew
+            willRenew: plan == .yearly && entitlement.willRenew,
+            originalPurchaseDate: entitlement.originalPurchaseDate
         )
     }
 }
@@ -120,6 +121,19 @@ struct ProEntitlementSnapshot: Equatable, Sendable {
     let plan: ProPlan
     let expirationDate: Date?
     let willRenew: Bool
+    let originalPurchaseDate: Date?
+
+    init(
+        plan: ProPlan,
+        expirationDate: Date?,
+        willRenew: Bool = false,
+        originalPurchaseDate: Date? = nil
+    ) {
+        self.plan = plan
+        self.expirationDate = expirationDate
+        self.willRenew = willRenew
+        self.originalPurchaseDate = originalPurchaseDate
+    }
 }
 
 @MainActor

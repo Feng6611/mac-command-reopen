@@ -9,6 +9,13 @@ import AppKit
 import SwiftUI
 import os
 
+private let proFeatureItems: [(String, String)] = [
+    ("arrow.clockwise", "Auto-reopen windows"),
+    ("slider.horizontal.3", "Per-app exclusion"),
+    ("chart.bar", "Statistics & insights"),
+    ("arrow.up.circle", "Future updates")
+]
+
 // MARK: - Upgrade Card (shown when trial or expired)
 
 struct UpgradeCardView: View {
@@ -221,29 +228,7 @@ struct UpgradeCardView: View {
     // MARK: - Features
 
     private var featuresGrid: some View {
-        let features: [(String, String)] = [
-            ("arrow.clockwise", "Auto-reopen windows"),
-            ("slider.horizontal.3", "Per-app exclusion"),
-            ("chart.bar", "Statistics & insights"),
-            ("arrow.up.circle", "Future updates"),
-        ]
-
-        return LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-        ], alignment: .leading, spacing: 8) {
-            ForEach(features, id: \.1) { icon, text in
-                HStack(spacing: 6) {
-                    Image(systemName: icon)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.accentColor)
-                        .frame(width: 14)
-                    Text(text)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
+        ProFeatureListView(accentColor: .accentColor)
     }
 
     // MARK: - Plan Row
@@ -414,57 +399,80 @@ struct ProStatusBadgeView: View {
 
     var body: some View {
         if case .pro(let plan, _, _) = proStatusManager.status {
-            HStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(Color.green.opacity(0.12))
-                        .frame(width: 36, height: 36)
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 16))
-                        .foregroundColor(.green)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text("Pro")
-                            .font(.system(size: 14, weight: .semibold))
-                        Text(plan == .lifetime ? "Lifetime" : "Yearly")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                Capsule().fill(Color.green.opacity(0.8))
-                            )
+            VStack(spacing: 0) {
+                HStack(alignment: .top, spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.green.opacity(0.12))
+                            .frame(width: 42, height: 42)
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(.green)
                     }
 
-                    if let renewalState = proStatusManager.status.renewalState {
-                        Text(renewalSummary(for: renewalState))
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
+                    VStack(alignment: .leading, spacing: 7) {
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("Pro")
+                                .font(.system(size: 20, weight: .semibold))
 
-                        Text(renewalFooter(for: renewalState))
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary.opacity(0.85))
-                    } else {
-                        Text("Thank you for your support!")
-                            .font(.system(size: 11))
+                            Text(plan == .lifetime ? "Lifetime" : "Yearly")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(
+                                    Capsule().fill(plan == .lifetime ? Color.green.opacity(0.85) : Color.accentColor.opacity(0.9))
+                                )
+                        }
+
+                        Text(plan == .lifetime ? "Thank you for supporting Command Reopen with a one-time purchase." : "Thank you for supporting Command Reopen with an active yearly membership.")
+                            .font(.system(size: 12))
                             .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            if let originalPurchaseDate = proStatusManager.currentEntitlementSnapshot?.originalPurchaseDate {
+                                metadataRow(label: "Member since", value: formattedDate(originalPurchaseDate))
+                                metadataRow(label: "Supporting for", value: "\(supportingDays(since: originalPurchaseDate)) day\(supportingDays(since: originalPurchaseDate) == 1 ? "" : "s")")
+                            }
+
+                            if let renewalState = proStatusManager.status.renewalState {
+                                metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
+                                metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
+                            }
+                        }
                     }
-                }
 
-                Spacer()
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 22)
+                .padding(.bottom, 18)
+
+                Divider()
+                    .padding(.horizontal, 16)
+
+                ProFeatureListView(accentColor: .green)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 18)
 
                 if plan == .yearly {
-                    Button("Manage Subscription") {
-                        openManageSubscription()
+                    Divider()
+                        .padding(.horizontal, 16)
+
+                    HStack {
+                        Button("Manage Subscription") {
+                            openManageSubscription()
+                        }
+                        .buttonStyle(.link)
+                        .font(.system(size: 11, weight: .medium))
+
+                        Spacer()
                     }
-                    .buttonStyle(.link)
-                    .font(.system(size: 11, weight: .medium))
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(Color(nsColor: .windowBackgroundColor))
@@ -476,15 +484,6 @@ struct ProStatusBadgeView: View {
         }
     }
 
-    private func renewalSummary(for renewalState: ProRenewalState) -> String {
-        switch renewalState {
-        case .renews(let expirationDate, _):
-            return "Renews on \(formattedDate(expirationDate))"
-        case .ends(let expirationDate, _):
-            return "Ends on \(formattedDate(expirationDate))"
-        }
-    }
-
     private func renewalFooter(for renewalState: ProRenewalState) -> String {
         let daysRemaining: Int
 
@@ -493,11 +492,47 @@ struct ProStatusBadgeView: View {
             daysRemaining = remaining
         }
 
-        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining in current period"
+        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left in current period"
+    }
+
+    private func renewalLabel(for renewalState: ProRenewalState) -> String {
+        switch renewalState {
+        case .renews:
+            return "Renews"
+        case .ends:
+            return "Ends"
+        }
+    }
+
+    private func renewalDate(for renewalState: ProRenewalState) -> String {
+        switch renewalState {
+        case .renews(let expirationDate, _), .ends(let expirationDate, _):
+            return formattedDate(expirationDate)
+        }
     }
 
     private func formattedDate(_ date: Date) -> String {
         date.formatted(.dateTime.month(.abbreviated).day().year())
+    }
+
+    private func metadataRow(label: String, value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Text(label)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.secondary)
+                .frame(width: 86, alignment: .leading)
+
+            Text(value)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundColor(.primary)
+
+            Spacer()
+        }
+    }
+
+    private func supportingDays(since date: Date) -> Int {
+        let days = Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0
+        return max(1, days)
     }
 
     private func openManageSubscription() {
@@ -506,6 +541,88 @@ struct ProStatusBadgeView: View {
         }
 
         NSWorkspace.shared.open(url)
+    }
+}
+
+private struct ProFeatureListView: View {
+    let accentColor: Color
+
+    var body: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+        ], alignment: .leading, spacing: 8) {
+            ForEach(proFeatureItems, id: \.1) { icon, text in
+                HStack(spacing: 6) {
+                    Image(systemName: icon)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(accentColor)
+                        .frame(width: 14)
+                    Text(text)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+}
+
+private struct ProLetterView: View {
+    @EnvironmentObject private var proStatusManager: ProStatusManager
+
+    private var isPurchased: Bool {
+        proStatusManager.status.isPro
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(isPurchased ? "A Note From Chen" : "Before You Decide")
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .foregroundColor(Color.accentColor.opacity(0.72))
+
+            Text(headline)
+                .font(.system(size: 22, weight: .medium, design: .serif))
+                .foregroundColor(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(bodyText)
+                .font(.system(size: 14, weight: .regular, design: .monospaced))
+                .foregroundColor(.primary.opacity(0.9))
+                .lineSpacing(5)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(signature)
+                .font(.system(size: 15, weight: .medium, design: .serif))
+                .foregroundColor(.primary.opacity(0.82))
+                .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+    }
+
+    private var headline: String {
+        isPurchased ? "Thank you for keeping this app small, focused, and cared for." : "Command Reopen is a tiny utility, and we want to keep it that way."
+    }
+
+    private var bodyText: String {
+        if isPurchased {
+            return """
+            We built Command Reopen to solve one specific annoyance: when you switch back to an app, the window should actually be there.
+
+            Your support helps us keep the app fast, quiet, and well maintained instead of bloating it with distractions. If it has earned a place in your menu bar, that means a lot.
+            """
+        }
+
+        return """
+        We built Command Reopen to solve one specific annoyance: when you switch back to an app, the window should actually be there.
+
+        Pro keeps the app sustainable without turning it into a noisy product. If the app has been useful, choosing a plan is the most direct way to help us keep improving it.
+        """
+    }
+
+    private var signature: String {
+        isPurchased ? "With thanks,\nChen" : "Warmly,\nChen"
     }
 }
 
@@ -530,12 +647,14 @@ struct ProSectionView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
 
     var body: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 22) {
             if proStatusManager.status.isPro {
                 ProStatusBadgeView()
             } else {
                 UpgradeCardView()
             }
+
+            ProLetterView()
         }
     }
 }

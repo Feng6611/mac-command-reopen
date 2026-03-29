@@ -912,6 +912,8 @@ struct ProStatusManagerTests {
 
 @MainActor
 struct RevenueCatSnapshotParserTests {
+    private let originalPurchaseDate = Date(timeIntervalSince1970: 1_700_000_000)
+
     private func makeEntitlement(
         identifier: String,
         isActive: Bool,
@@ -924,8 +926,8 @@ struct RevenueCatSnapshotParserTests {
             isActive: isActive,
             willRenew: willRenew ?? (expirationDate != nil),
             periodType: .normal,
-            latestPurchaseDate: Date(timeIntervalSince1970: 1_700_000_000),
-            originalPurchaseDate: Date(timeIntervalSince1970: 1_700_000_000),
+            latestPurchaseDate: originalPurchaseDate,
+            originalPurchaseDate: originalPurchaseDate,
             expirationDate: expirationDate,
             store: .macAppStore,
             productIdentifier: productIdentifier,
@@ -987,7 +989,7 @@ struct RevenueCatSnapshotParserTests {
 
         let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
 
-        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false))
+        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false, originalPurchaseDate: originalPurchaseDate))
     }
 
     @Test("RevenueCat parser falls back to active product identifiers when entitlement id is missing")
@@ -1004,7 +1006,7 @@ struct RevenueCatSnapshotParserTests {
 
         let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
 
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
     }
 
     @Test("RevenueCat parser ignores inactive configured entitlements")
@@ -1036,7 +1038,7 @@ struct RevenueCatSnapshotParserTests {
 
         let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
 
-        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false))
+        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false, originalPurchaseDate: originalPurchaseDate))
     }
 
     @Test("RevenueCat parser infers yearly for unknown products with expiration")
@@ -1053,7 +1055,7 @@ struct RevenueCatSnapshotParserTests {
 
         let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
 
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
     }
 
     @Test("RevenueCat parser preserves cancelled yearly renewals")
@@ -1071,7 +1073,7 @@ struct RevenueCatSnapshotParserTests {
 
         let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
 
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: false))
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: false, originalPurchaseDate: originalPurchaseDate))
     }
 }
 
