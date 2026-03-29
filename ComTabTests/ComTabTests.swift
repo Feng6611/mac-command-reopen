@@ -69,6 +69,7 @@ final class MockRevenueCatService: RevenueCatServicing {
 
     var currentOffering: Offering?
     var fetchedEntitlementSnapshot: ProEntitlementSnapshot?
+    var fetchedEntitlementSnapshots: [ProEntitlementSnapshot?] = []
     var purchaseSnapshot: ProEntitlementSnapshot?
     var restoreSnapshot: ProEntitlementSnapshot?
     var offeringsError: Error?
@@ -76,6 +77,7 @@ final class MockRevenueCatService: RevenueCatServicing {
     var purchaseError: Error?
     var restoreError: Error?
     var configureCallCount = 0
+    var fetchEntitlementSnapshotCallCount = 0
     var purchaseDelayNanoseconds: UInt64?
     var restoreDelayNanoseconds: UInt64?
 
@@ -92,8 +94,14 @@ final class MockRevenueCatService: RevenueCatServicing {
     }
 
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
+        fetchEntitlementSnapshotCallCount += 1
+
         if let entitlementError {
             throw entitlementError
+        }
+
+        if !fetchedEntitlementSnapshots.isEmpty {
+            return fetchedEntitlementSnapshots.removeFirst()
         }
 
         return fetchedEntitlementSnapshot
@@ -504,6 +512,48 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
+    @Test("Trial keeps one day remaining until the final second")
+    func proStatusTrialRoundsUpRemainingDay() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-((6 * 24 * 60 * 60) + 1)), forKey: "com.comtab.trialStartDate")
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .trial(daysRemaining: 1, expiresAt: now.addingTimeInterval((24 * 60 * 60) - 1)))
+    }
+
+    @MainActor
+    @Test("Trial expires exactly at the seven day boundary")
+    func proStatusExpiresAtExactBoundary() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(7 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .expired)
+    }
+
+    @MainActor
     @Test("Active lifetime entitlement overrides an expired trial")
     func lifetimeEntitlementOverridesTrial() async {
         let (defaults, suiteName) = makeDefaults()
@@ -513,7 +563,7 @@ struct ProStatusManagerTests {
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
         let mockService = MockRevenueCatService()
-        mockService.cachedEntitlementSnapshot = .init(plan: .lifetime, expirationDate: nil)
+        mockService.cachedEntitlementSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -524,7 +574,7 @@ struct ProStatusManagerTests {
 
         manager.configureIfNeeded()
 
-        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil))
+        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil, willRenew: false))
         #expect(manager.status.isActive)
     }
 
@@ -544,9 +594,47 @@ struct ProStatusManagerTests {
         )
 
         manager.configureIfNeeded()
-        mockService.customerInfoDidChange?(.init(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60)))
+        mockService.customerInfoDidChange?(
+            .init(
+                plan: .yearly,
+                expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60),
+                willRenew: true
+            )
+        )
 
-        #expect(manager.status == .pro(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60)))
+        #expect(
+            manager.status == .pro(
+                plan: .yearly,
+                expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60),
+                willRenew: true
+            )
+        )
+    }
+
+    @MainActor
+    @Test("Active yearly entitlement overrides an expired trial")
+    func yearlyEntitlementOverridesTrial() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let mockService = MockRevenueCatService()
+        mockService.cachedEntitlementSnapshot = .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        manager.configureIfNeeded()
+
+        #expect(manager.status == .pro(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+        #expect(manager.status.isActive)
     }
 
     @MainActor
@@ -571,6 +659,31 @@ struct ProStatusManagerTests {
         }
         #expect(manager.lastError == .network)
         #expect(manager.paywallErrorMessage == ProPurchaseError.network.errorDescription)
+    }
+
+    @MainActor
+    @Test("Cancelled purchases stay silent in the paywall")
+    func purchaseCancelledClearsPaywallError() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.purchaseError = ProPurchaseError.purchaseCancelled
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await #expect(throws: ProPurchaseError.purchaseCancelled) {
+            try await manager.purchase(.yearly)
+        }
+
+        #expect(manager.lastError == .purchaseCancelled)
+        #expect(manager.paywallErrorMessage == nil)
     }
 
     @MainActor
@@ -602,7 +715,11 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let mockService = MockRevenueCatService()
         mockService.purchaseDelayNanoseconds = 100_000_000
-        mockService.purchaseSnapshot = .init(plan: .yearly, expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60))
+        mockService.purchaseSnapshot = .init(
+            plan: .yearly,
+            expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60),
+            willRenew: true
+        )
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -634,7 +751,7 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let mockService = MockRevenueCatService()
         mockService.restoreDelayNanoseconds = 100_000_000
-        mockService.restoreSnapshot = .init(plan: .lifetime, expirationDate: nil)
+        mockService.restoreSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -654,7 +771,64 @@ struct ProStatusManagerTests {
         try await task.value
 
         #expect(!manager.isRestoringPurchases)
-        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil))
+        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil, willRenew: false))
+    }
+
+    @MainActor
+    @Test("Restore with no previous purchase shows feedback and skips retry")
+    func restoreNoPurchaseShowsFeedback() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.restoreSnapshot = nil
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        try await manager.restorePurchases()
+
+        #expect(!manager.isRestoringPurchases)
+        #expect(!manager.status.isPro)
+        #expect(manager.paywallErrorMessage != nil)
+        #expect(mockService.fetchEntitlementSnapshotCallCount == 0)
+    }
+
+    @MainActor
+    @Test("Purchase retries entitlement refresh until RevenueCat catches up")
+    func purchaseRetriesEntitlementRefresh() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let mockService = MockRevenueCatService()
+        mockService.purchaseSnapshot = nil
+        mockService.fetchedEntitlementSnapshots = [
+            nil,
+            nil,
+            .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
+        ]
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        try await manager.purchase(.yearly)
+
+        #expect(mockService.fetchEntitlementSnapshotCallCount == 3)
+        #expect(manager.status == .pro(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+        #expect(manager.lastError == nil)
     }
 
     @MainActor
@@ -681,6 +855,232 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
         #expect(!manager.shouldOpenProSettings)
+    }
+
+    @MainActor
+    @Test("Bootstrap with an expired trial does not auto-open Pro settings")
+    func bootstrapExpiredDoesNotPrompt() {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        manager.configureIfNeeded()
+
+        #expect(manager.status == .expired)
+        #expect(!manager.shouldOpenProSettings)
+    }
+
+    @Test("Yearly renewal state reports a renewing subscription")
+    func yearlyRenewalStateRenews() {
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let expirationDate = now.addingTimeInterval((12 * 24 * 60 * 60) - 60)
+        let status = ProStatus.pro(plan: .yearly, expirationDate: expirationDate, willRenew: true)
+
+        guard case .renews(let resolvedDate, let daysRemaining) = status.renewalState(now: now) else {
+            Issue.record("Expected a renewing yearly state.")
+            return
+        }
+
+        #expect(resolvedDate == expirationDate)
+        #expect(daysRemaining == 12)
+    }
+
+    @Test("Yearly renewal state reports a non-renewing subscription")
+    func yearlyRenewalStateEnds() {
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let expirationDate = now.addingTimeInterval((2 * 24 * 60 * 60) - 60)
+        let status = ProStatus.pro(plan: .yearly, expirationDate: expirationDate, willRenew: false)
+
+        guard case .ends(let resolvedDate, let daysRemaining) = status.renewalState(now: now) else {
+            Issue.record("Expected a non-renewing yearly state.")
+            return
+        }
+
+        #expect(resolvedDate == expirationDate)
+        #expect(daysRemaining == 2)
+    }
+}
+
+@MainActor
+struct RevenueCatSnapshotParserTests {
+    private func makeEntitlement(
+        identifier: String,
+        isActive: Bool,
+        productIdentifier: String,
+        expirationDate: Date?,
+        willRenew: Bool? = nil
+    ) -> EntitlementInfo {
+        .init(
+            identifier: identifier,
+            isActive: isActive,
+            willRenew: willRenew ?? (expirationDate != nil),
+            periodType: .normal,
+            latestPurchaseDate: Date(timeIntervalSince1970: 1_700_000_000),
+            originalPurchaseDate: Date(timeIntervalSince1970: 1_700_000_000),
+            expirationDate: expirationDate,
+            store: .macAppStore,
+            productIdentifier: productIdentifier,
+            isSandbox: true,
+            ownershipType: .purchased
+        )
+    }
+
+    private func makeCustomerInfo(entitlements: [EntitlementInfo]) -> CustomerInfo {
+        let requestDate = Date(timeIntervalSince1970: 1_700_000_100)
+        let entitlementsByIdentifier = Dictionary(uniqueKeysWithValues: entitlements.map { ($0.identifier, $0) })
+        let expirationDatesByProductId: [String: Date] = Dictionary(
+            uniqueKeysWithValues: entitlements.compactMap { entitlement in
+                guard let expirationDate = entitlement.expirationDate else {
+                    return nil
+                }
+
+                return (entitlement.productIdentifier, expirationDate)
+            }
+        )
+        let purchaseDatesByProductId: [String: Date] = Dictionary(
+            uniqueKeysWithValues: entitlements.compactMap { entitlement in
+                guard let latestPurchaseDate = entitlement.latestPurchaseDate else {
+                    return nil
+                }
+
+                return (entitlement.productIdentifier, latestPurchaseDate)
+            }
+        )
+
+        return .init(
+            entitlements: .init(entitlements: entitlementsByIdentifier),
+            expirationDatesByProductId: expirationDatesByProductId,
+            purchaseDatesByProductId: purchaseDatesByProductId,
+            allPurchasedProductIds: Set(entitlements.map(\.productIdentifier)),
+            requestDate: requestDate,
+            firstSeen: requestDate,
+            originalAppUserId: "test-user"
+        )
+    }
+
+    @Test("RevenueCat parser prefers the configured entitlement identifier")
+    func parserUsesConfiguredEntitlementIdentifier() {
+        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: RevenueCatConfiguration.entitlementIdentifier,
+                isActive: true,
+                productIdentifier: RevenueCatConfiguration.lifetimeProductIdentifier,
+                expirationDate: nil
+            ),
+            makeEntitlement(
+                identifier: "other",
+                isActive: true,
+                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
+                expirationDate: expirationDate
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false))
+    }
+
+    @Test("RevenueCat parser falls back to active product identifiers when entitlement id is missing")
+    func parserFallsBackToProductIdentifier() {
+        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: "fallback-yearly",
+                isActive: true,
+                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
+                expirationDate: expirationDate
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+    }
+
+    @Test("RevenueCat parser ignores inactive configured entitlements")
+    func parserIgnoresInactiveConfiguredEntitlement() {
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: RevenueCatConfiguration.entitlementIdentifier,
+                isActive: false,
+                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
+                expirationDate: Date(timeIntervalSince1970: 1_800_000_000)
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == nil)
+    }
+
+    @Test("RevenueCat parser infers lifetime for unknown products without expiration")
+    func parserInfersLifetimeWithoutExpirationDate() {
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: RevenueCatConfiguration.entitlementIdentifier,
+                isActive: true,
+                productIdentifier: "custom.product",
+                expirationDate: nil
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false))
+    }
+
+    @Test("RevenueCat parser infers yearly for unknown products with expiration")
+    func parserInfersYearlyWithExpirationDate() {
+        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: RevenueCatConfiguration.entitlementIdentifier,
+                isActive: true,
+                productIdentifier: "custom.subscription",
+                expirationDate: expirationDate
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true))
+    }
+
+    @Test("RevenueCat parser preserves cancelled yearly renewals")
+    func parserPreservesCancelledYearlyRenewalState() {
+        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: RevenueCatConfiguration.entitlementIdentifier,
+                isActive: true,
+                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
+                expirationDate: expirationDate,
+                willRenew: false
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: false))
+    }
+}
+
+struct ProPurchaseErrorTests {
+    @Test("RevenueCat configuration errors map to not configured")
+    func configurationErrorMapsToNotConfigured() {
+        let error = NSError(domain: "RevenueCat", code: RevenueCat.ErrorCode.configurationError.rawValue)
+
+        #expect(ProPurchaseError(error: error) == .notConfigured)
     }
 }
 

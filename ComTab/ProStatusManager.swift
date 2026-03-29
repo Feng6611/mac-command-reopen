@@ -94,6 +94,8 @@ enum ProPurchaseError: Error, Equatable {
                 self = .network
             case .invalidCredentialsError:
                 self = .invalidCredentials
+            case .configurationError:
+                self = .notConfigured
             default:
                 self = .unknown(nsError.localizedDescription)
             }
@@ -131,7 +133,7 @@ extension ProPurchaseError: LocalizedError {
 enum ProStatus: Equatable {
     case trial(daysRemaining: Int, expiresAt: Date)
     case expired
-    case pro(plan: ProPlan, expirationDate: Date?)
+    case pro(plan: ProPlan, expirationDate: Date?, willRenew: Bool)
 
     var isActive: Bool {
         switch self {
@@ -157,6 +159,32 @@ enum ProStatus: Equatable {
 
         return false
     }
+
+    var renewalState: ProRenewalState? {
+        renewalState(now: Date())
+    }
+
+    func renewalState(now: Date) -> ProRenewalState? {
+        guard case .pro(let plan, let expirationDate, let willRenew) = self,
+              plan == .yearly,
+              let expirationDate else {
+            return nil
+        }
+
+        let remaining = expirationDate.timeIntervalSince(now)
+        let daysRemaining = remaining > 0 ? max(1, Int(ceil(remaining / 86_400))) : 0
+
+        if willRenew {
+            return .renews(on: expirationDate, daysRemaining: daysRemaining)
+        }
+
+        return .ends(on: expirationDate, daysRemaining: daysRemaining)
+    }
+}
+
+enum ProRenewalState: Equatable {
+    case renews(on: Date, daysRemaining: Int)
+    case ends(on: Date, daysRemaining: Int)
 }
 
 @MainActor
@@ -316,7 +344,11 @@ final class ProStatusManager: ObservableObject {
             entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
-                await refreshEntitlementStateAfterTransaction()
+                if snapshot != nil {
+                    await refreshEntitlementStateAfterTransaction()
+                } else {
+                    paywallErrorMessage = String(localized: "No previous purchase found on this account.")
+                }
             }
         } catch {
             let purchaseError = ProPurchaseError(error: error)
@@ -437,7 +469,11 @@ final class ProStatusManager: ObservableObject {
         now: () -> Date
     ) -> ProStatus {
         if let entitlementSnapshot {
-            return .pro(plan: entitlementSnapshot.plan, expirationDate: entitlementSnapshot.expirationDate)
+            return .pro(
+                plan: entitlementSnapshot.plan,
+                expirationDate: entitlementSnapshot.expirationDate,
+                willRenew: entitlementSnapshot.willRenew
+            )
         }
 
         let trialStart = defaults.object(forKey: Constants.trialStartDateKey) as? Date ?? now()

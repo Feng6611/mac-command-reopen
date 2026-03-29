@@ -28,10 +28,15 @@ enum RevenueCatConfiguration {
     nonisolated static let lifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime"
 }
 
-private enum RevenueCatSnapshotParser {
+enum RevenueCatSnapshotParser {
     nonisolated static func resolveActiveEntitlement(from customerInfo: CustomerInfo, logger: Logger) -> EntitlementInfo? {
         if let configuredEntitlement = customerInfo.entitlements.all[RevenueCatConfiguration.entitlementIdentifier] {
-            return configuredEntitlement
+            if configuredEntitlement.isActive {
+                return configuredEntitlement
+            }
+            logger.debug(
+                "Entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) present but inactive. product=\(configuredEntitlement.productIdentifier)"
+            )
         }
 
         let fallbackEntitlement = customerInfo.entitlements.all.values.first { entitlement in
@@ -43,7 +48,7 @@ private enum RevenueCatSnapshotParser {
 
         if let fallbackEntitlement {
             logger.notice(
-                "Falling back to active entitlement product=\(fallbackEntitlement.productIdentifier) because configured entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) was not found."
+                "Falling back to active entitlement product=\(fallbackEntitlement.productIdentifier) because configured entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) was not found or inactive."
             )
         }
 
@@ -78,13 +83,6 @@ private enum RevenueCatSnapshotParser {
             return nil
         }
 
-        guard entitlement.isActive else {
-            logger.debug(
-                "Entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) present but inactive. product=\(entitlement.productIdentifier)"
-            )
-            return nil
-        }
-
         let plan: ProPlan
         switch entitlement.productIdentifier {
         case RevenueCatConfiguration.lifetimeProductIdentifier:
@@ -99,7 +97,11 @@ private enum RevenueCatSnapshotParser {
             "Mapped active entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) product=\(entitlement.productIdentifier) plan=\(plan.rawValue)"
         )
 
-        return ProEntitlementSnapshot(plan: plan, expirationDate: entitlement.expirationDate)
+        return ProEntitlementSnapshot(
+            plan: plan,
+            expirationDate: entitlement.expirationDate,
+            willRenew: plan == .yearly && entitlement.willRenew
+        )
     }
 }
 
@@ -117,6 +119,7 @@ extension ProPlan {
 struct ProEntitlementSnapshot: Equatable, Sendable {
     let plan: ProPlan
     let expirationDate: Date?
+    let willRenew: Bool
 }
 
 @MainActor
@@ -207,7 +210,7 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
         try ensureConfigured()
 
-        let customerInfo = try await Purchases.shared.customerInfo()
+        let customerInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
         return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
     }
 

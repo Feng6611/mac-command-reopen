@@ -11,6 +11,7 @@ enum AppStoreLinks {
     static let appID = "6757333924"
     static let productURL = "macappstore://apps.apple.com/app/id\(appID)"
     static let reviewURL = "macappstore://apps.apple.com/app/id\(appID)?action=write-review"
+    static let manageSubscriptionsURL = "https://apps.apple.com/account/subscriptions"
 }
 
 enum DistributionChannel {
@@ -20,8 +21,10 @@ enum DistributionChannel {
     nonisolated(unsafe) static var current: Self {
 #if DIRECT
         .direct
-#else
+#elseif APPSTORE
         .appStore
+#else
+        .direct
 #endif
     }
 }

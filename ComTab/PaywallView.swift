@@ -178,7 +178,7 @@ struct UpgradeCardView: View {
                 if isExpired {
                     Text("Trial Expired")
                         .font(.system(size: 14, weight: .semibold))
-                    Text("Upgrade to continue using Command Reopen")
+                    Text("Purchased on another Mac? Tap Restore below.")
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 } else if case .trial(let days, _) = proStatusManager.status {
@@ -413,7 +413,7 @@ struct ProStatusBadgeView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
 
     var body: some View {
-        if case .pro(let plan, _) = proStatusManager.status {
+        if case .pro(let plan, _, _) = proStatusManager.status {
             HStack(spacing: 10) {
                 ZStack {
                     Circle()
@@ -437,12 +437,31 @@ struct ProStatusBadgeView: View {
                                 Capsule().fill(Color.green.opacity(0.8))
                             )
                     }
-                    Text("Thank you for your support!")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+
+                    if let renewalState = proStatusManager.status.renewalState {
+                        Text(renewalSummary(for: renewalState))
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+
+                        Text(renewalFooter(for: renewalState))
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary.opacity(0.85))
+                    } else {
+                        Text("Thank you for your support!")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
                 }
 
                 Spacer()
+
+                if plan == .yearly {
+                    Button("Manage Subscription") {
+                        openManageSubscription()
+                    }
+                    .buttonStyle(.link)
+                    .font(.system(size: 11, weight: .medium))
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -455,6 +474,38 @@ struct ProStatusBadgeView: View {
                     .strokeBorder(Color(nsColor: .separatorColor).opacity(0.5), lineWidth: 1)
             )
         }
+    }
+
+    private func renewalSummary(for renewalState: ProRenewalState) -> String {
+        switch renewalState {
+        case .renews(let expirationDate, _):
+            return "Renews on \(formattedDate(expirationDate))"
+        case .ends(let expirationDate, _):
+            return "Ends on \(formattedDate(expirationDate))"
+        }
+    }
+
+    private func renewalFooter(for renewalState: ProRenewalState) -> String {
+        let daysRemaining: Int
+
+        switch renewalState {
+        case .renews(_, let remaining), .ends(_, let remaining):
+            daysRemaining = remaining
+        }
+
+        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining in current period"
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day().year())
+    }
+
+    private func openManageSubscription() {
+        guard let url = URL(string: AppStoreLinks.manageSubscriptionsURL) else {
+            return
+        }
+
+        NSWorkspace.shared.open(url)
     }
 }
 
