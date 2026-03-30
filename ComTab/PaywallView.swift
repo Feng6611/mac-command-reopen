@@ -48,7 +48,7 @@ struct UpgradeCardView: View {
 
             featuresGrid
                 .padding(.horizontal, 20)
-                .padding(.bottom, 24)
+                .padding(.bottom, 20)
 
             Divider()
                 .padding(.horizontal, 16)
@@ -410,7 +410,7 @@ struct ProStatusBadgeView: View {
                             .foregroundColor(.green)
                     }
 
-                    VStack(alignment: .leading, spacing: 7) {
+                    VStack(alignment: .leading, spacing: 6) {
                         HStack(alignment: .center, spacing: 8) {
                             Text("Pro")
                                 .font(.system(size: 20, weight: .semibold))
@@ -430,17 +430,18 @@ struct ProStatusBadgeView: View {
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        VStack(alignment: .leading, spacing: 6) {
-                            if let originalPurchaseDate = proStatusManager.currentEntitlementSnapshot?.originalPurchaseDate {
-                                metadataRow(label: "Member since", value: formattedDate(originalPurchaseDate))
-                                metadataRow(label: "Supporting for", value: "\(supportingDays(since: originalPurchaseDate)) day\(supportingDays(since: originalPurchaseDate) == 1 ? "" : "s")")
-                            }
+                VStack(alignment: .leading, spacing: 6) {
+                    if let originalPurchaseDate = proStatusManager.currentEntitlementSnapshot?.originalPurchaseDate {
+                        metadataRow(label: "Member since", value: formattedDate(originalPurchaseDate))
+                        metadataRow(label: "Supporting for", value: "\(supportingDays(since: originalPurchaseDate)) day\(supportingDays(since: originalPurchaseDate) == 1 ? "" : "s")")
+                    }
 
-                            if let renewalState = proStatusManager.status.renewalState {
-                                metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
-                                metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
-                            }
-                        }
+                    if let renewalState = proStatusManager.status.renewalState {
+                        metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
+                        metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
+                    }
+                }
+                .padding(.top, 2)
                     }
 
                     Spacer(minLength: 0)
@@ -454,7 +455,7 @@ struct ProStatusBadgeView: View {
 
                 ProFeatureListView(accentColor: .green)
                     .padding(.horizontal, 20)
-                    .padding(.vertical, 18)
+                    .padding(.vertical, 16)
 
                 if plan == .yearly {
                     Divider()
@@ -549,17 +550,17 @@ private struct ProFeatureListView: View {
 
     var body: some View {
         LazyVGrid(columns: [
-            GridItem(.flexible()),
-            GridItem(.flexible()),
-        ], alignment: .leading, spacing: 8) {
+            GridItem(.flexible(), alignment: .leading),
+            GridItem(.flexible(), alignment: .leading),
+        ], spacing: 10) {
             ForEach(proFeatureItems, id: \.1) { icon, text in
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: icon)
-                        .font(.system(size: 10, weight: .medium))
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(accentColor)
-                        .frame(width: 14)
+                        .frame(width: 16, height: 16)
                     Text(text)
-                        .font(.system(size: 11))
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
                 }
             }
@@ -575,30 +576,29 @@ private struct ProLetterView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(isPurchased ? "A Note From Chen" : "Before You Decide")
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                .foregroundColor(Color.accentColor.opacity(0.72))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.secondary)
 
             Text(headline)
-                .font(.system(size: 22, weight: .medium, design: .serif))
+                .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(bodyText)
-                .font(.system(size: 14, weight: .regular, design: .monospaced))
-                .foregroundColor(.primary.opacity(0.9))
-                .lineSpacing(5)
+                .font(.system(size: 13))
+                .foregroundColor(.primary.opacity(0.85))
+                .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(signature)
-                .font(.system(size: 15, weight: .medium, design: .serif))
-                .foregroundColor(.primary.opacity(0.82))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.primary.opacity(0.7))
                 .padding(.top, 4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 4)
     }
 
     private var headline: String {
@@ -647,7 +647,7 @@ struct ProSectionView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 20) {
             if proStatusManager.status.isPro {
                 ProStatusBadgeView()
             } else {
