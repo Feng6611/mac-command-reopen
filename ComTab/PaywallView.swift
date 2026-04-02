@@ -16,16 +16,95 @@ private let proFeatureItems: [(String, String)] = [
     ("arrow.up.circle", "Future updates")
 ]
 
+enum ProPreviewMode: String, CaseIterable, Identifiable {
+    case live
+    case notPro
+    case yearlyPro
+    case lifetimePro
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .live: return "真实状态"
+        case .notPro: return "未开通"
+        case .yearlyPro: return "年度 Pro"
+        case .lifetimePro: return "永久 Pro"
+        }
+    }
+}
+
+struct ProDisplayState {
+    let status: ProStatus
+    let entitlementSnapshot: ProEntitlementSnapshot?
+    let isPreviewing: Bool
+    let showsStatusChip: Bool
+
+    static func live(
+        status: ProStatus,
+        entitlementSnapshot: ProEntitlementSnapshot?
+    ) -> Self {
+        .init(
+            status: status,
+            entitlementSnapshot: entitlementSnapshot,
+            isPreviewing: false,
+            showsStatusChip: true
+        )
+    }
+
+    static func preview(_ mode: ProPreviewMode, now: Date = Date()) -> Self {
+        let purchaseDate = Calendar.current.date(byAdding: .day, value: -120, to: now)
+        let yearlyExpirationDate = Calendar.current.date(byAdding: .day, value: 365, to: now)
+
+        switch mode {
+        case .live:
+            fatalError("Use live(status:entitlementSnapshot:) for live display state.")
+        case .notPro:
+            return .init(
+                status: .expired,
+                entitlementSnapshot: nil,
+                isPreviewing: true,
+                showsStatusChip: false
+            )
+        case .yearlyPro:
+            return .init(
+                status: .pro(plan: .yearly, expirationDate: yearlyExpirationDate, willRenew: true),
+                entitlementSnapshot: .init(
+                    plan: .yearly,
+                    expirationDate: yearlyExpirationDate,
+                    willRenew: true,
+                    originalPurchaseDate: purchaseDate
+                ),
+                isPreviewing: true,
+                showsStatusChip: false
+            )
+        case .lifetimePro:
+            return .init(
+                status: .pro(plan: .lifetime, expirationDate: nil, willRenew: false),
+                entitlementSnapshot: .init(
+                    plan: .lifetime,
+                    expirationDate: nil,
+                    willRenew: false,
+                    originalPurchaseDate: purchaseDate
+                ),
+                isPreviewing: true,
+                showsStatusChip: false
+            )
+        }
+    }
+}
+
 // MARK: - Upgrade Card (shown when trial or expired)
 
 struct UpgradeCardView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
+    let displayState: ProDisplayState
     @State private var selectedPlan: ProPlan = .lifetime
     @State private var isLoadingOfferings = false
 
-    private var isExpired: Bool {
-        proStatusManager.status == .expired
-    }
+    private var displayStatus: ProStatus { displayState.status }
+
+    private var isExpired: Bool { displayStatus == .expired }
 
     private var selectedProduct: ProPlanProduct {
         proStatusManager.planProduct(for: selectedPlan)
@@ -36,23 +115,24 @@ struct UpgradeCardView: View {
     }
 
     private var isBusy: Bool {
-        proStatusManager.purchaseInProgressPlan != nil || proStatusManager.isRestoringPurchases || isLoadingOfferings
+        proStatusManager.purchaseInProgressPlan != nil
+            || proStatusManager.isRestoringPurchases
+            || isLoadingOfferings
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            statusBanner
+            // Tinted header — mirrors ProStatusBadgeView layout
+            heroSection
                 .padding(.horizontal, DS.Spacing.xl)
-                .padding(.top, DS.Spacing.xxl)
-                .padding(.bottom, DS.Spacing.xl)
-
-            featuresGrid
-                .padding(.horizontal, DS.Spacing.xl)
-                .padding(.bottom, DS.Spacing.xl)
+                .padding(.top, DS.Spacing.xl)
+                .padding(.bottom, DS.Spacing.lg)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.accentColor.opacity(0.05))
 
             Divider()
-                .padding(.horizontal, DS.Spacing.lg)
 
+            // Plans
             Group {
                 if isLoadingOfferings {
                     ProgressView()
@@ -60,7 +140,7 @@ struct UpgradeCardView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, DS.Spacing.xl)
                 } else {
-                    VStack(spacing: DS.Spacing.md) {
+                    VStack(spacing: DS.Spacing.sm) {
                         ForEach(proStatusManager.availablePlans) { product in
                             planRow(product: product)
                         }
@@ -68,7 +148,8 @@ struct UpgradeCardView: View {
                 }
             }
             .padding(.horizontal, DS.Spacing.lg)
-            .padding(.vertical, 18)
+            .padding(.top, DS.Spacing.md)
+            .padding(.bottom, DS.Spacing.sm)
 
             if let paywallErrorMessage = proStatusManager.paywallErrorMessage {
                 Text(paywallErrorMessage)
@@ -76,76 +157,22 @@ struct UpgradeCardView: View {
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, DS.Spacing.lg)
-                    .padding(.bottom, 10)
+                    .padding(.bottom, DS.Spacing.xs)
             }
 
-            Button {
-                Task {
-                    await purchaseSelectedPlan()
-                }
-            } label: {
-                HStack(spacing: DS.Spacing.sm) {
-                    if isPurchasingSelectedPlan {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(.white)
-                    } else {
-                        Image(systemName: "lock.open.fill")
-                            .font(.system(size: 12))
-                    }
+            ctaButton
+                .padding(.horizontal, DS.Spacing.lg)
+                .padding(.vertical, DS.Spacing.sm)
 
-                    Text(ctaText)
-                        .font(DS.Typography.bodyLarge)
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 42)
-                .background(
-                    RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: ctaGradientColors,
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                )
-            }
-            .buttonStyle(.plain)
-            .disabled(isBusy || !selectedProduct.isAvailable)
-            .opacity(isBusy || !selectedProduct.isAvailable ? 0.7 : 1)
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.bottom, DS.Spacing.lg)
-
-            HStack(spacing: 10) {
-                Button(proStatusManager.isRestoringPurchases ? "Restoring..." : "Restore Purchase") {
-                    Task {
-                        await restorePurchases()
-                    }
-                }
-                .buttonStyle(.link)
-                .font(DS.Typography.caption)
-                .disabled(isBusy)
-
-                DSDotSeparator()
-
-                Button("Terms") {
-                    openExternalURL(ExternalLinks.officialURL)
-                }
-                .buttonStyle(.link)
-                .font(DS.Typography.caption)
-
-                DSDotSeparator()
-
-                Button("Privacy") {
-                    openExternalURL(ExternalLinks.officialURL)
-                }
-                .buttonStyle(.link)
-                .font(DS.Typography.caption)
-            }
-            .padding(.bottom, DS.Spacing.xl)
+            footerLinks
+                .padding(.bottom, DS.Spacing.lg)
         }
-        .dsCard(borderColor: cardBorder)
+        .background(DS.Colors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
+                .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
+        )
         .task {
             isLoadingOfferings = true
             await proStatusManager.loadOfferings()
@@ -157,67 +184,51 @@ struct UpgradeCardView: View {
         })
     }
 
-    // MARK: - Status Banner
+    // MARK: - Hero (mirrors ProStatusBadgeView proHeader layout)
 
-    private var statusBanner: some View {
-        HStack(spacing: 10) {
+    private var heroSection: some View {
+        HStack(spacing: DS.Spacing.md) {
             DSIconBadge(
-                systemName: isExpired ? "exclamationmark.triangle.fill" : "clock.fill",
-                iconColor: isExpired ? .orange : .accentColor,
-                backgroundColor: isExpired ? DS.Colors.warningTint : DS.Colors.accentTint,
-                size: 36,
-                iconSize: 16
+                systemName: "checkmark.seal.fill",
+                iconColor: .accentColor,
+                backgroundColor: DS.Colors.accentTint,
+                size: 42,
+                iconSize: 18
             )
-
-            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                if isExpired {
-                    Text("Trial Expired")
-                        .font(DS.Typography.bodyLarge)
-                    Text("Purchased on another Mac? Tap Restore below.")
-                        .font(DS.Typography.caption)
-                        .foregroundColor(.secondary)
-                } else if case .trial(let days, _) = proStatusManager.status {
-                    Text("Pro Trial")
-                        .font(DS.Typography.bodyLarge)
-                    Text("\(days) day\(days == 1 ? "" : "s") remaining")
-                        .font(DS.Typography.caption)
-                        .foregroundColor(.secondary)
-                }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Reopen Pro")
+                    .font(DS.Typography.headlineMedium)
+                Text(statusSubtitle)
+                    .font(DS.Typography.caption)
+                    .foregroundColor(statusSubtitleColor)
             }
-
-            Spacer()
-
-            if case .trial(let days, _) = proStatusManager.status {
-                trialProgressRing(daysRemaining: days)
-            }
+            Spacer(minLength: 0)
         }
     }
 
-    private func trialProgressRing(daysRemaining: Int) -> some View {
-        let progress = Double(7 - daysRemaining) / 7.0
-
-        return ZStack {
-            Circle()
-                .stroke(Color.secondary.opacity(0.15), lineWidth: 3)
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    daysRemaining <= 2 ? Color.orange : Color.accentColor,
-                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-            Text("\(daysRemaining)")
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundColor(daysRemaining <= 2 ? .orange : .accentColor)
+    private var statusSubtitle: String {
+        switch displayStatus {
+        case .expired:
+            return "Your trial has ended"
+        case .trial(let days, _):
+            return "\(days) day\(days == 1 ? "" : "s") left in your free trial"
+        case .pro:
+            return ""
         }
-        .frame(width: 32, height: 32)
     }
 
-    // MARK: - Features
-
-    private var featuresGrid: some View {
-        ProFeatureListView(accentColor: .accentColor)
+    private var statusSubtitleColor: Color {
+        switch displayStatus {
+        case .expired:
+            return .orange.opacity(0.85)
+        case .trial(let days, _) where days <= 2:
+            return .orange.opacity(0.85)
+        default:
+            return .secondary
+        }
     }
+
+    // MARK: - Status Chip (removed — status is now shown in heroSection subtitle)
 
     // MARK: - Plan Row
 
@@ -225,10 +236,7 @@ struct UpgradeCardView: View {
         let isSelected = selectedPlan == product.plan
 
         return Button {
-            guard product.isAvailable, !isBusy else {
-                return
-            }
-
+            guard product.isAvailable, !isBusy else { return }
             withAnimation(.easeInOut(duration: 0.15)) {
                 selectedPlan = product.plan
             }
@@ -238,54 +246,50 @@ struct UpgradeCardView: View {
                     Circle()
                         .stroke(
                             isSelected ? Color.accentColor : Color(nsColor: .separatorColor),
-                            lineWidth: isSelected ? 5.5 : 1.5
+                            lineWidth: 1.5
                         )
                         .frame(width: 18, height: 18)
                     if isSelected {
                         Circle()
-                            .fill(Color.white)
-                            .frame(width: 7, height: 7)
+                            .fill(Color.accentColor)
+                            .frame(width: 8, height: 8)
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 1) {
-                    HStack(spacing: 6) {
-                        Text(product.title)
-                            .font(DS.Typography.bodyMedium)
-                        if let badge = product.badge {
-                            Text(badge)
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, DS.Spacing.xxs)
-                                .background(
-                                    Capsule().fill(
-                                        LinearGradient(
-                                            colors: [.orange, .pink],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
+                HStack(spacing: 6) {
+                    Text(product.title)
+                        .font(DS.Typography.bodyMedium)
+                    if let badge = product.badge {
+                        Text(badge)
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, DS.Spacing.xxs)
+                            .background(
+                                Capsule().fill(
+                                    LinearGradient(
+                                        colors: [.accentColor, Color.accentColor.opacity(0.7)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
                                     )
                                 )
-                        }
-                        if !product.isAvailable {
-                            Text("Unavailable")
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundColor(.secondary)
-                        }
+                            )
                     }
-                    Text(product.subtitle)
-                        .font(DS.Typography.caption)
-                        .foregroundColor(.secondary)
+                    if !product.isAvailable {
+                        Text("Unavailable")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(.secondary)
+                    }
                 }
 
                 Spacer()
 
-                HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.xxs) {
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text(product.displayPrice)
                         .font(DS.Typography.headlineSmall)
-                    Text(product.billingDetail)
-                        .font(DS.Typography.caption)
+                        .foregroundColor(isSelected ? .accentColor : .primary)
+                    Text(product.plan == .lifetime ? "once" : "yr")
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
                 }
             }
@@ -308,45 +312,88 @@ struct UpgradeCardView: View {
         .disabled(!product.isAvailable || isBusy)
     }
 
+    // MARK: - CTA Button
+
+    private var ctaButton: some View {
+        Button {
+            Task { await purchaseSelectedPlan() }
+        } label: {
+            HStack(spacing: DS.Spacing.sm) {
+                if isPurchasingSelectedPlan {
+                    ProgressView().controlSize(.small).tint(.white)
+                } else {
+                    Image(systemName: "lock.open.fill")
+                        .font(.system(size: 12))
+                }
+                Text(ctaText).font(DS.Typography.bodyLarge)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .fill(LinearGradient(
+                        colors: ctaGradientColors,
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isBusy || !selectedProduct.isAvailable)
+        .opacity(isBusy || !selectedProduct.isAvailable ? 0.7 : 1)
+    }
+
+    // MARK: - Footer Links
+
+    private var footerLinks: some View {
+        HStack(spacing: 10) {
+            Button(proStatusManager.isRestoringPurchases ? "Restoring..." : "Restore Purchase") {
+                Task { await restorePurchases() }
+            }
+            .buttonStyle(.link)
+            .font(DS.Typography.caption)
+            .disabled(isBusy)
+
+            DSDotSeparator()
+
+            Button("Terms") { openExternalURL(ExternalLinks.officialURL) }
+                .buttonStyle(.link)
+                .font(DS.Typography.caption)
+
+            DSDotSeparator()
+
+            Button("Privacy") { openExternalURL(ExternalLinks.officialURL) }
+                .buttonStyle(.link)
+                .font(DS.Typography.caption)
+        }
+    }
+
     // MARK: - Helpers
 
     private var ctaText: String {
-        guard selectedProduct.isAvailable else {
-            return "Currently Unavailable"
-        }
-
+        guard selectedProduct.isAvailable else { return "Currently Unavailable" }
         switch selectedPlan {
-        case .yearly:
-            return "Subscribe - \(selectedProduct.displayPrice)/year"
-        case .lifetime:
-            return "Buy Once - \(selectedProduct.displayPrice)"
+        case .yearly:   return "Subscribe — \(selectedProduct.displayPrice)/year"
+        case .lifetime: return "Unlock Forever — \(selectedProduct.displayPrice)"
         }
     }
 
     private var ctaGradientColors: [Color] {
         selectedProduct.isAvailable
-            ? [Color.accentColor, Color.accentColor.opacity(0.8)]
+            ? [Color.accentColor, Color.accentColor.opacity(0.75)]
             : [Color.secondary.opacity(0.7), Color.secondary.opacity(0.5)]
     }
 
-    private var cardBorder: Color {
-        isExpired ? DS.Colors.warningBorder : DS.Colors.cardBorder
-    }
-
     private func syncSelectedPlan() {
-        if proStatusManager.planProduct(for: selectedPlan).isAvailable {
-            return
-        }
-
+        if proStatusManager.planProduct(for: selectedPlan).isAvailable { return }
         if let firstAvailablePlan = proStatusManager.availablePlans.first(where: { $0.isAvailable })?.plan {
             selectedPlan = firstAvailablePlan
         }
     }
 
     private func purchaseSelectedPlan() async {
-        guard selectedProduct.isAvailable else {
-            return
-        }
+        guard selectedProduct.isAvailable else { return }
 
         do {
             try await proStatusManager.purchase(selectedPlan)
@@ -380,56 +427,20 @@ struct UpgradeCardView: View {
 
 struct ProStatusBadgeView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
+    let displayState: ProDisplayState
 
     var body: some View {
-        if case .pro(let plan, _, _) = proStatusManager.status {
+        if case .pro(let plan, _, _) = displayState.status {
             VStack(spacing: 0) {
-                HStack(alignment: .center, spacing: 14) {
-                    DSIconBadge(
-                        systemName: "checkmark.seal.fill",
-                        iconColor: .green,
-                        backgroundColor: DS.Colors.proTint
-                    )
-
-                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        HStack(alignment: .center, spacing: DS.Spacing.sm) {
-                            Text("Pro")
-                                .font(DS.Typography.headlineMedium)
-
-                            Text(plan == .lifetime ? "Lifetime" : "Yearly")
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, DS.Spacing.sm)
-                                .padding(.vertical, 3)
-                                .background(
-                                    Capsule().fill(plan == .lifetime ? DS.Colors.proFill : Color.accentColor.opacity(0.9))
-                                )
-                        }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    if let originalPurchaseDate = proStatusManager.currentEntitlementSnapshot?.originalPurchaseDate {
-                        metadataRow(label: "Member since", value: formattedDate(originalPurchaseDate))
-                        metadataRow(label: "Supporting for", value: "\(supportingDays(since: originalPurchaseDate)) day\(supportingDays(since: originalPurchaseDate) == 1 ? "" : "s")")
-                    }
-
-                    if let renewalState = proStatusManager.status.renewalState {
-                        metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
-                        metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
-                    }
-                }
-                .padding(.top, DS.Spacing.xxs)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, DS.Spacing.xl)
-                .padding(.top, 22)
-                .padding(.bottom, 18)
+                proHeader(plan: plan)
+                    .padding(.horizontal, DS.Spacing.xl)
+                    .padding(.top, DS.Spacing.xl)
+                    .padding(.bottom, DS.Spacing.lg)
 
                 Divider()
                     .padding(.horizontal, DS.Spacing.lg)
 
-                ProFeatureListView(accentColor: .green)
+                metadataSection
                     .padding(.horizontal, DS.Spacing.xl)
                     .padding(.vertical, DS.Spacing.lg)
 
@@ -447,42 +458,59 @@ struct ProStatusBadgeView: View {
                         Spacer()
                     }
                     .padding(.horizontal, DS.Spacing.xl)
-                    .padding(.vertical, DS.Spacing.lg)
+                    .padding(.vertical, DS.Spacing.md)
                 }
             }
             .dsCard()
         }
     }
 
-    private func renewalFooter(for renewalState: ProRenewalState) -> String {
-        let daysRemaining: Int
+    private func proHeader(plan: ProPlan) -> some View {
+        HStack(spacing: DS.Spacing.md) {
+            DSIconBadge(
+                systemName: "checkmark.seal.fill",
+                iconColor: .accentColor,
+                backgroundColor: DS.Colors.accentTint,
+                size: 42,
+                iconSize: 18
+            )
 
-        switch renewalState {
-        case .renews(_, let remaining), .ends(_, let remaining):
-            daysRemaining = remaining
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: DS.Spacing.sm) {
+                    Text("Pro")
+                        .font(DS.Typography.headlineMedium)
+
+                    Text(plan == .lifetime ? "Lifetime" : "Yearly")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, DS.Spacing.sm)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule().fill(DS.Colors.proFill)
+                        )
+                }
+
+                Text("All features unlocked — thank you for your support.")
+                    .font(DS.Typography.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer(minLength: 0)
         }
-
-        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left in current period"
     }
 
-    private func renewalLabel(for renewalState: ProRenewalState) -> String {
-        switch renewalState {
-        case .renews:
-            return "Renews"
-        case .ends:
-            return "Ends"
-        }
-    }
+    private var metadataSection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+            if let purchaseDate = displayState.entitlementSnapshot?.originalPurchaseDate {
+                metadataRow(label: "Member since", value: formattedDate(purchaseDate))
+                metadataRow(label: "Supporting for", value: supportingText(since: purchaseDate))
+            }
 
-    private func renewalDate(for renewalState: ProRenewalState) -> String {
-        switch renewalState {
-        case .renews(let expirationDate, _), .ends(let expirationDate, _):
-            return formattedDate(expirationDate)
+            if let renewalState = displayState.status.renewalState {
+                metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
+                metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
+            }
         }
-    }
-
-    private func formattedDate(_ date: Date) -> String {
-        date.formatted(.dateTime.month(.abbreviated).day().year())
     }
 
     private func metadataRow(label: String, value: String) -> some View {
@@ -500,102 +528,108 @@ struct ProStatusBadgeView: View {
         }
     }
 
-    private func supportingDays(since date: Date) -> Int {
-        let days = Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0
-        return max(1, days)
+    private func supportingText(since date: Date) -> String {
+        let days = max(1, Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0)
+        return "\(days) day\(days == 1 ? "" : "s")"
+    }
+
+    private func renewalFooter(for renewalState: ProRenewalState) -> String {
+        let daysRemaining: Int
+        switch renewalState {
+        case .renews(_, let remaining), .ends(_, let remaining):
+            daysRemaining = remaining
+        }
+        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left in current period"
+    }
+
+    private func renewalLabel(for renewalState: ProRenewalState) -> String {
+        switch renewalState {
+        case .renews: return "Renews"
+        case .ends:   return "Ends"
+        }
+    }
+
+    private func renewalDate(for renewalState: ProRenewalState) -> String {
+        switch renewalState {
+        case .renews(let date, _), .ends(let date, _):
+            return formattedDate(date)
+        }
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day().year())
     }
 
     private func openManageSubscription() {
-        guard let url = URL(string: AppStoreLinks.manageSubscriptionsURL) else {
-            return
-        }
-
+        guard let url = URL(string: AppStoreLinks.manageSubscriptionsURL) else { return }
         NSWorkspace.shared.open(url)
     }
 }
 
-private struct ProFeatureListView: View {
-    let accentColor: Color
 
-    var body: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible(), alignment: .leading),
-            GridItem(.flexible(), alignment: .leading),
-        ], spacing: 10) {
-            ForEach(proFeatureItems, id: \.1) { icon, text in
-                HStack(spacing: DS.Spacing.sm) {
-                    ZStack {
-                        Circle()
-                            .fill(accentColor.opacity(0.1))
-                            .frame(width: 22, height: 22)
-                        Image(systemName: icon)
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(accentColor)
-                    }
-                    Text(text)
-                        .font(.system(size: 12))
-                        .foregroundColor(.primary.opacity(0.8))
-                }
-            }
-        }
-    }
-}
 
 private struct ProLetterView: View {
-    @EnvironmentObject private var proStatusManager: ProStatusManager
-
-    private var isPurchased: Bool {
-        proStatusManager.status.isPro
-    }
+    let displayState: ProDisplayState
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            Text(isPurchased ? "A Note From Chen" : "Before You Decide")
-                .font(DS.Typography.letterLabel)
-                .foregroundColor(Color.accentColor.opacity(0.6))
+        VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+            // Small caps label
+            Text(labelText)
+                .font(.system(size: 10, weight: .semibold))
+                .tracking(0.8)
+                .foregroundColor(.accentColor.opacity(0.55))
 
+            // Editorial headline
             Text(headline)
-                .font(DS.Typography.letterHeadline)
+                .font(.system(size: 16, weight: .regular))
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            // Body — relaxed, lighter
             Text(bodyText)
-                .font(DS.Typography.letterBody)
-                .foregroundColor(.primary.opacity(0.85))
-                .lineSpacing(DS.Spacing.xs)
+                .font(.system(size: 13))
+                .foregroundColor(.primary.opacity(0.62))
+                .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
 
+            // Signature — medium, distinct from body
             Text(signature)
-                .font(DS.Typography.letterSignature)
-                .foregroundColor(.primary.opacity(0.7))
-                .padding(.top, DS.Spacing.xs)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.primary.opacity(0.5))
+                .padding(.top, DS.Spacing.xxs)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, DS.Spacing.xs)
     }
 
+    private var labelText: String {
+        displayState.status.isPro ? "A NOTE FROM CHEN" : "BEFORE YOU DECIDE"
+    }
+
     private var headline: String {
-        isPurchased ? "Thank you for keeping this app small, focused, and cared for." : "Command Reopen is a tiny utility, and we want to keep it that way."
+        switch displayState.status {
+        case .pro:
+            return "Thank you for being here."
+        case .trial(let days, _):
+            return "You came in with \(days == 7 ? "7 days" : "\(days) day\(days == 1 ? "" : "s")") free. Use them."
+        case .expired:
+            return "Your 7 days are up."
+        }
     }
 
     private var bodyText: String {
-        if isPurchased {
-            return """
-            We built Command Reopen to solve one specific annoyance: when you switch back to an app, the window should actually be there.
-
-            Your support helps us keep the app fast, quiet, and well maintained instead of bloating it with distractions. If it has earned a place in your menu bar, that means a lot.
-            """
+        switch displayState.status {
+        case .pro:
+            return "Your support keeps this app small and honest — no bloat, no noise. I hope it keeps showing up for you, quietly, every time you need it."
+        case .trial:
+            return "Every Cmd+Tab should bring your window back. That's the only thing this app does — and you have a full week to test that claim, with everything unlocked.\n\nIf it holds up, I hope you'll stick around."
+        case .expired:
+            return "You've had a full week with everything unlocked. If Command Reopen made your workflow a little smoother, I hope you'll keep it.\n\nIf it didn't, no hard feelings."
         }
-
-        return """
-        We built Command Reopen to solve one specific annoyance: when you switch back to an app, the window should actually be there.
-
-        Pro keeps the app sustainable without turning it into a noisy product. If the app has been useful, choosing a plan is the most direct way to help us keep improving it.
-        """
     }
 
     private var signature: String {
-        isPurchased ? "With thanks,\nChen" : "Warmly,\nChen"
+        displayState.status.isPro ? "With thanks,\nChen" : "Warmly,\nChen"
     }
 }
 
@@ -603,16 +637,50 @@ private struct ProLetterView: View {
 
 struct ProSectionView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
+    @State private var previewMode: ProPreviewMode = .live
+
+    private var displayState: ProDisplayState {
+        switch previewMode {
+        case .live:
+            return .live(
+                status: proStatusManager.status,
+                entitlementSnapshot: proStatusManager.currentEntitlementSnapshot
+            )
+        case .notPro, .yearlyPro, .lifetimePro:
+            return .preview(previewMode)
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
-            if proStatusManager.status.isPro {
-                ProStatusBadgeView()
+            if displayState.status.isPro {
+                ProStatusBadgeView(displayState: displayState)
             } else {
-                UpgradeCardView()
+                UpgradeCardView(displayState: displayState)
             }
 
-            ProLetterView()
+            ProLetterView(displayState: displayState)
+
+#if DEBUG
+            previewPicker
+#endif
         }
     }
+
+#if DEBUG
+    private var previewPicker: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+            Picker("UI 预览", selection: $previewMode) {
+                ForEach(ProPreviewMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text("仅用于临时查看 UI 状态")
+                .font(DS.Typography.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+#endif
 }

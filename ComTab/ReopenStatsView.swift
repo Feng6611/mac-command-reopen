@@ -76,7 +76,6 @@ struct ReopenStatsView: View {
                 .padding(.top, DS.Spacing.xs)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, DS.Spacing.lg)
         .padding(DS.Spacing.lg)
         .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
     }
@@ -114,7 +113,7 @@ struct ReopenStatsView: View {
 #endif
 
                 if allZero {
-                    Text("Start using ComTab to see trends")
+                    Text("Start using Command Reopen to see trends")
                         .font(.system(size: 12))
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -246,8 +245,6 @@ private struct ChartsTrendView: View {
 private struct ChartsTopAppsView: View {
     let apps: [ReopenStatsStore.AppStat]
 
-    private static let barColors: [Color] = [.blue, .purple, .orange, .green, .pink, .teal]
-
     var body: some View {
         Chart {
             ForEach(Array(apps.enumerated()), id: \.element.id) { index, app in
@@ -255,7 +252,7 @@ private struct ChartsTopAppsView: View {
                     x: .value("Count", app.count),
                     y: .value("App", app.displayName)
                 )
-                .foregroundStyle(Self.barColors[index % Self.barColors.count])
+                .foregroundStyle(Color.accentColor.opacity(1.0 - Double(index) * 0.12))
                 .cornerRadius(4)
                 .annotation(position: .trailing, alignment: .leading, spacing: 4) {
                     Text("\(app.count)")
@@ -334,8 +331,6 @@ private struct FallbackTopAppsView: View {
     let apps: [ReopenStatsStore.AppStat]
     let maxCount: Int
 
-    private static let barColors: [Color] = [.blue, .purple, .orange, .green, .pink, .teal]
-
     var body: some View {
         VStack(spacing: DS.Spacing.sm) {
             ForEach(Array(apps.enumerated()), id: \.element.id) { index, app in
@@ -348,7 +343,7 @@ private struct FallbackTopAppsView: View {
 
                     GeometryReader { geometry in
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(Self.barColors[index % Self.barColors.count])
+                            .fill(Color.accentColor.opacity(1.0 - Double(index) * 0.12))
                             .frame(width: barWidth(for: app.count, in: geometry.size.width))
                     }
                     .frame(height: 18)

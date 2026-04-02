@@ -115,9 +115,37 @@ struct DSCardModifier: ViewModifier {
     }
 }
 
+// MARK: - Glass Card Modifier (uses system material for depth)
+
+struct DSGlassCardModifier: ViewModifier {
+    var borderColor: Color = DS.Colors.cardBorder
+    var radius: CGFloat = DS.Radius.lg
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(macOS 12.0, *) {
+            content
+                .background(
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .fill(.regularMaterial)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .strokeBorder(borderColor, lineWidth: 1)
+                )
+        } else {
+            content.modifier(DSCardModifier(borderColor: borderColor, radius: radius))
+        }
+    }
+}
+
 extension View {
     func dsCard(borderColor: Color = DS.Colors.cardBorder, radius: CGFloat = DS.Radius.lg) -> some View {
         modifier(DSCardModifier(borderColor: borderColor, radius: radius))
+    }
+
+    func dsGlassCard(borderColor: Color = DS.Colors.cardBorder, radius: CGFloat = DS.Radius.lg) -> some View {
+        modifier(DSGlassCardModifier(borderColor: borderColor, radius: radius))
     }
 }
 

@@ -178,7 +178,7 @@ struct SidebarButton: View {
         if isSelected {
             return Color.accentColor.opacity(0.08)
         } else if isHovering {
-            return Color.primary.opacity(0.025)
+            return Color.primary.opacity(0.04)
         }
         return .clear
     }
@@ -251,15 +251,18 @@ struct SettingsTabContent: View {
                             .disabled(isFeatureLocked)
                         if isFeatureLocked {
                             Spacer()
-                            Text("Requires Pro")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.orange)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(
-                                    Capsule()
-                                        .fill(DS.Colors.warningFill)
-                                )
+                            HStack(spacing: 3) {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 8, weight: .semibold))
+                                Text("Pro")
+                                    .font(.system(size: 10, weight: .semibold))
+                            }
+                            .foregroundColor(.accentColor)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(
+                                Capsule().fill(DS.Colors.accentTint)
+                            )
                         }
                     }
                     Text("Automatically reopen windows when switching apps via Cmd+Tab")
