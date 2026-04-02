@@ -26,6 +26,9 @@
     "7-day free trial included" : {
 
     },
+    "A Note From Chen" : {
+
+    },
     "About" : {
       "localizations" : {
         "ja" : {
@@ -66,6 +69,9 @@
       }
     },
     "Automatically reopen windows when switching apps via Cmd+Tab" : {
+
+    },
+    "Before You Decide" : {
 
     },
     "Best Value" : {
@@ -172,6 +178,9 @@
     "Lifetime" : {
 
     },
+    "Manage Subscription" : {
+
+    },
     "Month" : {
 
     },
@@ -187,6 +196,9 @@
           }
         }
       }
+    },
+    "No previous purchase found on this account." : {
+
     },
     "No reopen activity yet" : {
 
@@ -220,6 +232,9 @@
 
     },
     "Pro Trial" : {
+
+    },
+    "Purchased on another Mac? Tap Restore below." : {
 
     },
     "Quit Command Reopen" : {
@@ -293,9 +308,6 @@
     "Terms" : {
 
     },
-    "Thank you for your support!" : {
-
-    },
     "Top Apps" : {
 
     },
@@ -309,9 +321,6 @@
 
     },
     "Unavailable" : {
-
-    },
-    "Upgrade to continue using Command Reopen" : {
 
     },
     "Upgrade to Pro..." : {

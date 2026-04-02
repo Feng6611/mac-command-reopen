@@ -63,7 +63,7 @@ struct SettingsView: View {
     var body: some View {
         HStack(spacing: 0) {
             // Sidebar
-            VStack(spacing: 2) {
+            VStack(spacing: DS.Spacing.xxs) {
                 ForEach(SettingsTab.visibleTabs(showProTab: accessController.showsProTab), id: \.self) { tab in
                     SidebarButton(tab: tab, isSelected: navigationModel.selectedTab == tab) {
                         withAnimation(.easeInOut(duration: 0.15)) {
@@ -75,12 +75,12 @@ struct SettingsView: View {
                 Spacer()
 
                 Text("v\(appVersion) (\(buildNumber))")
-                    .font(.system(size: 10))
-                    .foregroundColor(Color.secondary.opacity(0.5))
+                    .font(DS.Typography.micro)
+                    .foregroundColor(DS.Colors.textTertiary)
                     .padding(.bottom, 14)
             }
-            .padding(.top, 20)
-            .padding(.horizontal, 12)
+            .padding(.top, DS.Spacing.xl)
+            .padding(.horizontal, DS.Spacing.md)
             .frame(width: 150)
             .background(SidebarBackgroundView())
 
@@ -125,7 +125,7 @@ struct SettingsView: View {
 private struct SidebarBackgroundView: NSViewRepresentable {
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = NSVisualEffectView()
-        view.material = .sidebar
+        view.material = .windowBackground
         view.blendingMode = .behindWindow
         view.state = .followsWindowActiveState
         return view
@@ -144,9 +144,9 @@ struct SidebarButton: View {
 
     var body: some View {
         let button = Button(action: action) {
-            HStack(spacing: 8) {
+            HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(DS.Typography.bodyMedium)
                     .foregroundColor(isSelected ? .accentColor : .secondary)
                     .frame(width: 20)
                 Text(tab.title)
@@ -156,7 +156,7 @@ struct SidebarButton: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
                     .fill(backgroundColor)
             )
             .contentShape(Rectangle())
@@ -176,9 +176,9 @@ struct SidebarButton: View {
 
     private var backgroundColor: Color {
         if isSelected {
-            return Color.accentColor.opacity(0.12)
+            return Color.accentColor.opacity(0.08)
         } else if isHovering {
-            return Color.primary.opacity(0.04)
+            return Color.primary.opacity(0.025)
         }
         return .clear
     }
@@ -191,9 +191,9 @@ struct ProTabContent: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             ProSectionView()
-                .padding(.vertical, 24)
+                .padding(.vertical, DS.Spacing.xxl)
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, DS.Spacing.xxl)
     }
 }
 #endif
@@ -258,12 +258,12 @@ struct SettingsTabContent: View {
                                 .padding(.vertical, 2)
                                 .background(
                                     Capsule()
-                                        .fill(Color.orange.opacity(0.1))
+                                        .fill(DS.Colors.warningFill)
                                 )
                         }
                     }
                     Text("Automatically reopen windows when switching apps via Cmd+Tab")
-                        .font(.system(size: 11))
+                        .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
                 if #available(macOS 13.0, *) {

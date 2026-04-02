@@ -28,27 +28,6 @@ enum StatTimeRange: CaseIterable {
     }
 }
 
-private struct CardModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 0.5)
-            )
-    }
-}
-
-private extension View {
-    func statsCard() -> some View {
-        modifier(CardModifier())
-    }
-}
-
 struct ReopenStatsView: View {
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
 
@@ -72,21 +51,21 @@ struct ReopenStatsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: DS.Spacing.lg) {
                 heroSection
                 trendSection
                 topAppsSection
                 resetSection
             }
-            .padding(20)
+            .padding(DS.Spacing.xl)
         }
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.3))
     }
 
     private var heroSection: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: DS.Spacing.xxs) {
             Text("\(reopenStatsStore.totalSuccessfulReopens)")
-                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .font(DS.Typography.displayLarge)
                 .foregroundColor(.primary)
             Text("total reopens")
                 .font(.system(size: 12))
@@ -94,15 +73,16 @@ struct ReopenStatsView: View {
             Text("\(reopenStatsStore.todayCount) today")
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundColor(.secondary.opacity(0.7))
-                .padding(.top, 4)
+                .padding(.top, DS.Spacing.xs)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .statsCard()
+        .padding(.vertical, DS.Spacing.lg)
+        .padding(DS.Spacing.lg)
+        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
     }
 
     private var trendSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
             HStack {
                 Text("Trend")
                     .font(.system(size: 12, weight: .semibold))
@@ -142,11 +122,12 @@ struct ReopenStatsView: View {
                 }
             }
         }
-        .statsCard()
+        .padding(DS.Spacing.lg)
+        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
     }
 
     private var topAppsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
             Text("Top Apps")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.secondary)
@@ -161,11 +142,11 @@ struct ReopenStatsView: View {
                             .foregroundColor(.secondary.opacity(0.5))
                         Text("No reopen activity yet")
                             .foregroundColor(.secondary)
-                            .font(.system(size: 11))
+                            .font(DS.Typography.caption)
                     }
                     Spacer()
                 }
-                .padding(.vertical, 16)
+                .padding(.vertical, DS.Spacing.lg)
             } else {
 #if canImport(Charts)
                 if #available(macOS 13.0, *) {
@@ -179,7 +160,8 @@ struct ReopenStatsView: View {
 #endif
             }
         }
-        .statsCard()
+        .padding(DS.Spacing.lg)
+        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
     }
 
     private var resetSection: some View {
@@ -188,7 +170,7 @@ struct ReopenStatsView: View {
             Button("Reset Statistics", role: .destructive) {
                 showResetConfirmation = true
             }
-            .font(.system(size: 11))
+            .font(DS.Typography.caption)
             .disabled(reopenStatsStore.totalSuccessfulReopens == 0)
             .alert("Reset Statistics?", isPresented: $showResetConfirmation) {
                 Button("Cancel", role: .cancel) {}
@@ -200,7 +182,7 @@ struct ReopenStatsView: View {
             }
             Spacer()
         }
-        .padding(.top, 4)
+        .padding(.top, DS.Spacing.xs)
     }
 }
 
@@ -355,9 +337,9 @@ private struct FallbackTopAppsView: View {
     private static let barColors: [Color] = [.blue, .purple, .orange, .green, .pink, .teal]
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: DS.Spacing.sm) {
             ForEach(Array(apps.enumerated()), id: \.element.id) { index, app in
-                HStack(spacing: 8) {
+                HStack(spacing: DS.Spacing.sm) {
                     Text(app.displayName)
                         .font(.system(size: 11))
                         .frame(width: 80, alignment: .trailing)

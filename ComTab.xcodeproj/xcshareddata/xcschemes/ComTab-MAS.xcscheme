@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2620"
+   LastUpgradeVersion = "2630"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -11,8 +11,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Auto Increment Build Number"
-               scriptText = "/bin/sh &quot;${SRCROOT}/scripts/auto_increment_build_number.sh&quot;
-">
+               scriptText = "/bin/sh &quot;${SRCROOT}/scripts/auto_increment_build_number.sh&quot; ">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"

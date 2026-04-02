@@ -42,40 +42,40 @@ struct UpgradeCardView: View {
     var body: some View {
         VStack(spacing: 0) {
             statusBanner
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 20)
+                .padding(.horizontal, DS.Spacing.xl)
+                .padding(.top, DS.Spacing.xxl)
+                .padding(.bottom, DS.Spacing.xl)
 
             featuresGrid
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+                .padding(.horizontal, DS.Spacing.xl)
+                .padding(.bottom, DS.Spacing.xl)
 
             Divider()
-                .padding(.horizontal, 16)
+                .padding(.horizontal, DS.Spacing.lg)
 
             Group {
                 if isLoadingOfferings {
                     ProgressView()
                         .controlSize(.small)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
+                        .padding(.vertical, DS.Spacing.xl)
                 } else {
-                    VStack(spacing: 12) {
+                    VStack(spacing: DS.Spacing.md) {
                         ForEach(proStatusManager.availablePlans) { product in
                             planRow(product: product)
                         }
                     }
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, 18)
 
             if let paywallErrorMessage = proStatusManager.paywallErrorMessage {
                 Text(paywallErrorMessage)
-                    .font(.system(size: 11))
+                    .font(DS.Typography.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
                     .padding(.bottom, 10)
             }
 
@@ -84,7 +84,7 @@ struct UpgradeCardView: View {
                     await purchaseSelectedPlan()
                 }
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: DS.Spacing.sm) {
                     if isPurchasingSelectedPlan {
                         ProgressView()
                             .controlSize(.small)
@@ -95,13 +95,13 @@ struct UpgradeCardView: View {
                     }
 
                     Text(ctaText)
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(DS.Typography.bodyLarge)
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 42)
                 .background(
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: ctaGradientColors,
@@ -114,8 +114,8 @@ struct UpgradeCardView: View {
             .buttonStyle(.plain)
             .disabled(isBusy || !selectedProduct.isAvailable)
             .opacity(isBusy || !selectedProduct.isAvailable ? 0.7 : 1)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.bottom, DS.Spacing.lg)
 
             HStack(spacing: 10) {
                 Button(proStatusManager.isRestoringPurchases ? "Restoring..." : "Restore Purchase") {
@@ -124,39 +124,28 @@ struct UpgradeCardView: View {
                     }
                 }
                 .buttonStyle(.link)
-                .font(.system(size: 11))
+                .font(DS.Typography.caption)
                 .disabled(isBusy)
 
-                Circle()
-                    .fill(Color.secondary.opacity(0.4))
-                    .frame(width: 3, height: 3)
+                DSDotSeparator()
 
                 Button("Terms") {
                     openExternalURL(ExternalLinks.officialURL)
                 }
                 .buttonStyle(.link)
-                .font(.system(size: 11))
+                .font(DS.Typography.caption)
 
-                Circle()
-                    .fill(Color.secondary.opacity(0.4))
-                    .frame(width: 3, height: 3)
+                DSDotSeparator()
 
                 Button("Privacy") {
                     openExternalURL(ExternalLinks.officialURL)
                 }
                 .buttonStyle(.link)
-                .font(.system(size: 11))
+                .font(DS.Typography.caption)
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, DS.Spacing.xl)
         }
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(cardBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(cardBorder, lineWidth: 1)
-        )
+        .dsCard(borderColor: cardBorder)
         .task {
             isLoadingOfferings = true
             await proStatusManager.loadOfferings()
@@ -172,27 +161,26 @@ struct UpgradeCardView: View {
 
     private var statusBanner: some View {
         HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(isExpired ? Color.orange.opacity(0.15) : Color.accentColor.opacity(0.12))
-                    .frame(width: 36, height: 36)
-                Image(systemName: isExpired ? "exclamationmark.triangle.fill" : "clock.fill")
-                    .font(.system(size: 16))
-                    .foregroundColor(isExpired ? .orange : .accentColor)
-            }
+            DSIconBadge(
+                systemName: isExpired ? "exclamationmark.triangle.fill" : "clock.fill",
+                iconColor: isExpired ? .orange : .accentColor,
+                backgroundColor: isExpired ? DS.Colors.warningTint : DS.Colors.accentTint,
+                size: 36,
+                iconSize: 16
+            )
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
                 if isExpired {
                     Text("Trial Expired")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(DS.Typography.bodyLarge)
                     Text("Purchased on another Mac? Tap Restore below.")
-                        .font(.system(size: 11))
+                        .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 } else if case .trial(let days, _) = proStatusManager.status {
                     Text("Pro Trial")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(DS.Typography.bodyLarge)
                     Text("\(days) day\(days == 1 ? "" : "s") remaining")
-                        .font(.system(size: 11))
+                        .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
             }
@@ -245,7 +233,7 @@ struct UpgradeCardView: View {
                 selectedPlan = product.plan
             }
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: DS.Spacing.md) {
                 ZStack {
                     Circle()
                         .stroke(
@@ -263,13 +251,13 @@ struct UpgradeCardView: View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 6) {
                         Text(product.title)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(DS.Typography.bodyMedium)
                         if let badge = product.badge {
                             Text(badge)
                                 .font(.system(size: 9, weight: .semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .padding(.vertical, DS.Spacing.xxs)
                                 .background(
                                     Capsule().fill(
                                         LinearGradient(
@@ -287,30 +275,30 @@ struct UpgradeCardView: View {
                         }
                     }
                     Text(product.subtitle)
-                        .font(.system(size: 11))
+                        .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
 
                 Spacer()
 
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.xxs) {
                     Text(product.displayPrice)
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .font(DS.Typography.headlineSmall)
                     Text(product.billingDetail)
-                        .font(.system(size: 11))
+                        .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.vertical, DS.Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(isSelected ? Color.accentColor.opacity(0.06) : Color(nsColor: .controlBackgroundColor))
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .fill(isSelected ? DS.Colors.accentTintSubtle : Color(nsColor: .controlBackgroundColor))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
                     .stroke(
-                        isSelected ? Color.accentColor.opacity(0.5) : Color(nsColor: .separatorColor).opacity(0.5),
+                        isSelected ? Color.accentColor.opacity(0.5) : DS.Colors.cardBorder,
                         lineWidth: isSelected ? 1.5 : 1
                     )
             )
@@ -341,12 +329,8 @@ struct UpgradeCardView: View {
             : [Color.secondary.opacity(0.7), Color.secondary.opacity(0.5)]
     }
 
-    private var cardBackground: Color {
-        Color(nsColor: .windowBackgroundColor)
-    }
-
     private var cardBorder: Color {
-        isExpired ? Color.orange.opacity(0.3) : Color(nsColor: .separatorColor).opacity(0.5)
+        isExpired ? DS.Colors.warningBorder : DS.Colors.cardBorder
     }
 
     private func syncSelectedPlan() {
@@ -400,35 +384,27 @@ struct ProStatusBadgeView: View {
     var body: some View {
         if case .pro(let plan, _, _) = proStatusManager.status {
             VStack(spacing: 0) {
-                HStack(alignment: .top, spacing: 14) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.green.opacity(0.12))
-                            .frame(width: 42, height: 42)
-                        Image(systemName: "checkmark.seal.fill")
-                            .font(.system(size: 18))
-                            .foregroundColor(.green)
-                    }
+                HStack(alignment: .center, spacing: 14) {
+                    DSIconBadge(
+                        systemName: "checkmark.seal.fill",
+                        iconColor: .green,
+                        backgroundColor: DS.Colors.proTint
+                    )
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(alignment: .center, spacing: 8) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                        HStack(alignment: .center, spacing: DS.Spacing.sm) {
                             Text("Pro")
-                                .font(.system(size: 20, weight: .semibold))
+                                .font(DS.Typography.headlineMedium)
 
                             Text(plan == .lifetime ? "Lifetime" : "Yearly")
                                 .font(.system(size: 11, weight: .semibold))
                                 .foregroundColor(.white)
-                                .padding(.horizontal, 8)
+                                .padding(.horizontal, DS.Spacing.sm)
                                 .padding(.vertical, 3)
                                 .background(
-                                    Capsule().fill(plan == .lifetime ? Color.green.opacity(0.85) : Color.accentColor.opacity(0.9))
+                                    Capsule().fill(plan == .lifetime ? DS.Colors.proFill : Color.accentColor.opacity(0.9))
                                 )
                         }
-
-                        Text(plan == .lifetime ? "Thank you for supporting Command Reopen with a one-time purchase." : "Thank you for supporting Command Reopen with an active yearly membership.")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
 
                 VStack(alignment: .leading, spacing: 6) {
                     if let originalPurchaseDate = proStatusManager.currentEntitlementSnapshot?.originalPurchaseDate {
@@ -441,47 +417,40 @@ struct ProStatusBadgeView: View {
                         metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
                     }
                 }
-                .padding(.top, 2)
+                .padding(.top, DS.Spacing.xxs)
                     }
 
                     Spacer(minLength: 0)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, DS.Spacing.xl)
                 .padding(.top, 22)
                 .padding(.bottom, 18)
 
                 Divider()
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, DS.Spacing.lg)
 
                 ProFeatureListView(accentColor: .green)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, DS.Spacing.xl)
+                    .padding(.vertical, DS.Spacing.lg)
 
                 if plan == .yearly {
                     Divider()
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, DS.Spacing.lg)
 
                     HStack {
                         Button("Manage Subscription") {
                             openManageSubscription()
                         }
                         .buttonStyle(.link)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(DS.Typography.captionMedium)
 
                         Spacer()
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, DS.Spacing.xl)
+                    .padding(.vertical, DS.Spacing.lg)
                 }
             }
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(Color(nsColor: .separatorColor).opacity(0.5), lineWidth: 1)
-            )
+            .dsCard()
         }
     }
 
@@ -519,12 +488,12 @@ struct ProStatusBadgeView: View {
     private func metadataRow(label: String, value: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(label)
-                .font(.system(size: 11, weight: .medium))
+                .font(DS.Typography.captionMedium)
                 .foregroundColor(.secondary)
                 .frame(width: 86, alignment: .leading)
 
             Text(value)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(DS.Typography.bodySmall)
                 .foregroundColor(.primary)
 
             Spacer()
@@ -554,14 +523,18 @@ private struct ProFeatureListView: View {
             GridItem(.flexible(), alignment: .leading),
         ], spacing: 10) {
             ForEach(proFeatureItems, id: \.1) { icon, text in
-                HStack(spacing: 8) {
-                    Image(systemName: icon)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(accentColor)
-                        .frame(width: 16, height: 16)
+                HStack(spacing: DS.Spacing.sm) {
+                    ZStack {
+                        Circle()
+                            .fill(accentColor.opacity(0.1))
+                            .frame(width: 22, height: 22)
+                        Image(systemName: icon)
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(accentColor)
+                    }
                     Text(text)
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.primary.opacity(0.8))
                 }
             }
         }
@@ -576,29 +549,29 @@ private struct ProLetterView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
             Text(isPurchased ? "A Note From Chen" : "Before You Decide")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.secondary)
+                .font(DS.Typography.letterLabel)
+                .foregroundColor(Color.accentColor.opacity(0.6))
 
             Text(headline)
-                .font(.system(size: 18, weight: .semibold))
+                .font(DS.Typography.letterHeadline)
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(bodyText)
-                .font(.system(size: 13))
+                .font(DS.Typography.letterBody)
                 .foregroundColor(.primary.opacity(0.85))
-                .lineSpacing(4)
+                .lineSpacing(DS.Spacing.xs)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(signature)
-                .font(.system(size: 14, weight: .medium))
+                .font(DS.Typography.letterSignature)
                 .foregroundColor(.primary.opacity(0.7))
-                .padding(.top, 4)
+                .padding(.top, DS.Spacing.xs)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 4)
+        .padding(.horizontal, DS.Spacing.xs)
     }
 
     private var headline: String {
@@ -626,28 +599,13 @@ private struct ProLetterView: View {
     }
 }
 
-// MARK: - onChange backward-compatibility shim (macOS 12+)
-
-private struct OnChangeCompat<V: Equatable>: ViewModifier {
-    let value: V
-    let action: () -> Void
-
-    func body(content: Content) -> some View {
-        if #available(macOS 14.0, *) {
-            content.onChange(of: value) { action() }
-        } else {
-            content.onChange(of: value) { _ in action() }
-        }
-    }
-}
-
 // MARK: - Combined Pro Section
 
 struct ProSectionView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 28) {
             if proStatusManager.status.isPro {
                 ProStatusBadgeView()
             } else {
