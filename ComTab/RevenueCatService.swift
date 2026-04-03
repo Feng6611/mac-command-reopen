@@ -11,7 +11,6 @@ import os
 
 enum RevenueCatConfiguration {
     nonisolated static let apiKeyInfoKey = "ComTabRevenueCatAPIKey"
-    nonisolated static let bundledAPIKeyFallback = "appl_dDJatXaPwFuBLAelZfwDtGTNDbs"
     nonisolated static var apiKey: String {
         let configuredKey = (Bundle.main.object(forInfoDictionaryKey: apiKeyInfoKey) as? String)?
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -20,7 +19,7 @@ enum RevenueCatConfiguration {
             return configuredKey
         }
 
-        return bundledAPIKeyFallback
+        return ""
     }
     nonisolated static let entitlementIdentifier = "command reopen Pro"
     nonisolated static let offeringIdentifier = "default"

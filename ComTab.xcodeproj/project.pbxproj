@@ -500,10 +500,11 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
-				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = "$(COMTAB_REVENUECAT_API_KEY)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -512,7 +513,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -553,10 +554,11 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = NO;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
-				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = "$(COMTAB_REVENUECAT_API_KEY)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -565,7 +567,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -754,10 +756,11 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
-				INFOPLIST_KEY_ComTabRevenueCatAPIKey = appl_dDJatXaPwFuBLAelZfwDtGTNDbs;
+				INFOPLIST_KEY_ComTabRevenueCatAPIKey = "$(COMTAB_REVENUECAT_API_KEY)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -766,7 +769,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -834,6 +837,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComTab/ComTabDirect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COMTAB_REVENUECAT_API_KEY = "";
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -857,7 +861,8 @@
 					ProStatusManager.swift,
 					RevenueCatService.swift,
 				);
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -868,7 +873,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -893,6 +898,7 @@
 				CODE_SIGN_ENTITLEMENTS = ComTab/ComTabDirect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COMTAB_REVENUECAT_API_KEY = "";
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -916,7 +922,8 @@
 					ProStatusManager.swift,
 					RevenueCatService.swift,
 				);
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -927,7 +934,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -954,6 +961,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				COMTAB_REVENUECAT_API_KEY = "";
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -977,7 +985,8 @@
 					ProStatusManager.swift,
 					RevenueCatService.swift,
 				);
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/AppInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Command Reopen";
 				INFOPLIST_KEY_CFBundleName = "Command Reopen";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -988,7 +997,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen.direct;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";

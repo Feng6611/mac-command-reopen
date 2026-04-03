@@ -19,27 +19,39 @@ enum SettingsTab: Int, CaseIterable {
         showProTab ? [.general, .statistics, .pro] : [.general, .statistics]
     }
 
-    var title: String {
+    func title(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "General"
         case .statistics: return "Statistics"
-        case .pro: return "Pro"
+        case .pro:
+            switch distributionChannel {
+            case .appStore: return "Pro"
+            case .direct: return "Support"
+            }
         }
     }
 
-    var icon: String {
+    func icon(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "gearshape"
         case .statistics: return "chart.bar"
-        case .pro: return "star"
+        case .pro:
+            switch distributionChannel {
+            case .appStore: return "star"
+            case .direct: return "heart"
+            }
         }
     }
 
-    var selectedIcon: String {
+    func selectedIcon(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "gearshape.fill"
         case .statistics: return "chart.bar.fill"
-        case .pro: return "star.fill"
+        case .pro:
+            switch distributionChannel {
+            case .appStore: return "star.fill"
+            case .direct: return "heart.fill"
+            }
         }
     }
 }
@@ -70,6 +82,7 @@ struct SettingsView: View {
                             navigationModel.selectedTab = tab
                         }
                     }
+                    .environmentObject(accessController)
                 }
 
                 Spacer()
@@ -97,7 +110,7 @@ struct SettingsView: View {
 #if APPSTORE
                     ProTabContent()
 #else
-                    EmptyView()
+                    DirectSupportTabContent()
 #endif
                 }
             }
@@ -137,6 +150,7 @@ private struct SidebarBackgroundView: NSViewRepresentable {
 // MARK: - Sidebar Button
 
 struct SidebarButton: View {
+    @EnvironmentObject private var accessController: AppAccessController
     let tab: SettingsTab
     let isSelected: Bool
     let action: () -> Void
@@ -146,11 +160,14 @@ struct SidebarButton: View {
     var body: some View {
         let button = Button(action: action) {
             HStack(spacing: DS.Spacing.sm) {
-                Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
+                Image(systemName: isSelected
+                    ? tab.selectedIcon(for: accessController.distributionChannel)
+                    : tab.icon(for: accessController.distributionChannel)
+                )
                     .font(DS.Typography.bodyMedium)
                     .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
                     .frame(width: 20)
-                Text(tab.title)
+                Text(tab.title(for: accessController.distributionChannel))
                     .font(.system(size: 13, weight: isSelected ? .medium : .regular))
                 Spacer()
             }
@@ -195,6 +212,108 @@ struct ProTabContent: View {
                 .padding(.vertical, DS.Spacing.xxl)
         }
         .padding(.horizontal, DS.Spacing.xxl)
+    }
+}
+#else
+struct DirectSupportTabContent: View {
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: DS.Spacing.xl) {
+                supportCard
+                    .padding(.top, DS.Spacing.xxl)
+            }
+        }
+        .padding(.horizontal, DS.Spacing.xxl)
+    }
+
+    private var supportCard: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: DS.Spacing.md) {
+                DSIconBadge(
+                    systemName: "heart.fill",
+                    iconColor: .accentColor,
+                    backgroundColor: DS.Colors.accentTint,
+                    size: 42,
+                    iconSize: 18
+                )
+
+                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    Text("Support Command Reopen")
+                        .font(DS.Typography.headlineMedium)
+                    Text("The Mac App Store version is the mainline release for ongoing updates and long-term support.")
+                        .font(DS.Typography.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.top, DS.Spacing.xl)
+            .padding(.bottom, DS.Spacing.lg)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(DS.Colors.accentTintSubtle)
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                DirectSupportPoint(
+                    title: "Mainline updates",
+                    description: "Bug fixes, polish, and future improvements will continue shipping through the App Store version."
+                )
+                DirectSupportPoint(
+                    title: "Support the developer directly",
+                    description: "If Command Reopen is useful in your workflow, using the App Store version is the clearest way to support continued work."
+                )
+                DirectSupportPoint(
+                    title: "Same focused product direction",
+                    description: "The goal stays the same: keep the app lightweight, reliable, and continuously maintained."
+                )
+            }
+            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.top, DS.Spacing.md)
+            .padding(.bottom, DS.Spacing.sm)
+
+            HStack(spacing: DS.Spacing.md) {
+                Button {
+                    openURL(AppStoreLinks.productURL)
+                } label: {
+                    Label("Open Mac App Store", systemImage: "bag")
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    openURL(ExternalLinks.githubURL)
+                } label: {
+                    Label("View GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.vertical, DS.Spacing.sm)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
+        .dsCard()
+    }
+
+    private func openURL(_ urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        NSWorkspace.shared.open(url)
+    }
+}
+
+private struct DirectSupportPoint: View {
+    let title: String
+    let description: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+            Text(title)
+                .font(DS.Typography.bodyMedium)
+            Text(description)
+                .font(DS.Typography.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 #endif

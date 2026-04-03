@@ -206,6 +206,9 @@
     "once" : {
 
     },
+    "Open Mac App Store" : {
+
+    },
     "Pay once, use forever" : {
 
     },
@@ -281,6 +284,9 @@
     "Statistics" : {
 
     },
+    "Support Command Reopen" : {
+
+    },
     "Support on the Mac App Store" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -293,6 +299,9 @@
       }
     },
     "Terms" : {
+
+    },
+    "The Mac App Store version is the mainline release for ongoing updates and long-term support." : {
 
     },
     "Top Apps" : {
@@ -323,16 +332,19 @@
         }
       }
     },
+    "View GitHub" : {
+
+    },
     "Week" : {
 
     },
     "Welcome to Command Reopen" : {
 
     },
-    "Yearly" : {
+    "year" : {
 
     },
-    "yr" : {
+    "Yearly" : {
 
     },
     "仅用于临时查看 UI 状态" : {

@@ -93,7 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 guard self.hasCompletedInitialCommerceRefresh else {
                     return
                 }
-                guard !OnboardingWindowController.shared.isVisible else {
+                guard !self.isOnboardingVisible else {
                     return
                 }
 
@@ -123,7 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
-        if accessController.shouldOpenProSettings, !OnboardingWindowController.shared.isVisible {
+        if accessController.shouldOpenProSettings, !isOnboardingVisible {
             if !SettingsWindowController.shared.isVisible {
                 SettingsWindowController.shared.show(
                     activationMonitor: .shared,
@@ -135,6 +135,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             accessController.markPromptHandled()
         }
+    }
+
+    private var isOnboardingVisible: Bool {
+#if APPSTORE
+        OnboardingWindowController.shared.isVisible
+#else
+        false
+#endif
     }
 
     @MainActor

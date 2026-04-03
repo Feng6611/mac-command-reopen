@@ -1303,12 +1303,12 @@ struct ProPurchaseErrorTests {
 
 struct AppAccessControllerTests {
     @MainActor
-    @Test("Direct access controller keeps core feature unlocked and hides upgrade entry")
+    @Test("Direct access controller keeps core feature unlocked and shows support tab only")
     func directAccessControllerDefaults() {
         let controller = AppAccessController(distributionChannel: .direct)
 
         #expect(controller.isCoreFeatureAvailable)
-        #expect(!controller.showsProTab)
+        #expect(controller.showsProTab)
         #expect(!controller.showsUpgradeEntry)
         #expect(!controller.shouldShowOnboarding)
     }
@@ -1362,10 +1362,11 @@ struct AppAccessControllerTests {
 
 struct SettingsAndStatusBarPresentationTests {
     @MainActor
-    @Test("Settings tabs hide Pro for direct channel")
+    @Test("Settings tabs can include support or Pro tab")
     func settingsTabsForDirect() {
-        #expect(SettingsTab.visibleTabs(showProTab: false) == [.general, .statistics])
         #expect(SettingsTab.visibleTabs(showProTab: true) == [.general, .statistics, .pro])
+        #expect(SettingsTab.pro.title(for: .direct) == "Support")
+        #expect(SettingsTab.pro.title(for: .appStore) == "Pro")
     }
 
     @MainActor

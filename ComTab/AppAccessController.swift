@@ -30,7 +30,7 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
     }
 
     var showsProTab: Bool {
-        distributionChannel == .appStore
+        true
     }
 
     var showsUpgradeEntry: Bool {
