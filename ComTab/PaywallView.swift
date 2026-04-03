@@ -684,6 +684,12 @@ struct ProSectionView: View {
             Text("仅用于临时查看 UI 状态")
                 .font(DS.Typography.caption)
                 .foregroundColor(.secondary)
+
+            Button("触发 Onboarding") {
+                OnboardingWindowController.shared.show(proStatusManager: proStatusManager)
+            }
+            .buttonStyle(.link)
+            .font(DS.Typography.captionMedium)
         }
     }
 #endif

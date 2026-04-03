@@ -277,6 +277,10 @@ final class ProStatusManager: ObservableObject {
         applyStatus(computeStatus(), source: .stateChange)
     }
 
+    func markOnboardingSeen() {
+        defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
+    }
+
     func refresh() async {
         configureIfNeeded()
         await ensureTrialStartedIfNeeded()

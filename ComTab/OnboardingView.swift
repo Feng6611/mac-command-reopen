@@ -136,6 +136,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     static let shared = OnboardingWindowController()
 
     private var window: NSWindow?
+    private var proStatusManager: ProStatusManager?
 
     func showIfNeeded(proStatusManager: ProStatusManager) {
         guard proStatusManager.isFirstLaunch else { return }
@@ -162,6 +163,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         window.setContentSize(NSSize(width: 440, height: 560))
         window.center()
 
+        self.proStatusManager = proStatusManager
         self.window = window
 
         NSApplication.shared.activate(ignoringOtherApps: true)
@@ -173,6 +175,15 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        proStatusManager?.markOnboardingSeen()
         window = nil
+        proStatusManager = nil
+
+        SettingsWindowController.shared.show(
+            activationMonitor: .shared,
+            reopenStatsStore: .shared,
+            accessController: .shared,
+            initialTab: .pro
+        )
     }
 }
