@@ -67,11 +67,8 @@ struct OnboardingView: View {
                 Image(systemName: "gift.fill")
                     .foregroundColor(.accentColor)
                     .font(.system(size: 14))
-                Text("7-day free trial included")
+                Text("7-day free trial, no commitment")
                     .font(.system(size: 13, weight: .medium))
-                Text("- then from $5.99/year")
-                    .font(.system(size: 13))
-                    .foregroundColor(.secondary)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)

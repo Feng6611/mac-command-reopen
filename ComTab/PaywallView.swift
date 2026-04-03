@@ -9,13 +9,6 @@ import AppKit
 import SwiftUI
 import os
 
-private let proFeatureItems: [(String, String)] = [
-    ("arrow.clockwise", "Auto-reopen windows"),
-    ("slider.horizontal.3", "Per-app exclusion"),
-    ("chart.bar", "Statistics & insights"),
-    ("arrow.up.circle", "Future updates")
-]
-
 enum ProPreviewMode: String, CaseIterable, Identifiable {
     case live
     case notPro
@@ -98,6 +91,7 @@ struct ProDisplayState {
 
 struct UpgradeCardView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
+    @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
     let displayState: ProDisplayState
     @State private var selectedPlan: ProPlan = .lifetime
     @State private var isLoadingOfferings = false
@@ -128,9 +122,23 @@ struct UpgradeCardView: View {
                 .padding(.top, DS.Spacing.xl)
                 .padding(.bottom, DS.Spacing.lg)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.accentColor.opacity(0.05))
+                .background(isExpired ? DS.Colors.warningTint : DS.Colors.accentTintSubtle)
 
             Divider()
+
+            // Stats-based nudge for expired users
+            if isExpired, reopenStatsStore.totalSuccessfulReopens > 0 {
+                HStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.orange)
+                    Text("Command Reopen helped you **\(reopenStatsStore.totalSuccessfulReopens) times** during your trial.")
+                        .font(DS.Typography.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal, DS.Spacing.xl)
+                .padding(.top, DS.Spacing.md)
+            }
 
             // Plans
             Group {
@@ -147,7 +155,7 @@ struct UpgradeCardView: View {
                     }
                 }
             }
-            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.horizontal, DS.Spacing.xl)
             .padding(.top, DS.Spacing.md)
             .padding(.bottom, DS.Spacing.sm)
 
@@ -156,23 +164,19 @@ struct UpgradeCardView: View {
                     .font(DS.Typography.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, DS.Spacing.lg)
+                    .padding(.horizontal, DS.Spacing.xl)
                     .padding(.bottom, DS.Spacing.xs)
             }
 
             ctaButton
-                .padding(.horizontal, DS.Spacing.lg)
+                .padding(.horizontal, DS.Spacing.xl)
                 .padding(.vertical, DS.Spacing.sm)
 
             footerLinks
                 .padding(.bottom, DS.Spacing.lg)
         }
-        .background(DS.Colors.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
-                .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
-        )
+        .dsCard()
         .task {
             isLoadingOfferings = true
             await proStatusManager.loadOfferings()
@@ -189,13 +193,13 @@ struct UpgradeCardView: View {
     private var heroSection: some View {
         HStack(spacing: DS.Spacing.md) {
             DSIconBadge(
-                systemName: "checkmark.seal.fill",
-                iconColor: .accentColor,
-                backgroundColor: DS.Colors.accentTint,
+                systemName: isExpired ? "exclamationmark.triangle.fill" : "checkmark.seal.fill",
+                iconColor: isExpired ? .orange : .accentColor,
+                backgroundColor: isExpired ? DS.Colors.warningFill : DS.Colors.accentTint,
                 size: 42,
                 iconSize: 18
             )
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 Text("Reopen Pro")
                     .font(DS.Typography.headlineMedium)
                 Text(statusSubtitle)
@@ -261,7 +265,7 @@ struct UpgradeCardView: View {
                         .font(DS.Typography.bodyMedium)
                     if let badge = product.badge {
                         Text(badge)
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(DS.Typography.microSemibold)
                             .foregroundColor(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, DS.Spacing.xxs)
@@ -277,7 +281,7 @@ struct UpgradeCardView: View {
                     }
                     if !product.isAvailable {
                         Text("Unavailable")
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(DS.Typography.microSemibold)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -289,11 +293,11 @@ struct UpgradeCardView: View {
                         .font(DS.Typography.headlineSmall)
                         .foregroundColor(isSelected ? .accentColor : .primary)
                     Text(product.plan == .lifetime ? "once" : "yr")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(DS.Typography.captionMedium)
                         .foregroundColor(.secondary)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, DS.Spacing.md)
             .background(
                 RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
@@ -347,7 +351,7 @@ struct UpgradeCardView: View {
     // MARK: - Footer Links
 
     private var footerLinks: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: DS.Spacing.md) {
             Button(proStatusManager.isRestoringPurchases ? "Restoring..." : "Restore Purchase") {
                 Task { await restorePurchases() }
             }
@@ -475,7 +479,7 @@ struct ProStatusBadgeView: View {
                 iconSize: 18
             )
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                 HStack(spacing: DS.Spacing.sm) {
                     Text("Pro")
                         .font(DS.Typography.headlineMedium)
@@ -514,7 +518,7 @@ struct ProStatusBadgeView: View {
     }
 
     private func metadataRow(label: String, value: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
+        HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.md) {
             Text(label)
                 .font(DS.Typography.captionMedium)
                 .foregroundColor(.secondary)
@@ -575,26 +579,26 @@ private struct ProLetterView: View {
         VStack(alignment: .leading, spacing: DS.Spacing.lg) {
             // Small caps label
             Text(labelText)
-                .font(.system(size: 10, weight: .semibold))
+                .font(DS.Typography.letterLabel)
                 .tracking(0.8)
                 .foregroundColor(.accentColor.opacity(0.55))
 
             // Editorial headline
             Text(headline)
-                .font(.system(size: 16, weight: .regular))
+                .font(DS.Typography.letterHeadline)
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
             // Body — relaxed, lighter
             Text(bodyText)
-                .font(.system(size: 13))
+                .font(DS.Typography.letterBody)
                 .foregroundColor(.primary.opacity(0.62))
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
 
             // Signature — medium, distinct from body
             Text(signature)
-                .font(.system(size: 13, weight: .medium))
+                .font(DS.Typography.letterSignature)
                 .foregroundColor(.primary.opacity(0.5))
                 .padding(.top, DS.Spacing.xxs)
         }
@@ -652,7 +656,7 @@ struct ProSectionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 28) {
+        VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
             if displayState.status.isPro {
                 ProStatusBadgeView(displayState: displayState)
             } else {
