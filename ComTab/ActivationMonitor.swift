@@ -26,6 +26,7 @@ final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
         static let excludedBundlesDefaultsKey = "com.comtab.excludedBundleIDs"
+        static let defaultExcludedBundlesMigrationDefaultsKey = "com.comtab.defaultExcludedBundlesMigrated"
         static let reopenEvaluationDelay: TimeInterval = 0.2
         static let recentLaunchSuppressionInterval: TimeInterval = 0.9
         static let bundleDebounceInterval: TimeInterval = 0.1
@@ -36,13 +37,16 @@ final class ActivationMonitor: ObservableObject {
 
     static let ignoredBundleIDs: Set<String> = [
         "com.apple.dock",
-        "com.apple.finder",
         "com.apple.Spotlight",
         "com.apple.notificationcenterui",
         "com.apple.controlcenter",
         "com.apple.loginwindow",
         "com.apple.SecurityAgent",
         "com.apple.screencaptureui"
+    ]
+
+    static let defaultExcludedBundleIDs: Set<String> = [
+        "com.apple.finder"
     ]
 
     static let shared = ActivationMonitor()
@@ -91,9 +95,19 @@ final class ActivationMonitor: ObservableObject {
         self.accessController = accessController ?? AppAccessController.shared
         defaults.register(defaults: [Constants.featureDefaultsKey: true])
         let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
-        let storedExcluded = defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? []
+        let storedExcluded = Set(defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? [])
+        let hasStoredExcludedBundles = defaults.object(forKey: Constants.excludedBundlesDefaultsKey) != nil
+        let hasMigratedDefaultExcludedBundles = defaults.bool(forKey: Constants.defaultExcludedBundlesMigrationDefaultsKey)
+        var initialExcluded = hasStoredExcludedBundles ? storedExcluded : Self.defaultExcludedBundleIDs
+
+        if !hasMigratedDefaultExcludedBundles {
+            initialExcluded.formUnion(Self.defaultExcludedBundleIDs)
+            defaults.set(Array(initialExcluded).sorted(), forKey: Constants.excludedBundlesDefaultsKey)
+            defaults.set(true, forKey: Constants.defaultExcludedBundlesMigrationDefaultsKey)
+        }
+
         _isFeatureEnabled = Published(initialValue: storedValue)
-        _userExcludedBundleIDs = Published(initialValue: Set(storedExcluded))
+        _userExcludedBundleIDs = Published(initialValue: initialExcluded)
         updateObservationState()
         AppLogger.activation.debug("ActivationMonitor ready. Feature enabled: \(storedValue)")
     }

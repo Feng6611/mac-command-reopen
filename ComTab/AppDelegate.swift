@@ -21,6 +21,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var lastCommerceRefreshAt: Date?
     private var isRefreshingCommerce = false
 
+#if DEBUG
+    private var shouldAutoShowSettingsForDebugLaunch: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["OS_ACTIVITY_DT_MODE"] == "1" || environment["OS_ACTIVITY_DT_MODE"] == "YES"
+    }
+#endif
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
@@ -41,6 +48,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Ensure no windows are visible
         NSApp.windows.forEach { $0.orderOut(nil) }
+
+#if DEBUG
+        if shouldAutoShowSettingsForDebugLaunch, !shouldShowOnboardingImmediately {
+            AppLogger.lifecycle.notice("Debug launch detected. Opening settings window for visibility.")
+            SettingsWindowController.shared.show(
+                activationMonitor: .shared,
+                reopenStatsStore: .shared,
+                accessController: accessController
+            )
+        }
+#endif
 
         Task { @MainActor in
             await completeInitialCommerceRefresh(showOnboardingAfterRefresh: !shouldShowOnboardingImmediately)

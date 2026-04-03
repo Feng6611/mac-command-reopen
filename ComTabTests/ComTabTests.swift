@@ -144,7 +144,6 @@ struct ComTabTests {
     func ignoredBundleIDs() {
         let expected: Set<String> = [
             "com.apple.dock",
-            "com.apple.finder",
             "com.apple.Spotlight",
             "com.apple.notificationcenterui",
             "com.apple.controlcenter",
@@ -160,6 +159,7 @@ struct ComTabTests {
 
         #expect(!ActivationMonitor.isIgnoredBundleID("com.apple.TextEdit"))
         #expect(!ActivationMonitor.isIgnoredBundleID("com.google.Chrome"))
+        #expect(!ActivationMonitor.isIgnoredBundleID("com.apple.finder"))
     }
 
     @Test("Bundle ID normalization for user exclude list")
@@ -167,6 +167,65 @@ struct ComTabTests {
         #expect(ActivationMonitor.normalizeBundleID(" com.apple.TextEdit ") == "com.apple.TextEdit")
         #expect(ActivationMonitor.normalizeBundleID("\n\t") == nil)
         #expect(ActivationMonitor.normalizeBundleID("") == nil)
+    }
+
+    @MainActor
+    @Test("Activation monitor defaults Finder into the user exclude list")
+    func activationMonitorDefaultsFinderExclusion() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs.contains("com.apple.finder"))
+        #expect(defaults.stringArray(forKey: "com.comtab.excludedBundleIDs")?.contains("com.apple.finder") == true)
+    }
+
+    @MainActor
+    @Test("Activation monitor migrates Finder into existing exclude list once")
+    func activationMonitorMigratesFinderIntoExistingExcludeList() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(["com.apple.TextEdit"], forKey: "com.comtab.excludedBundleIDs")
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit", "com.apple.finder"])
+    }
+
+    @MainActor
+    @Test("Activation monitor does not re-add Finder after migration completes")
+    func activationMonitorDoesNotReAddFinderAfterMigration() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(["com.apple.TextEdit"], forKey: "com.comtab.excludedBundleIDs")
+        defaults.set(true, forKey: "com.comtab.defaultExcludedBundlesMigrated")
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit"])
+        #expect(!monitor.userExcludedBundleIDs.contains("com.apple.finder"))
     }
 
     @Test("Recent launch suppression helper respects interval bounds")
