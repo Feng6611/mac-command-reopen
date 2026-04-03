@@ -12,6 +12,11 @@ if [ "${CI:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
   exit 0
 fi
 
+if [ "${ACTION:-}" != "install" ]; then
+  echo "note: Skipping build number bump because ACTION=${ACTION:-unset} (archive only)"
+  exit 0
+fi
+
 VERSION_FILE="${SRCROOT}/Config/BuildNumber.xcconfig"
 
 if [ ! -f "${VERSION_FILE}" ]; then

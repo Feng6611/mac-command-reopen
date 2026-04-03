@@ -1,7 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "%lld" : {
+
+    },
+    "%lld today" : {
+
+    },
+    "7-day free trial, no commitment" : {
 
     },
     "About" : {
@@ -24,6 +33,18 @@
         }
       }
     },
+    "All features unlocked — thank you for your support." : {
+
+    },
+    "App" : {
+
+    },
+    "Are you sure? This cannot be undone." : {
+
+    },
+    "Auto-renews annually" : {
+
+    },
     "Auto-reopen windows" : {
       "localizations" : {
         "ja" : {
@@ -34,7 +55,20 @@
         }
       }
     },
+    "Automatically reopen windows when switching apps via Cmd+Tab" : {
+
+    },
+    "Best Value" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Command Reopen helped you **%lld times** during your trial." : {
+
+    },
     "Command Reopen v%@ (%@)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -59,6 +93,15 @@
           }
         }
       }
+    },
+    "Count" : {
+
+    },
+    "Date" : {
+
+    },
+    "Day" : {
+
     },
     "Enable Command Reopen" : {
 
@@ -103,6 +146,9 @@
         }
       }
     },
+    "Get Started" : {
+
+    },
     "GitHub" : {
 
     },
@@ -115,6 +161,21 @@
           }
         }
       }
+    },
+    "Lifetime" : {
+
+    },
+    "Manage Subscription" : {
+
+    },
+    "Month" : {
+
+    },
+    "Never lose your windows again.\nSwitch apps with Cmd+Tab, windows reopen automatically." : {
+
+    },
+    "No active purchase found on this account." : {
+
     },
     "No excluded apps" : {
       "localizations" : {
@@ -139,6 +200,30 @@
         }
       }
     },
+    "Official Website" : {
+
+    },
+    "once" : {
+
+    },
+    "Pay once, use forever" : {
+
+    },
+    "per year" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Pro" : {
+
+    },
+    "Purchase restored." : {
+
+    },
+    "Purchase successful. Pro unlocked." : {
+
+    },
     "Quit Command Reopen" : {
       "localizations" : {
         "ja" : {
@@ -159,7 +244,22 @@
         }
       }
     },
+    "Reopen Pro" : {
+
+    },
+    "Reset" : {
+
+    },
     "Reset Statistics" : {
+
+    },
+    "Reset Statistics?" : {
+
+    },
+    "Restore Purchase" : {
+
+    },
+    "Restoring..." : {
 
     },
     "Select an app..." : {
@@ -172,7 +272,10 @@
         }
       }
     },
-    "Settings…" : {
+    "Settings..." : {
+
+    },
+    "Start using Command Reopen to see trends" : {
 
     },
     "Statistics" : {
@@ -189,7 +292,53 @@
         }
       }
     },
-    "Total Reopens" : {
+    "Terms" : {
+
+    },
+    "Top Apps" : {
+
+    },
+    "total reopens" : {
+
+    },
+    "Trend" : {
+
+    },
+    "UI 预览" : {
+
+    },
+    "Unavailable" : {
+
+    },
+    "Upgrade to Pro..." : {
+
+    },
+    "v%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "v%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "Week" : {
+
+    },
+    "Welcome to Command Reopen" : {
+
+    },
+    "Yearly" : {
+
+    },
+    "yr" : {
+
+    },
+    "仅用于临时查看 UI 状态" : {
+
+    },
+    "触发 Onboarding" : {
 
     }
   },

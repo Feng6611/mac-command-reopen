@@ -7,19 +7,27 @@
 
 import AppKit
 import Combine
+import os
 
 @MainActor
 final class StatusBarController: NSObject {
+    struct Presentation: Equatable {
+        let showsUpgradeItem: Bool
+        let canToggleAutoReopen: Bool
+    }
+
     private let statusItem: NSStatusItem
     private let activationMonitor: ActivationMonitor
+    private let accessController: AppAccessController
     private let launchManager = LaunchAtLoginManager()
-    private let distributionChannel = DistributionChannel.current
     private var cancellables: Set<AnyCancellable> = []
     private var enableReopenItem: NSMenuItem?
+    private var upgradeItem: NSMenuItem?
 
-    init(activationMonitor: ActivationMonitor? = nil) {
+    init(activationMonitor: ActivationMonitor? = nil, accessController: AppAccessController? = nil) {
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.activationMonitor = activationMonitor ?? .shared
+        self.accessController = accessController ?? .shared
         super.init()
         configureButton()
         constructMenu()
@@ -28,15 +36,14 @@ final class StatusBarController: NSObject {
 
     private func configureButton() {
         if let button = statusItem.button {
-            if #available(macOS 11.0, *) {
-                button.image = NSImage(systemSymbolName: "command", accessibilityDescription: nil)
-            }
+            button.image = NSImage(systemSymbolName: "command", accessibilityDescription: nil)
             button.imagePosition = .imageOnly
         }
     }
 
     private func constructMenu() {
         let menu = NSMenu()
+        let presentation = Self.presentation(for: accessController)
 
         let enableReopenItem = NSMenuItem(
             title: String(localized: "Enable Command Reopen"),
@@ -60,10 +67,18 @@ final class StatusBarController: NSObject {
         menu.addItem(launchItem)
 
         menu.addItem(.separator())
-        menu.addItem(makeMenuItem(title: String(localized: "Settings…"), action: #selector(showSettings)))
+
+        // Upgrade to Pro (hidden when already pro)
+        let upgradeItem = NSMenuItem(title: String(localized: "Upgrade to Pro..."), action: #selector(showProSettings), keyEquivalent: "")
+        upgradeItem.target = self
+        upgradeItem.isHidden = !presentation.showsUpgradeItem
+        menu.addItem(upgradeItem)
+        self.upgradeItem = upgradeItem
+
+        menu.addItem(makeMenuItem(title: String(localized: "Settings..."), action: #selector(showSettings)))
         menu.addItem(.separator())
 
-        switch distributionChannel {
+        switch accessController.distributionChannel {
         case .appStore:
             menu.addItem(makeMenuItem(title: String(localized: "Official"), action: #selector(openOfficialWebsite)))
             menu.addItem(makeMenuItem(title: String(localized: "Rate on App Store"), action: #selector(openAppStoreReview)))
@@ -100,9 +115,39 @@ final class StatusBarController: NSObject {
                 self?.enableReopenItem?.state = isEnabled ? .on : .off
             }
             .store(in: &cancellables)
+
+        accessController.$entitlementState
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self else {
+                    return
+                }
+
+                let presentation = Self.presentation(for: self.accessController)
+                self.upgradeItem?.isHidden = !presentation.showsUpgradeItem
+
+                // Disable feature when expired
+                if !presentation.canToggleAutoReopen {
+                    self.enableReopenItem?.isEnabled = false
+                    self.enableReopenItem?.state = .off
+                } else {
+                    self.enableReopenItem?.isEnabled = true
+                    // Restore actual toggle state when transitioning back to active
+                    self.enableReopenItem?.state = self.activationMonitor.isFeatureEnabled ? .on : .off
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    static func presentation(for accessController: AppAccessController) -> Presentation {
+        Presentation(
+            showsUpgradeItem: accessController.showsUpgradeEntry,
+            canToggleAutoReopen: accessController.isCoreFeatureAvailable
+        )
     }
 
     @objc private func toggleEnableReopen(_ sender: NSMenuItem) {
+        guard accessController.isCoreFeatureAvailable else { return }
         activationMonitor.isFeatureEnabled.toggle()
         sender.state = activationMonitor.isFeatureEnabled ? .on : .off
     }
@@ -115,7 +160,7 @@ final class StatusBarController: NSObject {
 
     @objc private func showAbout() {
         NSApplication.shared.activate(ignoringOtherApps: true)
-        switch distributionChannel {
+        switch accessController.distributionChannel {
         case .appStore:
             NSApplication.shared.orderFrontStandardAboutPanel(options: [
                 .credits: NSAttributedString(string: "Contact: \(ExternalLinks.contactEmailAddress)")
@@ -126,7 +171,27 @@ final class StatusBarController: NSObject {
     }
 
     @objc private func showSettings() {
-        SettingsWindowController.shared.show(activationMonitor: activationMonitor)
+        AppLogger.lifecycle.notice("Status bar requested settings window.")
+        DispatchQueue.main.async { [activationMonitor, accessController] in
+            SettingsWindowController.shared.show(
+                activationMonitor: activationMonitor,
+                accessController: accessController
+            )
+        }
+    }
+
+    @objc private func showProSettings() {
+        guard accessController.showsProTab else {
+            return
+        }
+        AppLogger.lifecycle.notice("Status bar requested Pro settings window.")
+        DispatchQueue.main.async { [activationMonitor, accessController] in
+            SettingsWindowController.shared.show(
+                activationMonitor: activationMonitor,
+                accessController: accessController,
+                initialTab: .pro
+            )
+        }
     }
 
     @objc private func openOfficialWebsite() {

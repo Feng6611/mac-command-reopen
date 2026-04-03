@@ -29,4 +29,9 @@ enum AppLogger {
         subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
         category: "LaunchAtLogin"
     )
+
+    static let purchase = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+        category: "Purchase"
+    )
 }
