@@ -480,8 +480,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()
@@ -497,20 +496,18 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let trialStart = Date(timeIntervalSince1970: 1_700_000_000)
-        let now = trialStart.addingTimeInterval(2 * 24 * 60 * 60)
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { trialStart }
+            now: { now }
         )
 
         await manager.startTrial()
 
         #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == trialStart)
-        #expect(manager.status == .trial(daysRemaining: 5, expiresAt: trialStart.addingTimeInterval(7 * 24 * 60 * 60)))
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(manager.status == .trial(daysRemaining: 7, expiresAt: now.addingTimeInterval(7 * 24 * 60 * 60)))
     }
 
     @MainActor
@@ -525,8 +522,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()
@@ -547,8 +543,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()
@@ -568,8 +563,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()
@@ -592,8 +586,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         manager.configureIfNeeded()
@@ -613,8 +606,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         manager.configureIfNeeded()
@@ -651,8 +643,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         manager.configureIfNeeded()
@@ -674,8 +665,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await #expect(throws: ProPurchaseError.network) {
@@ -698,8 +688,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await #expect(throws: ProPurchaseError.purchaseCancelled) {
@@ -769,8 +758,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         let task = Task {
@@ -801,8 +789,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         let task = Task {
@@ -832,8 +819,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         try await manager.restorePurchases()
@@ -865,8 +851,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         try await manager.purchase(.yearly)
@@ -892,8 +877,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await #expect(throws: ProPurchaseError.activationPending) {
@@ -919,8 +903,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()
@@ -945,8 +928,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         manager.configureIfNeeded()
@@ -967,8 +949,7 @@ struct ProStatusManagerTests {
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: MockRevenueCatService(),
-            now: { now },
-            trialStartDateProvider: { now }
+            now: { now }
         )
 
         await manager.refresh()

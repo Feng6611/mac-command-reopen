@@ -282,7 +282,7 @@ struct UpgradeCardView: View {
                     Text(product.displayPrice)
                         .font(DS.Typography.headlineSmall)
                         .foregroundColor(isSelected ? .accentColor : .primary)
-                    Text(product.plan == .lifetime ? "once" : "yr")
+                    Text(product.plan == .lifetime ? "once" : "year")
                         .font(DS.Typography.captionMedium)
                         .foregroundColor(.secondary)
                 }

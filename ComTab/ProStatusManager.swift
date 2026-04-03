@@ -8,7 +8,6 @@
 import Combine
 import Foundation
 import RevenueCat
-import StoreKit
 import os
 
 enum ProPlan: String, Equatable, Sendable {
@@ -231,7 +230,6 @@ final class ProStatusManager: ObservableObject {
     private let defaults: UserDefaults
     private let revenueCatService: any RevenueCatServicing
     private let now: () -> Date
-    private let trialStartDateProvider: () async -> Date?
 
     private var entitlementSnapshot: ProEntitlementSnapshot?
     private var hasConfigured = false
@@ -249,15 +247,13 @@ final class ProStatusManager: ObservableObject {
     init(
         defaults: UserDefaults = .standard,
         revenueCatService: (any RevenueCatServicing)? = nil,
-        now: @escaping () -> Date = Date.init,
-        trialStartDateProvider: (() async -> Date?)? = nil
+        now: @escaping () -> Date = Date.init
     ) {
         let service = revenueCatService ?? RevenueCatService.shared
         let cachedSnapshot = service.cachedEntitlementSnapshot
         self.defaults = defaults
         self.revenueCatService = service
         self.now = now
-        self.trialStartDateProvider = trialStartDateProvider ?? Self.resolveTrialStartDate
         self.entitlementSnapshot = cachedSnapshot
         self.currentOffering = nil
         self.availablePlans = ProPlanProduct.fallbackPlans
@@ -286,7 +282,7 @@ final class ProStatusManager: ObservableObject {
         defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
 
         if defaults.object(forKey: Constants.trialStartDateKey) == nil {
-            let resolvedStartDate = await trialStartDateProvider() ?? now()
+            let resolvedStartDate = now()
             defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
             AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
         }
@@ -585,23 +581,4 @@ final class ProStatusManager: ObservableObject {
         }
     }
 
-    private static func resolveTrialStartDate() async -> Date? {
-        guard #available(macOS 13.0, *) else {
-            return nil
-        }
-
-        do {
-            let verification = try await AppTransaction.shared
-            switch verification {
-            case .verified(let appTransaction):
-                return appTransaction.originalPurchaseDate
-            case .unverified(_, let error):
-                AppLogger.purchase.error("AppTransaction verification failed: \(error.localizedDescription)")
-                return nil
-            }
-        } catch {
-            AppLogger.purchase.error("Unable to fetch AppTransaction: \(error.localizedDescription)")
-            return nil
-        }
-    }
 }
