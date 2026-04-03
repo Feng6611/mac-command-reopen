@@ -130,6 +130,7 @@ private struct SidebarBackgroundView: NSViewRepresentable {
         view.state = .followsWindowActiveState
         return view
     }
+
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }
 
@@ -147,7 +148,7 @@ struct SidebarButton: View {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
                     .font(DS.Typography.bodyMedium)
-                    .foregroundColor(isSelected ? .accentColor : .secondary)
+                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
                     .frame(width: 20)
                 Text(tab.title)
                     .font(.system(size: 13, weight: isSelected ? .medium : .regular))
@@ -162,7 +163,7 @@ struct SidebarButton: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .foregroundColor(isSelected ? .primary : .primary.opacity(0.85))
+        .foregroundStyle(isSelected ? Color.primary : Color.primary.opacity(0.85))
         .onHover { hovering in
             isHovering = hovering
         }

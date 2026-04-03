@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 #if canImport(Charts)
 import Charts
 #endif
@@ -66,13 +65,13 @@ struct ReopenStatsView: View {
         VStack(spacing: DS.Spacing.xxs) {
             Text("\(reopenStatsStore.totalSuccessfulReopens)")
                 .font(DS.Typography.displayLarge)
-                .foregroundColor(.primary)
+                .foregroundStyle(.primary)
             Text("total reopens")
                 .font(.system(size: 12))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             Text("\(reopenStatsStore.todayCount) today")
                 .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundColor(.secondary.opacity(0.7))
+                .foregroundStyle(.secondary.opacity(0.7))
                 .padding(.top, DS.Spacing.xs)
         }
         .frame(maxWidth: .infinity)
@@ -85,7 +84,7 @@ struct ReopenStatsView: View {
             HStack {
                 Text("Trend")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Picker("", selection: $timeRange) {
                     ForEach(StatTimeRange.allCases, id: \.self) { range in
@@ -115,7 +114,7 @@ struct ReopenStatsView: View {
                 if allZero {
                     Text("Start using Command Reopen to see trends")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color(nsColor: .windowBackgroundColor).opacity(0.6))
                 }
@@ -129,7 +128,7 @@ struct ReopenStatsView: View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
             Text("Top Apps")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             let topApps = reopenStatsStore.topApps(6)
             if topApps.isEmpty {
@@ -138,9 +137,9 @@ struct ReopenStatsView: View {
                     VStack(spacing: 6) {
                         Image(systemName: "app.dashed")
                             .font(.system(size: 20))
-                            .foregroundColor(.secondary.opacity(0.5))
+                            .foregroundStyle(.secondary.opacity(0.5))
                         Text("No reopen activity yet")
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .font(DS.Typography.caption)
                     }
                     Spacer()
@@ -257,7 +256,7 @@ private struct ChartsTopAppsView: View {
                 .annotation(position: .trailing, alignment: .leading, spacing: 4) {
                     Text("\(app.count)")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

@@ -470,8 +470,8 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Pro status manager starts a seven day trial on first refresh")
-    func proStatusStartsTrial() async {
+    @Test("Pro status manager does not auto-start trial on first refresh")
+    func proStatusDoesNotAutoStartTrial() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
@@ -486,7 +486,31 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
 
-        #expect(manager.status == .trial(daysRemaining: 7, expiresAt: now.addingTimeInterval(7 * 24 * 60 * 60)))
+        #expect(manager.status == .expired)
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == nil)
+        #expect(!manager.shouldOpenProSettings)
+    }
+
+    @MainActor
+    @Test("Pro status manager starts trial only after onboarding continues")
+    func proStatusStartsTrialAfterOnboarding() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let trialStart = Date(timeIntervalSince1970: 1_700_000_000)
+        let now = trialStart.addingTimeInterval(2 * 24 * 60 * 60)
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { trialStart }
+        )
+
+        await manager.startTrial()
+
+        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == trialStart)
+        #expect(manager.status == .trial(daysRemaining: 5, expiresAt: trialStart.addingTimeInterval(7 * 24 * 60 * 60)))
     }
 
     @MainActor
@@ -707,6 +731,27 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
+    @Test("Network failures keep fallback plans available")
+    func networkFailureKeepsFallbackPlansAvailable() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mockService = MockRevenueCatService()
+        mockService.offeringsError = ProPurchaseError.network
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService
+        )
+
+        await manager.loadOfferings()
+
+        #expect(manager.availablePlans.allSatisfy { $0.isAvailable })
+        #expect(manager.planProduct(for: .yearly).displayPrice == "$5.99")
+        #expect(manager.planProduct(for: .lifetime).displayPrice == "$10.99")
+    }
+
+    @MainActor
     @Test("Purchase loading state is set while a purchase is in flight")
     func purchaseLoadingState() async throws {
         let (defaults, suiteName) = makeDefaults()
@@ -795,7 +840,7 @@ struct ProStatusManagerTests {
 
         #expect(!manager.isRestoringPurchases)
         #expect(!manager.status.isPro)
-        #expect(manager.paywallErrorMessage != nil)
+        #expect(manager.paywallErrorMessage == "No active purchase found on this account.")
         #expect(mockService.fetchEntitlementSnapshotCallCount == 0)
     }
 
@@ -832,12 +877,43 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
+    @Test("Purchase surfaces an error when entitlement sync never unlocks Pro")
+    func purchaseReportsActivationSyncFailure() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+
+        let mockService = MockRevenueCatService()
+        mockService.purchaseSnapshot = nil
+        mockService.fetchedEntitlementSnapshots = [nil, nil, nil]
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await #expect(throws: ProPurchaseError.activationPending) {
+            try await manager.purchase(.yearly)
+        }
+
+        #expect(mockService.fetchEntitlementSnapshotCallCount == 3)
+        #expect(manager.lastError == .activationPending)
+        #expect(manager.paywallErrorMessage == ProPurchaseError.activationPending.errorDescription)
+        #expect(manager.status == .expired)
+    }
+
+    @MainActor
     @Test("Expired prompt is raised once per app session")
     func expiredPromptRaisedOncePerSession() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
+        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
         let manager = ProStatusManager(
@@ -876,6 +952,64 @@ struct ProStatusManagerTests {
         manager.configureIfNeeded()
 
         #expect(manager.status == .expired)
+        #expect(!manager.shouldOpenProSettings)
+    }
+
+    @MainActor
+    @Test("Expired state prompts after onboarding has already been seen")
+    func expiredPromptAppearsAfterOnboarding() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            now: { now },
+            trialStartDateProvider: { now }
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .expired)
+        #expect(manager.shouldOpenProSettings)
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == nil)
+    }
+
+    @MainActor
+    @Test("Network failures fail open instead of restricting core features")
+    func networkFailuresFailOpen() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+
+        let networkError = NSError(
+            domain: RevenueCat.ErrorCode.errorDomain,
+            code: RevenueCat.ErrorCode.networkError.rawValue
+        )
+        let mockService = MockRevenueCatService()
+        mockService.entitlementError = networkError
+
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService
+        )
+        let source = ProCommerceStateSource(proStatusManager: manager)
+        let controller = AppAccessController(
+            distributionChannel: .appStore,
+            commerceStateSource: source
+        )
+
+        await manager.refresh()
+
+        #expect(manager.status == .expired)
+        #expect(manager.lastError == .network)
+        #expect(source.entitlementState == .trial)
+        #expect(controller.isCoreFeatureAvailable)
+        #expect(controller.showsUpgradeEntry)
         #expect(!manager.shouldOpenProSettings)
     }
 
@@ -1009,6 +1143,23 @@ struct RevenueCatSnapshotParserTests {
         #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
     }
 
+    @Test("RevenueCat parser falls back to any active entitlement when identifiers drift")
+    func parserFallsBackToGenericActiveEntitlement() {
+        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: "promo-pro",
+                isActive: true,
+                productIdentifier: "com.dev.kkuk.CommandReopen.promo",
+                expirationDate: expirationDate
+            )
+        ])
+
+        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
+
+        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
+    }
+
     @Test("RevenueCat parser ignores inactive configured entitlements")
     func parserIgnoresInactiveConfiguredEntitlement() {
         let customerInfo = makeCustomerInfo(entitlements: [
@@ -1080,9 +1231,33 @@ struct RevenueCatSnapshotParserTests {
 struct ProPurchaseErrorTests {
     @Test("RevenueCat configuration errors map to not configured")
     func configurationErrorMapsToNotConfigured() {
-        let error = NSError(domain: "RevenueCat", code: RevenueCat.ErrorCode.configurationError.rawValue)
+        let error = NSError(
+            domain: RevenueCat.ErrorCode.errorDomain,
+            code: RevenueCat.ErrorCode.configurationError.rawValue
+        )
 
         #expect(ProPurchaseError(error: error) == .notConfigured)
+    }
+
+    @Test("RevenueCat invalid receipt errors map to invalid receipt")
+    func invalidReceiptMapsToInvalidReceipt() {
+        let error = NSError(
+            domain: RevenueCat.ErrorCode.errorDomain,
+            code: RevenueCat.ErrorCode.invalidReceiptError.rawValue
+        )
+
+        #expect(ProPurchaseError(error: error) == .invalidReceipt)
+    }
+
+    @Test("Non-RevenueCat domains do not get remapped by raw code alone")
+    func unrelatedDomainStaysUnknown() {
+        let error = NSError(
+            domain: NSCocoaErrorDomain,
+            code: RevenueCat.ErrorCode.configurationError.rawValue,
+            userInfo: [NSLocalizedDescriptionKey: "Cocoa failure"]
+        )
+
+        #expect(ProPurchaseError(error: error) == .unknown("Cocoa failure"))
     }
 }
 

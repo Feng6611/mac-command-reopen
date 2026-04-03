@@ -19,7 +19,7 @@ final class ProCommerceStateSource: CommerceStateSource {
     }
 
     var entitlementState: AccessEntitlementState {
-        Self.map(status: proStatusManager.status)
+        proStatusManager.accessEntitlementState
     }
 
     var isFirstLaunch: Bool {
@@ -31,8 +31,10 @@ final class ProCommerceStateSource: CommerceStateSource {
     }
 
     var entitlementStatePublisher: AnyPublisher<AccessEntitlementState, Never> {
-        proStatusManager.$status
-            .map(Self.map)
+        Publishers.CombineLatest(proStatusManager.$status, proStatusManager.$lastError)
+            .map { [self] _, _ in
+                proStatusManager.accessEntitlementState
+            }
             .eraseToAnyPublisher()
     }
 
@@ -51,16 +53,5 @@ final class ProCommerceStateSource: CommerceStateSource {
 
     func markPromptHandled() {
         proStatusManager.markExpiredPromptHandled()
-    }
-
-    private static func map(status: ProStatus) -> AccessEntitlementState {
-        switch status {
-        case .trial:
-            .trial
-        case .expired:
-            .expired
-        case .pro:
-            .pro
-        }
     }
 }

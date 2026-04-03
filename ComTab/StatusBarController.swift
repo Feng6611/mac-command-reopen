@@ -36,9 +36,7 @@ final class StatusBarController: NSObject {
 
     private func configureButton() {
         if let button = statusItem.button {
-            if #available(macOS 11.0, *) {
-                button.image = NSImage(systemSymbolName: "command", accessibilityDescription: nil)
-            }
+            button.image = NSImage(systemSymbolName: "command", accessibilityDescription: nil)
             button.imagePosition = .imageOnly
         }
     }

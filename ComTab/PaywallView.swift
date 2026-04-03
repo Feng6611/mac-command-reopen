@@ -111,7 +111,6 @@ struct UpgradeCardView: View {
     private var isBusy: Bool {
         proStatusManager.purchaseInProgressPlan != nil
             || proStatusManager.isRestoringPurchases
-            || isLoadingOfferings
     }
 
     var body: some View {
@@ -141,18 +140,9 @@ struct UpgradeCardView: View {
             }
 
             // Plans
-            Group {
-                if isLoadingOfferings {
-                    ProgressView()
-                        .controlSize(.small)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, DS.Spacing.xl)
-                } else {
-                    VStack(spacing: DS.Spacing.sm) {
-                        ForEach(proStatusManager.availablePlans) { product in
-                            planRow(product: product)
-                        }
-                    }
+            VStack(spacing: DS.Spacing.sm) {
+                ForEach(proStatusManager.availablePlans) { product in
+                    planRow(product: product)
                 }
             }
             .padding(.horizontal, DS.Spacing.xl)
@@ -330,6 +320,12 @@ struct UpgradeCardView: View {
                         .font(.system(size: 12))
                 }
                 Text(ctaText).font(DS.Typography.bodyLarge)
+
+                if isLoadingOfferings {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.white)
+                }
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -361,13 +357,13 @@ struct UpgradeCardView: View {
 
             DSDotSeparator()
 
-            Button("Terms") { openExternalURL(ExternalLinks.officialURL) }
+            Button("Terms") { openExternalURL(ExternalLinks.termsURL) }
                 .buttonStyle(.link)
                 .font(DS.Typography.caption)
 
             DSDotSeparator()
 
-            Button("Privacy") { openExternalURL(ExternalLinks.officialURL) }
+            Button("Privacy") { openExternalURL(ExternalLinks.privacyURL) }
                 .buttonStyle(.link)
                 .font(DS.Typography.caption)
         }
@@ -507,12 +503,10 @@ struct ProStatusBadgeView: View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             if let purchaseDate = displayState.entitlementSnapshot?.originalPurchaseDate {
                 metadataRow(label: "Member since", value: formattedDate(purchaseDate))
-                metadataRow(label: "Supporting for", value: supportingText(since: purchaseDate))
             }
 
             if let renewalState = displayState.status.renewalState {
                 metadataRow(label: renewalLabel(for: renewalState), value: renewalDate(for: renewalState))
-                metadataRow(label: "Remaining", value: renewalFooter(for: renewalState))
             }
         }
     }
@@ -530,20 +524,6 @@ struct ProStatusBadgeView: View {
 
             Spacer()
         }
-    }
-
-    private func supportingText(since date: Date) -> String {
-        let days = max(1, Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0)
-        return "\(days) day\(days == 1 ? "" : "s")"
-    }
-
-    private func renewalFooter(for renewalState: ProRenewalState) -> String {
-        let daysRemaining: Int
-        switch renewalState {
-        case .renews(_, let remaining), .ends(_, let remaining):
-            daysRemaining = remaining
-        }
-        return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left in current period"
     }
 
     private func renewalLabel(for renewalState: ProRenewalState) -> String {
@@ -657,6 +637,10 @@ struct ProSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xxl) {
+            if let successMessage = proStatusManager.paywallSuccessMessage, previewMode == .live {
+                successBanner(message: successMessage)
+            }
+
             if displayState.status.isPro {
                 ProStatusBadgeView(displayState: displayState)
             } else {
@@ -669,6 +653,23 @@ struct ProSectionView: View {
             previewPicker
 #endif
         }
+    }
+
+    private func successBanner(message: String) -> some View {
+        Text(message)
+            .font(DS.Typography.captionMedium)
+            .foregroundColor(Color(nsColor: .systemGreen))
+            .padding(.horizontal, DS.Spacing.md)
+            .padding(.vertical, DS.Spacing.sm)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .fill(Color(nsColor: .systemGreen).opacity(0.09))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .stroke(Color(nsColor: .systemGreen).opacity(0.18), lineWidth: 1)
+            )
     }
 
 #if DEBUG

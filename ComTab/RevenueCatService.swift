@@ -30,6 +30,10 @@ enum RevenueCatConfiguration {
 
 enum RevenueCatSnapshotParser {
     nonisolated static func resolveActiveEntitlement(from customerInfo: CustomerInfo, logger: Logger) -> EntitlementInfo? {
+        let activeEntitlements = customerInfo.entitlements.all.values
+            .filter(\.isActive)
+            .sorted(by: Self.preferredEntitlementOrder)
+
         if let configuredEntitlement = customerInfo.entitlements.all[RevenueCatConfiguration.entitlementIdentifier] {
             if configuredEntitlement.isActive {
                 return configuredEntitlement
@@ -39,20 +43,39 @@ enum RevenueCatSnapshotParser {
             )
         }
 
-        let fallbackEntitlement = customerInfo.entitlements.all.values.first { entitlement in
-            entitlement.isActive && (
-                entitlement.productIdentifier == RevenueCatConfiguration.yearlyProductIdentifier
-                    || entitlement.productIdentifier == RevenueCatConfiguration.lifetimeProductIdentifier
-            )
+        let fallbackEntitlement = activeEntitlements.first { entitlement in
+            entitlement.productIdentifier == RevenueCatConfiguration.yearlyProductIdentifier
+                || entitlement.productIdentifier == RevenueCatConfiguration.lifetimeProductIdentifier
         }
 
         if let fallbackEntitlement {
             logger.notice(
                 "Falling back to active entitlement product=\(fallbackEntitlement.productIdentifier) because configured entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) was not found or inactive."
             )
+            return fallbackEntitlement
         }
 
-        return fallbackEntitlement
+        if let genericEntitlement = activeEntitlements.first {
+            logger.notice(
+                "Falling back to generic active entitlement id=\(genericEntitlement.identifier) product=\(genericEntitlement.productIdentifier) because configured entitlement id=\(RevenueCatConfiguration.entitlementIdentifier) was not found or inactive."
+            )
+            return genericEntitlement
+        }
+
+        return nil
+    }
+
+    private nonisolated static func preferredEntitlementOrder(_ lhs: EntitlementInfo, _ rhs: EntitlementInfo) -> Bool {
+        switch (lhs.expirationDate, rhs.expirationDate) {
+        case (.none, .some):
+            return true
+        case (.some, .none):
+            return false
+        case let (.some(lhsDate), .some(rhsDate)) where lhsDate != rhsDate:
+            return lhsDate > rhsDate
+        default:
+            return lhs.identifier.localizedCompare(rhs.identifier) == .orderedAscending
+        }
     }
 
     nonisolated static func makeEntitlementSnapshot(from customerInfo: CustomerInfo?) -> ProEntitlementSnapshot? {
@@ -117,13 +140,26 @@ extension ProPlan {
     }
 }
 
+extension Offering {
+    func package(for plan: ProPlan) -> Package? {
+        switch plan {
+        case .yearly:
+            return self.annual
+                ?? self.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
+        case .lifetime:
+            return self.lifetime
+                ?? self.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
+        }
+    }
+}
+
 struct ProEntitlementSnapshot: Equatable, Sendable {
     let plan: ProPlan
     let expirationDate: Date?
     let willRenew: Bool
     let originalPurchaseDate: Date?
 
-    init(
+    nonisolated init(
         plan: ProPlan,
         expirationDate: Date?,
         willRenew: Bool = false,
@@ -150,6 +186,11 @@ protocol RevenueCatServicing: AnyObject {
 
 @MainActor
 final class RevenueCatService: NSObject, RevenueCatServicing {
+    private enum Constants {
+        static let requestTimeoutNanoseconds: UInt64 = 4_000_000_000
+        static let invalidReceiptRecoveryDelayNanoseconds: UInt64 = 1_000_000_000
+    }
+
     static let shared = RevenueCatService()
 
     var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)?
@@ -190,6 +231,8 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         let configuration = Configuration
             .builder(withAPIKey: RevenueCatConfiguration.apiKey)
             .with(storeKitVersion: .storeKit2)
+            // RevenueCat 5.67.0 still marks `.enforced` unavailable, so keep the strongest
+            // public verification mode that this SDK release supports.
             .with(entitlementVerificationMode: .informational)
             .with(showStoreMessagesAutomatically: true)
             .build()
@@ -204,7 +247,9 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
     func fetchCurrentOffering() async throws -> Offering? {
         try ensureConfigured()
 
-        let offerings = try await Purchases.shared.offerings()
+        let offerings = try await withTimeout("offerings") {
+            try await Purchases.shared.offerings()
+        }
         let resolvedOffering = offerings.current ?? offerings.all[RevenueCatConfiguration.offeringIdentifier]
 
         if let resolvedOffering {
@@ -224,7 +269,9 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
         try ensureConfigured()
 
-        let customerInfo = try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
+        let customerInfo = try await withTimeout("customer info") {
+            try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
+        }
         return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
     }
 
@@ -232,16 +279,34 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         try ensureConfigured()
 
         let resolvedOffering = try await resolveOffering(offering)
-        guard let package = package(for: plan, in: resolvedOffering) else {
+        guard let package = resolvedOffering.package(for: plan) else {
             throw ProPurchaseError.packageNotFound(plan)
         }
+        AppLogger.purchase.notice(
+            "Starting purchase. plan=\(plan.rawValue) package=\(package.identifier) product=\(package.storeProduct.productIdentifier)"
+        )
 
-        let result = try await Purchases.shared.purchase(package: package)
-        if result.userCancelled {
-            throw ProPurchaseError.purchaseCancelled
+        do {
+            let result = try await Purchases.shared.purchase(package: package)
+            if result.userCancelled {
+                throw ProPurchaseError.purchaseCancelled
+            }
+
+            return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: result.customerInfo)
+        } catch {
+            if isInvalidReceiptError(error) {
+                AppLogger.purchase.error(
+                    "Purchase returned an invalid receipt for plan=\(plan.rawValue). Attempting entitlement recovery."
+                )
+
+                if let recoveredSnapshot = try await recoverSnapshotAfterInvalidReceipt() {
+                    AppLogger.purchase.notice("Recovered purchase after invalid receipt for plan=\(plan.rawValue).")
+                    return recoveredSnapshot
+                }
+            }
+
+            throw error
         }
-
-        return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: result.customerInfo)
     }
 
     func restorePurchases() async throws -> ProEntitlementSnapshot? {
@@ -269,14 +334,44 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         throw ProPurchaseError.offeringUnavailable
     }
 
-    private func package(for plan: ProPlan, in offering: Offering) -> Package? {
-        switch plan {
-        case .yearly:
-            return offering.annual
-                ?? offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
-        case .lifetime:
-            return offering.lifetime
-                ?? offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
+    private func recoverSnapshotAfterInvalidReceipt() async throws -> ProEntitlementSnapshot? {
+        try? await Task.sleep(nanoseconds: Constants.invalidReceiptRecoveryDelayNanoseconds)
+
+        if let refreshedSnapshot = try await fetchEntitlementSnapshot() {
+            return refreshedSnapshot
+        }
+
+        return try await restorePurchases()
+    }
+
+    private func isInvalidReceiptError(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return nsError.domain == RevenueCat.ErrorCode.errorDomain
+            && RevenueCat.ErrorCode(rawValue: nsError.code) == .invalidReceiptError
+    }
+
+    private func withTimeout<T>(
+        _ operationName: String,
+        operation: @escaping @Sendable () async throws -> T
+    ) async throws -> T {
+        try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask {
+                try await operation()
+            }
+
+            group.addTask {
+                try await Task.sleep(nanoseconds: Constants.requestTimeoutNanoseconds)
+                throw ProPurchaseError.network
+            }
+
+            defer { group.cancelAll() }
+
+            guard let result = try await group.next() else {
+                AppLogger.purchase.error("Timed out waiting for \(operationName) with no result.")
+                throw ProPurchaseError.network
+            }
+
+            return result
         }
     }
 }

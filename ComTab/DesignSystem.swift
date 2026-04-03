@@ -7,7 +7,6 @@
 //  only define what Apple doesn't provide (spacing scale, semantic
 //  color aliases for opacity combos, card modifier, small components).
 //
-
 import SwiftUI
 
 // MARK: - Design Tokens
@@ -94,6 +93,7 @@ enum DS {
         static let letterSignature = Font.system(size: 14, weight: .medium)
         static let letterLabel     = Font.system(size: 12, weight: .semibold)
     }
+
 }
 
 // MARK: - Card Modifier
@@ -165,7 +165,7 @@ struct DSIconBadge: View {
                 .frame(width: size, height: size)
             Image(systemName: systemName)
                 .font(.system(size: iconSize))
-                .foregroundColor(iconColor)
+                .foregroundStyle(iconColor)
         }
     }
 }

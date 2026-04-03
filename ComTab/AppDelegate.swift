@@ -10,9 +10,16 @@ import Combine
 import os
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private enum Constants {
+        static let commerceRefreshThrottle: TimeInterval = 5 * 60
+    }
+
     private var statusController: StatusBarController?
     private let accessController = AppAccessController.shared
     private var cancellables: Set<AnyCancellable> = []
+    private var hasCompletedInitialCommerceRefresh = false
+    private var lastCommerceRefreshAt: Date?
+    private var isRefreshingCommerce = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
@@ -20,24 +27,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
         NSApp.setActivationPolicy(.accessory)
         accessController.configureIfNeeded()
-        let shouldShowOnboarding = accessController.shouldShowOnboarding
         bindUpgradePrompt()
         statusController = StatusBarController(activationMonitor: .shared, accessController: accessController)
+
+#if APPSTORE
+        let shouldShowOnboardingImmediately = accessController.shouldShowOnboarding
+        if shouldShowOnboardingImmediately {
+            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
+        }
+#else
+        let shouldShowOnboardingImmediately = false
+#endif
 
         // Ensure no windows are visible
         NSApp.windows.forEach { $0.orderOut(nil) }
 
         Task { @MainActor in
-            await accessController.refresh()
-        }
-
-        // Show onboarding on first launch
-        if shouldShowOnboarding {
-#if APPSTORE
-            DispatchQueue.main.async {
-                OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
-            }
-#endif
+            await completeInitialCommerceRefresh(showOnboardingAfterRefresh: !shouldShowOnboardingImmediately)
         }
     }
 
@@ -46,9 +52,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        AppLogger.lifecycle.debug("Application became active. Refreshing commerce state.")
+        AppLogger.lifecycle.debug("Application became active. Evaluating commerce refresh throttle.")
         Task { @MainActor in
-            await accessController.refresh()
+            await refreshCommerceStateIfNeeded(force: false, reason: "applicationDidBecomeActive")
         }
     }
 
@@ -59,8 +65,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func bindUpgradePrompt() {
         accessController.$shouldOpenProSettings
             .receive(on: RunLoop.main)
-            .sink { shouldOpenProSettings in
+            .sink { [weak self] shouldOpenProSettings in
+                guard let self else {
+                    return
+                }
                 guard shouldOpenProSettings else {
+                    return
+                }
+                guard self.hasCompletedInitialCommerceRefresh else {
+                    return
+                }
+                guard !OnboardingWindowController.shared.isVisible else {
                     return
                 }
 
@@ -76,5 +91,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.accessController.markPromptHandled()
             }
             .store(in: &cancellables)
+    }
+
+    @MainActor
+    private func completeInitialCommerceRefresh(showOnboardingAfterRefresh: Bool) async {
+        await refreshCommerceStateIfNeeded(force: true, reason: "initialLaunch")
+        hasCompletedInitialCommerceRefresh = true
+
+#if APPSTORE
+        if showOnboardingAfterRefresh, accessController.shouldShowOnboarding {
+            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
+            return
+        }
+#endif
+
+        if accessController.shouldOpenProSettings, !OnboardingWindowController.shared.isVisible {
+            if !SettingsWindowController.shared.isVisible {
+                SettingsWindowController.shared.show(
+                    activationMonitor: .shared,
+                    reopenStatsStore: .shared,
+                    accessController: accessController,
+                    initialTab: .pro
+                )
+            }
+
+            accessController.markPromptHandled()
+        }
+    }
+
+    @MainActor
+    private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {
+        if isRefreshingCommerce {
+            AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because another refresh is already running.")
+            return
+        }
+
+        let now = Date()
+        if !force,
+           let lastCommerceRefreshAt,
+           now.timeIntervalSince(lastCommerceRefreshAt) < Constants.commerceRefreshThrottle {
+            AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because the last refresh was too recent.")
+            return
+        }
+
+        isRefreshingCommerce = true
+        defer {
+            isRefreshingCommerce = false
+            lastCommerceRefreshAt = Date()
+        }
+
+        await accessController.refresh()
     }
 }

@@ -21,24 +21,24 @@ struct OnboardingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
 
-            Spacer().frame(height: 20)
+            Spacer().frame(height: DS.Spacing.xl)
 
             Text("Welcome to Command Reopen")
                 .font(.system(size: 22, weight: .bold))
 
-            Spacer().frame(height: 8)
+            Spacer().frame(height: DS.Spacing.sm)
 
             Text("Never lose your windows again.\nSwitch apps with Cmd+Tab, windows reopen automatically.")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
+                .font(DS.Typography.body)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, DS.Spacing.xxxl)
 
-            Spacer().frame(height: 32)
+            Spacer().frame(height: DS.Spacing.xxxl)
 
             // Feature list
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                 onboardingFeature(
                     icon: "command",
                     color: .accentColor,
@@ -63,32 +63,32 @@ struct OnboardingView: View {
             Spacer().frame(height: 36)
 
             // Trial callout
-            HStack(spacing: 8) {
+            HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "gift.fill")
-                    .foregroundColor(.accentColor)
-                    .font(.system(size: 14))
+                    .foregroundStyle(Color.accentColor)
+                    .font(DS.Typography.bodyLarge)
                 Text("7-day free trial, no commitment")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(DS.Typography.bodyMedium)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.vertical, DS.Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.accentColor.opacity(0.06))
+                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                    .fill(DS.Colors.accentTintSubtle)
             )
 
-            Spacer().frame(height: 24)
+            Spacer().frame(height: DS.Spacing.xxl)
 
             // CTA
             Button {
                 onGetStarted()
             } label: {
                 Text("Get Started")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.white)
+                    .font(DS.Typography.bodyLarge)
+                    .foregroundStyle(.white)
                     .frame(width: 200, height: 40)
                     .background(
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
                             .fill(
                                 LinearGradient(
                                     colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
@@ -109,12 +109,12 @@ struct OnboardingView: View {
     private func onboardingFeature(icon: String, color: Color, title: String, description: String) -> some View {
         HStack(alignment: .top, spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
                     .fill(color.opacity(0.1))
                     .frame(width: 36, height: 36)
                 Image(systemName: icon)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(color)
+                    .foregroundStyle(color)
             }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -122,7 +122,7 @@ struct OnboardingView: View {
                     .font(.system(size: 13, weight: .semibold))
                 Text(description)
                     .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineSpacing(1)
             }
         }
@@ -138,6 +138,10 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private var proStatusManager: ProStatusManager?
 
+    var isVisible: Bool {
+        window?.isVisible == true
+    }
+
     func showIfNeeded(proStatusManager: ProStatusManager) {
         guard proStatusManager.isFirstLaunch else { return }
         show(proStatusManager: proStatusManager)
@@ -149,9 +153,11 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
             return
         }
 
-        let contentView = OnboardingView {
-            proStatusManager.startTrial()
-            self.close()
+        let contentView = OnboardingView { [weak self] in
+            Task { @MainActor [weak self] in
+                await proStatusManager.startTrial()
+                self?.close()
+            }
         }
 
         let hostingController = NSHostingController(rootView: contentView)

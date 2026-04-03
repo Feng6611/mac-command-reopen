@@ -70,6 +70,8 @@ enum ProPurchaseError: Error, Equatable {
     case packageNotFound(ProPlan)
     case purchaseCancelled
     case purchaseNotAllowed
+    case activationPending
+    case invalidReceipt
     case network
     case invalidCredentials
     case productUnavailable
@@ -82,12 +84,15 @@ enum ProPurchaseError: Error, Equatable {
         }
 
         let nsError = error as NSError
-        if let errorCode = RevenueCat.ErrorCode(rawValue: nsError.code) {
+        if nsError.domain == RevenueCat.ErrorCode.errorDomain,
+           let errorCode = RevenueCat.ErrorCode(rawValue: nsError.code) {
             switch errorCode {
             case .purchaseCancelledError:
                 self = .purchaseCancelled
             case .purchaseNotAllowedError:
                 self = .purchaseNotAllowed
+            case .invalidReceiptError:
+                self = .invalidReceipt
             case .productNotAvailableForPurchaseError:
                 self = .productUnavailable
             case .networkError:
@@ -118,6 +123,10 @@ extension ProPurchaseError: LocalizedError {
             "The purchase was cancelled."
         case .purchaseNotAllowed:
             "Purchases are not allowed on this Mac."
+        case .activationPending:
+            "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase."
+        case .invalidReceipt:
+            "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase."
         case .network:
             "A network connection is required to load purchases."
         case .invalidCredentials:
@@ -216,6 +225,7 @@ final class ProStatusManager: ObservableObject {
         entitlementSnapshot
     }
     @Published private(set) var paywallErrorMessage: String?
+    @Published private(set) var paywallSuccessMessage: String?
     @Published private(set) var shouldOpenProSettings = false
 
     private let defaults: UserDefaults
@@ -230,6 +240,10 @@ final class ProStatusManager: ObservableObject {
 
     var isFirstLaunch: Bool {
         !defaults.bool(forKey: Constants.hasSeenOnboardingKey)
+    }
+
+    var accessEntitlementState: AccessEntitlementState {
+        Self.accessEntitlementState(status: status, lastError: lastError)
     }
 
     init(
@@ -250,6 +264,7 @@ final class ProStatusManager: ObservableObject {
         self.lastError = nil
         self.purchaseInProgressPlan = nil
         self.paywallErrorMessage = nil
+        self.paywallSuccessMessage = nil
         self.status = Self.computeStatus(entitlementSnapshot: cachedSnapshot, defaults: defaults, now: now)
     }
 
@@ -267,11 +282,13 @@ final class ProStatusManager: ObservableObject {
         applyStatus(computeStatus(), source: .bootstrap)
     }
 
-    func startTrial() {
+    func startTrial() async {
         defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
 
         if defaults.object(forKey: Constants.trialStartDateKey) == nil {
-            defaults.set(now(), forKey: Constants.trialStartDateKey)
+            let resolvedStartDate = await trialStartDateProvider() ?? now()
+            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
+            AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
         }
 
         applyStatus(computeStatus(), source: .stateChange)
@@ -283,21 +300,24 @@ final class ProStatusManager: ObservableObject {
 
     func refresh() async {
         configureIfNeeded()
-        await ensureTrialStartedIfNeeded()
 
+        var offeringsError: Error?
         do {
             currentOffering = try await revenueCatService.fetchCurrentOffering()
         } catch {
             AppLogger.purchase.error("Failed to load offerings: \(error.localizedDescription)")
             currentOffering = nil
+            offeringsError = error
         }
-        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering), offeringsAttempted: true)
+        availablePlans = Self.resolveAvailablePlans(offering: currentOffering, offeringsError: offeringsError)
 
         do {
             entitlementSnapshot = try await revenueCatService.fetchEntitlementSnapshot()
             lastError = nil
         } catch {
-            AppLogger.purchase.error("Failed to refresh customer info: \(error.localizedDescription)")
+            let purchaseError = ProPurchaseError(error: error)
+            AppLogger.purchase.error("Failed to refresh customer info: \(purchaseError.localizedDescription)")
+            lastError = purchaseError
         }
 
         applyStatus(computeStatus(), source: .refresh)
@@ -306,62 +326,79 @@ final class ProStatusManager: ObservableObject {
     func loadOfferings() async {
         configureIfNeeded()
 
+        if currentOffering != nil {
+            availablePlans = Self.resolveAvailablePlans(offering: currentOffering, offeringsError: nil)
+            return
+        }
+
+        var offeringsError: Error?
         do {
             currentOffering = try await revenueCatService.fetchCurrentOffering()
         } catch {
             AppLogger.purchase.error("Failed to load offerings: \(error.localizedDescription)")
             currentOffering = nil
+            offeringsError = error
         }
 
-        availablePlans = Self.makeAvailablePlans(packageMetadata: Self.packageMetadata(from: currentOffering), offeringsAttempted: true)
+        availablePlans = Self.resolveAvailablePlans(offering: currentOffering, offeringsError: offeringsError)
     }
 
     func purchase(_ plan: ProPlan) async throws {
         configureIfNeeded()
-        paywallErrorMessage = nil
+        clearPaywallMessages()
         purchaseInProgressPlan = plan
         defer { purchaseInProgressPlan = nil }
 
         do {
             let snapshot = try await revenueCatService.purchase(plan: plan, offering: currentOffering)
             lastError = nil
-            paywallErrorMessage = nil
             entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
-                await refreshEntitlementStateAfterTransaction()
+                let didUnlock = await refreshEntitlementStateAfterTransaction()
+                if !didUnlock {
+                    throw ProPurchaseError.activationPending
+                }
             }
+            paywallSuccessMessage = String(localized: "Purchase successful. Pro unlocked.")
         } catch {
             let purchaseError = ProPurchaseError(error: error)
             lastError = purchaseError
             paywallErrorMessage = purchaseError == .purchaseCancelled ? nil : purchaseError.errorDescription
+            paywallSuccessMessage = nil
             throw purchaseError
         }
     }
 
     func restorePurchases() async throws {
         configureIfNeeded()
-        paywallErrorMessage = nil
+        clearPaywallMessages()
         isRestoringPurchases = true
         defer { isRestoringPurchases = false }
 
         do {
             let snapshot = try await revenueCatService.restorePurchases()
             lastError = nil
-            paywallErrorMessage = nil
             entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
                 if snapshot != nil {
-                    await refreshEntitlementStateAfterTransaction()
+                    let didUnlock = await refreshEntitlementStateAfterTransaction()
+                    if !didUnlock {
+                        throw ProPurchaseError.activationPending
+                    }
                 } else {
-                    paywallErrorMessage = String(localized: "No previous purchase found on this account.")
+                    paywallErrorMessage = String(localized: "No active purchase found on this account.")
                 }
+            }
+            if status.isPro {
+                paywallSuccessMessage = String(localized: "Purchase restored.")
             }
         } catch {
             let purchaseError = ProPurchaseError(error: error)
             lastError = purchaseError
             paywallErrorMessage = purchaseError == .purchaseCancelled ? nil : purchaseError.errorDescription
+            paywallSuccessMessage = nil
             throw purchaseError
         }
     }
@@ -394,19 +431,12 @@ final class ProStatusManager: ObservableObject {
         }
     }
 
-    private func ensureTrialStartedIfNeeded() async {
-        guard defaults.object(forKey: Constants.trialStartDateKey) == nil else {
-            return
-        }
-
-        let resolvedStartDate = await trialStartDateProvider() ?? now()
-        defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
-        applyStatus(computeStatus(), source: .stateChange)
-
-        AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
+    private func clearPaywallMessages() {
+        paywallErrorMessage = nil
+        paywallSuccessMessage = nil
     }
 
-    private func refreshEntitlementStateAfterTransaction() async {
+    private func refreshEntitlementStateAfterTransaction() async -> Bool {
         for attempt in 1...Constants.transactionRefreshAttempts {
             do {
                 let snapshot = try await revenueCatService.fetchEntitlementSnapshot()
@@ -415,7 +445,7 @@ final class ProStatusManager: ObservableObject {
 
                 if status.isPro {
                     AppLogger.purchase.notice("Entitlement refresh succeeded after transaction on attempt \(attempt).")
-                    return
+                    return true
                 }
             } catch {
                 AppLogger.purchase.error("Failed to refresh entitlement after transaction on attempt \(attempt): \(error.localizedDescription)")
@@ -427,6 +457,7 @@ final class ProStatusManager: ObservableObject {
         }
 
         AppLogger.purchase.error("Entitlement remained inactive after transaction refresh attempts.")
+        return false
     }
 
     private func applyEntitlementSnapshot(_ snapshot: ProEntitlementSnapshot?, source: StatusUpdateSource) {
@@ -454,6 +485,12 @@ final class ProStatusManager: ObservableObject {
         source: StatusUpdateSource
     ) -> Bool {
         guard newStatus == .expired, !hasPromptedForExpiredStateThisSession else {
+            return false
+        }
+        guard Self.accessEntitlementState(status: newStatus, lastError: lastError) != .trial else {
+            return false
+        }
+        guard !isFirstLaunch else {
             return false
         }
 
@@ -484,7 +521,9 @@ final class ProStatusManager: ObservableObject {
             )
         }
 
-        let trialStart = defaults.object(forKey: Constants.trialStartDateKey) as? Date ?? now()
+        guard let trialStart = defaults.object(forKey: Constants.trialStartDateKey) as? Date else {
+            return .expired
+        }
         let expiresAt = trialStart.addingTimeInterval(Constants.trialDuration)
         let remaining = expiresAt.timeIntervalSince(now())
 
@@ -504,7 +543,7 @@ final class ProStatusManager: ObservableObject {
         var metadata: [ProPlan: ProPlanPackageMetadata] = [:]
 
         for plan in [ProPlan.yearly, .lifetime] {
-            guard let package = package(for: plan, in: offering) else {
+            guard let package = offering.package(for: plan) else {
                 continue
             }
 
@@ -518,14 +557,31 @@ final class ProStatusManager: ObservableObject {
         return metadata.isEmpty ? nil : metadata
     }
 
-    private static func package(for plan: ProPlan, in offering: Offering) -> Package? {
-        switch plan {
-        case .yearly:
-            return offering.annual
-                ?? offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
-        case .lifetime:
-            return offering.lifetime
-                ?? offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
+    private static func resolveAvailablePlans(offering: Offering?, offeringsError: Error?) -> [ProPlanProduct] {
+        let purchaseError = offeringsError.map(ProPurchaseError.init(error:))
+        let shouldKeepFallbackAvailable = purchaseError == .network
+
+        return makeAvailablePlans(
+            packageMetadata: packageMetadata(from: offering),
+            offeringsAttempted: !shouldKeepFallbackAvailable
+        )
+    }
+
+    private static func accessEntitlementState(
+        status: ProStatus,
+        lastError: ProPurchaseError?
+    ) -> AccessEntitlementState {
+        if status == .expired, lastError == .network {
+            return .trial
+        }
+
+        switch status {
+        case .trial:
+            return .trial
+        case .expired:
+            return .expired
+        case .pro:
+            return .pro
         }
     }
 
