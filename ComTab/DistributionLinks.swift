@@ -4,8 +4,17 @@ enum ExternalLinks {
     static let officialURL = "https://commandreopen.com"
     static let githubURL = "https://github.com/Feng6611/mac-command-reopen"
     static let githubDocsBaseURL = "https://github.com/Feng6611/mac-command-reopen/blob/main"
-    static let termsURL = "\(githubDocsBaseURL)/TERMS.md"
-    static let privacyURL = "\(githubDocsBaseURL)/PRIVACY.md"
+    static let appStoreStandardEULAURL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
+    static let customTermsURL = "\(githubDocsBaseURL)/TERMS.md"
+    static let privacyURL = "\(officialURL)/privacy/"
+    static var termsURL: String {
+        switch DistributionChannel.current {
+        case .appStore:
+            appStoreStandardEULAURL
+        case .direct:
+            customTermsURL
+        }
+    }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
 }
