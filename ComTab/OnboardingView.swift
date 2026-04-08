@@ -137,6 +137,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     private var window: NSWindow?
     private var proStatusManager: ProStatusManager?
+    private var shouldOpenSettingsAfterClose = false
 
     var isVisible: Bool {
         window?.isVisible == true
@@ -155,6 +156,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
         let contentView = OnboardingView { [weak self] in
             Task { @MainActor [weak self] in
+                self?.shouldOpenSettingsAfterClose = true
                 await proStatusManager.startTrial()
                 self?.close()
             }
@@ -170,6 +172,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         window.center()
 
         self.proStatusManager = proStatusManager
+        self.shouldOpenSettingsAfterClose = false
         self.window = window
 
         NSApplication.shared.activate(ignoringOtherApps: true)
@@ -181,9 +184,14 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        proStatusManager?.markOnboardingSeen()
+        let shouldOpenSettingsAfterClose = shouldOpenSettingsAfterClose
+        self.shouldOpenSettingsAfterClose = false
         window = nil
         proStatusManager = nil
+
+        guard shouldOpenSettingsAfterClose else {
+            return
+        }
 
         SettingsWindowController.shared.show(
             activationMonitor: .shared,

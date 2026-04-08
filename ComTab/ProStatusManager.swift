@@ -8,6 +8,8 @@
 import Combine
 import Foundation
 import RevenueCat
+import Security
+import StoreKit
 import os
 
 enum ProPlan: String, Equatable, Sendable {
@@ -61,6 +63,351 @@ struct ProPlanProduct: Equatable, Identifiable {
         .fallback(for: .yearly),
         .fallback(for: .lifetime)
     ]
+}
+
+struct LegacyAppPurchaseSnapshot: Equatable, Sendable {
+    let originalAppVersion: String
+    let originalPurchaseDate: Date?
+
+    var asEntitlementSnapshot: ProEntitlementSnapshot {
+        .init(
+            plan: .lifetime,
+            expirationDate: nil,
+            willRenew: false,
+            originalPurchaseDate: originalPurchaseDate
+        )
+    }
+}
+
+@MainActor
+protocol LegacyAppPurchaseChecking: AnyObject {
+    var cachedLegacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot? { get }
+
+    func refreshLegacyAppPurchaseSnapshot() async -> LegacyAppPurchaseSnapshot?
+}
+
+@MainActor
+final class LegacyAppPurchaseTracker: LegacyAppPurchaseChecking {
+    static let shared = LegacyAppPurchaseTracker()
+
+    private(set) var cachedLegacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
+
+    func refreshLegacyAppPurchaseSnapshot() async -> LegacyAppPurchaseSnapshot? {
+        if #available(macOS 13.0, *) {
+            do {
+                let verificationResult = try await AppTransaction.shared
+                let snapshot = Self.snapshotIfGrandfathered(from: verificationResult)
+                cachedLegacyAppPurchaseSnapshot = snapshot
+                logGrandfatheredSnapshotIfNeeded(snapshot)
+                return snapshot
+            } catch {
+                AppLogger.purchase.error("Failed to load AppTransaction for grandfathering: \(error.localizedDescription)")
+            }
+        }
+
+        do {
+            let snapshot = try Self.snapshotIfGrandfatheredFromLocalReceipt()
+            cachedLegacyAppPurchaseSnapshot = snapshot
+            logGrandfatheredSnapshotIfNeeded(snapshot)
+            return snapshot
+        } catch {
+            AppLogger.purchase.error("Failed to parse App Store receipt for grandfathering: \(error.localizedDescription)")
+            return cachedLegacyAppPurchaseSnapshot
+        }
+    }
+
+    private func logGrandfatheredSnapshotIfNeeded(_ snapshot: LegacyAppPurchaseSnapshot?) {
+        guard let snapshot else {
+            return
+        }
+
+        let purchaseDateDescription = snapshot.originalPurchaseDate?.formatted() ?? "unknown"
+        AppLogger.purchase.notice(
+            "Detected grandfathered paid-app customer. originalVersion=\(snapshot.originalAppVersion) purchaseDate=\(purchaseDateDescription)"
+        )
+    }
+
+    @available(macOS 13.0, *)
+    private static func snapshotIfGrandfathered(
+        from verificationResult: StoreKit.VerificationResult<StoreKit.AppTransaction>
+    ) -> LegacyAppPurchaseSnapshot? {
+        guard case .verified(let transaction) = verificationResult else {
+            AppLogger.purchase.error("AppTransaction verification failed; skipping grandfathering.")
+            return nil
+        }
+
+        guard isGrandfathered(originalAppVersion: transaction.originalAppVersion) else {
+            return nil
+        }
+
+        return LegacyAppPurchaseSnapshot(
+            originalAppVersion: transaction.originalAppVersion,
+            originalPurchaseDate: transaction.originalPurchaseDate
+        )
+    }
+
+    private static func isGrandfathered(originalAppVersion: String) -> Bool {
+        originalAppVersion.compare(ProStatusManager.Constants.grandfatheringCutoffVersion, options: .numeric) == .orderedAscending
+    }
+
+    private static func snapshotIfGrandfatheredFromLocalReceipt() throws -> LegacyAppPurchaseSnapshot? {
+        guard let receiptURL = Bundle.main.appStoreReceiptURL else {
+            return nil
+        }
+
+        let receiptData = try Data(contentsOf: receiptURL)
+        let payloadData = try LegacyAppStoreReceiptParser.extractPayload(fromSignedReceiptData: receiptData)
+        let receipt = try LegacyAppStoreReceiptParser.parse(payloadData: payloadData)
+
+        guard isGrandfathered(originalAppVersion: receipt.originalAppVersion) else {
+            return nil
+        }
+
+        return LegacyAppPurchaseSnapshot(
+            originalAppVersion: receipt.originalAppVersion,
+            originalPurchaseDate: nil
+        )
+    }
+}
+
+struct LegacyAppStoreReceipt: Equatable, Sendable {
+    let originalAppVersion: String
+
+    nonisolated init(originalAppVersion: String) {
+        self.originalAppVersion = originalAppVersion
+    }
+
+    nonisolated static func == (lhs: LegacyAppStoreReceipt, rhs: LegacyAppStoreReceipt) -> Bool {
+        lhs.originalAppVersion == rhs.originalAppVersion
+    }
+}
+
+enum LegacyAppStoreReceiptParser {
+    private enum AttributeType {
+        static let originalAppVersion = 19
+    }
+
+    static func extractPayload(fromSignedReceiptData receiptData: Data) throws -> Data {
+        var decoder: CMSDecoder?
+        guard CMSDecoderCreate(&decoder) == errSecSuccess, let decoder else {
+            throw ReceiptDecodingError.cmsDecoderCreateFailed
+        }
+
+        let updateStatus = receiptData.withUnsafeBytes { rawBuffer -> OSStatus in
+            guard let baseAddress = rawBuffer.baseAddress else {
+                return errSecParam
+            }
+
+            return CMSDecoderUpdateMessage(decoder, baseAddress, receiptData.count)
+        }
+
+        guard updateStatus == errSecSuccess else {
+            throw ReceiptDecodingError.cmsDecoderUpdateFailed(updateStatus)
+        }
+
+        let finalizeStatus = CMSDecoderFinalizeMessage(decoder)
+        guard finalizeStatus == errSecSuccess else {
+            throw ReceiptDecodingError.cmsDecoderFinalizeFailed(finalizeStatus)
+        }
+
+        var payloadDataReference: CFData?
+        let copyStatus = CMSDecoderCopyContent(decoder, &payloadDataReference)
+        guard copyStatus == errSecSuccess, let payloadDataReference else {
+            throw ReceiptDecodingError.cmsDecoderCopyContentFailed(copyStatus)
+        }
+
+        return payloadDataReference as Data
+    }
+
+    static func parse(payloadData: Data) throws -> LegacyAppStoreReceipt {
+        let rootNode = try ASN1Node.parse(from: payloadData, startingAt: payloadData.startIndex)
+        guard rootNode.tag == .set else {
+            throw ReceiptDecodingError.unexpectedASN1Tag(expected: .set, actual: rootNode.tag.rawValue)
+        }
+
+        var originalAppVersion: String?
+        var attributeCursor = rootNode.valueRange.lowerBound
+
+        while attributeCursor < rootNode.valueRange.upperBound {
+            let attributeNode = try ASN1Node.parse(from: payloadData, startingAt: attributeCursor)
+            guard attributeNode.tag == .sequence else {
+                throw ReceiptDecodingError.unexpectedASN1Tag(expected: .sequence, actual: attributeNode.tag.rawValue)
+            }
+
+            let attributeData = payloadData[attributeNode.valueRange]
+            let attribute = try parseAttribute(from: Data(attributeData))
+            if attribute.type == AttributeType.originalAppVersion {
+                originalAppVersion = try decodeString(fromWrappedASN1Data: attribute.value)
+            }
+
+            attributeCursor = attributeNode.nextOffset
+        }
+
+        guard let originalAppVersion else {
+            throw ReceiptDecodingError.missingOriginalAppVersion
+        }
+
+        return LegacyAppStoreReceipt(originalAppVersion: originalAppVersion)
+    }
+
+    private static func parseAttribute(from attributeData: Data) throws -> ParsedReceiptAttribute {
+        let typeNode = try ASN1Node.parse(from: attributeData, startingAt: attributeData.startIndex)
+        guard typeNode.tag == .integer else {
+            throw ReceiptDecodingError.unexpectedASN1Tag(expected: .integer, actual: typeNode.tag.rawValue)
+        }
+
+        let versionNode = try ASN1Node.parse(from: attributeData, startingAt: typeNode.nextOffset)
+        guard versionNode.tag == .integer else {
+            throw ReceiptDecodingError.unexpectedASN1Tag(expected: .integer, actual: versionNode.tag.rawValue)
+        }
+
+        let valueNode = try ASN1Node.parse(from: attributeData, startingAt: versionNode.nextOffset)
+        guard valueNode.tag == .octetString else {
+            throw ReceiptDecodingError.unexpectedASN1Tag(expected: .octetString, actual: valueNode.tag.rawValue)
+        }
+
+        return ParsedReceiptAttribute(
+            type: try decodeInteger(from: attributeData[typeNode.valueRange]),
+            value: Data(attributeData[valueNode.valueRange])
+        )
+    }
+
+    private static func decodeInteger(from data: Data) throws -> Int {
+        guard !data.isEmpty else {
+            throw ReceiptDecodingError.invalidInteger
+        }
+
+        return data.reduce(0) { partialResult, byte in
+            (partialResult << 8) | Int(byte)
+        }
+    }
+
+    private static func decodeString(fromWrappedASN1Data data: Data) throws -> String {
+        let node = try ASN1Node.parse(from: data, startingAt: data.startIndex)
+        switch node.tag {
+        case .utf8String, .ia5String:
+            guard let string = String(data: data[node.valueRange], encoding: .utf8) else {
+                throw ReceiptDecodingError.invalidStringEncoding
+            }
+
+            return string
+        default:
+            throw ReceiptDecodingError.unexpectedASN1Tag(expected: ASN1Tag.utf8String, actual: node.tag.rawValue)
+        }
+    }
+}
+
+private struct ParsedReceiptAttribute {
+    let type: Int
+    let value: Data
+}
+
+enum ASN1Tag: UInt8 {
+    case integer = 0x02
+    case octetString = 0x04
+    case ia5String = 0x16
+    case utf8String = 0x0C
+    case sequence = 0x30
+    case set = 0x31
+}
+
+private struct ASN1Node {
+    let tag: ASN1Tag
+    let valueRange: Range<Int>
+    let nextOffset: Int
+
+    static func parse(from data: Data, startingAt offset: Int) throws -> ASN1Node {
+        guard offset < data.endIndex else {
+            throw ReceiptDecodingError.truncatedASN1
+        }
+
+        guard let tag = ASN1Tag(rawValue: data[offset]) else {
+            throw ReceiptDecodingError.unknownASN1Tag(data[offset])
+        }
+
+        let lengthOffset = offset + 1
+        let (length, valueOffset) = try parseLength(from: data, startingAt: lengthOffset)
+        let valueEnd = valueOffset + length
+
+        guard valueEnd <= data.endIndex else {
+            throw ReceiptDecodingError.truncatedASN1
+        }
+
+        return ASN1Node(
+            tag: tag,
+            valueRange: valueOffset..<valueEnd,
+            nextOffset: valueEnd
+        )
+    }
+
+    private static func parseLength(from data: Data, startingAt offset: Int) throws -> (Int, Int) {
+        guard offset < data.endIndex else {
+            throw ReceiptDecodingError.truncatedASN1
+        }
+
+        let firstByte = data[offset]
+        if firstByte & 0x80 == 0 {
+            return (Int(firstByte), offset + 1)
+        }
+
+        let byteCount = Int(firstByte & 0x7F)
+        guard byteCount > 0 else {
+            throw ReceiptDecodingError.unsupportedASN1Length
+        }
+
+        let lengthStart = offset + 1
+        let lengthEnd = lengthStart + byteCount
+        guard lengthEnd <= data.endIndex else {
+            throw ReceiptDecodingError.truncatedASN1
+        }
+
+        let length = data[lengthStart..<lengthEnd].reduce(0) { partialResult, byte in
+            (partialResult << 8) | Int(byte)
+        }
+
+        return (length, lengthEnd)
+    }
+}
+
+enum ReceiptDecodingError: LocalizedError, Equatable {
+    case cmsDecoderCreateFailed
+    case cmsDecoderUpdateFailed(OSStatus)
+    case cmsDecoderFinalizeFailed(OSStatus)
+    case cmsDecoderCopyContentFailed(OSStatus)
+    case truncatedASN1
+    case unsupportedASN1Length
+    case unknownASN1Tag(UInt8)
+    case unexpectedASN1Tag(expected: ASN1Tag, actual: UInt8)
+    case invalidInteger
+    case invalidStringEncoding
+    case missingOriginalAppVersion
+
+    var errorDescription: String? {
+        switch self {
+        case .cmsDecoderCreateFailed:
+            return "Could not create CMS decoder."
+        case .cmsDecoderUpdateFailed(let status):
+            return "Could not decode signed App Store receipt. status=\(status)"
+        case .cmsDecoderFinalizeFailed(let status):
+            return "Could not finalize signed App Store receipt. status=\(status)"
+        case .cmsDecoderCopyContentFailed(let status):
+            return "Could not extract App Store receipt payload. status=\(status)"
+        case .truncatedASN1:
+            return "Receipt ASN.1 payload was truncated."
+        case .unsupportedASN1Length:
+            return "Receipt ASN.1 payload used an unsupported length encoding."
+        case .unknownASN1Tag(let tag):
+            return "Receipt ASN.1 payload used an unknown tag \(tag)."
+        case .unexpectedASN1Tag(let expected, let actual):
+            return "Receipt ASN.1 payload expected tag \(expected.rawValue) but found \(actual)."
+        case .invalidInteger:
+            return "Receipt ASN.1 integer was invalid."
+        case .invalidStringEncoding:
+            return "Receipt ASN.1 string could not be decoded as UTF-8."
+        case .missingOriginalAppVersion:
+            return "Receipt did not contain original_application_version."
+        }
+    }
 }
 
 enum ProPurchaseError: Error, Equatable {
@@ -197,12 +544,13 @@ enum ProRenewalState: Equatable {
 
 @MainActor
 final class ProStatusManager: ObservableObject {
-    private enum Constants {
+    enum Constants {
         static let trialStartDateKey = "com.comtab.trialStartDate"
         static let hasSeenOnboardingKey = "com.comtab.hasSeenOnboarding"
         static let trialDuration: TimeInterval = 7 * 24 * 60 * 60
         static let transactionRefreshAttempts = 3
         static let transactionRefreshDelayNanoseconds: UInt64 = 750_000_000
+        static let grandfatheringCutoffVersion = "1.2.0"
     }
 
     private enum StatusUpdateSource {
@@ -221,7 +569,10 @@ final class ProStatusManager: ObservableObject {
     @Published private(set) var isRestoringPurchases = false
 
     var currentEntitlementSnapshot: ProEntitlementSnapshot? {
-        entitlementSnapshot
+        Self.resolvedEntitlementSnapshot(
+            revenueCatSnapshot: revenueCatEntitlementSnapshot,
+            legacySnapshot: legacyAppPurchaseSnapshot
+        )
     }
     @Published private(set) var paywallErrorMessage: String?
     @Published private(set) var paywallSuccessMessage: String?
@@ -229,9 +580,11 @@ final class ProStatusManager: ObservableObject {
 
     private let defaults: UserDefaults
     private let revenueCatService: any RevenueCatServicing
+    private let legacyAppPurchaseTracker: any LegacyAppPurchaseChecking
     private let now: () -> Date
 
-    private var entitlementSnapshot: ProEntitlementSnapshot?
+    private var revenueCatEntitlementSnapshot: ProEntitlementSnapshot?
+    private var legacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
     private var hasConfigured = false
     private var hasCompletedInitialRefresh = false
     private var hasPromptedForExpiredStateThisSession = false
@@ -247,21 +600,28 @@ final class ProStatusManager: ObservableObject {
     init(
         defaults: UserDefaults = .standard,
         revenueCatService: (any RevenueCatServicing)? = nil,
+        legacyAppPurchaseTracker: (any LegacyAppPurchaseChecking)? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         let service = revenueCatService ?? RevenueCatService.shared
         let cachedSnapshot = service.cachedEntitlementSnapshot
+        let legacyTracker = legacyAppPurchaseTracker ?? LegacyAppPurchaseTracker.shared
         self.defaults = defaults
         self.revenueCatService = service
+        self.legacyAppPurchaseTracker = legacyTracker
         self.now = now
-        self.entitlementSnapshot = cachedSnapshot
+        self.revenueCatEntitlementSnapshot = cachedSnapshot
+        self.legacyAppPurchaseSnapshot = legacyTracker.cachedLegacyAppPurchaseSnapshot
         self.currentOffering = nil
         self.availablePlans = ProPlanProduct.fallbackPlans
         self.lastError = nil
         self.purchaseInProgressPlan = nil
         self.paywallErrorMessage = nil
         self.paywallSuccessMessage = nil
-        self.status = Self.computeStatus(entitlementSnapshot: cachedSnapshot, defaults: defaults, now: now)
+        self.status = Self.computeStatus(entitlementSnapshot: Self.resolvedEntitlementSnapshot(
+            revenueCatSnapshot: cachedSnapshot,
+            legacySnapshot: self.legacyAppPurchaseSnapshot
+        ), defaults: defaults, now: now)
     }
 
     func configureIfNeeded() {
@@ -273,7 +633,8 @@ final class ProStatusManager: ObservableObject {
             self?.applyEntitlementSnapshot(snapshot, source: .stateChange)
         }
         revenueCatService.configureIfNeeded()
-        entitlementSnapshot = revenueCatService.cachedEntitlementSnapshot
+        revenueCatEntitlementSnapshot = revenueCatService.cachedEntitlementSnapshot
+        legacyAppPurchaseSnapshot = legacyAppPurchaseTracker.cachedLegacyAppPurchaseSnapshot
         hasConfigured = true
         applyStatus(computeStatus(), source: .bootstrap)
     }
@@ -290,25 +651,13 @@ final class ProStatusManager: ObservableObject {
         applyStatus(computeStatus(), source: .stateChange)
     }
 
-    func markOnboardingSeen() {
-        defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
-    }
-
     func refresh() async {
         configureIfNeeded()
 
-        var offeringsError: Error?
-        do {
-            currentOffering = try await revenueCatService.fetchCurrentOffering()
-        } catch {
-            AppLogger.purchase.error("Failed to load offerings: \(error.localizedDescription)")
-            currentOffering = nil
-            offeringsError = error
-        }
-        availablePlans = Self.resolveAvailablePlans(offering: currentOffering, offeringsError: offeringsError)
+        legacyAppPurchaseSnapshot = await legacyAppPurchaseTracker.refreshLegacyAppPurchaseSnapshot()
 
         do {
-            entitlementSnapshot = try await revenueCatService.fetchEntitlementSnapshot()
+            revenueCatEntitlementSnapshot = try await revenueCatService.fetchEntitlementSnapshot()
             lastError = nil
         } catch {
             let purchaseError = ProPurchaseError(error: error)
@@ -348,7 +697,7 @@ final class ProStatusManager: ObservableObject {
         do {
             let snapshot = try await revenueCatService.purchase(plan: plan, offering: currentOffering)
             lastError = nil
-            entitlementSnapshot = snapshot
+            revenueCatEntitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
                 let didUnlock = await refreshEntitlementStateAfterTransaction()
@@ -375,7 +724,7 @@ final class ProStatusManager: ObservableObject {
         do {
             let snapshot = try await revenueCatService.restorePurchases()
             lastError = nil
-            entitlementSnapshot = snapshot
+            revenueCatEntitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
                 if snapshot != nil {
@@ -436,7 +785,7 @@ final class ProStatusManager: ObservableObject {
         for attempt in 1...Constants.transactionRefreshAttempts {
             do {
                 let snapshot = try await revenueCatService.fetchEntitlementSnapshot()
-                entitlementSnapshot = snapshot
+                revenueCatEntitlementSnapshot = snapshot
                 applyStatus(computeStatus(), source: .stateChange)
 
                 if status.isPro {
@@ -457,7 +806,7 @@ final class ProStatusManager: ObservableObject {
     }
 
     private func applyEntitlementSnapshot(_ snapshot: ProEntitlementSnapshot?, source: StatusUpdateSource) {
-        entitlementSnapshot = snapshot
+        revenueCatEntitlementSnapshot = snapshot
         applyStatus(computeStatus(), source: source)
     }
 
@@ -501,7 +850,21 @@ final class ProStatusManager: ObservableObject {
     }
 
     private func computeStatus() -> ProStatus {
-        Self.computeStatus(entitlementSnapshot: entitlementSnapshot, defaults: defaults, now: now)
+        Self.computeStatus(
+            entitlementSnapshot: Self.resolvedEntitlementSnapshot(
+                revenueCatSnapshot: revenueCatEntitlementSnapshot,
+                legacySnapshot: legacyAppPurchaseSnapshot
+            ),
+            defaults: defaults,
+            now: now
+        )
+    }
+
+    private static func resolvedEntitlementSnapshot(
+        revenueCatSnapshot: ProEntitlementSnapshot?,
+        legacySnapshot: LegacyAppPurchaseSnapshot?
+    ) -> ProEntitlementSnapshot? {
+        revenueCatSnapshot ?? legacySnapshot?.asEntitlementSnapshot
     }
 
     private static func computeStatus(

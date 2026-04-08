@@ -38,7 +38,8 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
     }
 
     var shouldShowOnboarding: Bool {
-        distributionChannel == .appStore && (commerceStateSource?.isFirstLaunch ?? false)
+        distributionChannel == .appStore
+            && (commerceStateSource?.isFirstLaunch ?? false)
     }
 
     init(

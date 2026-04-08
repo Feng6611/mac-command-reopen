@@ -41,6 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let shouldShowOnboardingImmediately = accessController.shouldShowOnboarding
         if shouldShowOnboardingImmediately {
             OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
+            hasCompletedInitialCommerceRefresh = true
         }
 #else
         let shouldShowOnboardingImmediately = false
@@ -60,8 +61,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 #endif
 
+        guard !shouldShowOnboardingImmediately else {
+            return
+        }
+
         Task { @MainActor in
-            await completeInitialCommerceRefresh(showOnboardingAfterRefresh: !shouldShowOnboardingImmediately)
+            await completeInitialCommerceRefresh()
         }
     }
 
@@ -112,16 +117,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @MainActor
-    private func completeInitialCommerceRefresh(showOnboardingAfterRefresh: Bool) async {
+    private func completeInitialCommerceRefresh() async {
         await refreshCommerceStateIfNeeded(force: true, reason: "initialLaunch")
         hasCompletedInitialCommerceRefresh = true
-
-#if APPSTORE
-        if showOnboardingAfterRefresh, accessController.shouldShowOnboarding {
-            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
-            return
-        }
-#endif
 
         if accessController.shouldOpenProSettings, !isOnboardingVisible {
             if !SettingsWindowController.shared.isVisible {
@@ -147,6 +145,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {
+        if accessController.shouldShowOnboarding && !hasCompletedInitialCommerceRefresh {
+            AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because onboarding is pending.")
+            return
+        }
+
         if isRefreshingCommerce {
             AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because another refresh is already running.")
             return

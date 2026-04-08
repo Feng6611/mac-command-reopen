@@ -311,7 +311,9 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
     func restorePurchases() async throws -> ProEntitlementSnapshot? {
         try ensureConfigured()
 
-        let customerInfo = try await Purchases.shared.restorePurchases()
+        let customerInfo = try await withTimeout("restore purchases") {
+            try await Purchases.shared.restorePurchases()
+        }
         return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
     }
 
