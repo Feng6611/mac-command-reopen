@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ComTab/Assets.xcassets/AppIcon.appiconset/CommandTab-iOS-Default-1024x1024@1x.png" alt="Command Reopen" width="160">
+  <img src="docs/icon.svg" alt="Command Reopen" width="160">
 </p>
 
 <h1 align="center">Command Reopen</h1>
