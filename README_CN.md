@@ -1,30 +1,36 @@
-# Command Reopen
+<p align="center">
+  <img src="ComTab/Assets.xcassets/AppIcon.appiconset/CommandTab-iOS-Default-1024x1024@1x.png" alt="Command Reopen" width="160">
+</p>
 
-**让 macOS 原生 Cmd+Tab 自动恢复最小化和关闭的窗口。**
-
-你按 Cmd+Tab 切到某个应用——什么都没发生。应用在切换器里显示为"活跃"，但窗口还缩在 Dock 里。更糟的情况是你之前关了窗口，现在 Cmd+Tab 切过去，应用激活了，但没有任何窗口出现。
-
-Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已关闭的窗口会自动恢复。
+<h1 align="center">Command Reopen</h1>
 
 <p align="center">
-  <a href="https://commandreopen.com">🌐 产品主页</a> &nbsp;•&nbsp;
-  <a href="https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8">🛒 Mac App Store</a> &nbsp;•&nbsp;
-  <a href="https://github.com/Feng6611/mac-command-reopen/releases">📦 下载安装包</a> &nbsp;•&nbsp;
-  <a href="README.md">🇺🇸 English</a>
+  <strong>让 macOS 原生 Cmd+Tab 自动恢复最小化和关闭的窗口。</strong>
+</p>
+
+<p align="center">
+  Cmd+Tab 切到某个应用——什么都没发生，窗口还缩在 Dock 里，或者之前关掉了根本没打开。Command Reopen 让原生 Cmd+Tab 自动把这些窗口恢复回来，像本该的那样工作。
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-mac-app-store/black/zh-cn?size=250x83&amp;releaseDate=1742256000" alt="在 Mac App Store 下载" height="54">
+  </a>
+</p>
+
+<p align="center">
+  <sub>想要免费版本？去 <a href="https://github.com/Feng6611/mac-command-reopen/releases">GitHub Releases</a> 下载 DMG · <a href="https://commandreopen.com">产品主页</a> · <a href="README.md">English</a></sub>
 </p>
 
 
 ## 功能特点
 
-- Cmd+Tab 自动恢复最小化的窗口
-- Cmd+Tab 自动重新打开已关闭的窗口——如果应用没有打开的窗口，会自动创建新窗口
-- 无需任何系统权限——不需要辅助功能、不需要屏幕录制、什么都不需要
-- 不替换原生 Cmd+Tab 界面——在后台静默工作
-- 智能激活追踪——快速来回切换时跳过不必要的恢复
-- 支持用户自定义排除列表
-- 支持登录时自动启动（macOS 13+）
-- 轻量菜单栏应用（<2 MB，几乎零 CPU 占用）
-- 开源，代码完全可审计
+- **恢复最小化和已关闭的窗口** —— Cmd+Tab 切过去自动恢复；如果应用没有打开的窗口，会自动新建
+- **零权限** —— 不需要辅助功能、不需要屏幕录制，什么都不需要
+- **保留原生切换器** —— 在 Cmd+Tab 原生界面背后静默工作，界面不变
+- **自定义排除列表** —— 你不想被恢复的应用可以排除
+- **轻量** —— 菜单栏应用，<2 MB，几乎零 CPU 占用
+- **开源**（MIT），代码完全可审计
 
 ## macOS 窗口操作快捷键
 
@@ -47,30 +53,6 @@ Command Reopen 解决了这个问题。Cmd+Tab 切换应用时，最小化和已
 Command Reopen 通过 `NSWorkspace.didActivateApplicationNotification` 监听应用激活事件。当你用 Cmd+Tab 切换到某个应用时，它会先用公开的 CoreGraphics 窗口列表 API（`CGWindowListCopyWindowInfo`）检查这个应用当前是否已经有可见窗口。只有在没有找到可见窗口时，才会通过 `NSWorkspace.openApplication(at:configuration:)` 发送恢复请求。这会恢复最小化的窗口并重新创建已关闭的窗口——全部使用标准 macOS API，无需任何特殊权限。
 
 核心逻辑约 300 行，集中在一个文件中：[ActivationMonitor.swift](ComTab/ActivationMonitor.swift)。
-
-## 测试与日志
-
-本地验证时请使用共享的 `ComTab` scheme。现在它的 `Run` 动作已经改成 `Debug`，但 `Profile` 和 `Archive` 仍然保持发布配置。
-
-如果你想验证新的“可见窗口判断”是否符合预期，可以先运行应用，然后在终端里观察激活日志：
-
-```bash
-log stream --style compact --level debug --predicate 'subsystem == "com.dev.kkuk.CommandReopen.direct" OR subsystem == "com.dev.kkuk.CommandReopen" OR subsystem == "com.dev.kkuk.CmdReopen"'
-```
-
-你需要重点看这几类日志：
-
-- `Application did finish launching. version=1.1.0 build=9`
-- `Window inspection for com.apple.TextEdit: total=1, onScreen=1, visibleCandidates=1, transparent=0, tiny=0, hasVisibleWindow=true`
-- `Skipping reopen for com.apple.TextEdit; app already has a visible window.`
-- `Re-opening com.apple.TextEdit`
-
-建议你按下面几种场景手测：
-
-1. 让某个应用保持正常可见窗口，然后用 Cmd+Tab 切回去。预期是 `hasVisibleWindow=true`，且不会出现 `Re-opening ...`。
-2. 把应用窗口最小化，再用 Cmd+Tab 切回去。预期是 `hasVisibleWindow=false`，随后出现 `Re-opening ...`。
-3. 把某个支持新建窗口的应用全部关闭窗口，再用 Cmd+Tab 切回去。预期同样是 `hasVisibleWindow=false`，随后出现 `Re-opening ...`。
-4. 找一个会弹出很小浮层或临时面板的应用。日志里有 `tiny=` 统计，方便你判断这类小窗口是否被当前启发式有意忽略了。
 
 ## 常见问题
 

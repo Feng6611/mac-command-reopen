@@ -1,30 +1,36 @@
-# Command Reopen
+<p align="center">
+  <img src="ComTab/Assets.xcassets/AppIcon.appiconset/CommandTab-iOS-Default-1024x1024@1x.png" alt="Command Reopen" width="160">
+</p>
 
-**Fix Cmd+Tab for minimized and closed windows on macOS.**
-
-You press Cmd+Tab to switch to an app — nothing happens. The app shows as "active" in the switcher, but its window is still minimized in the Dock. Or worse, you closed the window earlier and now Cmd+Tab brings up the app with no window at all.
-
-Command Reopen fixes this. It makes the native Cmd+Tab automatically restore minimized and closed windows — the way you always expected it to work.
+<h1 align="center">Command Reopen</h1>
 
 <p align="center">
-  <a href="https://commandreopen.com">🌐 Landing Page</a> &nbsp;•&nbsp;
-  <a href="https://apps.apple.com/app/id6757333924?ct=cmdr_github_readme&mt=8">🛒 Mac App Store</a> &nbsp;•&nbsp;
-  <a href="https://github.com/Feng6611/mac-command-reopen/releases">📦 Download</a> &nbsp;•&nbsp;
-  <a href="README_CN.md">🇨🇳 中文</a>
+  <strong>Fix Cmd+Tab for minimized and closed windows on macOS.</strong>
+</p>
+
+<p align="center">
+  Cmd+Tab to an app with a minimized or closed window — and nothing happens. Command Reopen makes the native Cmd+Tab restore those windows, the way it should have always worked.
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-mac-app-store/black/en-us?size=250x83&amp;releaseDate=1742256000" alt="Download on the Mac App Store" height="54">
+  </a>
+</p>
+
+<p align="center">
+  <sub>Prefer a free build? Grab the DMG from <a href="https://github.com/Feng6611/mac-command-reopen/releases">GitHub Releases</a> · <a href="https://commandreopen.com">Landing</a> · <a href="README_CN.md">中文</a></sub>
 </p>
 
 
 ## Features
 
-- Restore minimized windows with Cmd+Tab
-- Restore closed windows with Cmd+Tab — if an app has no open windows, a new one is created automatically
-- No system permissions required — no Accessibility, no Screen Recording, nothing
-- Does not replace the native Cmd+Tab interface — works invisibly behind it
-- Smart activation tracking — skips unnecessary restores when rapidly switching
-- User-configurable exclude list for specific apps
-- Launch at Login support (macOS 13+)
-- Lightweight menu bar app (<2 MB, near-zero CPU usage)
-- Open source and fully auditable
+- **Restore minimized and closed windows** with Cmd+Tab — if an app has no open windows, a new one is created automatically
+- **Zero permissions** — no Accessibility, no Screen Recording, nothing
+- **Native switcher preserved** — works invisibly behind the stock Cmd+Tab UI
+- **Configurable exclude list** for apps you don't want restored
+- **Lightweight** menu bar app, <2 MB, near-zero CPU
+- **Open source** (MIT) and fully auditable
 
 ## macOS Window Shortcuts You Should Know
 
@@ -47,30 +53,6 @@ That's exactly what Command Reopen fixes. Every Cmd+Tab switch restores your win
 Command Reopen listens for app activation events via `NSWorkspace.didActivateApplicationNotification`. When you Cmd+Tab to an app, it first checks whether that app already has a visible on-screen window by inspecting the public CoreGraphics window list (`CGWindowListCopyWindowInfo`). Only if no visible window is found does it send a restore request through `NSWorkspace.openApplication(at:configuration:)`. This brings back minimized windows and recreates closed ones — all using standard macOS APIs that require no special permissions.
 
 The core logic is ~300 lines in a single file: [ActivationMonitor.swift](ComTab/ActivationMonitor.swift).
-
-## Testing And Logs
-
-For local verification, use the shared `ComTab` scheme. Its `Run` action now uses `Debug`, while `Profile` and `Archive` remain on release configurations.
-
-If you want to verify the new visible-window check, run the app and watch the activation logs:
-
-```bash
-log stream --style compact --level debug --predicate 'subsystem == "com.dev.kkuk.CommandReopen.direct" OR subsystem == "com.dev.kkuk.CommandReopen" OR subsystem == "com.dev.kkuk.CmdReopen"'
-```
-
-The important lines look like this:
-
-- `Application did finish launching. version=1.1.0 build=9`
-- `Window inspection for com.apple.TextEdit: total=1, onScreen=1, visibleCandidates=1, transparent=0, tiny=0, hasVisibleWindow=true`
-- `Skipping reopen for com.apple.TextEdit; app already has a visible window.`
-- `Re-opening com.apple.TextEdit`
-
-Suggested manual checks:
-
-1. Open an app with a normal visible window, then Cmd+Tab back to it. You should see `hasVisibleWindow=true` and no `Re-opening ...`.
-2. Minimize the app window, then Cmd+Tab back. You should see `hasVisibleWindow=false` followed by `Re-opening ...`.
-3. Close all windows for an app that supports opening a fresh one, then Cmd+Tab back. You should again see `hasVisibleWindow=false` followed by `Re-opening ...`.
-4. Try an app with tiny transient panels or overlays. The log includes `tiny=` so you can confirm whether a small window was intentionally ignored by the heuristic.
 
 ## FAQ
 
