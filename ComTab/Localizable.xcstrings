@@ -36,6 +36,9 @@
     "All features unlocked — thank you for your support." : {
 
     },
+    "Allow Accessibility Access to Minimize Windows" : {
+
+    },
     "App" : {
 
     },
@@ -83,6 +86,9 @@
           }
         }
       }
+    },
+    "ComTab needs Accessibility permission to minimize other apps' windows. Enable Command Reopen in System Settings > Privacy & Security > Accessibility, then try again." : {
+
     },
     "Contact Developer" : {
       "localizations" : {
@@ -152,6 +158,9 @@
     "GitHub" : {
 
     },
+    "Hide All Windows" : {
+
+    },
     "Launch at Login" : {
       "localizations" : {
         "ja" : {
@@ -166,6 +175,9 @@
 
     },
     "Manage Subscription" : {
+
+    },
+    "Minimize All Windows" : {
 
     },
     "Month" : {
@@ -201,6 +213,9 @@
       }
     },
     "Official Website" : {
+
+    },
+    "OK" : {
 
     },
     "once" : {

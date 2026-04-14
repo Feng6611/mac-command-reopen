@@ -34,4 +34,9 @@ enum AppLogger {
         subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
         category: "Purchase"
     )
+
+    static let windowActions = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
+        category: "WindowActions"
+    )
 }
