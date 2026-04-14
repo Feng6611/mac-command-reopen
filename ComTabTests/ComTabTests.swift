@@ -1597,4 +1597,31 @@ struct SettingsAndStatusBarPresentationTests {
             canToggleAutoReopen: false
         ))
     }
+
+    @Test("Status bar hide action only targets eligible visible apps")
+    func statusBarManualWindowActionAvailability() {
+        #expect(StatusBarController.canPerformManualWindowAction(
+            frontmostBundleID: "com.apple.TextEdit",
+            isTerminated: false,
+            selfBundleID: "com.dev.kkuk.CommandReopen"
+        ))
+
+        #expect(!StatusBarController.canPerformManualWindowAction(
+            frontmostBundleID: nil,
+            isTerminated: false,
+            selfBundleID: "com.dev.kkuk.CommandReopen"
+        ))
+
+        #expect(!StatusBarController.canPerformManualWindowAction(
+            frontmostBundleID: "com.dev.kkuk.CommandReopen",
+            isTerminated: false,
+            selfBundleID: "com.dev.kkuk.CommandReopen"
+        ))
+
+        #expect(!StatusBarController.canPerformManualWindowAction(
+            frontmostBundleID: "com.apple.TextEdit",
+            isTerminated: true,
+            selfBundleID: "com.dev.kkuk.CommandReopen"
+        ))
+    }
 }

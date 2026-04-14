@@ -26,7 +26,7 @@
 ## Features
 
 - **Restore minimized and closed windows** with Cmd+Tab — if an app has no open windows, a new one is created automatically
-- **Zero permissions** — no Accessibility, no Screen Recording, nothing
+- **Zero permissions for core reopen** — the main Cmd+Tab reopen behavior needs no Accessibility or Screen Recording permission
 - **Native switcher preserved** — works invisibly behind the stock Cmd+Tab UI
 - **Configurable exclude list** for apps you don't want restored
 - **Lightweight** menu bar app, <2 MB, near-zero CPU
@@ -62,7 +62,7 @@ macOS treats minimized windows as intentionally "put away." Cmd+Tab switches the
 
 **Does Command Reopen need any permissions?**
 
-No. It uses `NSWorkspace` APIs available to sandboxed apps. No Accessibility permission, no Screen Recording, no special entitlements.
+No special permissions for the core app behavior. It uses `NSWorkspace` APIs available to sandboxed apps and needs no Accessibility or Screen Recording permission for Cmd+Tab reopen.
 
 **Does it change the Cmd+Tab interface?**
 

@@ -7,13 +7,23 @@
 
 import AppKit
 import Combine
+import CoreGraphics
 import os
 
 @MainActor
-final class StatusBarController: NSObject {
+final class StatusBarController: NSObject, NSMenuDelegate {
     struct Presentation: Equatable {
         let showsUpgradeItem: Bool
         let canToggleAutoReopen: Bool
+    }
+
+    private struct VisibleWindowActionTarget {
+        let application: NSRunningApplication
+        let visibleWindowBounds: [CGRect]
+    }
+
+    private enum Constants {
+        static let minimumVisibleWindowDimension: CGFloat = 32
     }
 
     private let statusItem: NSStatusItem
@@ -22,6 +32,7 @@ final class StatusBarController: NSObject {
     private let launchManager = LaunchAtLoginManager()
     private var cancellables: Set<AnyCancellable> = []
     private var enableReopenItem: NSMenuItem?
+    private var hideAllWindowsItem: NSMenuItem?
     private var upgradeItem: NSMenuItem?
 
     init(activationMonitor: ActivationMonitor? = nil, accessController: AppAccessController? = nil) {
@@ -43,6 +54,7 @@ final class StatusBarController: NSObject {
 
     private func constructMenu() {
         let menu = NSMenu()
+        menu.delegate = self
         let presentation = Self.presentation(for: accessController)
 
         let enableReopenItem = NSMenuItem(
@@ -65,6 +77,15 @@ final class StatusBarController: NSObject {
             launchItem.isEnabled = false
         }
         menu.addItem(launchItem)
+
+        menu.addItem(.separator())
+
+        let hideAllWindowsItem = makeMenuItem(
+            title: String(localized: "Hide All Windows"),
+            action: #selector(hideAllWindows)
+        )
+        menu.addItem(hideAllWindowsItem)
+        self.hideAllWindowsItem = hideAllWindowsItem
 
         menu.addItem(.separator())
 
@@ -100,6 +121,7 @@ final class StatusBarController: NSObject {
         menu.addItem(quitItem)
 
         statusItem.menu = menu
+        updateManualWindowActionItems()
     }
 
     private func makeMenuItem(title: String, action: Selector) -> NSMenuItem {
@@ -146,6 +168,22 @@ final class StatusBarController: NSObject {
         )
     }
 
+    nonisolated static func canPerformManualWindowAction(
+        frontmostBundleID: String?,
+        isTerminated: Bool,
+        selfBundleID: String? = Bundle.main.bundleIdentifier
+    ) -> Bool {
+        guard let frontmostBundleID, !frontmostBundleID.isEmpty else {
+            return false
+        }
+
+        guard !isTerminated else {
+            return false
+        }
+
+        return frontmostBundleID != selfBundleID
+    }
+
     @objc private func toggleEnableReopen(_ sender: NSMenuItem) {
         guard accessController.isCoreFeatureAvailable else { return }
         activationMonitor.isFeatureEnabled.toggle()
@@ -156,6 +194,25 @@ final class StatusBarController: NSObject {
         let newValue = sender.state != .on
         launchManager.setEnabled(newValue)
         sender.state = launchManager.isEnabled ? .on : .off
+    }
+
+    @objc private func hideAllWindows() {
+        let targetApplications = visibleWindowActionTargets()
+        guard !targetApplications.isEmpty else {
+            AppLogger.windowActions.info("Hide All Windows ignored because there are no eligible visible apps.")
+            updateManualWindowActionItems()
+            return
+        }
+
+        AppLogger.windowActions.notice("Hiding \(targetApplications.count) visible apps on the current desktop.")
+        for target in targetApplications {
+            let bundleID = target.application.bundleIdentifier ?? "unknown app"
+            if target.application.hide() {
+                AppLogger.windowActions.debug("Hide All Windows sent to \(bundleID).")
+            } else {
+                AppLogger.windowActions.error("Hide All Windows failed for \(bundleID).")
+            }
+        }
     }
 
     @objc private func showAbout() {
@@ -220,5 +277,112 @@ final class StatusBarController: NSObject {
 
     @objc private func quitApp() {
         NSApplication.shared.terminate(nil)
+    }
+
+    func menuWillOpen(_ menu: NSMenu) {
+        updateManualWindowActionItems()
+    }
+
+    private func updateManualWindowActionItems() {
+        let isEnabled = !visibleWindowActionTargets().isEmpty
+        hideAllWindowsItem?.isEnabled = isEnabled
+    }
+
+    private func visibleWindowActionTargets() -> [VisibleWindowActionTarget] {
+        guard let windowInfoList = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements],
+            kCGNullWindowID
+        ) as? [[String: Any]] else {
+            AppLogger.windowActions.error("Unable to inspect on-screen windows for manual window actions.")
+            return []
+        }
+
+        let runningApplicationsByPID = Dictionary(
+            uniqueKeysWithValues: NSWorkspace.shared.runningApplications.map { ($0.processIdentifier, $0) }
+        )
+        var orderedPIDs: [pid_t] = []
+        var visibleBoundsByPID: [pid_t: [CGRect]] = [:]
+
+        for windowInfo in windowInfoList {
+            guard Self.isEligibleVisibleWindow(
+                windowInfo: windowInfo,
+                minimumDimension: Constants.minimumVisibleWindowDimension
+            ), let windowPID = ActivationMonitor.windowOwnerPID(from: windowInfo),
+            let application = runningApplicationsByPID[windowPID],
+            let bounds = Self.windowBounds(from: windowInfo),
+            Self.canPerformManualWindowAction(
+                frontmostBundleID: application.bundleIdentifier,
+                isTerminated: application.isTerminated
+            ) else {
+                continue
+            }
+
+            if visibleBoundsByPID[windowPID] == nil {
+                orderedPIDs.append(windowPID)
+                visibleBoundsByPID[windowPID] = []
+            }
+            visibleBoundsByPID[windowPID, default: []].append(bounds)
+        }
+
+        return orderedPIDs.compactMap { pid in
+            guard let application = runningApplicationsByPID[pid],
+                  let visibleWindowBounds = visibleBoundsByPID[pid],
+                  !visibleWindowBounds.isEmpty else {
+                return nil
+            }
+
+            return VisibleWindowActionTarget(
+                application: application,
+                visibleWindowBounds: visibleWindowBounds
+            )
+        }
+    }
+
+    private static func isEligibleVisibleWindow(
+        windowInfo: [String: Any],
+        minimumDimension: CGFloat
+    ) -> Bool {
+        let ownerName = (windowInfo[kCGWindowOwnerName as String] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard ownerName?.isEmpty == false else {
+            return false
+        }
+
+        let alpha = (windowInfo[kCGWindowAlpha as String] as? NSNumber)?.doubleValue
+            ?? (windowInfo[kCGWindowAlpha as String] as? Double)
+            ?? 1
+        guard alpha > 0 else {
+            return false
+        }
+
+        let layer = (windowInfo[kCGWindowLayer as String] as? NSNumber)?.intValue
+            ?? (windowInfo[kCGWindowLayer as String] as? Int)
+            ?? 0
+        guard layer == 0 else {
+            return false
+        }
+
+        guard let boundsDictionary = windowInfo[kCGWindowBounds as String] as? NSDictionary else {
+            return false
+        }
+
+        var bounds = CGRect.zero
+        guard CGRectMakeWithDictionaryRepresentation(boundsDictionary, &bounds) else {
+            return false
+        }
+
+        return bounds.width >= minimumDimension && bounds.height >= minimumDimension
+    }
+
+    private static func windowBounds(from windowInfo: [String: Any]) -> CGRect? {
+        guard let boundsDictionary = windowInfo[kCGWindowBounds as String] as? NSDictionary else {
+            return nil
+        }
+
+        var bounds = CGRect.zero
+        guard CGRectMakeWithDictionaryRepresentation(boundsDictionary, &bounds) else {
+            return nil
+        }
+
+        return bounds
     }
 }

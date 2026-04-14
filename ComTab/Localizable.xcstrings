@@ -152,6 +152,9 @@
     "GitHub" : {
 
     },
+    "Hide All Windows" : {
+
+    },
     "Launch at Login" : {
       "localizations" : {
         "ja" : {
@@ -201,6 +204,9 @@
       }
     },
     "Official Website" : {
+
+    },
+    "OK" : {
 
     },
     "once" : {
