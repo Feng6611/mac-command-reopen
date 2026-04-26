@@ -9,12 +9,6 @@
             "state": "translated",
             "value": "Command Reopen"
           }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen"
-          }
         }
       }
     },
@@ -26,12 +20,6 @@
             "state": "translated",
             "value": "Command Reopen"
           }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen"
-          }
         }
       }
     },
@@ -39,12 +27,6 @@
       "comment": "Copyright (human-readable)",
       "localizations": {
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copyright © 2025 CHEN. All rights reserved."
-          }
-        },
-        "ja": {
           "stringUnit": {
             "state": "translated",
             "value": "Copyright © 2025 CHEN. All rights reserved."

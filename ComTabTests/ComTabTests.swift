@@ -551,8 +551,8 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Pro status manager does not auto-start trial on first refresh")
-    func proStatusDoesNotAutoStartTrial() async {
+    @Test("Pro status manager starts trial by default when no local trial exists")
+    func proStatusStartsTrialByDefault() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
@@ -568,14 +568,15 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
 
-        #expect(manager.status == .expired)
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == nil)
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
         #expect(!manager.shouldOpenProSettings)
     }
 
     @MainActor
-    @Test("Pro status manager starts trial only after onboarding continues")
-    func proStatusStartsTrialAfterOnboarding() async {
+    @Test("Get Started marks onboarding without resetting the trial")
+    func getStartedMarksOnboardingWithoutResettingTrial() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
@@ -587,11 +588,15 @@ struct ProStatusManagerTests {
             now: { now }
         )
 
+        #expect(!defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+
         await manager.startTrial()
 
         #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
         #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
-        #expect(manager.status == .trial(daysRemaining: 7, expiresAt: now.addingTimeInterval(7 * 24 * 60 * 60)))
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
     }
 
     @MainActor
@@ -623,7 +628,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-((6 * 24 * 60 * 60) + 1)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-((24 * 60 * 60) + 1)), forKey: "com.comtab.trialStartDate")
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -638,13 +643,13 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Trial expires exactly at the seven day boundary")
+    @Test("Trial expires exactly at the two day boundary")
     func proStatusExpiresAtExactBoundary() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(7 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(2 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -1070,8 +1075,8 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Expired state prompts after onboarding has already been seen")
-    func expiredPromptAppearsAfterOnboarding() async {
+    @Test("Missing trial date backfills trial even after onboarding has been seen")
+    func missingTrialDateBackfillsTrialAfterOnboarding() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
@@ -1087,9 +1092,10 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
 
-        #expect(manager.status == .expired)
-        #expect(manager.shouldOpenProSettings)
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == nil)
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
+        #expect(!manager.shouldOpenProSettings)
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
     }
 
     @MainActor
@@ -1106,11 +1112,13 @@ struct ProStatusManagerTests {
         )
         let mockService = MockRevenueCatService()
         mockService.entitlementError = networkError
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
 
         let manager = ProStatusManager(
             defaults: defaults,
             revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker()
+            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            now: { now }
         )
         let source = ProCommerceStateSource(proStatusManager: manager)
         let controller = AppAccessController(
@@ -1120,7 +1128,8 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
 
-        #expect(manager.status == .expired)
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
         #expect(manager.lastError == .network)
         #expect(source.entitlementState == .trial)
         #expect(controller.isCoreFeatureAvailable)
@@ -1193,8 +1202,8 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Free downloads at 1.2.0 or later are not grandfathered")
-    func currentFreeDownloadsAreNotGrandfathered() async {
+    @Test("Free downloads at 1.2.0 or later use the local trial")
+    func currentFreeDownloadsUseLocalTrial() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
@@ -1216,7 +1225,8 @@ struct ProStatusManagerTests {
 
         await manager.refresh()
 
-        #expect(manager.status == .expired)
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
         #expect(manager.currentEntitlementSnapshot == nil)
     }
 }

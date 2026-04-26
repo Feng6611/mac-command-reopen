@@ -547,7 +547,7 @@ final class ProStatusManager: ObservableObject {
     enum Constants {
         static let trialStartDateKey = "com.comtab.trialStartDate"
         static let hasSeenOnboardingKey = "com.comtab.hasSeenOnboarding"
-        static let trialDuration: TimeInterval = 7 * 24 * 60 * 60
+        static let trialDuration: TimeInterval = 2 * 24 * 60 * 60
         static let transactionRefreshAttempts = 3
         static let transactionRefreshDelayNanoseconds: UInt64 = 750_000_000
         static let grandfatheringCutoffVersion = "1.2.0"
@@ -606,12 +606,22 @@ final class ProStatusManager: ObservableObject {
         let service = revenueCatService ?? RevenueCatService.shared
         let cachedSnapshot = service.cachedEntitlementSnapshot
         let legacyTracker = legacyAppPurchaseTracker ?? LegacyAppPurchaseTracker.shared
+        let cachedLegacySnapshot = legacyTracker.cachedLegacyAppPurchaseSnapshot
+        if Self.resolvedEntitlementSnapshot(
+            revenueCatSnapshot: cachedSnapshot,
+            legacySnapshot: cachedLegacySnapshot
+        ) == nil,
+           defaults.object(forKey: Constants.trialStartDateKey) == nil {
+            let resolvedStartDate = now()
+            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
+            AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
+        }
         self.defaults = defaults
         self.revenueCatService = service
         self.legacyAppPurchaseTracker = legacyTracker
         self.now = now
         self.revenueCatEntitlementSnapshot = cachedSnapshot
-        self.legacyAppPurchaseSnapshot = legacyTracker.cachedLegacyAppPurchaseSnapshot
+        self.legacyAppPurchaseSnapshot = cachedLegacySnapshot
         self.currentOffering = nil
         self.availablePlans = ProPlanProduct.fallbackPlans
         self.lastError = nil
@@ -636,18 +646,12 @@ final class ProStatusManager: ObservableObject {
         revenueCatEntitlementSnapshot = revenueCatService.cachedEntitlementSnapshot
         legacyAppPurchaseSnapshot = legacyAppPurchaseTracker.cachedLegacyAppPurchaseSnapshot
         hasConfigured = true
+        startTrialIfMissingEntitlement()
         applyStatus(computeStatus(), source: .bootstrap)
     }
 
     func startTrial() async {
-        defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
-
-        if defaults.object(forKey: Constants.trialStartDateKey) == nil {
-            let resolvedStartDate = now()
-            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
-            AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
-        }
-
+        startTrialIfNeeded(markOnboardingSeen: true)
         applyStatus(computeStatus(), source: .stateChange)
     }
 
@@ -779,6 +783,29 @@ final class ProStatusManager: ObservableObject {
     private func clearPaywallMessages() {
         paywallErrorMessage = nil
         paywallSuccessMessage = nil
+    }
+
+    private func startTrialIfMissingEntitlement() {
+        guard Self.resolvedEntitlementSnapshot(
+            revenueCatSnapshot: revenueCatEntitlementSnapshot,
+            legacySnapshot: legacyAppPurchaseSnapshot
+        ) == nil else {
+            return
+        }
+
+        startTrialIfNeeded(markOnboardingSeen: false)
+    }
+
+    private func startTrialIfNeeded(markOnboardingSeen: Bool) {
+        if markOnboardingSeen {
+            defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
+        }
+
+        if defaults.object(forKey: Constants.trialStartDateKey) == nil {
+            let resolvedStartDate = now()
+            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
+            AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
+        }
     }
 
     private func refreshEntitlementStateAfterTransaction() async -> Bool {

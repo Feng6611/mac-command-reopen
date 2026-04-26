@@ -595,9 +595,9 @@ private struct ProLetterView: View {
         case .pro:
             return "Thank you for being here."
         case .trial(let days, _):
-            return "You came in with \(days == 7 ? "7 days" : "\(days) day\(days == 1 ? "" : "s")") free. Use them."
+            return "You came in with \(days == 2 ? "2 days" : "\(days) day\(days == 1 ? "" : "s")") free. Use them."
         case .expired:
-            return "Your 7 days are up."
+            return "Your 2 days are up."
         }
     }
 
@@ -675,18 +675,18 @@ struct ProSectionView: View {
 #if DEBUG
     private var previewPicker: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-            Picker("UI 预览", selection: $previewMode) {
+            Picker("UI Preview", selection: $previewMode) {
                 ForEach(ProPreviewMode.allCases) { mode in
                     Text(mode.title).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
 
-            Text("仅用于临时查看 UI 状态")
+            Text("Temporary UI state preview only")
                 .font(DS.Typography.caption)
                 .foregroundColor(.secondary)
 
-            Button("触发 Onboarding") {
+            Button("Trigger Onboarding") {
                 OnboardingWindowController.shared.show(proStatusManager: proStatusManager)
             }
             .buttonStyle(.link)

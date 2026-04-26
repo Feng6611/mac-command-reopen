@@ -10,28 +10,14 @@
     "%lld today" : {
 
     },
-    "7-day free trial, no commitment" : {
+    "2-day free trial, no commitment" : {
 
     },
     "About" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このアプリについて"
-          }
-        }
-      }
+
     },
     "Add" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "追加"
-          }
-        }
-      }
+
     },
     "All features unlocked — thank you for your support." : {
 
@@ -46,14 +32,7 @@
 
     },
     "Auto-reopen windows" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ウィンドウを自動で再度開く"
-          }
-        }
-      }
+
     },
     "Automatically reopen windows when switching apps via Cmd+Tab" : {
 
@@ -75,24 +54,11 @@
             "state" : "translated",
             "value" : "Command Reopen v%1$@ (%2$@)"
           }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen v%1$@ (%2$@)"
-          }
         }
       }
     },
     "Contact Developer" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開発者に連絡"
-          }
-        }
-      }
+
     },
     "Count" : {
 
@@ -107,44 +73,16 @@
 
     },
     "Excluded Apps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "除外するアプリ"
-          }
-        }
-      }
+
     },
     "Feedback & Support" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバックとサポート"
-          }
-        }
-      }
+
     },
     "General" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一般"
-          }
-        }
-      }
+
     },
     "Get on Mac App Store" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store で入手"
-          }
-        }
-      }
+
     },
     "Get Started" : {
 
@@ -156,14 +94,7 @@
 
     },
     "Launch at Login" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ログイン時に起動"
-          }
-        }
-      }
+
     },
     "Lifetime" : {
 
@@ -181,32 +112,15 @@
 
     },
     "No excluded apps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "除外アプリなし"
-          }
-        }
-      }
+
     },
     "No reopen activity yet" : {
 
     },
     "Official" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "公式サイト"
-          }
-        }
-      }
-    },
-    "Official Website" : {
 
     },
-    "OK" : {
+    "Official Website" : {
 
     },
     "once" : {
@@ -234,24 +148,10 @@
 
     },
     "Quit Command Reopen" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen を終了"
-          }
-        }
-      }
+
     },
     "Rate on App Store" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Store で評価する"
-          }
-        }
-      }
+
     },
     "Reopen Pro" : {
 
@@ -272,14 +172,7 @@
 
     },
     "Select an app..." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを選択…"
-          }
-        }
-      }
+
     },
     "Settings..." : {
 
@@ -292,17 +185,6 @@
     },
     "Support Command Reopen" : {
 
-    },
-    "Support on the Mac App Store" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store で開発を支援"
-          }
-        }
-      }
     },
     "Terms" : {
 
@@ -317,9 +199,6 @@
 
     },
     "Trend" : {
-
-    },
-    "UI 预览" : {
 
     },
     "Unavailable" : {
@@ -351,12 +230,6 @@
 
     },
     "Yearly" : {
-
-    },
-    "仅用于临时查看 UI 状态" : {
-
-    },
-    "触发 Onboarding" : {
 
     }
   },
