@@ -99,13 +99,8 @@ struct ReopenStatsView: View {
 
             ZStack {
 #if canImport(Charts)
-                if #available(macOS 13.0, *) {
-                    ChartsTrendView(data: trendData, timeRange: timeRange)
-                        .frame(height: 140)
-                } else {
-                    FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
-                        .frame(height: 140)
-                }
+                ChartsTrendView(data: trendData, timeRange: timeRange)
+                    .frame(height: 140)
 #else
                 FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
                     .frame(height: 140)
@@ -147,12 +142,8 @@ struct ReopenStatsView: View {
                 .padding(.vertical, DS.Spacing.lg)
             } else {
 #if canImport(Charts)
-                if #available(macOS 13.0, *) {
-                    ChartsTopAppsView(apps: topApps)
-                        .frame(height: CGFloat(topApps.count) * 30 + 8)
-                } else {
-                    FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
-                }
+                ChartsTopAppsView(apps: topApps)
+                    .frame(height: CGFloat(topApps.count) * 30 + 8)
 #else
                 FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
 #endif
@@ -185,7 +176,6 @@ struct ReopenStatsView: View {
 }
 
 #if canImport(Charts)
-@available(macOS 13.0, *)
 private struct ChartsTrendView: View {
     let data: [(date: Date, count: Int)]
     let timeRange: StatTimeRange
@@ -240,7 +230,6 @@ private struct ChartsTrendView: View {
     }
 }
 
-@available(macOS 13.0, *)
 private struct ChartsTopAppsView: View {
     let apps: [ReopenStatsStore.AppStat]
 

@@ -14,7 +14,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         static let commerceRefreshThrottle: TimeInterval = 5 * 60
     }
 
-    private var statusController: StatusBarController?
     private let accessController = AppAccessController.shared
     private var cancellables: Set<AnyCancellable> = []
     private var hasCompletedInitialCommerceRefresh = false
@@ -35,7 +34,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         accessController.configureIfNeeded()
         bindUpgradePrompt()
-        statusController = StatusBarController(activationMonitor: .shared, accessController: accessController)
 
 #if APPSTORE
         let shouldShowOnboardingImmediately = accessController.shouldShowOnboarding
@@ -47,8 +45,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let shouldShowOnboardingImmediately = false
 #endif
 
-        // Ensure no windows are visible
-        NSApp.windows.forEach { $0.orderOut(nil) }
+        if !shouldShowOnboardingImmediately {
+            // Ensure no windows are visible for the menu-bar-only idle state.
+            NSApp.windows.forEach { $0.orderOut(nil) }
+        }
 
 #if DEBUG
         if shouldAutoShowSettingsForDebugLaunch, !shouldShowOnboardingImmediately {

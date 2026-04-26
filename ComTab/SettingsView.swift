@@ -63,6 +63,7 @@ struct SettingsView: View {
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
     @EnvironmentObject private var accessController: AppAccessController
     @EnvironmentObject private var navigationModel: SettingsNavigationModel
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -73,33 +74,86 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Sidebar
-            VStack(spacing: DS.Spacing.xxs) {
-                ForEach(SettingsTab.visibleTabs(showProTab: accessController.showsProTab), id: \.self) { tab in
-                    SidebarButton(tab: tab, isSelected: navigationModel.selectedTab == tab) {
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            navigationModel.selectedTab = tab
-                        }
-                    }
-                    .environmentObject(accessController)
-                }
-
-                Spacer()
-
-                Text("v\(appVersion) (\(buildNumber))")
-                    .font(DS.Typography.micro)
-                    .foregroundColor(DS.Colors.textTertiary)
-                    .padding(.bottom, 14)
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            sidebar
+                .navigationSplitViewColumnWidth(
+                    min: DS.Settings.sidebarWidth,
+                    ideal: DS.Settings.sidebarWidth,
+                    max: DS.Settings.sidebarWidth
+                )
+        } detail: {
+            detail
+        }
+        .navigationSplitViewStyle(.balanced)
+        .frame(width: DS.Settings.windowWidth, height: DS.Settings.windowHeight)
+        .toolbar(.hidden, for: .windowToolbar)
+        .task {
+            await accessController.refresh()
+        }
+        .onAppear {
+            columnVisibility = .all
+            if !accessController.showsProTab && navigationModel.selectedTab == .pro {
+                navigationModel.selectedTab = .general
             }
-            .padding(.top, DS.Spacing.xl)
-            .padding(.horizontal, DS.Spacing.md)
-            .frame(width: 150)
-            .background(SidebarBackgroundView())
+        }
+        .onChange(of: columnVisibility) { visibility in
+            if visibility != .all {
+                columnVisibility = .all
+            }
+        }
+        .onChange(of: accessController.showsProTab) { showsProTab in
+            if !showsProTab && navigationModel.selectedTab == .pro {
+                navigationModel.selectedTab = .general
+            }
+        }
+    }
 
-            Divider()
+    private var selectedTabBinding: Binding<SettingsTab?> {
+        Binding(
+            get: { navigationModel.selectedTab },
+            set: { newValue in
+                if let newValue {
+                    navigationModel.selectedTab = newValue
+                }
+            }
+        )
+    }
 
-            // Content
+    private var sidebar: some View {
+        VStack(spacing: 0) {
+            List(selection: selectedTabBinding) {
+                ForEach(SettingsTab.visibleTabs(showProTab: accessController.showsProTab), id: \.self) { tab in
+                    SettingsSidebarLabel(
+                        tab: tab,
+                        isSelected: navigationModel.selectedTab == tab,
+                        distributionChannel: accessController.distributionChannel
+                    )
+                    .tag(tab)
+                    .frame(height: DS.Settings.sidebarRowHeight)
+                }
+            }
+            .listStyle(.sidebar)
+            .environment(\.defaultMinListRowHeight, DS.Settings.sidebarRowHeight)
+            .padding(.top, DS.Settings.sidebarTopPadding)
+
+            Spacer(minLength: 0)
+
+            Text("v\(appVersion) (\(buildNumber))")
+                .font(DS.Typography.body)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, DS.Settings.sidebarHorizontalPadding)
+        }
+        .padding(.bottom, DS.Settings.sidebarBottomPadding)
+        .frame(maxHeight: .infinity)
+    }
+
+    private var detail: some View {
+        VStack(spacing: DS.Spacing.lg) {
+            Text(navigationModel.selectedTab.title(for: accessController.distributionChannel))
+                .font(DS.Typography.title3Emphasized)
+                .frame(maxWidth: .infinity, alignment: .center)
+
             Group {
                 switch navigationModel.selectedTab {
                 case .general:
@@ -114,91 +168,28 @@ struct SettingsView: View {
 #endif
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .frame(width: 600, height: 520)
-        .task {
-            await accessController.refresh()
-        }
-        .onAppear {
-            if !accessController.showsProTab && navigationModel.selectedTab == .pro {
-                navigationModel.selectedTab = .general
-            }
-        }
-        .onChange(of: accessController.showsProTab) { showsProTab in
-            if !showsProTab && navigationModel.selectedTab == .pro {
-                navigationModel.selectedTab = .general
-            }
-        }
+        .padding(.top, DS.Settings.detailTopPadding)
+        .padding(.horizontal, DS.Settings.detailHorizontalPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
-// MARK: - Sidebar Background
-
-private struct SidebarBackgroundView: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = .windowBackground
-        view.blendingMode = .behindWindow
-        view.state = .followsWindowActiveState
-        return view
-    }
-
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
-}
-
-// MARK: - Sidebar Button
-
-struct SidebarButton: View {
-    @EnvironmentObject private var accessController: AppAccessController
+private struct SettingsSidebarLabel: View {
     let tab: SettingsTab
     let isSelected: Bool
-    let action: () -> Void
-
-    @State private var isHovering = false
+    let distributionChannel: DistributionChannel
 
     var body: some View {
-        let button = Button(action: action) {
-            HStack(spacing: DS.Spacing.sm) {
-                Image(systemName: isSelected
-                    ? tab.selectedIcon(for: accessController.distributionChannel)
-                    : tab.icon(for: accessController.distributionChannel)
-                )
-                    .font(DS.Typography.bodyMedium)
-                    .foregroundStyle(isSelected ? Color.accentColor : Color.secondary)
-                    .frame(width: 20)
-                Text(tab.title(for: accessController.distributionChannel))
-                    .font(.system(size: 13, weight: isSelected ? .medium : .regular))
-                Spacer()
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(
-                RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
-                    .fill(backgroundColor)
-            )
-            .contentShape(Rectangle())
+        Label {
+            Text(tab.title(for: distributionChannel))
+                .font(isSelected ? DS.Typography.bodyEmphasized : DS.Typography.body)
+        } icon: {
+            Image(systemName: isSelected ? tab.selectedIcon(for: distributionChannel) : tab.icon(for: distributionChannel))
+                .font(DS.Typography.bodyEmphasized)
+                .frame(width: 18)
         }
-        .buttonStyle(.plain)
-        .foregroundStyle(isSelected ? Color.primary : Color.primary.opacity(0.85))
-        .onHover { hovering in
-            isHovering = hovering
-        }
-
-        if #available(macOS 14.0, *) {
-            button.focusEffectDisabled()
-        } else {
-            button
-        }
-    }
-
-    private var backgroundColor: Color {
-        if isSelected {
-            return Color.accentColor.opacity(0.08)
-        } else if isHovering {
-            return Color.primary.opacity(0.04)
-        }
-        return .clear
     }
 }
 
@@ -322,11 +313,7 @@ private struct DirectSupportPoint: View {
 
 struct GroupedFormStyleModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(macOS 13.0, *) {
-            content.formStyle(.grouped)
-        } else {
-            content
-        }
+        content.formStyle(.grouped)
     }
 }
 
@@ -389,9 +376,7 @@ struct SettingsTabContent: View {
                         .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
-                if #available(macOS 13.0, *) {
-                    Toggle("Launch at Login", isOn: launchManager.binding)
-                }
+                Toggle("Launch at Login", isOn: launchManager.binding)
             }
 
             Section {

@@ -84,26 +84,15 @@ struct OnboardingView: View {
                 onGetStarted()
             } label: {
                 Text("Get Started")
-                    .font(DS.Typography.bodyLarge)
-                    .foregroundStyle(.white)
-                    .frame(width: 200, height: 40)
-                    .background(
-                        RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
+                    .frame(width: 200)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
 
             Spacer().frame(height: 28)
         }
         .frame(width: 440, height: 560)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(.regularMaterial)
     }
 
     private func onboardingFeature(icon: String, color: Color, title: String, description: String) -> some View {

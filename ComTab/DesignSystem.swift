@@ -26,6 +26,20 @@ enum DS {
         static let xxxl: CGFloat = 32
     }
 
+    // MARK: Settings Layout
+
+    enum Settings {
+        static let windowWidth: CGFloat = 620
+        static let windowHeight: CGFloat = 520
+        static let sidebarWidth: CGFloat = 210
+        static let sidebarRowHeight: CGFloat = 36
+        static let detailTopPadding: CGFloat = 22
+        static let detailHorizontalPadding: CGFloat = 28
+        static let sidebarHorizontalPadding: CGFloat = 18
+        static let sidebarTopPadding: CGFloat = 42
+        static let sidebarBottomPadding: CGFloat = 18
+    }
+
     // MARK: Corner Radius
 
     enum Radius {
@@ -70,12 +84,16 @@ enum DS {
     // MARK: Typography
 
     enum Typography {
+        static let body = Font.body
+        static let bodyEmphasized = Font.body.weight(.semibold)
+        static let title3 = Font.title3
+        static let title3Emphasized = Font.title3.weight(.semibold)
+
         static let headlineMedium = Font.system(size: 20, weight: .semibold)
         static let headlineSmall  = Font.system(size: 18, weight: .bold, design: .rounded)
 
         static let bodyLarge  = Font.system(size: 14, weight: .semibold)
         static let bodyMedium = Font.system(size: 13, weight: .medium)
-        static let body       = Font.system(size: 13)
         static let bodySmall  = Font.system(size: 12, weight: .medium)
 
         static let caption       = Font.system(size: 11)
@@ -121,21 +139,16 @@ struct DSGlassCardModifier: ViewModifier {
     var borderColor: Color = DS.Colors.cardBorder
     var radius: CGFloat = DS.Radius.lg
 
-    @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(macOS 12.0, *) {
-            content
-                .background(
-                    RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .fill(.regularMaterial)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .strokeBorder(borderColor, lineWidth: 1)
-                )
-        } else {
-            content.modifier(DSCardModifier(borderColor: borderColor, radius: radius))
-        }
+        content
+            .background(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(.regularMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .strokeBorder(borderColor, lineWidth: 1)
+            )
     }
 }
 
@@ -180,7 +193,7 @@ struct DSDotSeparator: View {
     }
 }
 
-// MARK: - onChange backward-compatibility shim (macOS 12+)
+// MARK: - onChange compatibility shim (macOS 13+)
 
 struct OnChangeCompat<V: Equatable>: ViewModifier {
     let value: V

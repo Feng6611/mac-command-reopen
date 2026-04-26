@@ -93,16 +93,14 @@ final class LegacyAppPurchaseTracker: LegacyAppPurchaseChecking {
     private(set) var cachedLegacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
 
     func refreshLegacyAppPurchaseSnapshot() async -> LegacyAppPurchaseSnapshot? {
-        if #available(macOS 13.0, *) {
-            do {
-                let verificationResult = try await AppTransaction.shared
-                let snapshot = Self.snapshotIfGrandfathered(from: verificationResult)
-                cachedLegacyAppPurchaseSnapshot = snapshot
-                logGrandfatheredSnapshotIfNeeded(snapshot)
-                return snapshot
-            } catch {
-                AppLogger.purchase.error("Failed to load AppTransaction for grandfathering: \(error.localizedDescription)")
-            }
+        do {
+            let verificationResult = try await AppTransaction.shared
+            let snapshot = Self.snapshotIfGrandfathered(from: verificationResult)
+            cachedLegacyAppPurchaseSnapshot = snapshot
+            logGrandfatheredSnapshotIfNeeded(snapshot)
+            return snapshot
+        } catch {
+            AppLogger.purchase.error("Failed to load AppTransaction for grandfathering: \(error.localizedDescription)")
         }
 
         do {
@@ -127,7 +125,6 @@ final class LegacyAppPurchaseTracker: LegacyAppPurchaseChecking {
         )
     }
 
-    @available(macOS 13.0, *)
     private static func snapshotIfGrandfathered(
         from verificationResult: StoreKit.VerificationResult<StoreKit.AppTransaction>
     ) -> LegacyAppPurchaseSnapshot? {

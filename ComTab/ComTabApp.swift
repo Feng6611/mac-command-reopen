@@ -13,12 +13,21 @@ struct ComTabApp: App {
     @StateObject private var activationMonitor = ActivationMonitor.shared
     @StateObject private var reopenStatsStore = ReopenStatsStore.shared
     @StateObject private var accessController = AppAccessController.shared
-    @StateObject private var settingsNavigationModel = SettingsNavigationModel()
+    @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
 #if APPSTORE
     @StateObject private var proStatusManager = ProStatusManager.shared
 #endif
 
     var body: some Scene {
+        MenuBarExtra {
+            StatusBarMenu()
+                .environmentObject(activationMonitor)
+                .environmentObject(accessController)
+        } label: {
+            Image(systemName: "command")
+        }
+        .menuBarExtraStyle(.menu)
+
         Settings {
             SettingsView()
                 .environmentObject(activationMonitor)

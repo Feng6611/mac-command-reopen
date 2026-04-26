@@ -12,6 +12,8 @@ import os
 
 @MainActor
 final class SettingsNavigationModel: ObservableObject {
+    static let shared = SettingsNavigationModel()
+
     @Published var selectedTab: SettingsTab
 
     init(selectedTab: SettingsTab = .general) {
@@ -20,15 +22,27 @@ final class SettingsNavigationModel: ObservableObject {
 }
 
 @MainActor
-final class SettingsWindowController: NSObject, NSWindowDelegate {
+final class SettingsWindowController {
     static let shared = SettingsWindowController()
 
-    private var window: NSWindow?
-    private var hostingController: NSHostingController<AnyView>?
-    private let navigationModel = SettingsNavigationModel()
-
     var isVisible: Bool {
-        window?.isVisible == true
+        NSApp.windows.contains { window in
+            window.isVisible && window.title == "Settings"
+        }
+    }
+
+    func prepareForSettingsScene(
+        accessController: AppAccessController? = nil,
+        initialTab: SettingsTab = .general
+    ) {
+        let accessController = accessController ?? .shared
+        let resolvedInitialTab: SettingsTab = accessController.showsProTab ? initialTab : .general
+
+        AppLogger.lifecycle.notice("Preparing settings scene. initialTab=\(resolvedInitialTab.rawValue)")
+        SettingsNavigationModel.shared.selectedTab = resolvedInitialTab
+
+        NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
+        NSApplication.shared.activate(ignoringOtherApps: true)
     }
 
     func show(
@@ -37,77 +51,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         accessController: AppAccessController? = nil,
         initialTab: SettingsTab = .general
     ) {
-        let activationMonitor = activationMonitor ?? .shared
-        let reopenStatsStore = reopenStatsStore ?? .shared
-        let accessController = accessController ?? .shared
-        let resolvedInitialTab: SettingsTab = accessController.showsProTab ? initialTab : .general
-
-        if let window {
-            AppLogger.lifecycle.debug("Reusing existing settings window. initialTab=\(resolvedInitialTab.rawValue)")
-            navigationModel.selectedTab = resolvedInitialTab
-            present(window)
-            return
-        }
-
-        navigationModel.selectedTab = resolvedInitialTab
-
-        let hostingController = NSHostingController(
-            rootView: makeRootView(
-                activationMonitor: activationMonitor,
-                reopenStatsStore: reopenStatsStore,
-                accessController: accessController,
-                navigationModel: navigationModel
-            )
-        )
-        let window = NSWindow(contentViewController: hostingController)
-        window.title = "Settings"
-        window.delegate = self
-        window.styleMask = [.titled, .closable, .miniaturizable]
-        window.collectionBehavior = [.moveToActiveSpace]
-        window.isReleasedWhenClosed = false
-        window.setContentSize(NSSize(width: 600, height: 520))
-        window.center()
-        window.setFrameAutosaveName("CommandReopenSettingsWindow")
-
-        self.window = window
-        self.hostingController = hostingController
-
-        AppLogger.lifecycle.notice("Showing settings window. initialTab=\(resolvedInitialTab.rawValue)")
-        present(window)
-    }
-
-    private func makeRootView(
-        activationMonitor: ActivationMonitor,
-        reopenStatsStore: ReopenStatsStore,
-        accessController: AppAccessController,
-        navigationModel: SettingsNavigationModel
-    ) -> AnyView {
-        let rootView =
-            SettingsView()
-                .environmentObject(activationMonitor)
-                .environmentObject(reopenStatsStore)
-                .environmentObject(accessController)
-                .environmentObject(navigationModel)
-#if APPSTORE
-                .environmentObject(ProStatusManager.shared)
-#endif
-
-        return AnyView(rootView)
-    }
-
-    private func present(_ window: NSWindow) {
-        if window.isMiniaturized {
-            window.deminiaturize(nil)
-        }
-
-        NSRunningApplication.current.activate(options: [.activateIgnoringOtherApps])
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-        window.orderFrontRegardless()
-    }
-
-    func windowWillClose(_ notification: Notification) {
-        window = nil
-        hostingController = nil
+        prepareForSettingsScene(accessController: accessController, initialTab: initialTab)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 }
