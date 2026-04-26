@@ -32,11 +32,9 @@ enum DS {
         static let windowWidth: CGFloat = 620
         static let windowHeight: CGFloat = 520
         static let sidebarWidth: CGFloat = 210
-        static let sidebarRowHeight: CGFloat = 36
-        static let detailTopPadding: CGFloat = 22
-        static let detailHorizontalPadding: CGFloat = 28
+        static let sidebarRowHeight: CGFloat = 22
+        static let detailHorizontalPadding: CGFloat = 16
         static let sidebarHorizontalPadding: CGFloat = 18
-        static let sidebarTopPadding: CGFloat = 42
         static let sidebarBottomPadding: CGFloat = 18
     }
 

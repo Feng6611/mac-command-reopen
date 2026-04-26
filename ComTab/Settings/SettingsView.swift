@@ -86,7 +86,6 @@ struct SettingsView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .frame(width: DS.Settings.windowWidth, height: DS.Settings.windowHeight)
-        .toolbar(.hidden, for: .windowToolbar)
         .task {
             await accessController.refresh()
         }
@@ -134,7 +133,6 @@ struct SettingsView: View {
             }
             .listStyle(.sidebar)
             .environment(\.defaultMinListRowHeight, DS.Settings.sidebarRowHeight)
-            .padding(.top, DS.Settings.sidebarTopPadding)
 
             Spacer(minLength: 0)
 
@@ -152,7 +150,7 @@ struct SettingsView: View {
         VStack(spacing: DS.Spacing.lg) {
             Text(navigationModel.selectedTab.title(for: accessController.distributionChannel))
                 .font(DS.Typography.title3Emphasized)
-                .frame(maxWidth: .infinity, alignment: .center)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Group {
                 switch navigationModel.selectedTab {
@@ -170,7 +168,6 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .padding(.top, DS.Settings.detailTopPadding)
         .padding(.horizontal, DS.Settings.detailHorizontalPadding)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
@@ -184,7 +181,7 @@ private struct SettingsSidebarLabel: View {
     var body: some View {
         Label {
             Text(tab.title(for: distributionChannel))
-                .font(isSelected ? DS.Typography.bodyEmphasized : DS.Typography.body)
+                .font(DS.Typography.bodyEmphasized)
         } icon: {
             Image(systemName: isSelected ? tab.selectedIcon(for: distributionChannel) : tab.icon(for: distributionChannel))
                 .font(DS.Typography.bodyEmphasized)

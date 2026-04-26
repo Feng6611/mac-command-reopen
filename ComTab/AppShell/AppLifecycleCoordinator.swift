@@ -1,33 +1,33 @@
 //
-//  AppDelegate.swift
-//  Command Reopen
+//  AppLifecycleCoordinator.swift
+//  ComTab
 //
-//  Created by CHEN on 2025/10/31.
+//  Created by Codex on 2026/4/26.
 //
 
 import AppKit
 import Combine
 import os
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor
+final class AppLifecycleCoordinator {
     private enum Constants {
         static let commerceRefreshThrottle: TimeInterval = 5 * 60
     }
 
-    private let accessController = AppAccessController.shared
+    static let shared = AppLifecycleCoordinator()
+
+    private let accessController: AppAccessController
     private var cancellables: Set<AnyCancellable> = []
     private var hasCompletedInitialCommerceRefresh = false
     private var lastCommerceRefreshAt: Date?
     private var isRefreshingCommerce = false
 
-#if DEBUG
-    private var shouldAutoShowSettingsForDebugLaunch: Bool {
-        let environment = ProcessInfo.processInfo.environment
-        return environment["OS_ACTIVITY_DT_MODE"] == "1" || environment["OS_ACTIVITY_DT_MODE"] == "YES"
+    init(accessController: AppAccessController? = nil) {
+        self.accessController = accessController ?? .shared
     }
-#endif
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching() {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
@@ -70,22 +70,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        false
-    }
-
-    func applicationDidBecomeActive(_ notification: Notification) {
+    func applicationDidBecomeActive() {
         AppLogger.lifecycle.debug("Application became active. Evaluating commerce refresh throttle.")
         Task { @MainActor in
             await refreshCommerceStateIfNeeded(force: false, reason: "applicationDidBecomeActive")
         }
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
+    func applicationWillTerminate() {
         AppLogger.lifecycle.notice("Application will terminate.")
     }
 
+#if DEBUG
+    private var shouldAutoShowSettingsForDebugLaunch: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["OS_ACTIVITY_DT_MODE"] == "1" || environment["OS_ACTIVITY_DT_MODE"] == "YES"
+    }
+#endif
+
     private func bindUpgradePrompt() {
+        guard cancellables.isEmpty else {
+            return
+        }
+
         accessController.$shouldOpenProSettings
             .receive(on: RunLoop.main)
             .sink { [weak self] shouldOpenProSettings in
@@ -116,7 +123,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
     }
 
-    @MainActor
     private func completeInitialCommerceRefresh() async {
         await refreshCommerceStateIfNeeded(force: true, reason: "initialLaunch")
         hasCompletedInitialCommerceRefresh = true
@@ -143,7 +149,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 #endif
     }
 
-    @MainActor
     private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {
         if accessController.shouldShowOnboarding && !hasCompletedInitialCommerceRefresh {
             AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because onboarding is pending.")

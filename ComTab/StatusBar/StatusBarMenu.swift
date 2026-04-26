@@ -72,7 +72,7 @@ struct StatusBarMenu: View {
             Divider()
 
             Button("Quit Command Reopen") {
-                NSApplication.shared.terminate(nil)
+                model.quit()
             }
             .keyboardShortcut("q")
         }
@@ -149,12 +149,8 @@ struct StatusBarMenu: View {
 @MainActor
 final class StatusBarMenuModel: ObservableObject {
     private struct VisibleWindowActionTarget {
-        let application: NSRunningApplication
+        let application: WindowActionApplication
         let visibleWindowBounds: [CGRect]
-    }
-
-    private enum Constants {
-        static let minimumVisibleWindowDimension: CGFloat = 32
     }
 
     @Published private(set) var launchAtLoginEnabled: Bool
@@ -163,10 +159,26 @@ final class StatusBarMenuModel: ObservableObject {
         !visibleWindowActionTargets().isEmpty
     }
 
-    private let launchManager = LaunchAtLoginManager()
+    private let launchManager: LaunchAtLoginManaging
+    private let windowInfoProvider: WindowInfoListing
+    private let applicationProvider: WindowActionApplicationProviding
+    private let urlOpener: URLOpening
+    private let applicationPresenter: ApplicationPresenting
 
-    init() {
-        self.launchAtLoginEnabled = launchManager.isEnabled
+    init(
+        launchManager: LaunchAtLoginManaging? = nil,
+        windowInfoProvider: WindowInfoListing? = nil,
+        applicationProvider: WindowActionApplicationProviding? = nil,
+        urlOpener: URLOpening? = nil,
+        applicationPresenter: ApplicationPresenting? = nil
+    ) {
+        let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
+        self.launchManager = resolvedLaunchManager
+        self.windowInfoProvider = windowInfoProvider ?? CoreGraphicsWindowInfoProvider()
+        self.applicationProvider = applicationProvider ?? WorkspaceWindowActionApplicationProvider()
+        self.urlOpener = urlOpener ?? WorkspaceURLOpener()
+        self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
+        self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
     }
 
     func refresh() {
@@ -197,15 +209,7 @@ final class StatusBarMenuModel: ObservableObject {
     }
 
     func showAbout(distributionChannel: DistributionChannel) {
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        switch distributionChannel {
-        case .appStore:
-            NSApplication.shared.orderFrontStandardAboutPanel(options: [
-                .credits: NSAttributedString(string: "Contact: \(ExternalLinks.contactEmailAddress)")
-            ])
-        case .direct:
-            NSApplication.shared.orderFrontStandardAboutPanel(nil)
-        }
+        applicationPresenter.showAbout(distributionChannel: distributionChannel)
     }
 
     func openURL(_ urlString: String) {
@@ -213,31 +217,30 @@ final class StatusBarMenuModel: ObservableObject {
             return
         }
 
-        NSWorkspace.shared.open(url)
+        urlOpener.open(url)
+    }
+
+    func quit() {
+        applicationPresenter.terminate()
     }
 
     private func visibleWindowActionTargets() -> [VisibleWindowActionTarget] {
-        guard let windowInfoList = CGWindowListCopyWindowInfo(
-            [.optionOnScreenOnly, .excludeDesktopElements],
-            kCGNullWindowID
-        ) as? [[String: Any]] else {
+        guard let windowInfoList = windowInfoProvider.onScreenWindowInfo() else {
             AppLogger.windowActions.error("Unable to inspect on-screen windows for manual window actions.")
             return []
         }
 
         let runningApplicationsByPID = Dictionary(
-            uniqueKeysWithValues: NSWorkspace.shared.runningApplications.map { ($0.processIdentifier, $0) }
+            uniqueKeysWithValues: applicationProvider.runningWindowActionApplications.map { ($0.processIdentifier, $0) }
         )
         var orderedPIDs: [pid_t] = []
         var visibleBoundsByPID: [pid_t: [CGRect]] = [:]
 
         for windowInfo in windowInfoList {
-            guard Self.isEligibleVisibleWindow(
-                windowInfo: windowInfo,
-                minimumDimension: Constants.minimumVisibleWindowDimension
-            ), let windowPID = ActivationMonitor.windowOwnerPID(from: windowInfo),
+            guard let windowPID = WindowInspector.windowOwnerPID(from: windowInfo),
             let application = runningApplicationsByPID[windowPID],
-            let bounds = Self.windowBounds(from: windowInfo),
+            WindowInspector.hasVisibleWindow(ownerPID: windowPID, windowInfoList: [windowInfo]),
+            let bounds = WindowInspector.windowBounds(from: windowInfo),
             StatusBarController.canPerformManualWindowAction(
                 frontmostBundleID: application.bundleIdentifier,
                 isTerminated: application.isTerminated
@@ -264,54 +267,5 @@ final class StatusBarMenuModel: ObservableObject {
                 visibleWindowBounds: visibleWindowBounds
             )
         }
-    }
-
-    private static func isEligibleVisibleWindow(
-        windowInfo: [String: Any],
-        minimumDimension: CGFloat
-    ) -> Bool {
-        let ownerName = (windowInfo[kCGWindowOwnerName as String] as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard ownerName?.isEmpty == false else {
-            return false
-        }
-
-        let alpha = (windowInfo[kCGWindowAlpha as String] as? NSNumber)?.doubleValue
-            ?? (windowInfo[kCGWindowAlpha as String] as? Double)
-            ?? 1
-        guard alpha > 0 else {
-            return false
-        }
-
-        let layer = (windowInfo[kCGWindowLayer as String] as? NSNumber)?.intValue
-            ?? (windowInfo[kCGWindowLayer as String] as? Int)
-            ?? 0
-        guard layer == 0 else {
-            return false
-        }
-
-        guard let boundsDictionary = windowInfo[kCGWindowBounds as String] as? NSDictionary else {
-            return false
-        }
-
-        var bounds = CGRect.zero
-        guard CGRectMakeWithDictionaryRepresentation(boundsDictionary, &bounds) else {
-            return false
-        }
-
-        return bounds.width >= minimumDimension && bounds.height >= minimumDimension
-    }
-
-    private static func windowBounds(from windowInfo: [String: Any]) -> CGRect? {
-        guard let boundsDictionary = windowInfo[kCGWindowBounds as String] as? NSDictionary else {
-            return nil
-        }
-
-        var bounds = CGRect.zero
-        guard CGRectMakeWithDictionaryRepresentation(boundsDictionary, &bounds) else {
-            return nil
-        }
-
-        return bounds
     }
 }

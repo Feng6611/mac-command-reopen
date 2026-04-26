@@ -11,7 +11,7 @@ import Combine
 import ServiceManagement
 import os
 
-final class LaunchAtLoginManager: ObservableObject {
+final class LaunchAtLoginManager: ObservableObject, LaunchAtLoginManaging {
     @Published private(set) var isEnabled: Bool
 
     init() {
