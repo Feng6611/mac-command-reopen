@@ -31,9 +31,6 @@
     "Auto-renews annually" : {
 
     },
-    "Auto-reopen windows" : {
-
-    },
     "Automatically reopen windows when switching apps via Cmd+Tab" : {
 
     },
@@ -215,16 +212,6 @@
     },
     "Upgrade to Pro..." : {
 
-    },
-    "v%@ (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "v%1$@ (%2$@)"
-          }
-        }
-      }
     },
     "View GitHub" : {
 

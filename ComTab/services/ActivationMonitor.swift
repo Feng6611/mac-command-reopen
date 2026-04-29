@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import Defaults
 import Foundation
 import os
 
@@ -14,9 +15,6 @@ import os
 /// via Command+Tab (or other non-mouse activation), unless the app was recently launched.
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
-        static let featureDefaultsKey = "com.comtab.autoHelpEnabled"
-        static let excludedBundlesDefaultsKey = "com.comtab.excludedBundleIDs"
-        static let defaultExcludedBundlesMigrationDefaultsKey = "com.comtab.defaultExcludedBundlesMigrated"
         static let reopenEvaluationDelay: TimeInterval = 0.2
         static let recentLaunchSuppressionInterval: TimeInterval = 0.9
         static let bundleDebounceInterval: TimeInterval = 0.1
@@ -43,7 +41,7 @@ final class ActivationMonitor: ObservableObject {
     @Published var isFeatureEnabled: Bool {
         didSet {
             guard self.isFeatureEnabled != oldValue else { return }
-            defaults.set(self.isFeatureEnabled, forKey: Constants.featureDefaultsKey)
+            defaults[AppDefaults.featureEnabled] = self.isFeatureEnabled
             self.updateObservationState()
             AppLogger.activation.notice("Feature toggled to \(self.isFeatureEnabled ? "ON" : "OFF")")
         }
@@ -52,7 +50,7 @@ final class ActivationMonitor: ObservableObject {
     @Published private(set) var userExcludedBundleIDs: Set<String> {
         didSet {
             guard userExcludedBundleIDs != oldValue else { return }
-            defaults.set(Array(userExcludedBundleIDs).sorted(), forKey: Constants.excludedBundlesDefaultsKey)
+            defaults[AppDefaults.excludedBundleIDs] = Array(userExcludedBundleIDs).sorted()
             AppLogger.activation.notice("Updated user exclude list: \(self.userExcludedBundleIDs.count) bundle IDs")
         }
     }
@@ -85,17 +83,16 @@ final class ActivationMonitor: ObservableObject {
         self.reopenStatsStore = reopenStatsStore ?? .shared
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
-        defaults.register(defaults: [Constants.featureDefaultsKey: true])
-        let storedValue = defaults.bool(forKey: Constants.featureDefaultsKey)
-        let storedExcluded = Set(defaults.stringArray(forKey: Constants.excludedBundlesDefaultsKey) ?? [])
-        let hasStoredExcludedBundles = defaults.object(forKey: Constants.excludedBundlesDefaultsKey) != nil
-        let hasMigratedDefaultExcludedBundles = defaults.bool(forKey: Constants.defaultExcludedBundlesMigrationDefaultsKey)
+        let storedValue = defaults[AppDefaults.featureEnabled]
+        let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
+        let hasStoredExcludedBundles = defaults.object(forKey: AppDefaults.excludedBundleIDs.name) != nil
+        let hasMigratedDefaultExcludedBundles = defaults[AppDefaults.defaultExcludedBundlesMigrated]
         var initialExcluded = hasStoredExcludedBundles ? storedExcluded : Self.defaultExcludedBundleIDs
 
         if !hasMigratedDefaultExcludedBundles {
             initialExcluded.formUnion(Self.defaultExcludedBundleIDs)
-            defaults.set(Array(initialExcluded).sorted(), forKey: Constants.excludedBundlesDefaultsKey)
-            defaults.set(true, forKey: Constants.defaultExcludedBundlesMigrationDefaultsKey)
+            defaults[AppDefaults.excludedBundleIDs] = Array(initialExcluded).sorted()
+            defaults[AppDefaults.defaultExcludedBundlesMigrated] = true
         }
 
         _isFeatureEnabled = Published(initialValue: storedValue)

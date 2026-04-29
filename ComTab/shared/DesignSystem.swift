@@ -31,11 +31,6 @@ enum DS {
     enum Settings {
         static let windowWidth: CGFloat = 620
         static let windowHeight: CGFloat = 520
-        static let sidebarWidth: CGFloat = 210
-        static let sidebarRowHeight: CGFloat = 22
-        static let detailHorizontalPadding: CGFloat = 16
-        static let sidebarHorizontalPadding: CGFloat = 18
-        static let sidebarBottomPadding: CGFloat = 18
     }
 
     // MARK: Corner Radius

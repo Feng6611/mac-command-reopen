@@ -6,9 +6,10 @@
 //
 
 import AppKit
+import LaunchAtLogin
 import SwiftUI
 
-// MARK: - Sidebar Tab
+// MARK: - Settings Tab
 
 enum SettingsTab: Int, CaseIterable {
     case general
@@ -34,70 +35,53 @@ enum SettingsTab: Int, CaseIterable {
     func icon(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "gearshape"
-        case .statistics: return "chart.bar"
+        case .statistics: return "chart.bar.xaxis"
         case .pro:
             switch distributionChannel {
-            case .appStore: return "star"
-            case .direct: return "heart"
+            case .appStore: return "star.circle"
+            case .direct: return "heart.circle"
             }
         }
     }
 
-    func selectedIcon(for distributionChannel: DistributionChannel) -> String {
-        switch self {
-        case .general: return "gearshape.fill"
-        case .statistics: return "chart.bar.fill"
-        case .pro:
-            switch distributionChannel {
-            case .appStore: return "star.fill"
-            case .direct: return "heart.fill"
-            }
-        }
-    }
 }
 
 // MARK: - Main Settings View
 
 struct SettingsView: View {
-    @EnvironmentObject private var activationMonitor: ActivationMonitor
-    @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
     @EnvironmentObject private var accessController: AppAccessController
     @EnvironmentObject private var navigationModel: SettingsNavigationModel
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
-
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-    }
-
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-    }
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            sidebar
-                .navigationSplitViewColumnWidth(
-                    min: DS.Settings.sidebarWidth,
-                    ideal: DS.Settings.sidebarWidth,
-                    max: DS.Settings.sidebarWidth
-                )
-        } detail: {
-            detail
+        TabView(selection: selectedTabBinding) {
+            SettingsTabContent()
+                .settingsTabPane()
+                .tabItem { tabLabel(for: .general) }
+                .tag(SettingsTab.general)
+
+            ReopenStatsView()
+                .tabItem { tabLabel(for: .statistics) }
+                .tag(SettingsTab.statistics)
+
+            if accessController.showsProTab {
+                Group {
+#if APPSTORE
+                    ProTabContent()
+#else
+                    DirectSupportTabContent()
+#endif
+                }
+                .tabItem { tabLabel(for: .pro) }
+                .tag(SettingsTab.pro)
+            }
         }
-        .navigationSplitViewStyle(.balanced)
         .frame(width: DS.Settings.windowWidth, height: DS.Settings.windowHeight)
         .task {
             await accessController.refresh()
         }
         .onAppear {
-            columnVisibility = .all
             if !accessController.showsProTab && navigationModel.selectedTab == .pro {
                 navigationModel.selectedTab = .general
-            }
-        }
-        .onChange(of: columnVisibility) { visibility in
-            if visibility != .all {
-                columnVisibility = .all
             }
         }
         .onChange(of: accessController.showsProTab) { showsProTab in
@@ -118,75 +102,19 @@ struct SettingsView: View {
         )
     }
 
-    private var sidebar: some View {
-        VStack(spacing: 0) {
-            List(selection: selectedTabBinding) {
-                ForEach(SettingsTab.visibleTabs(showProTab: accessController.showsProTab), id: \.self) { tab in
-                    SettingsSidebarLabel(
-                        tab: tab,
-                        isSelected: navigationModel.selectedTab == tab,
-                        distributionChannel: accessController.distributionChannel
-                    )
-                    .tag(tab)
-                    .frame(height: DS.Settings.sidebarRowHeight)
-                }
-            }
-            .listStyle(.sidebar)
-            .environment(\.defaultMinListRowHeight, DS.Settings.sidebarRowHeight)
-
-            Spacer(minLength: 0)
-
-            Text("v\(appVersion) (\(buildNumber))")
-                .font(DS.Typography.body)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, DS.Settings.sidebarHorizontalPadding)
-        }
-        .padding(.bottom, DS.Settings.sidebarBottomPadding)
-        .frame(maxHeight: .infinity)
-    }
-
-    private var detail: some View {
-        VStack(spacing: DS.Spacing.lg) {
-            Text(navigationModel.selectedTab.title(for: accessController.distributionChannel))
-                .font(DS.Typography.title3Emphasized)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Group {
-                switch navigationModel.selectedTab {
-                case .general:
-                    SettingsTabContent()
-                case .statistics:
-                    ReopenStatsView()
-                case .pro:
-#if APPSTORE
-                    ProTabContent()
-#else
-                    DirectSupportTabContent()
-#endif
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        }
-        .padding(.horizontal, DS.Settings.detailHorizontalPadding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    private func tabLabel(for tab: SettingsTab) -> Label<Text, Image> {
+        Label(
+            tab.title(for: accessController.distributionChannel),
+            systemImage: tab.icon(for: accessController.distributionChannel)
+        )
     }
 }
 
-private struct SettingsSidebarLabel: View {
-    let tab: SettingsTab
-    let isSelected: Bool
-    let distributionChannel: DistributionChannel
-
-    var body: some View {
-        Label {
-            Text(tab.title(for: distributionChannel))
-                .font(DS.Typography.bodyEmphasized)
-        } icon: {
-            Image(systemName: isSelected ? tab.selectedIcon(for: distributionChannel) : tab.icon(for: distributionChannel))
-                .font(DS.Typography.bodyEmphasized)
-                .frame(width: 18)
-        }
+private extension View {
+    func settingsTabPane() -> some View {
+        self
+            .scenePadding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
@@ -317,7 +245,6 @@ struct GroupedFormStyleModifier: ViewModifier {
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
-    @StateObject private var launchManager = LaunchAtLoginManager()
     @State private var selectedBundleToExclude: String?
 
     private var isFeatureLocked: Bool {
@@ -351,7 +278,7 @@ struct SettingsTabContent: View {
             Section {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Toggle("Auto-reopen windows", isOn: activationMonitor.featureToggleBinding)
+                        Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                             .disabled(isFeatureLocked)
                         if isFeatureLocked {
                             Spacer()
@@ -373,7 +300,7 @@ struct SettingsTabContent: View {
                         .font(DS.Typography.caption)
                         .foregroundColor(.secondary)
                 }
-                Toggle("Launch at Login", isOn: launchManager.binding)
+                LaunchAtLogin.Toggle("Launch at Login")
             }
 
             Section {

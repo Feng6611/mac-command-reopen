@@ -8,31 +8,20 @@
 import Foundation
 import SwiftUI
 import Combine
-import ServiceManagement
+import LaunchAtLogin
 import os
 
 final class LaunchAtLoginManager: ObservableObject, LaunchAtLoginManaging {
     @Published private(set) var isEnabled: Bool
 
     init() {
-        isEnabled = SMAppService.mainApp.status == .enabled
+        isEnabled = LaunchAtLogin.isEnabled
     }
 
     func setEnabled(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-                AppLogger.launchAtLogin.info("Successfully registered launch at login")
-            } else {
-                try SMAppService.mainApp.unregister()
-                AppLogger.launchAtLogin.info("Successfully unregistered launch at login")
-            }
-            self.isEnabled = enabled
-        } catch {
-            // Roll back to actual status on failure
-            self.isEnabled = SMAppService.mainApp.status == .enabled
-            AppLogger.launchAtLogin.error("Failed to \(enabled ? "register" : "unregister") launch at login: \(error.localizedDescription)")
-        }
+        LaunchAtLogin.isEnabled = enabled
+        isEnabled = LaunchAtLogin.isEnabled
+        AppLogger.launchAtLogin.info("Set launch at login to \(self.isEnabled)")
     }
 }
 

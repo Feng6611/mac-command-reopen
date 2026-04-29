@@ -6,14 +6,13 @@
 //
 
 import Combine
+import Defaults
 import Foundation
 import os
 
 @MainActor
 final class ProStatusManager: ObservableObject {
     enum Constants {
-        static let trialStartDateKey = "com.comtab.trialStartDate"
-        static let hasSeenOnboardingKey = "com.comtab.hasSeenOnboarding"
         static let trialDuration: TimeInterval = 2 * 24 * 60 * 60
         static let transactionRefreshAttempts = 3
         static let transactionRefreshDelayNanoseconds: UInt64 = 750_000_000
@@ -57,7 +56,7 @@ final class ProStatusManager: ObservableObject {
     private var hasPromptedForExpiredStateThisSession = false
 
     var isFirstLaunch: Bool {
-        !defaults.bool(forKey: Constants.hasSeenOnboardingKey)
+        !defaults[AppDefaults.hasSeenOnboarding]
     }
 
     var accessEntitlementState: AccessEntitlementState {
@@ -78,9 +77,9 @@ final class ProStatusManager: ObservableObject {
             revenueCatSnapshot: cachedSnapshot,
             legacySnapshot: cachedLegacySnapshot
         ) == nil,
-           defaults.object(forKey: Constants.trialStartDateKey) == nil {
+           defaults[AppDefaults.trialStartDate] == nil {
             let resolvedStartDate = now()
-            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
+            defaults[AppDefaults.trialStartDate] = resolvedStartDate
             AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
         }
         self.defaults = defaults
@@ -265,12 +264,12 @@ final class ProStatusManager: ObservableObject {
 
     private func startTrialIfNeeded(markOnboardingSeen: Bool) {
         if markOnboardingSeen {
-            defaults.set(true, forKey: Constants.hasSeenOnboardingKey)
+            defaults[AppDefaults.hasSeenOnboarding] = true
         }
 
-        if defaults.object(forKey: Constants.trialStartDateKey) == nil {
+        if defaults[AppDefaults.trialStartDate] == nil {
             let resolvedStartDate = now()
-            defaults.set(resolvedStartDate, forKey: Constants.trialStartDateKey)
+            defaults[AppDefaults.trialStartDate] = resolvedStartDate
             AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
         }
     }
@@ -374,7 +373,7 @@ final class ProStatusManager: ObservableObject {
             )
         }
 
-        guard let trialStart = defaults.object(forKey: Constants.trialStartDateKey) as? Date else {
+        guard let trialStart = defaults[AppDefaults.trialStartDate] else {
             return .expired
         }
         let expiresAt = trialStart.addingTimeInterval(Constants.trialDuration)
