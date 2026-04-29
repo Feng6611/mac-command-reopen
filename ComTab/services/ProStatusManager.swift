@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import RevenueCat
 import os
 
 @MainActor
@@ -30,7 +29,7 @@ final class ProStatusManager: ObservableObject {
     static let shared = ProStatusManager()
 
     @Published private(set) var status: ProStatus
-    @Published private(set) var currentOffering: Offering?
+    @Published private(set) var currentOffering: ProOfferingSnapshot?
     @Published private(set) var availablePlans: [ProPlanProduct]
     @Published private(set) var lastError: ProPurchaseError?
     @Published private(set) var purchaseInProgressPlan: ProPlan?
@@ -167,7 +166,7 @@ final class ProStatusManager: ObservableObject {
         defer { purchaseInProgressPlan = nil }
 
         do {
-            let snapshot = try await revenueCatService.purchase(plan: plan, offering: currentOffering)
+            let snapshot = try await revenueCatService.purchase(plan: plan)
             lastError = nil
             revenueCatEntitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
@@ -389,29 +388,15 @@ final class ProStatusManager: ObservableObject {
         return .expired
     }
 
-    private static func packageMetadata(from offering: Offering?) -> [ProPlan: ProPlanPackageMetadata]? {
+    private static func packageMetadata(from offering: ProOfferingSnapshot?) -> [ProPlan: ProPlanPackageMetadata]? {
         guard let offering else {
             return nil
         }
 
-        var metadata: [ProPlan: ProPlanPackageMetadata] = [:]
-
-        for plan in [ProPlan.yearly, .lifetime] {
-            guard let package = offering.package(for: plan) else {
-                continue
-            }
-
-            metadata[plan] = .init(
-                displayPrice: package.storeProduct.localizedPriceString,
-                billingDetail: plan == .yearly ? String(localized: "per year") : String(localized: "once"),
-                isAvailable: true
-            )
-        }
-
-        return metadata.isEmpty ? nil : metadata
+        return offering.isEmpty ? nil : offering.packageMetadata
     }
 
-    private static func resolveAvailablePlans(offering: Offering?, offeringsError: Error?) -> [ProPlanProduct] {
+    private static func resolveAvailablePlans(offering: ProOfferingSnapshot?, offeringsError: Error?) -> [ProPlanProduct] {
         let purchaseError = offeringsError.map(ProPurchaseError.init(error:))
         let shouldKeepFallbackAvailable = purchaseError == .network
 

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import RevenueCat
 
 enum ProPurchaseError: Error, Equatable {
     case notConfigured
@@ -20,38 +19,6 @@ enum ProPurchaseError: Error, Equatable {
     case invalidCredentials
     case productUnavailable
     case unknown(String)
-
-    init(error: Error) {
-        if let purchaseError = error as? ProPurchaseError {
-            self = purchaseError
-            return
-        }
-
-        let nsError = error as NSError
-        if nsError.domain == RevenueCat.ErrorCode.errorDomain,
-           let errorCode = RevenueCat.ErrorCode(rawValue: nsError.code) {
-            switch errorCode {
-            case .purchaseCancelledError:
-                self = .purchaseCancelled
-            case .purchaseNotAllowedError:
-                self = .purchaseNotAllowed
-            case .invalidReceiptError:
-                self = .invalidReceipt
-            case .productNotAvailableForPurchaseError:
-                self = .productUnavailable
-            case .networkError:
-                self = .network
-            case .invalidCredentialsError:
-                self = .invalidCredentials
-            case .configurationError:
-                self = .notConfigured
-            default:
-                self = .unknown(nsError.localizedDescription)
-            }
-        } else {
-            self = .unknown(nsError.localizedDescription)
-        }
-    }
 }
 
 extension ProPurchaseError: LocalizedError {

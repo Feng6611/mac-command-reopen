@@ -18,6 +18,14 @@ struct ProPlanPackageMetadata: Equatable {
     let isAvailable: Bool
 }
 
+struct ProOfferingSnapshot: Equatable {
+    let packageMetadata: [ProPlan: ProPlanPackageMetadata]
+
+    var isEmpty: Bool {
+        packageMetadata.isEmpty
+    }
+}
+
 struct ProPlanProduct: Equatable, Identifiable {
     let plan: ProPlan
     let title: String
@@ -58,4 +66,23 @@ struct ProPlanProduct: Equatable, Identifiable {
         .fallback(for: .yearly),
         .fallback(for: .lifetime)
     ]
+}
+
+struct ProEntitlementSnapshot: Equatable, Sendable {
+    let plan: ProPlan
+    let expirationDate: Date?
+    let willRenew: Bool
+    let originalPurchaseDate: Date?
+
+    nonisolated init(
+        plan: ProPlan,
+        expirationDate: Date?,
+        willRenew: Bool = false,
+        originalPurchaseDate: Date? = nil
+    ) {
+        self.plan = plan
+        self.expirationDate = expirationDate
+        self.willRenew = willRenew
+        self.originalPurchaseDate = originalPurchaseDate
+    }
 }

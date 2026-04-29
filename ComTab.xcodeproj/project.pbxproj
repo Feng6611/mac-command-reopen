@@ -481,7 +481,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTab.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTab.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -535,7 +535,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTab.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTab.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -735,7 +735,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTab.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTab.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -834,7 +834,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTabDirect.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTabDirect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COMTAB_REVENUECAT_API_KEY = "";
@@ -866,6 +866,7 @@
 					ProStatusManager.swift,
 					RevenueCatEntitlements.swift,
 					RevenueCatService.swift,
+					RevenueCatErrorMapping.swift,
 				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Config/AppInfo.plist;
@@ -901,7 +902,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTabDirect.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTabDirect.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COMTAB_REVENUECAT_API_KEY = "";
@@ -933,6 +934,7 @@
 					ProStatusManager.swift,
 					RevenueCatEntitlements.swift,
 					RevenueCatService.swift,
+					RevenueCatErrorMapping.swift,
 				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Config/AppInfo.plist;
@@ -968,7 +970,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
-				CODE_SIGN_ENTITLEMENTS = ComTab/Resources/ComTabDirect.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ComTab/resources/ComTabDirect.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1002,6 +1004,7 @@
 					ProStatusManager.swift,
 					RevenueCatEntitlements.swift,
 					RevenueCatService.swift,
+					RevenueCatErrorMapping.swift,
 				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Config/AppInfo.plist;

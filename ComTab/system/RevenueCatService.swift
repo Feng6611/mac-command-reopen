@@ -21,6 +21,7 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
     var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)?
 
     private(set) var isConfigured = false
+    private var currentOffering: Offering?
 
     var cachedEntitlementSnapshot: ProEntitlementSnapshot? {
         guard isConfigured else {
@@ -69,13 +70,14 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         AppLogger.purchase.notice("RevenueCat configured.")
     }
 
-    func fetchCurrentOffering() async throws -> Offering? {
+    func fetchCurrentOffering() async throws -> ProOfferingSnapshot? {
         try ensureConfigured()
 
         let offerings = try await withTimeout("offerings") {
             try await Purchases.shared.offerings()
         }
         let resolvedOffering = offerings.current ?? offerings.all[RevenueCatConfiguration.offeringIdentifier]
+        currentOffering = resolvedOffering
 
         if let resolvedOffering {
             let packageIdentifiers = resolvedOffering.availablePackages.map(\.identifier).joined(separator: ", ")
@@ -88,7 +90,7 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
             )
         }
 
-        return resolvedOffering
+        return resolvedOffering?.proOfferingSnapshot()
     }
 
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
@@ -100,10 +102,10 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         return RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
     }
 
-    func purchase(plan: ProPlan, offering: Offering?) async throws -> ProEntitlementSnapshot? {
+    func purchase(plan: ProPlan) async throws -> ProEntitlementSnapshot? {
         try ensureConfigured()
 
-        let resolvedOffering = try await resolveOffering(offering)
+        let resolvedOffering = try await resolveOffering()
         guard let package = resolvedOffering.package(for: plan) else {
             throw ProPurchaseError.packageNotFound(plan)
         }
@@ -149,13 +151,14 @@ final class RevenueCatService: NSObject, RevenueCatServicing {
         }
     }
 
-    private func resolveOffering(_ offering: Offering?) async throws -> Offering {
-        if let offering {
-            return offering
+    private func resolveOffering() async throws -> Offering {
+        if let currentOffering {
+            return currentOffering
         }
 
-        if let fetched = try await fetchCurrentOffering() {
-            return fetched
+        _ = try await fetchCurrentOffering()
+        if let currentOffering {
+            return currentOffering
         }
 
         throw ProPurchaseError.offeringUnavailable

@@ -150,24 +150,23 @@ extension Offering {
                 ?? self.availablePackages.first(where: { $0.storeProduct.productIdentifier == plan.productIdentifier })
         }
     }
-}
 
-struct ProEntitlementSnapshot: Equatable, Sendable {
-    let plan: ProPlan
-    let expirationDate: Date?
-    let willRenew: Bool
-    let originalPurchaseDate: Date?
+    func proOfferingSnapshot() -> ProOfferingSnapshot {
+        var metadata: [ProPlan: ProPlanPackageMetadata] = [:]
 
-    nonisolated init(
-        plan: ProPlan,
-        expirationDate: Date?,
-        willRenew: Bool = false,
-        originalPurchaseDate: Date? = nil
-    ) {
-        self.plan = plan
-        self.expirationDate = expirationDate
-        self.willRenew = willRenew
-        self.originalPurchaseDate = originalPurchaseDate
+        for plan in [ProPlan.yearly, .lifetime] {
+            guard let package = package(for: plan) else {
+                continue
+            }
+
+            metadata[plan] = .init(
+                displayPrice: package.storeProduct.localizedPriceString,
+                billingDetail: plan == .yearly ? String(localized: "per year") : String(localized: "once"),
+                isAvailable: true
+            )
+        }
+
+        return ProOfferingSnapshot(packageMetadata: metadata)
     }
 }
 
@@ -177,8 +176,8 @@ protocol RevenueCatServicing: AnyObject {
     var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)? { get set }
 
     func configureIfNeeded()
-    func fetchCurrentOffering() async throws -> Offering?
+    func fetchCurrentOffering() async throws -> ProOfferingSnapshot?
     func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot?
-    func purchase(plan: ProPlan, offering: Offering?) async throws -> ProEntitlementSnapshot?
+    func purchase(plan: ProPlan) async throws -> ProEntitlementSnapshot?
     func restorePurchases() async throws -> ProEntitlementSnapshot?
 }

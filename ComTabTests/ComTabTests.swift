@@ -67,7 +67,7 @@ final class MockRevenueCatService: RevenueCatServicing {
     var cachedEntitlementSnapshot: ProEntitlementSnapshot?
     var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)?
 
-    var currentOffering: Offering?
+    var currentOffering: ProOfferingSnapshot?
     var fetchedEntitlementSnapshot: ProEntitlementSnapshot?
     var fetchedEntitlementSnapshots: [ProEntitlementSnapshot?] = []
     var purchaseSnapshot: ProEntitlementSnapshot?
@@ -86,7 +86,7 @@ final class MockRevenueCatService: RevenueCatServicing {
         configureCallCount += 1
     }
 
-    func fetchCurrentOffering() async throws -> Offering? {
+    func fetchCurrentOffering() async throws -> ProOfferingSnapshot? {
         fetchCurrentOfferingCallCount += 1
 
         if let offeringsError {
@@ -110,7 +110,7 @@ final class MockRevenueCatService: RevenueCatServicing {
         return fetchedEntitlementSnapshot
     }
 
-    func purchase(plan: ProPlan, offering: Offering?) async throws -> ProEntitlementSnapshot? {
+    func purchase(plan: ProPlan) async throws -> ProEntitlementSnapshot? {
         if let purchaseDelayNanoseconds {
             try? await Task.sleep(nanoseconds: purchaseDelayNanoseconds)
         }
