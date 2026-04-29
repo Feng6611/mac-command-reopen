@@ -14,6 +14,8 @@
 		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
+		9C2010062F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
+		9C2010072F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +70,7 @@
 			files = (
 				9A1111112F1000010099C190 /* RevenueCat in Frameworks */,
 				9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */,
+				9C2010062F3401010099C190 /* Defaults in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +93,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */,
+				9C2010072F3401010099C190 /* Defaults in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,6 +146,7 @@
 			packageProductDependencies = (
 				9A1111132F1000010099C190 /* RevenueCat */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
+				9C2010082F3401010099C190 /* Defaults */,
 			);
 			productName = ComTab;
 			productReference = 748FCE1B2EB5027B0099C190 /* Command Reopen.app */;
@@ -211,6 +216,7 @@
 			name = "Command Reopen Direct";
 			packageProductDependencies = (
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
+				9C2010082F3401010099C190 /* Defaults */,
 			);
 			productName = ComTabDirect;
 			productReference = 9B1000022F2000010099C190 /* Command Reopen Direct.app */;
@@ -259,6 +265,7 @@
 			packageReferences = (
 				9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 748FCE1C2EB5027B0099C190 /* Products */;
@@ -1106,6 +1113,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1118,6 +1133,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
+		};
+		9C2010082F3401010099C190 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

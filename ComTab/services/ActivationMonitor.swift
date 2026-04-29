@@ -85,7 +85,7 @@ final class ActivationMonitor: ObservableObject {
         self.windowInfoProvider = windowInfoProvider
         let storedValue = defaults[AppDefaults.featureEnabled]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
-        let hasStoredExcludedBundles = defaults.object(forKey: AppDefaults.excludedBundleIDs.name) != nil
+        let hasStoredExcludedBundles = defaults.object(forKey: AppDefaults.RawKey.excludedBundleIDs) != nil
         let hasMigratedDefaultExcludedBundles = defaults[AppDefaults.defaultExcludedBundlesMigrated]
         var initialExcluded = hasStoredExcludedBundles ? storedExcluded : Self.defaultExcludedBundleIDs
 
