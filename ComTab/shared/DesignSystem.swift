@@ -29,8 +29,8 @@ enum DS {
     // MARK: Settings Layout
 
     enum Settings {
-        static let windowWidth: CGFloat = 620
-        static let windowHeight: CGFloat = 520
+        static let windowWidth: CGFloat = 540
+        static let windowHeight: CGFloat = 460
     }
 
     // MARK: Corner Radius
@@ -96,7 +96,7 @@ enum DS {
         static let microSemibold = Font.system(size: 10, weight: .semibold)
 
         // Stats hero
-        static let displayLarge = Font.system(size: 36, weight: .bold, design: .rounded)
+        static let displayLarge = Font.system(size: 30, weight: .bold, design: .rounded)
 
         // Letter-specific
         static let letterHeadline  = Font.system(size: 18, weight: .regular)

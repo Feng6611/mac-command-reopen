@@ -125,21 +125,21 @@ struct ProTabContent: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             ProSectionView()
-                .padding(.vertical, DS.Spacing.xxl)
+                .padding(.vertical, DS.Spacing.lg)
         }
-        .padding(.horizontal, DS.Spacing.xxl)
+        .padding(.horizontal, DS.Spacing.lg)
     }
 }
 #else
 struct DirectSupportTabContent: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: DS.Spacing.xl) {
+            VStack(spacing: DS.Spacing.lg) {
                 supportCard
-                    .padding(.top, DS.Spacing.xxl)
+                    .padding(.top, DS.Spacing.lg)
             }
         }
-        .padding(.horizontal, DS.Spacing.xxl)
+        .padding(.horizontal, DS.Spacing.lg)
     }
 
     private var supportCard: some View {
@@ -149,8 +149,8 @@ struct DirectSupportTabContent: View {
                     systemName: "heart.fill",
                     iconColor: .accentColor,
                     backgroundColor: DS.Colors.accentTint,
-                    size: 42,
-                    iconSize: 18
+                    size: 36,
+                    iconSize: 16
                 )
 
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
@@ -163,9 +163,9 @@ struct DirectSupportTabContent: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(.horizontal, DS.Spacing.xl)
-            .padding(.top, DS.Spacing.xl)
-            .padding(.bottom, DS.Spacing.lg)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.top, DS.Spacing.lg)
+            .padding(.bottom, DS.Spacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(DS.Colors.accentTintSubtle)
 
@@ -185,7 +185,7 @@ struct DirectSupportTabContent: View {
                     description: "The goal stays the same: keep the app lightweight, reliable, and continuously maintained."
                 )
             }
-            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.horizontal, DS.Spacing.lg)
             .padding(.top, DS.Spacing.md)
             .padding(.bottom, DS.Spacing.sm)
 
@@ -204,7 +204,7 @@ struct DirectSupportTabContent: View {
                 }
                 .buttonStyle(.bordered)
             }
-            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, DS.Spacing.sm)
         }
         .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))

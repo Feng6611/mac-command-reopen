@@ -48,43 +48,98 @@ struct ReopenStatsView: View {
         trendData.map(\.count).max() ?? 1
     }
 
+    private var activeDaysInLast30: Int {
+        reopenStatsStore.dailyStats(last: 30).filter { $0.count > 0 }.count
+    }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: DS.Spacing.lg) {
+            VStack(spacing: DS.Spacing.md) {
                 heroSection
                 trendSection
                 topAppsSection
                 resetSection
             }
-            .padding(DS.Spacing.xl)
+            .padding(DS.Spacing.md)
         }
-        .background(Color(nsColor: .controlBackgroundColor).opacity(0.3))
+        .background(statsBackground)
+    }
+
+    private var statsBackground: some View {
+        Color(nsColor: .controlBackgroundColor).opacity(0.22)
     }
 
     private var heroSection: some View {
-        VStack(spacing: DS.Spacing.xxs) {
-            Text("\(reopenStatsStore.totalSuccessfulReopens)")
-                .font(DS.Typography.displayLarge)
-                .foregroundStyle(.primary)
-            Text("total reopens")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            Text("\(reopenStatsStore.todayCount) today")
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(.secondary.opacity(0.7))
-                .padding(.top, DS.Spacing.xs)
+        HStack(alignment: .center, spacing: DS.Spacing.lg) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
+                Text("\(reopenStatsStore.totalSuccessfulReopens)")
+                    .font(DS.Typography.displayLarge)
+                    .foregroundStyle(.primary)
+                    .monospacedDigit()
+                Text("total reopens")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: DS.Spacing.md)
+
+            HStack(spacing: DS.Spacing.sm) {
+                metricTile(
+                    title: "Today",
+                    value: "\(reopenStatsStore.todayCount)",
+                    systemImage: "sun.max.fill",
+                    tint: .orange
+                )
+                metricTile(
+                    title: "Active",
+                    value: "\(activeDaysInLast30)d",
+                    systemImage: "calendar",
+                    tint: .teal
+                )
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(DS.Spacing.lg)
-        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(DS.Spacing.md)
+        .statsPanel(tint: .accentColor.opacity(0.07))
+    }
+
+    private func metricTile(title: String, value: String, systemImage: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+            Image(systemName: systemImage)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(tint)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(value)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .monospacedDigit()
+                Text(title)
+                    .font(DS.Typography.microSemibold)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(minWidth: 58, alignment: .leading)
+        .padding(.horizontal, DS.Spacing.sm)
+        .padding(.vertical, DS.Spacing.xs)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+        )
     }
 
     private var trendSection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             HStack {
-                Text("Trend")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
+                    Text("Trend")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.primary)
+                    Text(timeRangeSubtitle)
+                        .font(DS.Typography.micro)
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
                 Picker("", selection: $timeRange) {
                     ForEach(StatTimeRange.allCases, id: \.self) { range in
@@ -92,7 +147,7 @@ struct ReopenStatsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 160)
+                .frame(width: 132)
             }
 
             let allZero = trendData.allSatisfy { $0.count == 0 }
@@ -100,57 +155,47 @@ struct ReopenStatsView: View {
             ZStack {
 #if canImport(Charts)
                 ChartsTrendView(data: trendData, timeRange: timeRange)
-                    .frame(height: 140)
+                    .frame(height: 112)
 #else
                 FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
-                    .frame(height: 140)
+                    .frame(height: 112)
 #endif
 
                 if allZero {
-                    Text("Start using Command Reopen to see trends")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(nsColor: .windowBackgroundColor).opacity(0.6))
+                    emptyState(systemImage: "chart.bar", text: "Start using Command Reopen to see trends")
                 }
             }
         }
-        .padding(DS.Spacing.lg)
-        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
+        .padding(DS.Spacing.md)
+        .statsPanel(tint: .blue.opacity(0.04))
     }
 
     private var topAppsSection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            Text("Top Apps")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
+                Text("Top Apps")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.primary)
+                Text("Most often reopened")
+                    .font(DS.Typography.micro)
+                    .foregroundStyle(.secondary)
+            }
 
-            let topApps = reopenStatsStore.topApps(6)
+            let topApps = reopenStatsStore.topApps(5)
             if topApps.isEmpty {
-                HStack {
-                    Spacer()
-                    VStack(spacing: 6) {
-                        Image(systemName: "app.dashed")
-                            .font(.system(size: 20))
-                            .foregroundStyle(.secondary.opacity(0.5))
-                        Text("No reopen activity yet")
-                            .foregroundStyle(.secondary)
-                            .font(DS.Typography.caption)
-                    }
-                    Spacer()
-                }
-                .padding(.vertical, DS.Spacing.lg)
+                emptyState(systemImage: "app.dashed", text: "No reopen activity yet")
+                    .frame(height: 58)
             } else {
 #if canImport(Charts)
                 ChartsTopAppsView(apps: topApps)
-                    .frame(height: CGFloat(topApps.count) * 30 + 8)
+                    .frame(height: CGFloat(topApps.count) * 26 + 6)
 #else
                 FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
 #endif
             }
         }
-        .padding(DS.Spacing.lg)
-        .dsCard(borderColor: DS.Colors.cardBorderSubtle, radius: DS.Radius.md)
+        .padding(DS.Spacing.md)
+        .statsPanel(tint: .teal.opacity(0.04))
     }
 
     private var resetSection: some View {
@@ -160,6 +205,8 @@ struct ReopenStatsView: View {
                 showResetConfirmation = true
             }
             .font(DS.Typography.caption)
+            .buttonStyle(.bordered)
+            .controlSize(.small)
             .disabled(reopenStatsStore.totalSuccessfulReopens == 0)
             .alert("Reset Statistics?", isPresented: $showResetConfirmation) {
                 Button("Cancel", role: .cancel) {}
@@ -172,6 +219,30 @@ struct ReopenStatsView: View {
             Spacer()
         }
         .padding(.top, DS.Spacing.xs)
+    }
+
+    private func emptyState(systemImage: String, text: String) -> some View {
+        VStack(spacing: DS.Spacing.xs) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18))
+                .foregroundStyle(.secondary.opacity(0.48))
+            Text(text)
+                .font(DS.Typography.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
+    }
+
+    private var timeRangeSubtitle: String {
+        switch timeRange {
+        case .day:
+            return "Last 30 days"
+        case .week:
+            return "Last 12 weeks"
+        case .month:
+            return "Last 12 months"
+        }
     }
 }
 
@@ -187,7 +258,7 @@ private struct ChartsTrendView: View {
                     x: .value("Date", item.date, unit: calendarUnit),
                     y: .value("Count", item.count)
                 )
-                .foregroundStyle(Color.accentColor.gradient)
+                .foregroundStyle(item.count > 0 ? Color.accentColor : Color.secondary.opacity(0.18))
                 .cornerRadius(3)
             }
         }
@@ -240,7 +311,7 @@ private struct ChartsTopAppsView: View {
                     x: .value("Count", app.count),
                     y: .value("App", app.displayName)
                 )
-                .foregroundStyle(Color.accentColor.opacity(1.0 - Double(index) * 0.12))
+                .foregroundStyle(topAppColor(at: index))
                 .cornerRadius(4)
                 .annotation(position: .trailing, alignment: .leading, spacing: 4) {
                     Text("\(app.count)")
@@ -252,10 +323,24 @@ private struct ChartsTopAppsView: View {
         .chartYAxis {
             AxisMarks { _ in
                 AxisValueLabel()
-                    .font(.system(size: 10))
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.secondary)
             }
         }
         .chartXAxis(.hidden)
+    }
+
+    private func topAppColor(at index: Int) -> Color {
+        switch index {
+        case 0:
+            return .accentColor
+        case 1:
+            return .blue.opacity(0.82)
+        case 2:
+            return .teal.opacity(0.78)
+        default:
+            return .secondary.opacity(0.55)
+        }
     }
 }
 #endif
@@ -323,15 +408,20 @@ private struct FallbackTopAppsView: View {
         VStack(spacing: DS.Spacing.sm) {
             ForEach(Array(apps.enumerated()), id: \.element.id) { index, app in
                 HStack(spacing: DS.Spacing.sm) {
+                    Text("\(index + 1)")
+                        .font(DS.Typography.microSemibold)
+                        .foregroundColor(fallbackTopAppColor(at: index))
+                        .frame(width: 14, alignment: .leading)
+
                     Text(app.displayName)
                         .font(.system(size: 11))
-                        .frame(width: 80, alignment: .trailing)
+                        .frame(width: 78, alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)
 
                     GeometryReader { geometry in
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(Color.accentColor.opacity(1.0 - Double(index) * 0.12))
+                            .fill(fallbackTopAppColor(at: index))
                             .frame(width: barWidth(for: app.count, in: geometry.size.width))
                     }
                     .frame(height: 18)
@@ -341,6 +431,7 @@ private struct FallbackTopAppsView: View {
                         .foregroundColor(.secondary)
                         .frame(width: 28, alignment: .leading)
                 }
+                .frame(height: 20)
             }
         }
     }
@@ -348,5 +439,34 @@ private struct FallbackTopAppsView: View {
     private func barWidth(for count: Int, in totalWidth: CGFloat) -> CGFloat {
         guard maxCount > 0 else { return 4 }
         return max(4, CGFloat(count) / CGFloat(maxCount) * totalWidth)
+    }
+
+    private func fallbackTopAppColor(at index: Int) -> Color {
+        switch index {
+        case 0:
+            return .accentColor
+        case 1:
+            return .blue.opacity(0.82)
+        case 2:
+            return .teal.opacity(0.78)
+        default:
+            return .secondary.opacity(0.55)
+        }
+    }
+}
+
+private extension View {
+    func statsPanel(tint: Color) -> some View {
+        self
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                    .fill(tint)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                    .strokeBorder(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
     }
 }

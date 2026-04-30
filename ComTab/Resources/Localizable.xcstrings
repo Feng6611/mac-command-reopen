@@ -7,9 +7,6 @@
     "%lld" : {
 
     },
-    "%lld today" : {
-
-    },
     "2-day free trial, no commitment" : {
 
     },
@@ -100,6 +97,9 @@
 
     },
     "Month" : {
+
+    },
+    "Most often reopened" : {
 
     },
     "Never lose your windows again.\nSwitch apps with Cmd+Tab, windows reopen automatically." : {
