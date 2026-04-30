@@ -10,7 +10,8 @@
 		7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
-		9A1111112F1000010099C190 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 9A1111132F1000010099C190 /* RevenueCat */; };
+		8D3000012F4400010099C190 /* RevenueCatCommerceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000032F4400010099C190 /* RevenueCatCommerceKit */; };
+		8D3000022F4400010099C190 /* RevenueCatCommerceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000032F4400010099C190 /* RevenueCatCommerceKit */; };
 		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
@@ -68,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9A1111112F1000010099C190 /* RevenueCat in Frameworks */,
+				8D3000012F4400010099C190 /* RevenueCatCommerceKit in Frameworks */,
 				9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010062F3401010099C190 /* Defaults in Frameworks */,
 			);
@@ -78,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D3000022F4400010099C190 /* RevenueCatCommerceKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +146,7 @@
 			);
 			name = "Command Reopen";
 			packageProductDependencies = (
-				9A1111132F1000010099C190 /* RevenueCat */,
+				8D3000032F4400010099C190 /* RevenueCatCommerceKit */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
 			);
@@ -170,6 +172,7 @@
 			);
 			name = ComTabTests;
 			packageProductDependencies = (
+				8D3000032F4400010099C190 /* RevenueCatCommerceKit */,
 			);
 			productName = ComTabTests;
 			productReference = 748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */;
@@ -263,7 +266,7 @@
 			mainGroup = 748FCE122EB5027A0099C190;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "RevenueCatCommerceKit" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
@@ -1096,15 +1099,14 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.16.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "RevenueCatCommerceKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/RevenueCatCommerceKit;
 		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
 		9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
@@ -1124,10 +1126,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9A1111132F1000010099C190 /* RevenueCat */ = {
+		8D3000032F4400010099C190 /* RevenueCatCommerceKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9A1111152F1000010099C190 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
-			productName = RevenueCat;
+			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "RevenueCatCommerceKit" */;
+			productName = RevenueCatCommerceKit;
 		};
 		9C2010042F3400010099C190 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;

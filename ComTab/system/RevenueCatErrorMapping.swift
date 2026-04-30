@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RevenueCat
+import RevenueCatCommerceKit
 
 extension ProPurchaseError {
     init(error: Error) {
@@ -15,29 +15,39 @@ extension ProPurchaseError {
             return
         }
 
+        if let commerceError = error as? CommercePurchaseError {
+            self = ProPurchaseError(commerceError: commerceError)
+            return
+        }
+
         let nsError = error as NSError
-        if nsError.domain == RevenueCat.ErrorCode.errorDomain,
-           let errorCode = RevenueCat.ErrorCode(rawValue: nsError.code) {
-            switch errorCode {
-            case .purchaseCancelledError:
-                self = .purchaseCancelled
-            case .purchaseNotAllowedError:
-                self = .purchaseNotAllowed
-            case .invalidReceiptError:
-                self = .invalidReceipt
-            case .productNotAvailableForPurchaseError:
-                self = .productUnavailable
-            case .networkError:
-                self = .network
-            case .invalidCredentialsError:
-                self = .invalidCredentials
-            case .configurationError:
-                self = .notConfigured
-            default:
-                self = .unknown(nsError.localizedDescription)
-            }
-        } else {
-            self = .unknown(nsError.localizedDescription)
+        self = .unknown(nsError.localizedDescription)
+    }
+
+    private init(commerceError: CommercePurchaseError) {
+        switch commerceError {
+        case .notConfigured, .invalidConfiguration:
+            self = .notConfigured
+        case .offeringUnavailable:
+            self = .offeringUnavailable
+        case .packageNotFound(let plan), .productIdentifierMissing(let plan):
+            self = .packageNotFound(plan.proPlan)
+        case .purchaseCancelled:
+            self = .purchaseCancelled
+        case .purchaseNotAllowed:
+            self = .purchaseNotAllowed
+        case .activationPending:
+            self = .activationPending
+        case .invalidReceipt:
+            self = .invalidReceipt
+        case .network:
+            self = .network
+        case .invalidCredentials:
+            self = .invalidCredentials
+        case .productUnavailable:
+            self = .productUnavailable
+        case .unknown(let message):
+            self = .unknown(message)
         }
     }
 }

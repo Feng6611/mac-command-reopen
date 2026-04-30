@@ -10,7 +10,7 @@ import Combine
 import Foundation
 import Testing
 import CoreGraphics
-import RevenueCat
+import RevenueCatCommerceKit
 @testable import Command_Reopen
 
 @MainActor
@@ -1106,12 +1106,8 @@ struct ProStatusManagerTests {
 
         defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
 
-        let networkError = NSError(
-            domain: RevenueCat.ErrorCode.errorDomain,
-            code: RevenueCat.ErrorCode.networkError.rawValue
-        )
         let mockService = MockRevenueCatService()
-        mockService.entitlementError = networkError
+        mockService.entitlementError = CommercePurchaseError.network
         let now = Date(timeIntervalSince1970: 1_700_000_000)
 
         let manager = ProStatusManager(
@@ -1231,220 +1227,20 @@ struct ProStatusManagerTests {
     }
 }
 
-@MainActor
-struct RevenueCatSnapshotParserTests {
-    private let originalPurchaseDate = Date(timeIntervalSince1970: 1_700_000_000)
-
-    private func makeEntitlement(
-        identifier: String,
-        isActive: Bool,
-        productIdentifier: String,
-        expirationDate: Date?,
-        willRenew: Bool? = nil
-    ) -> EntitlementInfo {
-        .init(
-            identifier: identifier,
-            isActive: isActive,
-            willRenew: willRenew ?? (expirationDate != nil),
-            periodType: .normal,
-            latestPurchaseDate: originalPurchaseDate,
-            originalPurchaseDate: originalPurchaseDate,
-            expirationDate: expirationDate,
-            store: .macAppStore,
-            productIdentifier: productIdentifier,
-            isSandbox: true,
-            ownershipType: .purchased
-        )
-    }
-
-    private func makeCustomerInfo(entitlements: [EntitlementInfo]) -> CustomerInfo {
-        let requestDate = Date(timeIntervalSince1970: 1_700_000_100)
-        let entitlementsByIdentifier = Dictionary(uniqueKeysWithValues: entitlements.map { ($0.identifier, $0) })
-        let expirationDatesByProductId: [String: Date] = Dictionary(
-            uniqueKeysWithValues: entitlements.compactMap { entitlement in
-                guard let expirationDate = entitlement.expirationDate else {
-                    return nil
-                }
-
-                return (entitlement.productIdentifier, expirationDate)
-            }
-        )
-        let purchaseDatesByProductId: [String: Date] = Dictionary(
-            uniqueKeysWithValues: entitlements.compactMap { entitlement in
-                guard let latestPurchaseDate = entitlement.latestPurchaseDate else {
-                    return nil
-                }
-
-                return (entitlement.productIdentifier, latestPurchaseDate)
-            }
-        )
-
-        return .init(
-            entitlements: .init(entitlements: entitlementsByIdentifier),
-            expirationDatesByProductId: expirationDatesByProductId,
-            purchaseDatesByProductId: purchaseDatesByProductId,
-            allPurchasedProductIds: Set(entitlements.map(\.productIdentifier)),
-            requestDate: requestDate,
-            firstSeen: requestDate,
-            originalAppUserId: "test-user"
-        )
-    }
-
-    @Test("RevenueCat parser prefers the configured entitlement identifier")
-    func parserUsesConfiguredEntitlementIdentifier() {
-        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: RevenueCatConfiguration.entitlementIdentifier,
-                isActive: true,
-                productIdentifier: RevenueCatConfiguration.lifetimeProductIdentifier,
-                expirationDate: nil
-            ),
-            makeEntitlement(
-                identifier: "other",
-                isActive: true,
-                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
-                expirationDate: expirationDate
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false, originalPurchaseDate: originalPurchaseDate))
-    }
-
-    @Test("RevenueCat parser falls back to active product identifiers when entitlement id is missing")
-    func parserFallsBackToProductIdentifier() {
-        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: "fallback-yearly",
-                isActive: true,
-                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
-                expirationDate: expirationDate
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
-    }
-
-    @Test("RevenueCat parser falls back to any active entitlement when identifiers drift")
-    func parserFallsBackToGenericActiveEntitlement() {
-        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: "promo-pro",
-                isActive: true,
-                productIdentifier: "com.dev.kkuk.CommandReopen.promo",
-                expirationDate: expirationDate
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
-    }
-
-    @Test("RevenueCat parser ignores inactive configured entitlements")
-    func parserIgnoresInactiveConfiguredEntitlement() {
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: RevenueCatConfiguration.entitlementIdentifier,
-                isActive: false,
-                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
-                expirationDate: Date(timeIntervalSince1970: 1_800_000_000)
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == nil)
-    }
-
-    @Test("RevenueCat parser infers lifetime for unknown products without expiration")
-    func parserInfersLifetimeWithoutExpirationDate() {
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: RevenueCatConfiguration.entitlementIdentifier,
-                isActive: true,
-                productIdentifier: "custom.product",
-                expirationDate: nil
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .lifetime, expirationDate: nil, willRenew: false, originalPurchaseDate: originalPurchaseDate))
-    }
-
-    @Test("RevenueCat parser infers yearly for unknown products with expiration")
-    func parserInfersYearlyWithExpirationDate() {
-        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: RevenueCatConfiguration.entitlementIdentifier,
-                isActive: true,
-                productIdentifier: "custom.subscription",
-                expirationDate: expirationDate
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: true, originalPurchaseDate: originalPurchaseDate))
-    }
-
-    @Test("RevenueCat parser preserves cancelled yearly renewals")
-    func parserPreservesCancelledYearlyRenewalState() {
-        let expirationDate = Date(timeIntervalSince1970: 1_800_000_000)
-        let customerInfo = makeCustomerInfo(entitlements: [
-            makeEntitlement(
-                identifier: RevenueCatConfiguration.entitlementIdentifier,
-                isActive: true,
-                productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
-                expirationDate: expirationDate,
-                willRenew: false
-            )
-        ])
-
-        let snapshot = RevenueCatSnapshotParser.makeEntitlementSnapshot(from: customerInfo)
-
-        #expect(snapshot == .init(plan: .yearly, expirationDate: expirationDate, willRenew: false, originalPurchaseDate: originalPurchaseDate))
-    }
-}
-
 struct ProPurchaseErrorTests {
-    @Test("RevenueCat configuration errors map to not configured")
+    @Test("Commerce configuration errors map to not configured")
     func configurationErrorMapsToNotConfigured() {
-        let error = NSError(
-            domain: RevenueCat.ErrorCode.errorDomain,
-            code: RevenueCat.ErrorCode.configurationError.rawValue
-        )
-
-        #expect(ProPurchaseError(error: error) == .notConfigured)
+        #expect(ProPurchaseError(error: CommercePurchaseError.invalidConfiguration("Missing key")) == .notConfigured)
     }
 
-    @Test("RevenueCat invalid receipt errors map to invalid receipt")
+    @Test("Commerce invalid receipt errors map to invalid receipt")
     func invalidReceiptMapsToInvalidReceipt() {
-        let error = NSError(
-            domain: RevenueCat.ErrorCode.errorDomain,
-            code: RevenueCat.ErrorCode.invalidReceiptError.rawValue
-        )
-
-        #expect(ProPurchaseError(error: error) == .invalidReceipt)
+        #expect(ProPurchaseError(error: CommercePurchaseError.invalidReceipt) == .invalidReceipt)
     }
 
-    @Test("Non-RevenueCat domains do not get remapped by raw code alone")
-    func unrelatedDomainStaysUnknown() {
-        let error = NSError(
-            domain: NSCocoaErrorDomain,
-            code: RevenueCat.ErrorCode.configurationError.rawValue,
-            userInfo: [NSLocalizedDescriptionKey: "Cocoa failure"]
-        )
-
-        #expect(ProPurchaseError(error: error) == .unknown("Cocoa failure"))
+    @Test("Commerce package errors preserve the failed plan")
+    func packageErrorsPreservePlan() {
+        #expect(ProPurchaseError(error: CommercePurchaseError.productIdentifierMissing(.lifetime)) == .packageNotFound(.lifetime))
     }
 }
 
