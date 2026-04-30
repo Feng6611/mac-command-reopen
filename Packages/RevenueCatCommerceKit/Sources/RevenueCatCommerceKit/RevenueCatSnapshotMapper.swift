@@ -150,18 +150,6 @@ enum RevenueCatSnapshotMapper {
 
 extension Offering {
     func package(for plan: CommercePlan, configuration: CommerceConfiguration) -> Package? {
-        switch plan {
-        case .yearly:
-            return annual ?? packageMatchingProductIdentifier(for: plan, configuration: configuration)
-        case .lifetime:
-            return lifetime ?? packageMatchingProductIdentifier(for: plan, configuration: configuration)
-        }
-    }
-
-    private func packageMatchingProductIdentifier(
-        for plan: CommercePlan,
-        configuration: CommerceConfiguration
-    ) -> Package? {
         guard let productIdentifier = configuration.productIdentifiers[plan] else {
             return nil
         }

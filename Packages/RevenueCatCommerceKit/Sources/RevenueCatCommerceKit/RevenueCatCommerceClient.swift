@@ -134,9 +134,13 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
             if isInvalidReceiptError(error) {
                 logger.error("Purchase returned an invalid receipt for plan=\(plan.rawValue). Attempting entitlement recovery.")
 
-                if let recoveredEntitlement = try await recoverEntitlementAfterInvalidReceipt() {
-                    logger.notice("Recovered purchase after invalid receipt for plan=\(plan.rawValue).")
-                    return recoveredEntitlement
+                do {
+                    if let recoveredEntitlement = try await recoverEntitlementAfterInvalidReceipt() {
+                        logger.notice("Recovered purchase after invalid receipt for plan=\(plan.rawValue).")
+                        return recoveredEntitlement
+                    }
+                } catch {
+                    throw CommercePurchaseError(error: error)
                 }
             }
 
