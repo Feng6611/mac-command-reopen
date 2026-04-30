@@ -102,6 +102,35 @@ final class RevenueCatSnapshotMapperTests: XCTestCase {
         ))
     }
 
+    func testParserCanRequireConfiguredEntitlementOrProductIdentifiers() {
+        let strictConfiguration = CommerceConfiguration(
+            apiKey: "test_key",
+            entitlementIdentifier: "pro",
+            productIdentifiers: [
+                .yearly: "com.example.app.pro.yearly",
+                .lifetime: "com.example.app.pro.lifetime"
+            ],
+            entitlementMatchingPolicy: .configuredEntitlementOrProductOnly,
+            logSubsystem: "RevenueCatCommerceKitTests"
+        )
+        let customerInfo = makeCustomerInfo(entitlements: [
+            makeEntitlement(
+                identifier: "promo-pro",
+                isActive: true,
+                productIdentifier: "custom.subscription",
+                expirationDate: Date(timeIntervalSince1970: 1_800_000_000)
+            )
+        ])
+
+        let entitlement = RevenueCatSnapshotMapper.makeEntitlement(
+            from: customerInfo,
+            configuration: strictConfiguration,
+            logger: .init(subsystem: "RevenueCatCommerceKitTests", category: "Tests")
+        )
+
+        XCTAssertNil(entitlement)
+    }
+
     func testParserIgnoresInactiveConfiguredEntitlements() {
         let customerInfo = makeCustomerInfo(entitlements: [
             makeEntitlement(
@@ -210,4 +239,3 @@ final class RevenueCatSnapshotMapperTests: XCTestCase {
         )
     }
 }
-

@@ -10,6 +10,7 @@ final class CommerceConfigurationTests: XCTestCase {
 
         XCTAssertEqual(configuration.entitlementIdentifier, "pro")
         XCTAssertEqual(configuration.offeringIdentifier, "default")
+        XCTAssertEqual(configuration.entitlementMatchingPolicy, .allowAnyActiveEntitlement)
         XCTAssertEqual(try configuration.productIdentifier(for: .yearly), "com.example.MyApp.pro.yearly")
         XCTAssertEqual(try configuration.productIdentifier(for: .lifetime), "com.example.MyApp.pro.lifetime")
     }

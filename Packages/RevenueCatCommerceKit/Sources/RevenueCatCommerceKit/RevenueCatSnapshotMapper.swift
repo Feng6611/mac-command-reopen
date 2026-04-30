@@ -64,11 +64,16 @@ enum RevenueCatSnapshotMapper {
             return fallbackEntitlement
         }
 
-        if let genericEntitlement = activeEntitlements.first {
-            logger.notice(
-                "Falling back to generic active entitlement id=\(genericEntitlement.identifier) product=\(genericEntitlement.productIdentifier) because configured entitlement id=\(configuration.entitlementIdentifier) was not found or inactive."
-            )
-            return genericEntitlement
+        switch configuration.entitlementMatchingPolicy {
+        case .configuredEntitlementOrProductOnly:
+            return nil
+        case .allowAnyActiveEntitlement:
+            if let genericEntitlement = activeEntitlements.first {
+                logger.notice(
+                    "Falling back to generic active entitlement id=\(genericEntitlement.identifier) product=\(genericEntitlement.productIdentifier) because configured entitlement id=\(configuration.entitlementIdentifier) was not found or inactive."
+                )
+                return genericEntitlement
+            }
         }
 
         return nil

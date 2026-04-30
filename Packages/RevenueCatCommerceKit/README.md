@@ -61,6 +61,44 @@ Use the same semantic model across apps:
 
 RevenueCat entitlement IDs can be shared semantically across apps, but Apple IAP product IDs usually need to be unique per App Store app. Prefer a fixed naming rule over literally sharing one SKU.
 
+## SKU And Entitlement Strategy
+
+The kit treats RevenueCat entitlement state as the source of truth. Products, packages, and prices are purchase entry points; the entitlement decides whether the user has access.
+
+This keeps simple setups easy to manage:
+
+- one Pro entitlement can be granted by yearly, lifetime, promotional, or migrated products
+- a lifetime purchase can have multiple price points or packages in RevenueCat
+- host apps do not need to ship a new build just to change the current price package
+
+By default, `CommerceConfiguration` uses `.allowAnyActiveEntitlement`. That means if the configured entitlement id or configured product ids drift, any active RevenueCat entitlement can still unlock access. This is useful when a project intentionally models access as "any active RevenueCat entitlement means Pro."
+
+For stricter apps, use `.configuredEntitlementOrProductOnly`:
+
+```swift
+let commerce = RevenueCatCommerceClient(
+    configuration: CommerceConfiguration(
+        apiKey: revenueCatAPIKey,
+        entitlementIdentifier: "pro",
+        productIdentifiers: [
+            .yearly: "com.example.myapp.pro.yearly",
+            .lifetime: "com.example.myapp.pro.lifetime"
+        ],
+        entitlementMatchingPolicy: .configuredEntitlementOrProductOnly
+    )
+)
+```
+
+Use the strict policy when one RevenueCat project contains unrelated entitlements and the app must only trust its configured entitlement or configured product ids.
+
+## Offering Strategy
+
+The kit loads RevenueCat's current offering first. `offeringIdentifier` is a fallback when RevenueCat does not return a current offering.
+
+This matches the recommended operational flow: manage active packages, price tests, and limited-time price points in RevenueCat, while keeping the app focused on semantic plans and entitlement access.
+
+For example, a project can offer two lifetime prices by configuring both packages in RevenueCat and making the desired package part of the current offering. Both products should grant the same Pro entitlement, so entitlement refresh and restore stay simple.
+
 ## Configure
 
 Read the public RevenueCat SDK key from the app Info.plist or build settings:
@@ -101,6 +139,7 @@ let commerce = RevenueCatCommerceClient(
 
 Advanced configuration is centralized in `CommerceConfiguration`:
 
+- `entitlementMatchingPolicy`
 - `requestTimeoutNanoseconds`
 - `invalidReceiptRecoveryDelayNanoseconds`
 - `allowsTestAPIKeyInRelease`

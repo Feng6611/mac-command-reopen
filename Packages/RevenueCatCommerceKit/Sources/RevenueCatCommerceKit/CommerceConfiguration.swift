@@ -1,11 +1,17 @@
 import Foundation
 import RevenueCat
 
+public enum CommerceEntitlementMatchingPolicy: Equatable, Sendable {
+    case configuredEntitlementOrProductOnly
+    case allowAnyActiveEntitlement
+}
+
 public struct CommerceConfiguration: Sendable {
     public let apiKey: String
     public let entitlementIdentifier: String
     public let offeringIdentifier: String
     public let productIdentifiers: [CommercePlan: String]
+    public let entitlementMatchingPolicy: CommerceEntitlementMatchingPolicy
     public let requestTimeoutNanoseconds: UInt64
     public let invalidReceiptRecoveryDelayNanoseconds: UInt64
     public let allowsTestAPIKeyInRelease: Bool
@@ -18,6 +24,7 @@ public struct CommerceConfiguration: Sendable {
         entitlementIdentifier: String,
         offeringIdentifier: String = "default",
         productIdentifiers: [CommercePlan: String],
+        entitlementMatchingPolicy: CommerceEntitlementMatchingPolicy = .allowAnyActiveEntitlement,
         requestTimeoutNanoseconds: UInt64 = 4_000_000_000,
         invalidReceiptRecoveryDelayNanoseconds: UInt64 = 1_000_000_000,
         allowsTestAPIKeyInRelease: Bool = false,
@@ -29,6 +36,7 @@ public struct CommerceConfiguration: Sendable {
         self.entitlementIdentifier = entitlementIdentifier
         self.offeringIdentifier = offeringIdentifier
         self.productIdentifiers = productIdentifiers
+        self.entitlementMatchingPolicy = entitlementMatchingPolicy
         self.requestTimeoutNanoseconds = requestTimeoutNanoseconds
         self.invalidReceiptRecoveryDelayNanoseconds = invalidReceiptRecoveryDelayNanoseconds
         self.allowsTestAPIKeyInRelease = allowsTestAPIKeyInRelease
