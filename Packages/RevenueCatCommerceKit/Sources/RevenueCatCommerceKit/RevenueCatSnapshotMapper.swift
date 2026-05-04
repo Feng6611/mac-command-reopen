@@ -161,4 +161,8 @@ extension Offering {
 
         return availablePackages.first { $0.storeProduct.productIdentifier == productIdentifier }
     }
+
+    func hasConfiguredProducts(configuration: CommerceConfiguration) -> Bool {
+        CommercePlan.allCases.contains { package(for: $0, configuration: configuration) != nil }
+    }
 }

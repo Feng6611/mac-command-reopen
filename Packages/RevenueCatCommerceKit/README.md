@@ -4,6 +4,15 @@
 
 The kit directly depends on the RevenueCat SDK. Host apps should depend on this kit instead of importing RevenueCat in product state, views, or feature code.
 
+This is intentionally not a general-purpose commerce framework. It fits apps with:
+
+- one semantic Pro entitlement
+- one yearly subscription product
+- one lifetime non-consumable product
+- host-owned trial, paywall copy, and feature locking
+
+If an app needs monthly plans, team tiers, consumables, multiple entitlements, or account-based server authorization, treat this package as a starting point rather than a drop-in abstraction.
+
 ## What This Kit Owns
 
 - RevenueCat SDK configuration
@@ -93,11 +102,13 @@ Use the strict policy when one RevenueCat project contains unrelated entitlement
 
 ## Offering Strategy
 
-The kit loads RevenueCat's current offering first. `offeringIdentifier` is a fallback when RevenueCat does not return a current offering.
+The kit prefers RevenueCat's current offering when that offering contains at least one configured product identifier. If the current offering does not contain this app's yearly or lifetime product, the kit falls back to `offeringIdentifier`.
 
 This matches the recommended operational flow: manage active packages, price tests, and limited-time price points in RevenueCat, while keeping the app focused on semantic plans and entitlement access.
 
 For example, a project can offer two lifetime prices by configuring both packages in RevenueCat and making the desired package part of the current offering. Both products should grant the same Pro entitlement, so entitlement refresh and restore stay simple.
+
+The configured-offering fallback is important when a shared RevenueCat project has a global current offering that belongs to another app or experiment. In that case, this kit will still try the host app's configured offering before reporting no products.
 
 ## Configure
 
@@ -146,6 +157,23 @@ Advanced configuration is centralized in `CommerceConfiguration`:
 - `showStoreMessagesAutomatically`
 - `logSubsystem`
 - `logCategory`
+
+## Host App Checklist
+
+Before reusing the package in another app:
+
+- Create the yearly and lifetime in-app purchase products in App Store Connect.
+- Create or reuse the RevenueCat entitlement, usually `pro`.
+- Add both products to RevenueCat and make sure both grant the Pro entitlement.
+- Create an offering, usually `default`, containing the packages the app should sell.
+- Decide whether the app trusts any active entitlement with `.allowAnyActiveEntitlement` or only configured identifiers with `.configuredEntitlementOrProductOnly`.
+- Add the public RevenueCat SDK key to the host app's Info.plist or build settings.
+- Call `configureIfNeeded()` during purchase-state startup before reading cached entitlement state.
+- Call `refreshEntitlement()` on app activation or purchase-state refresh.
+- Load offerings only when presenting purchase UI; feature access should be based on entitlement, not product availability.
+- Keep trial policy, expired prompts, onboarding, and paywall text in the host app.
+
+For local sandbox testing, use a non-empty RevenueCat SDK key, a sandbox App Store account, and products that are approved or available for StoreKit testing. Verify purchase, cancellation, restore, no-purchase restore, offline refresh behavior, and the first-launch trial path in the host app.
 
 ## Minimal Host App Usage
 
@@ -232,3 +260,7 @@ ComTab product state -> CommerceClient protocol -> RevenueCatCommerceKit -> Reve
 ```
 
 Views and feature code should not import RevenueCat.
+
+## Testing Boundary
+
+`CommerceClient` is the public boundary for host app tests. Inside this package, `RevenueCatCommerceClient` also routes SDK calls through an internal adapter so package tests can inject fake offerings, customer info, purchases, and restores without touching `Purchases.shared`.

@@ -10,15 +10,29 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
 
     private let configuration: CommerceConfiguration
     private let logger: Logger
+    private let sdkClient: any RevenueCatSDKClient
     private var currentOffering: Offering?
 
     public init(configuration: CommerceConfiguration) {
         self.configuration = configuration
+        self.sdkClient = RevenueCatPurchasesSDKClient()
         self.logger = Logger(
             subsystem: configuration.logSubsystem,
             category: configuration.logCategory
         )
         super.init()
+        bindSDKClient()
+    }
+
+    init(configuration: CommerceConfiguration, sdkClient: any RevenueCatSDKClient) {
+        self.configuration = configuration
+        self.sdkClient = sdkClient
+        self.logger = Logger(
+            subsystem: configuration.logSubsystem,
+            category: configuration.logCategory
+        )
+        super.init()
+        bindSDKClient()
     }
 
     public var cachedEntitlement: CommerceEntitlement? {
@@ -27,7 +41,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         }
 
         return RevenueCatSnapshotMapper.makeEntitlement(
-            from: Purchases.shared.cachedCustomerInfo,
+            from: sdkClient.cachedCustomerInfo,
             configuration: configuration,
             logger: logger
         )
@@ -50,21 +64,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         }
 #endif
 
-#if DEBUG
-        Purchases.logLevel = .debug
-#else
-        Purchases.logLevel = .warn
-#endif
-
-        let revenueCatConfiguration = Configuration
-            .builder(withAPIKey: configuration.apiKey)
-            .with(storeKitVersion: .storeKit2)
-            .with(entitlementVerificationMode: .informational)
-            .with(showStoreMessagesAutomatically: configuration.showStoreMessagesAutomatically)
-            .build()
-
-        Purchases.configure(with: revenueCatConfiguration)
-        Purchases.shared.delegate = self
+        sdkClient.configure(with: configuration)
         isConfigured = true
 
         logger.notice("RevenueCat configured.")
@@ -74,13 +74,13 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         try ensureConfigured()
 
         let offerings = try await withTimeout("offerings") {
-            try await Purchases.shared.offerings()
+            try await self.sdkClient.offerings()
         }
-        let resolvedOffering = offerings.current ?? offerings.all[configuration.offeringIdentifier]
+        let resolvedOffering = resolveOffering(from: offerings)
         currentOffering = resolvedOffering
 
         guard let resolvedOffering else {
-            logger.error("RevenueCat returned no current/default offering.")
+            logger.error("RevenueCat returned no usable current/configured offering.")
             return nil
         }
 
@@ -97,7 +97,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         try ensureConfigured()
 
         let customerInfo = try await withTimeout("customer info") {
-            try await Purchases.shared.customerInfo(fetchPolicy: .fetchCurrent)
+            try await self.sdkClient.customerInfo(fetchPolicy: .fetchCurrent)
         }
 
         return RevenueCatSnapshotMapper.makeEntitlement(
@@ -120,7 +120,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         )
 
         do {
-            let result = try await Purchases.shared.purchase(package: package)
+            let result = try await sdkClient.purchase(package: package)
             if result.userCancelled {
                 throw CommercePurchaseError.purchaseCancelled
             }
@@ -152,7 +152,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         try ensureConfigured()
 
         let customerInfo = try await withTimeout("restore purchases") {
-            try await Purchases.shared.restorePurchases()
+            try await self.sdkClient.restorePurchases()
         }
 
         return RevenueCatSnapshotMapper.makeEntitlement(
@@ -168,6 +168,21 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         }
     }
 
+    private func bindSDKClient() {
+        sdkClient.customerInfoDidChange = { [weak self] customerInfo in
+            guard let self else {
+                return
+            }
+
+            let entitlement = RevenueCatSnapshotMapper.makeEntitlement(
+                from: customerInfo,
+                configuration: self.configuration,
+                logger: self.logger
+            )
+            self.entitlementDidChange?(entitlement)
+        }
+    }
+
     private func resolveOffering() async throws -> Offering {
         if let currentOffering {
             return currentOffering
@@ -179,6 +194,25 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         }
 
         throw CommercePurchaseError.offeringUnavailable
+    }
+
+    private func resolveOffering(from offerings: RevenueCatSDKOfferings) -> Offering? {
+        let current = offerings.current
+        if let current, current.hasConfiguredProducts(configuration: configuration) {
+            return current
+        }
+
+        let configured = offerings.all[configuration.offeringIdentifier]
+        if let configured, configured.hasConfiguredProducts(configuration: configuration) {
+            if let current {
+                logger.notice(
+                    "Current RevenueCat offering id=\(current.identifier) has no configured products. Falling back to configured offering id=\(configured.identifier)."
+                )
+            }
+            return configured
+        }
+
+        return current ?? configured
     }
 
     private func recoverEntitlementAfterInvalidReceipt() async throws -> CommerceEntitlement? {
@@ -223,19 +257,69 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
     }
 }
 
-extension RevenueCatCommerceClient: PurchasesDelegate {
-    nonisolated public func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
-        Task { @MainActor [weak self] in
-            guard let self else {
-                return
-            }
+protocol RevenueCatSDKClient: AnyObject {
+    var cachedCustomerInfo: CustomerInfo? { get }
+    var customerInfoDidChange: ((CustomerInfo) -> Void)? { get set }
 
-            let entitlement = RevenueCatSnapshotMapper.makeEntitlement(
-                from: customerInfo,
-                configuration: self.configuration,
-                logger: self.logger
-            )
-            self.entitlementDidChange?(entitlement)
+    func configure(with configuration: CommerceConfiguration)
+    func offerings() async throws -> RevenueCatSDKOfferings
+    func customerInfo(fetchPolicy: CacheFetchPolicy) async throws -> CustomerInfo
+    func purchase(package: Package) async throws -> PurchaseResultData
+    func restorePurchases() async throws -> CustomerInfo
+}
+
+struct RevenueCatSDKOfferings: Sendable {
+    let current: Offering?
+    let all: [String: Offering]
+}
+
+final class RevenueCatPurchasesSDKClient: NSObject, RevenueCatSDKClient {
+    var customerInfoDidChange: ((CustomerInfo) -> Void)?
+
+    var cachedCustomerInfo: CustomerInfo? {
+        Purchases.shared.cachedCustomerInfo
+    }
+
+    func configure(with configuration: CommerceConfiguration) {
+#if DEBUG
+        Purchases.logLevel = .debug
+#else
+        Purchases.logLevel = .warn
+#endif
+
+        let revenueCatConfiguration = Configuration
+            .builder(withAPIKey: configuration.apiKey)
+            .with(storeKitVersion: .storeKit2)
+            .with(entitlementVerificationMode: .informational)
+            .with(showStoreMessagesAutomatically: configuration.showStoreMessagesAutomatically)
+            .build()
+
+        Purchases.configure(with: revenueCatConfiguration)
+        Purchases.shared.delegate = self
+    }
+
+    func offerings() async throws -> RevenueCatSDKOfferings {
+        let offerings = try await Purchases.shared.offerings()
+        return RevenueCatSDKOfferings(current: offerings.current, all: offerings.all)
+    }
+
+    func customerInfo(fetchPolicy: CacheFetchPolicy) async throws -> CustomerInfo {
+        try await Purchases.shared.customerInfo(fetchPolicy: fetchPolicy)
+    }
+
+    func purchase(package: Package) async throws -> PurchaseResultData {
+        try await Purchases.shared.purchase(package: package)
+    }
+
+    func restorePurchases() async throws -> CustomerInfo {
+        try await Purchases.shared.restorePurchases()
+    }
+}
+
+extension RevenueCatPurchasesSDKClient: PurchasesDelegate {
+    nonisolated func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
+        Task { @MainActor [weak self] in
+            self?.customerInfoDidChange?(customerInfo)
         }
     }
 }
