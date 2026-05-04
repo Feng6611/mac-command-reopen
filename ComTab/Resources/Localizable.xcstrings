@@ -7,7 +7,10 @@
     "%lld" : {
 
     },
-    "2-day free trial, no commitment" : {
+    "⌘" : {
+
+    },
+    "🎉" : {
 
     },
     "About" : {
@@ -34,10 +37,19 @@
     "Best Value" : {
 
     },
+    "Bring minimized windows back when you return to an app with Command-Tab." : {
+
+    },
+    "Buy once, or continue your 2-day trial and decide after using it in your own workflow." : {
+
+    },
     "Cancel" : {
 
     },
     "Command Reopen helped you **%lld times** during your trial." : {
+
+    },
+    "Command Reopen is working" : {
 
     },
     "Command Reopen v%@ (%@)" : {
@@ -52,6 +64,12 @@
       }
     },
     "Contact Developer" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Continue 2-Day Trial" : {
 
     },
     "Count" : {
@@ -78,13 +96,13 @@
     "Get on Mac App Store" : {
 
     },
-    "Get Started" : {
-
-    },
     "GitHub" : {
 
     },
     "Hide All Windows" : {
+
+    },
+    "Keep Command Reopen" : {
 
     },
     "Launch at Login" : {
@@ -96,13 +114,13 @@
     "Manage Subscription" : {
 
     },
+    "Minimize Window" : {
+
+    },
     "Month" : {
 
     },
     "Most often reopened" : {
-
-    },
-    "Never lose your windows again.\nSwitch apps with Cmd+Tab, windows reopen automatically." : {
 
     },
     "No active purchase found on this account." : {
@@ -177,13 +195,22 @@
     "Settings..." : {
 
     },
+    "Skip for Now" : {
+
+    },
     "Start using Command Reopen to see trends" : {
 
     },
     "Support Command Reopen" : {
 
     },
+    "Tab" : {
+
+    },
     "Terms" : {
+
+    },
+    "That was the core trick: when an app is active but its window is gone, Command Reopen brings it back." : {
 
     },
     "The Mac App Store version is the mainline release for ongoing updates and long-term support." : {
@@ -198,10 +225,16 @@
     "Trend" : {
 
     },
+    "Try it once" : {
+
+    },
     "Unavailable" : {
 
     },
     "Upgrade to Pro..." : {
+
+    },
+    "Use the real macOS flow. We'll bring this window back when you return." : {
 
     },
     "View GitHub" : {

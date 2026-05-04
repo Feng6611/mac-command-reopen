@@ -121,6 +121,11 @@ final class ProStatusManager: ObservableObject {
         applyStatus(computeStatus(), source: .stateChange)
     }
 
+    func finishOnboardingWithoutTrial() {
+        defaults[AppDefaults.hasSeenOnboarding] = true
+        applyStatus(computeStatus(), source: .stateChange)
+    }
+
     func refresh() async {
         configureIfNeeded()
 
@@ -174,6 +179,9 @@ final class ProStatusManager: ObservableObject {
                 if !didUnlock {
                     throw ProPurchaseError.activationPending
                 }
+            }
+            if status.isPro {
+                defaults[AppDefaults.hasSeenOnboarding] = true
             }
             paywallSuccessMessage = String(localized: "Purchase successful. Pro unlocked.")
         } catch {

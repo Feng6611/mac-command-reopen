@@ -600,6 +600,71 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
+    @Test("Skipping onboarding marks it seen without resetting the trial")
+    func skipOnboardingMarksSeenWithoutResettingTrial() {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: MockRevenueCatService(),
+            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            now: { now }
+        )
+
+        manager.finishOnboardingWithoutTrial()
+
+        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
+        #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
+    }
+
+    @MainActor
+    @Test("Lifetime purchase marks onboarding seen")
+    func lifetimePurchaseMarksOnboardingSeen() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let mockService = MockRevenueCatService()
+        mockService.purchaseSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            now: { now }
+        )
+
+        try await manager.purchase(.lifetime)
+
+        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil, willRenew: false))
+    }
+
+    @MainActor
+    @Test("Cancelled purchase does not mark onboarding seen")
+    func cancelledPurchaseDoesNotMarkOnboardingSeen() async {
+        let (defaults, suiteName) = makeDefaults()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let mockService = MockRevenueCatService()
+        mockService.purchaseError = ProPurchaseError.purchaseCancelled
+        let manager = ProStatusManager(
+            defaults: defaults,
+            revenueCatService: mockService,
+            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker()
+        )
+
+        await #expect(throws: ProPurchaseError.purchaseCancelled) {
+            try await manager.purchase(.lifetime)
+        }
+
+        #expect(!defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+    }
+
+    @MainActor
     @Test("Pro status manager marks expired trials as inactive")
     func proStatusExpiresTrial() async {
         let (defaults, suiteName) = makeDefaults()
@@ -1319,6 +1384,28 @@ struct AppAccessControllerTests {
 
         #expect(!controller.shouldOpenProSettings)
         #expect(!source.shouldOpenProSettings)
+    }
+}
+
+struct OnboardingSessionModelTests {
+    @MainActor
+    @Test("Onboarding session advances through live test states")
+    func onboardingSessionAdvancesThroughLiveTestStates() {
+        let session = OnboardingSessionModel()
+
+        #expect(session.phase == .welcome)
+        #expect(!session.isWaitingForCommandTabReturn)
+
+        session.moveToTryMinimize()
+        #expect(session.phase == .tryMinimize)
+        #expect(session.isWaitingForCommandTabReturn)
+
+        session.markWindowReturned()
+        #expect(session.phase == .success)
+        #expect(!session.isWaitingForCommandTabReturn)
+
+        session.moveToPaywall()
+        #expect(session.phase == .paywall)
     }
 }
 
