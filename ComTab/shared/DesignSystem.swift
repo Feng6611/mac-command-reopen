@@ -245,12 +245,11 @@ struct MetricTile: View {
         .padding(.vertical, DS.Spacing.sm)
         .background(
             RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous)
-                .fill(tint.opacity(0.06))
+                .fill(Color(nsColor: .controlBackgroundColor))
         )
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous)
-                .strokeBorder(tint.opacity(0.2), lineWidth: 0.5)
+                .strokeBorder(Color(nsColor: .separatorColor).opacity(0.3), lineWidth: 0.5)
         )
     }
 }

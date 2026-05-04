@@ -25,9 +25,6 @@
     "App" : {
 
     },
-    "Are you sure? This cannot be undone." : {
-
-    },
     "Auto-renews annually" : {
 
     },
@@ -41,9 +38,6 @@
 
     },
     "Buy once, or continue your 2-day trial and decide after using it in your own workflow." : {
-
-    },
-    "Cancel" : {
 
     },
     "Command Reopen helped you **%lld times** during your trial." : {
@@ -120,9 +114,6 @@
     "Month" : {
 
     },
-    "Most often reopened" : {
-
-    },
     "No active purchase found on this account." : {
 
     },
@@ -172,15 +163,6 @@
 
     },
     "Requires Pro to enable." : {
-
-    },
-    "Reset" : {
-
-    },
-    "Reset Statistics" : {
-
-    },
-    "Reset Statistics?" : {
 
     },
     "Restore Purchase" : {

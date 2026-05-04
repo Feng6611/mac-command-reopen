@@ -10,11 +10,12 @@ import Foundation
 
 @MainActor
 final class ReopenStatsStore: ObservableObject {
-    struct Snapshot: Codable, Equatable {
+    struct Snapshot: Equatable, Codable {
         var totalSuccessfulReopens: Int
         var perAppCounts: [String: Int]
         var perAppDisplayName: [String: String]
         var dailyCounts: [String: Int]
+        var dailyAppCounts: [String: [String: Int]]?
         var lastUpdatedAt: Date?
 
         static let empty = Snapshot(
@@ -22,6 +23,7 @@ final class ReopenStatsStore: ObservableObject {
             perAppCounts: [:],
             perAppDisplayName: [:],
             dailyCounts: [:],
+            dailyAppCounts: nil,
             lastUpdatedAt: nil
         )
     }
@@ -83,6 +85,30 @@ final class ReopenStatsStore: ObservableObject {
 
     func topApps(_ count: Int = 6) -> [AppStat] {
         Array(appStats.prefix(count))
+    }
+
+    func topApps(_ count: Int = 5, since startDate: Date) -> [AppStat] {
+        let startKey = Self.dayKeyFormatter.string(from: startDate)
+        let dailyAppCounts = snapshot.dailyAppCounts ?? [:]
+        var filtered: [String: Int] = [:]
+        for (dayKey, appCounts) in dailyAppCounts where dayKey >= startKey {
+            for (bundleID, count) in appCounts {
+                filtered[bundleID, default: 0] += count
+            }
+        }
+        return filtered.map { bundleID, count in
+            AppStat(
+                bundleID: bundleID,
+                displayName: snapshot.perAppDisplayName[bundleID] ?? bundleID,
+                count: count
+            )
+        }
+        .sorted { lhs, rhs in
+            if lhs.count != rhs.count { return lhs.count > rhs.count }
+            return lhs.displayName.localizedCaseInsensitiveCompare(rhs.displayName) == .orderedAscending
+        }
+        .prefix(count)
+        .map { $0 }
     }
 
     var maxAppCount: Int {
@@ -171,6 +197,8 @@ final class ReopenStatsStore: ObservableObject {
         }
         let dayKey = Self.dayKeyFormatter.string(from: Date())
         next.dailyCounts[dayKey, default: 0] += 1
+        if next.dailyAppCounts == nil { next.dailyAppCounts = [:] }
+        next.dailyAppCounts![dayKey, default: [:]][normalizedBundleID, default: 0] += 1
         next.lastUpdatedAt = Date()
 
         persist(next)
@@ -208,6 +236,7 @@ final class ReopenStatsStore: ObservableObject {
             perAppCounts: legacySnapshot.perAppCounts,
             perAppDisplayName: legacySnapshot.perAppDisplayName,
             dailyCounts: [:],
+            dailyAppCounts: nil,
             lastUpdatedAt: legacySnapshot.lastUpdatedAt
         )
     }

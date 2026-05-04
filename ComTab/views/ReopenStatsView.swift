@@ -22,11 +22,32 @@ enum StatTimeRange: CaseIterable {
     }
 }
 
+// MARK: - Animating Number
+
+private struct AnimatingNumber: View, Animatable {
+    var value: Double
+    var font: Font
+
+    var animatableData: Double {
+        get { value }
+        set { value = newValue }
+    }
+
+    var body: some View {
+        Text("\(Int(value))")
+            .font(font)
+            .monospacedDigit()
+    }
+}
+
+// MARK: - Main View
+
 struct ReopenStatsView: View {
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
 
     @State private var timeRange: StatTimeRange = .day
-    @State private var showResetConfirmation = false
+    @State private var heroTarget: Double = 0
+    @State private var appeared = false
 
     private var trendData: [(date: Date, count: Int)] {
         switch timeRange {
@@ -50,9 +71,15 @@ struct ReopenStatsView: View {
                 heroSection
                 trendSection
                 topAppsSection
-                resetSection
             }
             .padding(DS.Spacing.xl)
+        }
+        .onAppear {
+            guard !appeared else { return }
+            appeared = true
+            withAnimation(.easeOut(duration: 0.8).delay(0.15)) {
+                heroTarget = Double(reopenStatsStore.totalSuccessfulReopens)
+            }
         }
     }
 
@@ -62,10 +89,12 @@ struct ReopenStatsView: View {
         GroupBox {
             HStack(alignment: .center, spacing: DS.Spacing.lg) {
                 VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                    Text("\(reopenStatsStore.totalSuccessfulReopens)")
-                        .font(DS.Typography.displayHero)
-                        .foregroundStyle(.primary)
-                        .monospacedDigit()
+                    AnimatingNumber(
+                        value: heroTarget,
+                        font: DS.Typography.displayHero
+                    )
+                    .foregroundStyle(.primary)
+
                     Text("total reopens")
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -87,6 +116,9 @@ struct ReopenStatsView: View {
                         tint: .teal
                     )
                 }
+                .opacity(appeared ? 1 : 0)
+                .offset(x: appeared ? 0 : 12)
+                .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -113,29 +145,59 @@ struct ReopenStatsView: View {
                 ZStack {
 #if canImport(Charts)
                     ChartsTrendView(data: trendData, timeRange: timeRange)
-                        .frame(height: 112)
+                        .frame(height: 120)
 #else
                     FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
-                        .frame(height: 112)
+                        .frame(height: 120)
 #endif
 
                     if allZero {
                         EmptyStateView(systemImage: "chart.bar", text: "Start using Command Reopen to see trends")
                     }
                 }
+                .animation(.easeInOut(duration: 0.3), value: timeRange)
             }
         }
         .groupBoxStyle(.dsStats)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
     }
 
     // MARK: - Top Apps
 
+    private var topAppsStartDate: Date {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        switch timeRange {
+        case .day:   return calendar.date(byAdding: .day, value: -30, to: today) ?? today
+        case .week:  return calendar.date(byAdding: .weekOfYear, value: -12, to: today) ?? today
+        case .month: return calendar.date(byAdding: .month, value: -12, to: today) ?? today
+        }
+    }
+
+    private var topAppsForTimeRange: [ReopenStatsStore.AppStat] {
+        let filtered = reopenStatsStore.topApps(5, since: topAppsStartDate)
+        if filtered.isEmpty {
+            return reopenStatsStore.topApps(5)
+        }
+        return filtered
+    }
+
+    private var topAppsSubtitle: String {
+        let filtered = reopenStatsStore.topApps(5, since: topAppsStartDate)
+        if filtered.isEmpty {
+            return "All time"
+        }
+        return timeRangeSubtitle
+    }
+
     private var topAppsSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                SectionHeader(title: "Top Apps", subtitle: "Most often reopened")
+                SectionHeader(title: "Top Apps", subtitle: topAppsSubtitle)
 
-                let topApps = reopenStatsStore.topApps(5)
+                let topApps = topAppsForTimeRange
                 if topApps.isEmpty {
                     EmptyStateView(systemImage: "app.dashed", text: "No reopen activity yet")
                         .frame(height: 58)
@@ -144,37 +206,16 @@ struct ReopenStatsView: View {
                     ChartsTopAppsView(apps: topApps)
                         .frame(height: CGFloat(topApps.count) * 26 + 6)
 #else
-                    FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
+                    FallbackTopAppsView(apps: topApps, maxCount: topApps.first?.count ?? 1)
 #endif
                 }
             }
+            .animation(.easeInOut(duration: 0.3), value: timeRange)
         }
         .groupBoxStyle(.dsStats)
-    }
-
-    // MARK: - Reset
-
-    private var resetSection: some View {
-        HStack {
-            Spacer()
-            Button("Reset Statistics", role: .destructive) {
-                showResetConfirmation = true
-            }
-            .font(.caption)
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(reopenStatsStore.totalSuccessfulReopens == 0)
-            .alert("Reset Statistics?", isPresented: $showResetConfirmation) {
-                Button("Cancel", role: .cancel) {}
-                Button("Reset", role: .destructive) {
-                    reopenStatsStore.reset()
-                }
-            } message: {
-                Text("Are you sure? This cannot be undone.")
-            }
-            Spacer()
-        }
-        .padding(.top, DS.Spacing.xs)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(.easeOut(duration: 0.5).delay(0.35), value: appeared)
     }
 
     private var timeRangeSubtitle: String {
@@ -250,7 +291,7 @@ private struct ChartsTopAppsView: View {
                     y: .value("App", app.displayName)
                 )
                 .foregroundStyle(topAppColor(at: index))
-                .cornerRadius(4)
+                .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 .annotation(position: .trailing, alignment: .leading, spacing: 4) {
                     Text("\(app.count)")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
@@ -268,13 +309,10 @@ private struct ChartsTopAppsView: View {
         .chartXAxis(.hidden)
     }
 
+    private static let barColors: [Color] = [.purple, .blue, .teal, .orange, .pink, .indigo]
+
     private func topAppColor(at index: Int) -> Color {
-        switch index {
-        case 0:     return .accentColor
-        case 1:     return .blue.opacity(0.82)
-        case 2:     return .teal.opacity(0.78)
-        default:    return .secondary.opacity(0.55)
-        }
+        Self.barColors[index % Self.barColors.count]
     }
 }
 #endif
@@ -380,12 +418,9 @@ private struct FallbackTopAppsView: View {
         return max(4, CGFloat(count) / CGFloat(maxCount) * totalWidth)
     }
 
+    private static let barColors: [Color] = [.purple, .blue, .teal, .orange, .pink, .indigo]
+
     private func fallbackTopAppColor(at index: Int) -> Color {
-        switch index {
-        case 0:     return .accentColor
-        case 1:     return .blue.opacity(0.82)
-        case 2:     return .teal.opacity(0.78)
-        default:    return .secondary.opacity(0.55)
-        }
+        Self.barColors[index % Self.barColors.count]
     }
 }
