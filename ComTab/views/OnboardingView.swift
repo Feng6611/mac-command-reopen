@@ -29,7 +29,7 @@ struct OnboardingView: View {
             Spacer().frame(height: DS.Spacing.sm)
 
             Text("Never lose your windows again.\nSwitch apps with Cmd+Tab, windows reopen automatically.")
-                .font(DS.Typography.body)
+                .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(2)
@@ -47,13 +47,13 @@ struct OnboardingView: View {
                 )
                 onboardingFeature(
                     icon: "hand.raised",
-                    color: .orange,
+                    color: .accentColor,
                     title: "Per-App Control",
                     description: "Exclude specific apps that you don't want to auto-reopen."
                 )
                 onboardingFeature(
                     icon: "chart.bar",
-                    color: .purple,
+                    color: .accentColor,
                     title: "Usage Insights",
                     description: "Track how often Command Reopen helps you across different apps."
                 )
@@ -66,14 +66,14 @@ struct OnboardingView: View {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "gift.fill")
                     .foregroundStyle(Color.accentColor)
-                    .font(DS.Typography.bodyLarge)
+                    .font(.headline)
                 Text("2-day free trial, no commitment")
                     .font(DS.Typography.bodyMedium)
             }
             .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, DS.Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous)
                     .fill(DS.Colors.accentTintSubtle)
             )
 
@@ -98,7 +98,7 @@ struct OnboardingView: View {
     private func onboardingFeature(icon: String, color: Color, title: String, description: String) -> some View {
         HStack(alignment: .top, spacing: 14) {
             ZStack {
-                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous)
                     .fill(color.opacity(0.1))
                     .frame(width: 36, height: 36)
                 Image(systemName: icon)
@@ -113,6 +113,7 @@ struct OnboardingView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .lineSpacing(1)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

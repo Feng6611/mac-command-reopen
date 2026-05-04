@@ -132,7 +132,7 @@ struct UpgradeCardView: View {
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.orange)
                     Text("Command Reopen helped you **\(reopenStatsStore.totalSuccessfulReopens) times** during your trial.")
-                        .font(DS.Typography.caption)
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal, DS.Spacing.xl)
@@ -151,7 +151,7 @@ struct UpgradeCardView: View {
 
             if let paywallErrorMessage = proStatusManager.paywallErrorMessage {
                 Text(paywallErrorMessage)
-                    .font(DS.Typography.caption)
+                    .font(.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, DS.Spacing.xl)
@@ -165,7 +165,7 @@ struct UpgradeCardView: View {
             footerLinks
                 .padding(.bottom, DS.Spacing.lg)
         }
-        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
         .dsCard()
         .task {
             isLoadingOfferings = true
@@ -193,7 +193,7 @@ struct UpgradeCardView: View {
                 Text("Reopen Pro")
                     .font(DS.Typography.headlineMedium)
                 Text(statusSubtitle)
-                    .font(DS.Typography.caption)
+                    .font(.caption)
                     .foregroundColor(statusSubtitleColor)
             }
             Spacer(minLength: 0)
@@ -254,25 +254,10 @@ struct UpgradeCardView: View {
                     Text(product.title)
                         .font(DS.Typography.bodyMedium)
                     if let badge = product.badge {
-                        Text(badge)
-                            .font(DS.Typography.microSemibold)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, DS.Spacing.xxs)
-                            .background(
-                                Capsule().fill(
-                                    LinearGradient(
-                                        colors: [.accentColor, Color.accentColor.opacity(0.7)],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                            )
+                        StatusPill(text: badge, tone: .accent)
                     }
                     if !product.isAvailable {
-                        Text("Unavailable")
-                            .font(DS.Typography.microSemibold)
-                            .foregroundColor(.secondary)
+                        StatusPill(text: "Unavailable", tone: .neutral)
                     }
                 }
 
@@ -290,11 +275,11 @@ struct UpgradeCardView: View {
             .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, DS.Spacing.md)
             .background(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                     .fill(isSelected ? DS.Colors.accentTintSubtle : Color(nsColor: .controlBackgroundColor))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                     .stroke(
                         isSelected ? Color.accentColor.opacity(0.5) : DS.Colors.cardBorder,
                         lineWidth: isSelected ? 1.5 : 1
@@ -319,7 +304,7 @@ struct UpgradeCardView: View {
                     Image(systemName: "lock.open.fill")
                         .font(.system(size: 12))
                 }
-                Text(ctaText).font(DS.Typography.bodyLarge)
+                Text(ctaText).font(.headline)
 
                 if isLoadingOfferings {
                     ProgressView()
@@ -331,7 +316,7 @@ struct UpgradeCardView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 40)
             .background(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                     .fill(LinearGradient(
                         colors: ctaGradientColors,
                         startPoint: .leading,
@@ -352,20 +337,20 @@ struct UpgradeCardView: View {
                 Task { await restorePurchases() }
             }
             .buttonStyle(.link)
-            .font(DS.Typography.caption)
+            .font(.caption)
             .disabled(isBusy)
 
             DSDotSeparator()
 
             Button("Terms") { openExternalURL(ExternalLinks.termsURL) }
                 .buttonStyle(.link)
-                .font(DS.Typography.caption)
+                .font(.caption)
 
             DSDotSeparator()
 
             Button("Privacy") { openExternalURL(ExternalLinks.privacyURL) }
                 .buttonStyle(.link)
-                .font(DS.Typography.caption)
+                .font(.caption)
         }
     }
 
@@ -436,9 +421,10 @@ struct ProStatusBadgeView: View {
                     .padding(.horizontal, DS.Spacing.xl)
                     .padding(.top, DS.Spacing.xl)
                     .padding(.bottom, DS.Spacing.lg)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(DS.Colors.accentTintSubtle)
 
                 Divider()
-                    .padding(.horizontal, DS.Spacing.lg)
 
                 metadataSection
                     .padding(.horizontal, DS.Spacing.xl)
@@ -480,18 +466,11 @@ struct ProStatusBadgeView: View {
                     Text("Pro")
                         .font(DS.Typography.headlineMedium)
 
-                    Text(plan == .lifetime ? "Lifetime" : "Yearly")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, DS.Spacing.sm)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule().fill(DS.Colors.proFill)
-                        )
+                    StatusPill(text: plan == .lifetime ? "Lifetime" : "Yearly", tone: .accent)
                 }
 
                 Text("All features unlocked — thank you for your support.")
-                    .font(DS.Typography.caption)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
 
@@ -519,7 +498,7 @@ struct ProStatusBadgeView: View {
                 .frame(width: 86, alignment: .leading)
 
             Text(value)
-                .font(DS.Typography.bodySmall)
+                .font(.callout)
                 .foregroundColor(.primary)
 
             Spacer()
@@ -555,30 +534,33 @@ struct ProStatusBadgeView: View {
 private struct ProLetterView: View {
     let displayState: ProDisplayState
 
+    private enum LetterFont {
+        static let label     = Font.system(size: 12, weight: .semibold)
+        static let headline  = Font.system(size: 18, weight: .regular)
+        static let body      = Font.body
+        static let signature = Font.system(size: 14, weight: .medium)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.lg) {
-            // Small caps label
             Text(labelText)
-                .font(DS.Typography.letterLabel)
+                .font(LetterFont.label)
                 .tracking(0.8)
                 .foregroundColor(.accentColor.opacity(0.55))
 
-            // Editorial headline
             Text(headline)
-                .font(DS.Typography.letterHeadline)
+                .font(LetterFont.headline)
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            // Body — relaxed, lighter
             Text(bodyText)
-                .font(DS.Typography.letterBody)
+                .font(LetterFont.body)
                 .foregroundColor(.primary.opacity(0.62))
                 .lineSpacing(4)
                 .fixedSize(horizontal: false, vertical: true)
 
-            // Signature — medium, distinct from body
             Text(signature)
-                .font(DS.Typography.letterSignature)
+                .font(LetterFont.signature)
                 .foregroundColor(.primary.opacity(0.5))
                 .padding(.top, DS.Spacing.xxs)
         }
@@ -663,11 +645,11 @@ struct ProSectionView: View {
             .padding(.vertical, DS.Spacing.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                     .fill(Color(nsColor: .systemGreen).opacity(0.09))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                     .stroke(Color(nsColor: .systemGreen).opacity(0.18), lineWidth: 1)
             )
     }
@@ -683,7 +665,7 @@ struct ProSectionView: View {
             .pickerStyle(.segmented)
 
             Text("Temporary UI state preview only")
-                .font(DS.Typography.caption)
+                .font(.caption)
                 .foregroundColor(.secondary)
 
             Button("Trigger Onboarding") {

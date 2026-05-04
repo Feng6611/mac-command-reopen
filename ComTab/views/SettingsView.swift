@@ -23,7 +23,7 @@ enum SettingsTab: Int, CaseIterable {
     func title(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "General"
-        case .statistics: return "Statistics"
+        case .statistics: return "Stats"
         case .pro:
             switch distributionChannel {
             case .appStore: return "Pro"
@@ -75,7 +75,7 @@ struct SettingsView: View {
                 .tag(SettingsTab.pro)
             }
         }
-        .frame(width: DS.Settings.windowWidth, height: DS.Settings.windowHeight)
+        .frame(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
         .task {
             await accessController.refresh()
         }
@@ -125,9 +125,9 @@ struct ProTabContent: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             ProSectionView()
-                .padding(.vertical, DS.Spacing.lg)
+                .padding(.vertical, DS.Spacing.xl)
         }
-        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.horizontal, DS.Spacing.xl)
     }
 }
 #else
@@ -136,10 +136,10 @@ struct DirectSupportTabContent: View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: DS.Spacing.lg) {
                 supportCard
-                    .padding(.top, DS.Spacing.lg)
+                    .padding(.top, DS.Spacing.xl)
             }
         }
-        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.horizontal, DS.Spacing.xl)
     }
 
     private var supportCard: some View {
@@ -157,7 +157,7 @@ struct DirectSupportTabContent: View {
                     Text("Support Command Reopen")
                         .font(DS.Typography.headlineMedium)
                     Text("The Mac App Store version is the mainline release for ongoing updates and long-term support.")
-                        .font(DS.Typography.caption)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
 
@@ -207,7 +207,7 @@ struct DirectSupportTabContent: View {
             .padding(.horizontal, DS.Spacing.lg)
             .padding(.vertical, DS.Spacing.sm)
         }
-        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
         .dsCard()
     }
 
@@ -226,7 +226,7 @@ private struct DirectSupportPoint: View {
             Text(title)
                 .font(DS.Typography.bodyMedium)
             Text(description)
-                .font(DS.Typography.caption)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -276,31 +276,16 @@ struct SettingsTabContent: View {
     var body: some View {
         Form {
             Section {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
-                            .disabled(isFeatureLocked)
-                        if isFeatureLocked {
-                            Spacer()
-                            HStack(spacing: 3) {
-                                Image(systemName: "lock.fill")
-                                    .font(.system(size: 8, weight: .semibold))
-                                Text("Pro")
-                                    .font(.system(size: 10, weight: .semibold))
-                            }
-                            .foregroundColor(.accentColor)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(
-                                Capsule().fill(DS.Colors.accentTint)
-                            )
-                        }
-                    }
-                    Text("Automatically reopen windows when switching apps via Cmd+Tab")
-                        .font(DS.Typography.caption)
-                        .foregroundColor(.secondary)
-                }
+                Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
+                    .disabled(isFeatureLocked)
                 LaunchAtLogin.Toggle("Launch at Login")
+            } footer: {
+                if isFeatureLocked {
+                    Text("Requires Pro to enable.")
+                        .foregroundStyle(Color.accentColor)
+                } else {
+                    Text("Automatically reopen windows when switching apps via Cmd+Tab")
+                }
             }
 
             Section {
@@ -361,43 +346,21 @@ struct SettingsTabContent: View {
             .opacity(isFeatureLocked ? 0.5 : 1)
 
             Section {
-                Button {
-                    openURL(ExternalLinks.contactEmail)
-                } label: {
-                    Label("Contact Developer", systemImage: "envelope")
-                }
-                .buttonStyle(.link)
+                Button("Contact Developer") { openURL(ExternalLinks.contactEmail) }
+                    .buttonStyle(.link)
 
                 switch distributionChannel {
                 case .appStore:
-                    Button {
-                        openURL(ExternalLinks.officialURL)
-                    } label: {
-                        Label("Official Website", systemImage: "globe")
-                    }
-                    .buttonStyle(.link)
-
-                    Button {
-                        requestReview()
-                    } label: {
-                        Label("Rate on App Store", systemImage: "star.fill")
-                    }
-                    .buttonStyle(.link)
+                    Button("Official Website") { openURL(ExternalLinks.officialURL) }
+                        .buttonStyle(.link)
+                    Button("Rate on App Store") { requestReview() }
+                        .buttonStyle(.link)
 
                 case .direct:
-                    Button {
-                        openURL(AppStoreLinks.productURL)
-                    } label: {
-                        Label("Get on Mac App Store", systemImage: "bag")
-                    }
-                    .buttonStyle(.link)
-
-                    Button {
-                        openURL(ExternalLinks.githubURL)
-                    } label: {
-                        Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                    .buttonStyle(.link)
+                    Button("Get on Mac App Store") { openURL(AppStoreLinks.productURL) }
+                        .buttonStyle(.link)
+                    Button("GitHub") { openURL(ExternalLinks.githubURL) }
+                        .buttonStyle(.link)
                 }
             } header: {
                 Text("Feedback & Support")

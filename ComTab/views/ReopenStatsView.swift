@@ -2,8 +2,6 @@
 //  ReopenStatsView.swift
 //  ComTab
 //
-//  Created by CHEN on 2026/3/28.
-//
 
 import SwiftUI
 #if canImport(Charts)
@@ -17,12 +15,9 @@ enum StatTimeRange: CaseIterable {
 
     var title: String {
         switch self {
-        case .day:
-            return String(localized: "Day")
-        case .week:
-            return String(localized: "Week")
-        case .month:
-            return String(localized: "Month")
+        case .day:   return String(localized: "Day")
+        case .week:  return String(localized: "Week")
+        case .month: return String(localized: "Month")
         }
     }
 }
@@ -35,12 +30,9 @@ struct ReopenStatsView: View {
 
     private var trendData: [(date: Date, count: Int)] {
         switch timeRange {
-        case .day:
-            return reopenStatsStore.dailyStats(last: 30)
-        case .week:
-            return reopenStatsStore.weeklyStats(last: 12)
-        case .month:
-            return reopenStatsStore.monthlyStats(last: 12)
+        case .day:   return reopenStatsStore.dailyStats(last: 30)
+        case .week:  return reopenStatsStore.weeklyStats(last: 12)
+        case .month: return reopenStatsStore.monthlyStats(last: 12)
         }
     }
 
@@ -54,149 +46,113 @@ struct ReopenStatsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: DS.Spacing.md) {
+            VStack(spacing: DS.Spacing.lg) {
                 heroSection
                 trendSection
                 topAppsSection
                 resetSection
             }
-            .padding(DS.Spacing.md)
+            .padding(DS.Spacing.xl)
         }
-        .background(statsBackground)
     }
 
-    private var statsBackground: some View {
-        Color(nsColor: .controlBackgroundColor).opacity(0.22)
-    }
+    // MARK: - Hero
 
     private var heroSection: some View {
-        HStack(alignment: .center, spacing: DS.Spacing.lg) {
-            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text("\(reopenStatsStore.totalSuccessfulReopens)")
-                    .font(DS.Typography.displayLarge)
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-                Text("total reopens")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer(minLength: DS.Spacing.md)
-
-            HStack(spacing: DS.Spacing.sm) {
-                metricTile(
-                    title: "Today",
-                    value: "\(reopenStatsStore.todayCount)",
-                    systemImage: "sun.max.fill",
-                    tint: .orange
-                )
-                metricTile(
-                    title: "Active",
-                    value: "\(activeDaysInLast30)d",
-                    systemImage: "calendar",
-                    tint: .teal
-                )
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(DS.Spacing.md)
-        .statsPanel(tint: .accentColor.opacity(0.07))
-    }
-
-    private func metricTile(title: String, value: String, systemImage: String, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-            Image(systemName: systemImage)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(tint)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text(value)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .monospacedDigit()
-                Text(title)
-                    .font(DS.Typography.microSemibold)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .frame(minWidth: 58, alignment: .leading)
-        .padding(.horizontal, DS.Spacing.sm)
-        .padding(.vertical, DS.Spacing.xs)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
-                .strokeBorder(tint.opacity(0.18), lineWidth: 1)
-        )
-    }
-
-    private var trendSection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            HStack {
+        GroupBox {
+            HStack(alignment: .center, spacing: DS.Spacing.lg) {
                 VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                    Text("Trend")
-                        .font(.system(size: 12, weight: .semibold))
+                    Text("\(reopenStatsStore.totalSuccessfulReopens)")
+                        .font(DS.Typography.displayHero)
                         .foregroundStyle(.primary)
-                    Text(timeRangeSubtitle)
-                        .font(DS.Typography.micro)
+                        .monospacedDigit()
+                    Text("total reopens")
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
-                Picker("", selection: $timeRange) {
-                    ForEach(StatTimeRange.allCases, id: \.self) { range in
-                        Text(range.title).tag(range)
+
+                Spacer(minLength: DS.Spacing.md)
+
+                HStack(spacing: DS.Spacing.sm) {
+                    MetricTile(
+                        title: "Today",
+                        value: "\(reopenStatsStore.todayCount)",
+                        systemImage: "sun.max.fill",
+                        tint: .orange
+                    )
+                    MetricTile(
+                        title: "Active",
+                        value: "\(activeDaysInLast30)d",
+                        systemImage: "calendar",
+                        tint: .teal
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .groupBoxStyle(.dsStats)
+    }
+
+    // MARK: - Trend
+
+    private var trendSection: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                SectionHeader(title: "Trend", subtitle: timeRangeSubtitle) {
+                    Picker("", selection: $timeRange) {
+                        ForEach(StatTimeRange.allCases, id: \.self) { range in
+                            Text(range.title).tag(range)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 132)
+                }
+
+                let allZero = trendData.allSatisfy { $0.count == 0 }
+
+                ZStack {
+#if canImport(Charts)
+                    ChartsTrendView(data: trendData, timeRange: timeRange)
+                        .frame(height: 112)
+#else
+                    FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
+                        .frame(height: 112)
+#endif
+
+                    if allZero {
+                        EmptyStateView(systemImage: "chart.bar", text: "Start using Command Reopen to see trends")
                     }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 132)
             }
+        }
+        .groupBoxStyle(.dsStats)
+    }
 
-            let allZero = trendData.allSatisfy { $0.count == 0 }
+    // MARK: - Top Apps
 
-            ZStack {
+    private var topAppsSection: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                SectionHeader(title: "Top Apps", subtitle: "Most often reopened")
+
+                let topApps = reopenStatsStore.topApps(5)
+                if topApps.isEmpty {
+                    EmptyStateView(systemImage: "app.dashed", text: "No reopen activity yet")
+                        .frame(height: 58)
+                } else {
 #if canImport(Charts)
-                ChartsTrendView(data: trendData, timeRange: timeRange)
-                    .frame(height: 112)
+                    ChartsTopAppsView(apps: topApps)
+                        .frame(height: CGFloat(topApps.count) * 26 + 6)
 #else
-                FallbackTrendView(data: trendData, maxCount: trendMaxCount, timeRange: timeRange)
-                    .frame(height: 112)
+                    FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
 #endif
-
-                if allZero {
-                    emptyState(systemImage: "chart.bar", text: "Start using Command Reopen to see trends")
                 }
             }
         }
-        .padding(DS.Spacing.md)
-        .statsPanel(tint: .blue.opacity(0.04))
+        .groupBoxStyle(.dsStats)
     }
 
-    private var topAppsSection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text("Top Apps")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.primary)
-                Text("Most often reopened")
-                    .font(DS.Typography.micro)
-                    .foregroundStyle(.secondary)
-            }
-
-            let topApps = reopenStatsStore.topApps(5)
-            if topApps.isEmpty {
-                emptyState(systemImage: "app.dashed", text: "No reopen activity yet")
-                    .frame(height: 58)
-            } else {
-#if canImport(Charts)
-                ChartsTopAppsView(apps: topApps)
-                    .frame(height: CGFloat(topApps.count) * 26 + 6)
-#else
-                FallbackTopAppsView(apps: topApps, maxCount: reopenStatsStore.maxAppCount)
-#endif
-            }
-        }
-        .padding(DS.Spacing.md)
-        .statsPanel(tint: .teal.opacity(0.04))
-    }
+    // MARK: - Reset
 
     private var resetSection: some View {
         HStack {
@@ -204,7 +160,7 @@ struct ReopenStatsView: View {
             Button("Reset Statistics", role: .destructive) {
                 showResetConfirmation = true
             }
-            .font(DS.Typography.caption)
+            .font(.caption)
             .buttonStyle(.bordered)
             .controlSize(.small)
             .disabled(reopenStatsStore.totalSuccessfulReopens == 0)
@@ -221,30 +177,16 @@ struct ReopenStatsView: View {
         .padding(.top, DS.Spacing.xs)
     }
 
-    private func emptyState(systemImage: String, text: String) -> some View {
-        VStack(spacing: DS.Spacing.xs) {
-            Image(systemName: systemImage)
-                .font(.system(size: 18))
-                .foregroundStyle(.secondary.opacity(0.48))
-            Text(text)
-                .font(DS.Typography.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
-    }
-
     private var timeRangeSubtitle: String {
         switch timeRange {
-        case .day:
-            return "Last 30 days"
-        case .week:
-            return "Last 12 weeks"
-        case .month:
-            return "Last 12 months"
+        case .day:   return "Last 30 days"
+        case .week:  return "Last 12 weeks"
+        case .month: return "Last 12 months"
         }
     }
 }
+
+// MARK: - Charts Trend
 
 #if canImport(Charts)
 private struct ChartsTrendView: View {
@@ -280,26 +222,22 @@ private struct ChartsTrendView: View {
 
     private var calendarUnit: Calendar.Component {
         switch timeRange {
-        case .day:
-            return .day
-        case .week:
-            return .weekOfYear
-        case .month:
-            return .month
+        case .day:   return .day
+        case .week:  return .weekOfYear
+        case .month: return .month
         }
     }
 
     private var xAxisFormat: Date.FormatStyle {
         switch timeRange {
-        case .day:
-            return .dateTime.month(.abbreviated).day()
-        case .week:
-            return .dateTime.month(.abbreviated).day()
-        case .month:
-            return .dateTime.month(.abbreviated)
+        case .day:   return .dateTime.month(.abbreviated).day()
+        case .week:  return .dateTime.month(.abbreviated).day()
+        case .month: return .dateTime.month(.abbreviated)
         }
     }
 }
+
+// MARK: - Charts Top Apps
 
 private struct ChartsTopAppsView: View {
     let apps: [ReopenStatsStore.AppStat]
@@ -324,7 +262,7 @@ private struct ChartsTopAppsView: View {
             AxisMarks { _ in
                 AxisValueLabel()
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.primary)
             }
         }
         .chartXAxis(.hidden)
@@ -332,18 +270,16 @@ private struct ChartsTopAppsView: View {
 
     private func topAppColor(at index: Int) -> Color {
         switch index {
-        case 0:
-            return .accentColor
-        case 1:
-            return .blue.opacity(0.82)
-        case 2:
-            return .teal.opacity(0.78)
-        default:
-            return .secondary.opacity(0.55)
+        case 0:     return .accentColor
+        case 1:     return .blue.opacity(0.82)
+        case 2:     return .teal.opacity(0.78)
+        default:    return .secondary.opacity(0.55)
         }
     }
 }
 #endif
+
+// MARK: - Fallback Trend
 
 private struct FallbackTrendView: View {
     let data: [(date: Date, count: Int)]
@@ -400,6 +336,8 @@ private struct FallbackTrendView: View {
     }
 }
 
+// MARK: - Fallback Top Apps
+
 private struct FallbackTopAppsView: View {
     let apps: [ReopenStatsStore.AppStat]
     let maxCount: Int
@@ -410,11 +348,12 @@ private struct FallbackTopAppsView: View {
                 HStack(spacing: DS.Spacing.sm) {
                     Text("\(index + 1)")
                         .font(DS.Typography.microSemibold)
-                        .foregroundColor(fallbackTopAppColor(at: index))
+                        .foregroundColor(.secondary)
                         .frame(width: 14, alignment: .leading)
 
                     Text(app.displayName)
                         .font(.system(size: 11))
+                        .foregroundColor(.primary)
                         .frame(width: 78, alignment: .leading)
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -443,30 +382,10 @@ private struct FallbackTopAppsView: View {
 
     private func fallbackTopAppColor(at index: Int) -> Color {
         switch index {
-        case 0:
-            return .accentColor
-        case 1:
-            return .blue.opacity(0.82)
-        case 2:
-            return .teal.opacity(0.78)
-        default:
-            return .secondary.opacity(0.55)
+        case 0:     return .accentColor
+        case 1:     return .blue.opacity(0.82)
+        case 2:     return .teal.opacity(0.78)
+        default:    return .secondary.opacity(0.55)
         }
-    }
-}
-
-private extension View {
-    func statsPanel(tint: Color) -> some View {
-        self
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous))
-            .background(
-                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
-                    .fill(tint)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: DS.Radius.smMd, style: .continuous)
-                    .strokeBorder(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
     }
 }
