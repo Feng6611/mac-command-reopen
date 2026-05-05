@@ -34,17 +34,6 @@
     "Command Reopen helped you **%lld times** during your trial." : {
 
     },
-    "Command Reopen v%@ (%@)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen v%1$@ (%2$@)"
-          }
-        }
-      }
-    },
     "Contact Developer" : {
 
     },

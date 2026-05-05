@@ -77,6 +77,7 @@ final class ActivationMonitor: ObservableObject {
          reopenStatsStore: ReopenStatsStore? = nil,
          accessController: FeatureAvailabilityProviding? = nil,
          windowInfoProvider: WindowInfoListing = CoreGraphicsWindowInfoProvider()) {
+        AppDefaults.migrateLegacyKeys(in: defaults)
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults

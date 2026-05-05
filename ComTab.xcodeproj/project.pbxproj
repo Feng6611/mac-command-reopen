@@ -42,7 +42,6 @@
 		748FCE2D2EB5027D0099C190 /* ComTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE372EB5027D0099C190 /* ComTabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ComTabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/BuildNumber.xcconfig; sourceTree = SOURCE_ROOT; };
-		7A0A1E042F1A00010099C190 /* scripts/auto_increment_build_number.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = scripts/auto_increment_build_number.sh; sourceTree = SOURCE_ROOT; };
 		9B1000022F2000010099C190 /* Command Reopen Direct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen Direct.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -105,8 +104,6 @@
 		748FCE122EB5027A0099C190 = {
 			isa = PBXGroup;
 			children = (
-				7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */,
-				7A0A1E042F1A00010099C190 /* scripts/auto_increment_build_number.sh */,
 				748FCE1D2EB5027B0099C190 /* ComTab */,
 				748FCE302EB5027D0099C190 /* ComTabTests */,
 				748FCE3A2EB5027D0099C190 /* ComTabUITests */,

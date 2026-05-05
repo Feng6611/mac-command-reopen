@@ -25,10 +25,16 @@ final class SettingsNavigationModel: ObservableObject {
 final class SettingsWindowController {
     static let shared = SettingsWindowController()
 
+    private var openSettingsAction: (() -> Void)?
+
     var isVisible: Bool {
         NSApp.windows.contains { window in
             window.isVisible && window.title == "Settings"
         }
+    }
+
+    func installOpenSettingsAction(_ action: @escaping () -> Void) {
+        openSettingsAction = action
     }
 
     func prepareForSettingsScene(
@@ -52,6 +58,25 @@ final class SettingsWindowController {
         initialTab: SettingsTab = .general
     ) {
         prepareForSettingsScene(accessController: accessController, initialTab: initialTab)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        if let openSettingsAction {
+            openSettingsAction()
+        } else {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
+    }
+}
+
+@available(macOS 14.0, *)
+struct SettingsOpenActionInstaller: View {
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        Color.clear
+            .frame(width: 0, height: 0)
+            .onAppear {
+                SettingsWindowController.shared.installOpenSettingsAction {
+                    openSettings()
+                }
+            }
     }
 }

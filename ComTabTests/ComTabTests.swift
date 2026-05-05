@@ -206,7 +206,7 @@ struct ComTabTests {
         )
 
         #expect(monitor.userExcludedBundleIDs.contains("com.apple.finder"))
-        #expect(defaults.stringArray(forKey: "com.comtab.excludedBundleIDs")?.contains("com.apple.finder") == true)
+        #expect(defaults.stringArray(forKey: AppDefaults.RawKey.excludedBundleIDs)?.contains("com.apple.finder") == true)
     }
 
     @MainActor
@@ -215,7 +215,7 @@ struct ComTabTests {
         let suiteName = UUID().uuidString
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        defaults.set(["com.apple.TextEdit"], forKey: "com.comtab.excludedBundleIDs")
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.RawKey.excludedBundleIDs)
 
         let monitor = ActivationMonitor(
             notificationCenter: NotificationCenter(),
@@ -229,13 +229,40 @@ struct ComTabTests {
     }
 
     @MainActor
+    @Test("Activation monitor migrates legacy dotted Defaults keys")
+    func activationMonitorMigratesLegacyDefaultsKeys() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(false, forKey: AppDefaults.LegacyRawKey.featureEnabled)
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.LegacyRawKey.excludedBundleIDs)
+        defaults.set(true, forKey: AppDefaults.LegacyRawKey.defaultExcludedBundlesMigrated)
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(!monitor.isFeatureEnabled)
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit"])
+        #expect(defaults.object(forKey: AppDefaults.RawKey.featureEnabled) as? Bool == false)
+        #expect(defaults.stringArray(forKey: AppDefaults.RawKey.excludedBundleIDs) == ["com.apple.TextEdit"])
+        #expect(defaults.object(forKey: AppDefaults.RawKey.defaultExcludedBundlesMigrated) as? Bool == true)
+        #expect(defaults.object(forKey: AppDefaults.LegacyRawKey.featureEnabled) == nil)
+        #expect(defaults.object(forKey: AppDefaults.LegacyRawKey.excludedBundleIDs) == nil)
+    }
+
+    @MainActor
     @Test("Activation monitor does not re-add Finder after migration completes")
     func activationMonitorDoesNotReAddFinderAfterMigration() {
         let suiteName = UUID().uuidString
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }
-        defaults.set(["com.apple.TextEdit"], forKey: "com.comtab.excludedBundleIDs")
-        defaults.set(true, forKey: "com.comtab.defaultExcludedBundlesMigrated")
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.RawKey.excludedBundleIDs)
+        defaults.set(true, forKey: AppDefaults.RawKey.defaultExcludedBundlesMigrated)
 
         let monitor = ActivationMonitor(
             notificationCenter: NotificationCenter(),
@@ -567,7 +594,7 @@ struct ProStatusManagerTests {
 
         let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
         #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date == now)
         #expect(!manager.shouldOpenProSettings)
     }
 
@@ -584,13 +611,13 @@ struct ProStatusManagerTests {
             now: { now }
         )
 
-        #expect(!defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(!defaults.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding))
+        #expect(defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date == now)
 
         await manager.startTrial()
 
-        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(defaults.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding))
+        #expect(defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date == now)
         let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
         #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
     }
@@ -610,8 +637,8 @@ struct ProStatusManagerTests {
 
         manager.finishOnboardingWithoutTrial()
 
-        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(defaults.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding))
+        #expect(defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date == now)
         let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
         #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
     }
@@ -633,7 +660,7 @@ struct ProStatusManagerTests {
 
         try await manager.purchase(.lifetime)
 
-        #expect(defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(defaults.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding))
         #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil, willRenew: false))
     }
 
@@ -654,7 +681,7 @@ struct ProStatusManagerTests {
             try await manager.purchase(.lifetime)
         }
 
-        #expect(!defaults.bool(forKey: "com.comtab.hasSeenOnboarding"))
+        #expect(!defaults.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding))
     }
 
     @MainActor
@@ -664,7 +691,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -685,7 +712,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-((24 * 60 * 60) + 1)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-((24 * 60 * 60) + 1)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -705,7 +732,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(2 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(2 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -725,7 +752,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let mockService = MockCommerceClient()
         mockService.cachedEntitlement = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
@@ -781,7 +808,7 @@ struct ProStatusManagerTests {
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let mockService = MockCommerceClient()
         mockService.cachedEntitlement = .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
@@ -999,7 +1026,7 @@ struct ProStatusManagerTests {
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let mockService = MockCommerceClient()
         mockService.purchaseEntitlement = nil
@@ -1028,7 +1055,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let mockService = MockCommerceClient()
         mockService.purchaseEntitlement = nil
@@ -1056,8 +1083,8 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(true, forKey: AppDefaults.RawKey.hasSeenOnboarding)
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -1082,7 +1109,7 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
+        defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: AppDefaults.RawKey.trialStartDate)
 
         let manager = ProStatusManager(
             defaults: defaults,
@@ -1102,7 +1129,7 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+        defaults.set(true, forKey: AppDefaults.RawKey.hasSeenOnboarding)
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
@@ -1116,7 +1143,7 @@ struct ProStatusManagerTests {
         let expectedExpiresAt = now.addingTimeInterval(2 * 24 * 60 * 60)
         #expect(manager.status == .trial(daysRemaining: 2, expiresAt: expectedExpiresAt))
         #expect(!manager.shouldOpenProSettings)
-        #expect(defaults.object(forKey: "com.comtab.trialStartDate") as? Date == now)
+        #expect(defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date == now)
     }
 
     @MainActor
@@ -1125,7 +1152,7 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+        defaults.set(true, forKey: AppDefaults.RawKey.hasSeenOnboarding)
 
         let mockService = MockCommerceClient()
         mockService.entitlementError = CommercePurchaseError.network
@@ -1189,7 +1216,7 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+        defaults.set(true, forKey: AppDefaults.RawKey.hasSeenOnboarding)
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let purchaseDate = now.addingTimeInterval(-(30 * 24 * 60 * 60))
@@ -1224,7 +1251,7 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
+        defaults.set(true, forKey: AppDefaults.RawKey.hasSeenOnboarding)
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
 

@@ -61,6 +61,7 @@ final class ProStatusManager: ObservableObject {
         commerceClient: (any CommerceClient)? = nil,
         now: @escaping () -> Date = Date.init
     ) {
+        AppDefaults.migrateLegacyKeys(in: defaults)
         let client = commerceClient ?? RevenueCatCommerceClient(
             configuration: RevenueCatConfiguration.commerceConfiguration
         )

@@ -23,8 +23,18 @@ struct ComTabApp: App {
             StatusBarMenu()
                 .environmentObject(activationMonitor)
                 .environmentObject(accessController)
+                .background {
+                    if #available(macOS 14.0, *) {
+                        SettingsOpenActionInstaller()
+                    }
+                }
         } label: {
             Image(systemName: "command")
+                .background {
+                    if #available(macOS 14.0, *) {
+                        SettingsOpenActionInstaller()
+                    }
+                }
         }
         .menuBarExtraStyle(.menu)
 
