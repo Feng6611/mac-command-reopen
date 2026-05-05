@@ -8,143 +8,222 @@
 import AppKit
 import Combine
 import CoreGraphics
-import SwiftUI
 import os
 
-struct StatusBarMenu: View {
-    @EnvironmentObject private var activationMonitor: ActivationMonitor
-    @EnvironmentObject private var accessController: AppAccessController
-    @StateObject private var model = StatusBarMenuModel()
+@MainActor
+final class StatusBarMenuController: NSObject {
+    static let shared = StatusBarMenuController()
 
-    var body: some View {
+    private let statusItem: NSStatusItem
+    private let model: StatusBarMenuModel
+    private weak var activationMonitor: ActivationMonitor?
+    private weak var accessController: AppAccessController?
+
+    override init() {
+        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.model = StatusBarMenuModel()
+        super.init()
+        configureStatusItem()
+    }
+
+    deinit {
+        NSStatusBar.system.removeStatusItem(statusItem)
+    }
+
+    func install(
+        activationMonitor: ActivationMonitor,
+        accessController: AppAccessController
+    ) {
+        self.activationMonitor = activationMonitor
+        self.accessController = accessController
+        updateButtonImage()
+    }
+
+    private func configureStatusItem() {
+        statusItem.autosaveName = "CommandReopen.StatusItem"
+        guard let button = statusItem.button else {
+            return
+        }
+        button.target = self
+        button.action = #selector(showMenu)
+        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        button.toolTip = "Command Reopen"
+        updateButtonImage()
+    }
+
+    private func updateButtonImage() {
+        guard let button = statusItem.button else {
+            return
+        }
+        let image = NSImage(systemSymbolName: "command", accessibilityDescription: "Command Reopen")
+        image?.isTemplate = true
+        button.image = image
+    }
+
+    @objc private func showMenu() {
+        model.refresh()
+        statusItem.showMenu(makeMenu())
+    }
+
+    private func makeMenu() -> NSMenu {
+        let menu = NSMenu(title: "Command Reopen")
+        menu.autoenablesItems = false
+
+        let accessController = accessController ?? .shared
         let presentation = StatusBarController.presentation(for: accessController)
 
-        Group {
-            Toggle(isOn: featureEnabledBinding(canToggle: presentation.canToggleAutoReopen)) {
-                Text("Enable Command Reopen")
-            }
-            .disabled(!presentation.canToggleAutoReopen)
+        let featureItem = NSMenuItem(
+            title: "Enable Command Reopen",
+            action: #selector(toggleFeatureEnabled),
+            keyEquivalent: ""
+        )
+        featureItem.target = self
+        featureItem.state = activationMonitor?.isFeatureEnabled == true ? .on : .off
+        featureItem.isEnabled = presentation.canToggleAutoReopen
+        menu.addItem(featureItem)
 
-            Toggle(isOn: launchAtLoginBinding) {
-                Text("Launch at Login")
-            }
+        let launchItem = NSMenuItem(
+            title: "Launch at Login",
+            action: #selector(toggleLaunchAtLogin),
+            keyEquivalent: ""
+        )
+        launchItem.target = self
+        launchItem.state = model.launchAtLoginEnabled ? .on : .off
+        menu.addItem(launchItem)
 
-            Divider()
+        menu.addItem(.separator())
 
-            Button("Hide All Windows") {
-                model.hideAllWindows()
-            }
-            .disabled(!model.canHideAllWindows)
+        let hideAllItem = NSMenuItem(
+            title: "Hide All Windows",
+            action: #selector(hideAllWindows),
+            keyEquivalent: ""
+        )
+        hideAllItem.target = self
+        hideAllItem.isEnabled = model.canHideAllWindows
+        menu.addItem(hideAllItem)
 
-            Divider()
+        menu.addItem(.separator())
 
-            if presentation.showsUpgradeItem {
-                proSettingsItem
-            }
-
-            settingsItem
-
-            Divider()
-
-            switch accessController.distributionChannel {
-            case .appStore:
-                Button("Official") {
-                    model.openURL(ExternalLinks.officialURL)
-                }
-
-                Button("Rate on App Store") {
-                    model.openURL(AppStoreLinks.reviewURL)
-                }
-            case .direct:
-                Button("Get on Mac App Store") {
-                    model.openURL(AppStoreLinks.productURL)
-                }
-
-                Button("GitHub") {
-                    model.openURL(ExternalLinks.githubURL)
-                }
-            }
-
-            Button("About") {
-                model.showAbout(distributionChannel: accessController.distributionChannel)
-            }
-
-            Divider()
-
-            Button("Quit Command Reopen") {
-                model.quit()
-            }
-            .keyboardShortcut("q")
-        }
-        .onAppear {
-            model.refresh()
-        }
-    }
-
-    private func featureEnabledBinding(canToggle: Bool) -> Binding<Bool> {
-        Binding {
-            activationMonitor.isFeatureEnabled
-        } set: { isEnabled in
-            guard canToggle else {
-                return
-            }
-
-            activationMonitor.isFeatureEnabled = isEnabled
-        }
-    }
-
-    private var launchAtLoginBinding: Binding<Bool> {
-        Binding {
-            model.launchAtLoginEnabled
-        } set: { isEnabled in
-            model.setLaunchAtLogin(isEnabled)
-        }
-    }
-
-    @ViewBuilder
-    private var proSettingsItem: some View {
-        if #available(macOS 14.0, *) {
-            SettingsLink {
-                Text("Upgrade to Pro...")
-            }
-            .simultaneousGesture(
-                TapGesture().onEnded {
-                    SettingsWindowController.shared.prepareForSettingsScene(
-                        accessController: accessController,
-                        initialTab: .about,
-                        presentsPaywall: true
-                    )
-                }
+        if presentation.showsUpgradeItem {
+            let upgradeItem = NSMenuItem(
+                title: "Upgrade to Pro...",
+                action: #selector(showUpgradeSettings),
+                keyEquivalent: ""
             )
-        } else {
-            Button("Upgrade to Pro...") {
-                SettingsWindowController.shared.show(
-                    activationMonitor: activationMonitor,
-                    accessController: accessController,
-                    initialTab: .about,
-                    presentsPaywall: true
-                )
-            }
+            upgradeItem.target = self
+            menu.addItem(upgradeItem)
         }
+
+        let settingsItem = NSMenuItem(
+            title: "Settings...",
+            action: #selector(showSettings),
+            keyEquivalent: ","
+        )
+        settingsItem.target = self
+        settingsItem.keyEquivalentModifierMask = .command
+        menu.addItem(settingsItem)
+
+        menu.addItem(.separator())
+
+        switch accessController.distributionChannel {
+        case .appStore:
+            menu.addItem(actionItem(title: "Official", action: #selector(openOfficial)))
+            menu.addItem(actionItem(title: "Rate on App Store", action: #selector(openAppStoreReview)))
+        case .direct:
+            menu.addItem(actionItem(title: "Get on Mac App Store", action: #selector(openMacAppStore)))
+            menu.addItem(actionItem(title: "GitHub", action: #selector(openGitHub)))
+        }
+
+        menu.addItem(actionItem(title: "About", action: #selector(showAbout)))
+
+        menu.addItem(.separator())
+
+        let quitItem = NSMenuItem(
+            title: "Quit Command Reopen",
+            action: #selector(quit),
+            keyEquivalent: "q"
+        )
+        quitItem.target = self
+        quitItem.keyEquivalentModifierMask = .command
+        menu.addItem(quitItem)
+
+        return menu
     }
 
-    @ViewBuilder
-    private var settingsItem: some View {
-        if #available(macOS 14.0, *) {
-            SettingsLink()
-                .simultaneousGesture(
-                    TapGesture().onEnded {
-                        SettingsWindowController.shared.prepareForSettingsScene(accessController: accessController)
-                    }
-                )
-        } else {
-            Button("Settings...") {
-                SettingsWindowController.shared.show(
-                    activationMonitor: activationMonitor,
-                    accessController: accessController
-                )
-            }
+    private func actionItem(title: String, action: Selector) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        item.target = self
+        return item
+    }
+
+    @objc private func toggleFeatureEnabled() {
+        guard let activationMonitor else {
+            return
         }
+        let accessController = accessController ?? .shared
+        guard StatusBarController.presentation(for: accessController).canToggleAutoReopen else {
+            return
+        }
+        activationMonitor.isFeatureEnabled.toggle()
+    }
+
+    @objc private func toggleLaunchAtLogin() {
+        model.setLaunchAtLogin(!model.launchAtLoginEnabled)
+    }
+
+    @objc private func hideAllWindows() {
+        model.hideAllWindows()
+    }
+
+    @objc private func showUpgradeSettings() {
+        SettingsWindowController.shared.show(
+            activationMonitor: activationMonitor,
+            accessController: accessController,
+            initialTab: .about,
+            presentsPaywall: true
+        )
+    }
+
+    @objc private func showSettings() {
+        SettingsWindowController.shared.show(
+            activationMonitor: activationMonitor,
+            accessController: accessController
+        )
+    }
+
+    @objc private func openOfficial() {
+        model.openURL(ExternalLinks.officialURL)
+    }
+
+    @objc private func openAppStoreReview() {
+        model.openURL(AppStoreLinks.reviewURL)
+    }
+
+    @objc private func openMacAppStore() {
+        model.openURL(AppStoreLinks.productURL)
+    }
+
+    @objc private func openGitHub() {
+        model.openURL(ExternalLinks.githubURL)
+    }
+
+    @objc private func showAbout() {
+        model.showAbout(distributionChannel: (accessController ?? .shared).distributionChannel)
+    }
+
+    @objc private func quit() {
+        model.quit()
+    }
+}
+
+private extension NSStatusItem {
+    func showMenu(_ menu: NSMenu) {
+        let originalMenu = self.menu
+        defer {
+            self.menu = originalMenu
+        }
+        self.menu = menu
+        button?.performClick(nil)
     }
 }
 

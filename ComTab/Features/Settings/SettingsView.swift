@@ -279,8 +279,9 @@ struct AboutTabContent: View {
 
     private var statusColor: Color {
         switch displayState.status {
-        case .trial, .pro: return .secondary
+        case .trial: return .secondary
         case .expired: return .orange
+        case .pro: return DS.Colors.brandPrimary
         }
     }
 
@@ -293,10 +294,10 @@ struct AboutTabContent: View {
         case .pro(let plan, let expirationDate, let willRenew):
             switch plan {
             case .lifetime:
-                return "Lifetime Pro"
+                return "👑 Lifetime Pro"
             case .yearly:
-                guard let expirationDate else { return "Yearly Pro" }
-                return "\(willRenew ? "Renews" : "Ends") \(formattedDate(expirationDate))"
+                guard let expirationDate else { return "⭐ Yearly Pro" }
+                return "⭐ \(willRenew ? "Renews" : "Ends") \(formattedDate(expirationDate))"
             }
         }
     }
@@ -359,25 +360,11 @@ private struct AboutRowTitle: View {
 
 private enum AboutColors {
     static var sectionBackground: Color {
-        if #available(macOS 14.0, *) {
-            return Color(nsColor: NSColor.quaternarySystemFill.opaque)
-        }
-
-        return Color(nsColor: .controlBackgroundColor)
+        Color(nsColor: .controlBackgroundColor)
     }
 
     static var background: Color {
-        if #available(macOS 14.0, *) {
-            return Color(nsColor: NSColor.quinarySystemFill.opaque)
-        }
-
-        return Color(nsColor: .windowBackgroundColor)
-    }
-}
-
-private extension NSColor {
-    var opaque: NSColor {
-        usingColorSpace(.deviceRGB)?.withAlphaComponent(1) ?? withAlphaComponent(1)
+        Color(nsColor: .windowBackgroundColor)
     }
 }
 

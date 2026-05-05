@@ -199,6 +199,58 @@ struct ActivationMonitorAndReopenStatsTests {
         ))
     }
 
+    @Test("Expired paywall nudge is allowed when no previous nudge exists")
+    func expiredNudgeAllowsMissingPreviousDate() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 10).date)
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: nil,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge is suppressed on the same calendar day")
+    func expiredNudgeSuppressesSameDay() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let lastNudgeDate = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 9).date)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 22).date)
+
+        #expect(!ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: lastNudgeDate,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge is allowed on a different calendar day")
+    func expiredNudgeAllowsDifferentDay() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let lastNudgeDate = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 23).date)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 6, hour: 1).date)
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: lastNudgeDate,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge helper is pure")
+    func expiredNudgeHelperIsPure() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 10).date)
+        UserDefaults.standard.set(now, forKey: "lastExpiredPaywallNudgeDate")
+        defer { UserDefaults.standard.removeObject(forKey: "lastExpiredPaywallNudgeDate") }
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: nil,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
     @Test("Rapid-return heuristic suppresses short tab-away-and-back cycles")
     func rapidReturnSuppressionLogic() {
         let now = Date()

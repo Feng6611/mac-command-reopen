@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import ConfettiSwiftUI
 import RevenueCatCommerceKit
 import SwiftUI
 import os
@@ -545,11 +546,13 @@ struct PaywallSheetView: View {
     @ObservedObject var proStatusManager: ProStatusManager
     let context: PaywallPresentationContext
     var onFinish: () -> Void = {}
+    var reopenStatsStore: ReopenStatsStore = .shared
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPlan: CommercePlan = .lifetime
     @State private var isLoadingOfferings = false
     @State private var isStartingTrial = false
+    @State private var confettiTrigger = 0
 
     private var displayState: ProDisplayState {
         .live(
@@ -575,23 +578,34 @@ struct PaywallSheetView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: DS.Spacing.lg) {
-                    sheetHeader
+            VStack(spacing: 0) {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: DS.Spacing.md) {
+                        sheetHeader
+                            .padding(.top, DS.Spacing.sm)
 
-                    if displayState.status.isPro {
-                        ProStatusBadgeView(displayState: displayState)
-                            .environmentObject(proStatusManager)
-                    } else {
-                        benefits
-                        planPicker
-                        messageStack
+                        if displayState.status.isPro {
+                            ProStatusBadgeView(displayState: displayState)
+                                .environmentObject(proStatusManager)
+                        } else {
+                            statsStrip
+                            benefits
+                            planPicker
+                            messageStack
+                        }
+                    }
+                    .padding(.horizontal, sheetPadding)
+                    .padding(.bottom, DS.Spacing.md)
+                }
+
+                VStack(spacing: DS.Spacing.sm) {
+                    if !displayState.status.isPro {
                         actionStack
                     }
-
                     footer
                 }
-                .padding(sheetPadding)
+                .padding(.horizontal, sheetPadding)
+                .padding(.bottom, DS.Spacing.md)
             }
 
             if !isOnboarding {
@@ -609,7 +623,17 @@ struct PaywallSheetView: View {
             }
         }
         .frame(width: sheetWidth, height: sheetHeight)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background {
+            ZStack {
+                Color(nsColor: .windowBackgroundColor)
+                RadialGradient(
+                    colors: [DS.Colors.brandPrimary.opacity(0.05), .clear],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: 350
+                )
+            }
+        }
         .task {
             guard !isLoadingOfferings else { return }
             isLoadingOfferings = true
@@ -621,6 +645,15 @@ struct PaywallSheetView: View {
             syncSelectedPlan()
         })
         .interactiveDismissDisabled(isOnboarding)
+        .confettiCannon(
+            trigger: $confettiTrigger,
+            num: 50,
+            confettis: [.shape(.circle), .shape(.roundedCross)],
+            colors: [DS.Colors.brandPrimary, .orange, .purple, .pink],
+            confettiSize: 8,
+            rainHeight: 500,
+            radius: 300
+        )
     }
 
     private var sheetWidth: CGFloat {
@@ -636,14 +669,14 @@ struct PaywallSheetView: View {
     }
 
     private var sheetHeader: some View {
-        VStack(spacing: DS.Spacing.sm) {
+        VStack(spacing: DS.Spacing.md) {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
-                .frame(width: 64, height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                .shadow(color: .black.opacity(0.10), radius: 8, y: 4)
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .shadow(color: .black.opacity(0.10), radius: 10, y: 5)
 
-            Text(headerTitle)
+            Text("Choose your plan")
                 .font(DS.Typography.onboardingTitle)
                 .multilineTextAlignment(.center)
 
@@ -653,6 +686,37 @@ struct PaywallSheetView: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private var statsStrip: some View {
+        let totalReopens = reopenStatsStore.totalSuccessfulReopens
+        let topApps = reopenStatsStore.topApps(3)
+        if totalReopens > 0 {
+            HStack(spacing: DS.Spacing.lg) {
+                PaywallStatItem(
+                    value: "\(totalReopens)",
+                    label: "windows reopened"
+                )
+                if let topApp = topApps.first {
+                    PaywallStatItem(
+                        value: topApp.displayName,
+                        label: "\(topApp.count) reopens"
+                    )
+                }
+            }
+            .padding(.vertical, DS.Spacing.sm)
+            .padding(.horizontal, DS.Spacing.lg)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .fill(DS.Colors.brandPrimary.opacity(0.05))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .strokeBorder(DS.Colors.brandPrimary.opacity(0.12), lineWidth: 0.5)
+            )
+        }
     }
 
     private var benefits: some View {
@@ -753,17 +817,6 @@ struct PaywallSheetView: View {
         .font(.caption)
     }
 
-    private var headerTitle: String {
-        switch displayState.status {
-        case .pro:
-            return "Command Reopen Pro"
-        case .trial:
-            return isOnboarding ? "Keep Command Reopen" : "Command Reopen Pro"
-        case .expired:
-            return "Keep Command Reopen"
-        }
-    }
-
     private var headerSubtitle: String {
         switch displayState.status {
         case .pro:
@@ -835,11 +888,14 @@ struct PaywallSheetView: View {
     }
 
     private func finishSuccessfulPaidAction() {
-        if isOnboarding {
-            onFinish()
-        } else {
-            dismiss()
-            onFinish()
+        confettiTrigger += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            if isOnboarding {
+                onFinish()
+            } else {
+                dismiss()
+                onFinish()
+            }
         }
     }
 
@@ -853,6 +909,25 @@ struct PaywallSheetView: View {
 
     private func formattedDate(_ date: Date) -> String {
         date.formatted(.dateTime.month(.abbreviated).day().year())
+    }
+}
+
+private struct PaywallStatItem: View {
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: DS.Spacing.xxs) {
+            Text(value)
+                .font(DS.Typography.headlineSmall)
+                .foregroundStyle(DS.Colors.brandPrimary)
+                .lineLimit(1)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -878,53 +953,59 @@ private struct PaywallPlanCard: View {
     let isSelected: Bool
     let onSelect: () -> Void
 
+    private var originalPrice: String {
+        switch product.plan {
+        case .yearly: return "$7.99"
+        case .lifetime: return "$14.99"
+        }
+    }
+
     var body: some View {
         Button(action: onSelect) {
-            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                HStack {
+            VStack(spacing: DS.Spacing.sm) {
+                if let badge = product.badge {
+                    Text(badge)
+                        .font(DS.Typography.microSemibold)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, DS.Spacing.sm)
+                        .padding(.vertical, DS.Spacing.xxs)
+                        .background(Capsule().fill(DS.Colors.brandPrimary))
+                } else {
                     Text(product.title)
-                        .font(DS.Typography.bodyMedium)
-                    Spacer(minLength: 0)
-                    if let badge = product.badge {
-                        Text(badge)
-                            .font(DS.Typography.microSemibold)
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, DS.Spacing.xs)
-                            .padding(.vertical, DS.Spacing.xxs)
-                            .background(
-                                Capsule()
-                                    .fill(DS.Colors.brandPrimary)
-                            )
-                    }
+                        .font(DS.Typography.microSemibold)
+                        .foregroundStyle(.secondary)
                 }
 
-                Text(product.displayPrice)
-                    .font(DS.Typography.headlineMedium)
-                    .foregroundStyle(.primary)
+                HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.xs) {
+                    Text(originalPrice)
+                        .font(.callout)
+                        .strikethrough()
+                        .foregroundStyle(.secondary)
+                    Text(product.displayPrice)
+                        .font(DS.Typography.headlineSmall)
+                        .foregroundStyle(.primary)
+                }
 
                 Text(product.billingDetail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-
-                Text(product.subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
             }
-            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
-            .padding(DS.Spacing.md)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, DS.Spacing.md)
+            .padding(.horizontal, DS.Spacing.sm)
             .background(
                 RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-                    .fill(isSelected ? DS.Colors.accentTintSubtle : Color(nsColor: .controlBackgroundColor))
+                    .fill(isSelected ? DS.Colors.brandPrimary.opacity(0.06) : Color(nsColor: .controlBackgroundColor))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-                    .strokeBorder(isSelected ? DS.Colors.brandPrimary : DS.Colors.cardBorder, lineWidth: isSelected ? 1.2 : 0.5)
+                    .strokeBorder(isSelected ? DS.Colors.brandPrimary : DS.Colors.cardBorder, lineWidth: isSelected ? 1.5 : 0.5)
             )
         }
         .buttonStyle(.plain)
         .disabled(!product.isAvailable)
         .opacity(product.isAvailable ? 1 : 0.45)
+        .animation(.easeInOut(duration: 0.15), value: isSelected)
     }
 }
 

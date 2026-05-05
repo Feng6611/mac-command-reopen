@@ -18,13 +18,16 @@ final class AppLifecycleCoordinator {
     static let shared = AppLifecycleCoordinator()
 
     private let accessController: AppAccessController
+    private let statusBarController: StatusBarMenuController
     private var cancellables: Set<AnyCancellable> = []
     private var hasCompletedInitialCommerceRefresh = false
     private var lastCommerceRefreshAt: Date?
     private var isRefreshingCommerce = false
 
-    init(accessController: AppAccessController? = nil) {
+    init(accessController: AppAccessController? = nil,
+         statusBarController: StatusBarMenuController? = nil) {
         self.accessController = accessController ?? .shared
+        self.statusBarController = statusBarController ?? .shared
     }
 
     func applicationDidFinishLaunching() {
@@ -32,11 +35,14 @@ final class AppLifecycleCoordinator {
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
         NSApp.setActivationPolicy(.accessory)
-        accessController.configureIfNeeded()
+        statusBarController.install(
+            activationMonitor: .shared,
+            accessController: accessController
+        )
         bindUpgradePrompt()
 
 #if APPSTORE
-        let shouldShowOnboardingImmediately = accessController.shouldShowOnboarding
+        let shouldShowOnboardingImmediately = false
         if shouldShowOnboardingImmediately {
             OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
             hasCompletedInitialCommerceRefresh = true
@@ -65,13 +71,14 @@ final class AppLifecycleCoordinator {
             return
         }
 
-        Task { @MainActor in
-            await completeInitialCommerceRefresh()
-        }
+        hasCompletedInitialCommerceRefresh = true
     }
 
     func applicationDidBecomeActive() {
         AppLogger.lifecycle.debug("Application became active. Evaluating commerce refresh throttle.")
+        guard accessController.hasLoadedCommerceStateSource else {
+            return
+        }
         Task { @MainActor in
             await refreshCommerceStateIfNeeded(force: false, reason: "applicationDidBecomeActive")
         }

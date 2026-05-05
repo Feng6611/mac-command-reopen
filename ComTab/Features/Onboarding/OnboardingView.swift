@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import ConfettiSwiftUI
 import SwiftUI
 import os
 
@@ -56,6 +57,7 @@ struct OnboardingView: View {
 
     @State private var showMinimizeReturnHint = false
     @State private var isPaywallSheetPresented = false
+    @State private var confettiTrigger = 0
 
     var body: some View {
         ZStack {
@@ -83,14 +85,18 @@ struct OnboardingView: View {
         .animation(.easeInOut(duration: 0.22), value: session.phase)
         .animation(.easeInOut(duration: 0.18), value: showMinimizeReturnHint)
         .frame(width: 680, height: 680)
-        .background(Color(nsColor: .windowBackgroundColor))
         .background {
-            RadialGradient(
-                colors: [DS.Colors.brandPrimary.opacity(0.06), .clear],
-                center: .top,
-                startRadius: 0,
-                endRadius: 400
-            )
+            ZStack {
+                Color(nsColor: .windowBackgroundColor)
+                RadialGradient(
+                    colors: [DS.Colors.brandPrimary.opacity(0.06), .clear],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: 400
+                )
+            }
+            .ignoresSafeArea()
+            .overlay(.ultraThinMaterial.opacity(0.5))
         }
         .modifier(OnChangeCompat(value: session.phase) {
             if session.phase != .tryMinimize {
@@ -117,8 +123,8 @@ struct OnboardingView: View {
 
     private var welcomePage: some View {
         onboardingPage(
-            title: "Never lose a minimized window again",
-            subtitle: "You minimize a window, Command-Tab back — but the window is gone. Command Reopen fixes that."
+            title: "Fix ⌘⇥ for minimized and closed windows",
+            subtitle: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that."
         ) {
             Image(nsImage: NSApp.applicationIconImage)
                 .resizable()
@@ -138,26 +144,19 @@ struct OnboardingView: View {
     private var tryMinimizePage: some View {
         onboardingPage(
             title: "Try it yourself",
-            subtitle: "Two quick steps to see it in action."
+            subtitle: "See the magic in two steps."
         ) {
-            DSIconBadge(
-                systemName: "command",
-                iconColor: DS.Colors.brandPrimary,
-                backgroundColor: DS.Colors.brandPrimary.opacity(0.12),
-                size: 64,
-                iconSize: 26
-            )
+            Text("👇")
+                .font(.system(size: 56))
         } content: {
-            VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            VStack(spacing: DS.Spacing.lg) {
                 OnboardingStepRow(
-                    step: "1",
-                    title: "Minimize this window",
-                    detail: "Use the button below to minimize."
+                    number: "1",
+                    text: "Click \"Minimize Window\" below"
                 )
                 OnboardingStepRow(
-                    step: "2",
-                    title: "Command-Tab back",
-                    detail: "Switch to another app, then ⌘Tab back here — the window reappears automatically."
+                    number: "2",
+                    text: "Press ⌘⇥ to switch back here"
                 )
             }
             .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
@@ -185,23 +184,50 @@ struct OnboardingView: View {
     private var successPage: some View {
         onboardingPage(
             title: "It works!",
-            subtitle: "Command Reopen runs in the background for every app — whenever you ⌘Tab back, minimized windows reappear."
+            subtitle: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."
         ) {
-            CelebrationMark()
-                .scaleEffect(0.68)
+            ZStack {
+                CelebrationMark()
+                    .scaleEffect(0.68)
+                    .confettiCannon(
+                        trigger: $confettiTrigger,
+                        num: 30,
+                        confettis: [.shape(.circle), .shape(.roundedCross)],
+                        colors: [DS.Colors.brandPrimary, .orange, .purple, .pink],
+                        confettiSize: 8,
+                        rainHeight: 500,
+                        radius: 300
+                    )
+            }
         } content: {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "macwindow.on.rectangle")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(DS.Colors.brandPrimary)
                 Text("Works for Safari, Finder, Xcode, and every other app.")
-                    .font(.callout)
+                    .font(.body)
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
         } footer: {
             onboardingPrimaryButton("Continue", width: OnboardingLayout.primaryButtonWidth) {
                 session.moveToPaywall()
+            }
+            .confettiCannon(
+                trigger: $confettiTrigger,
+                num: 20,
+                confettis: [.shape(.circle)],
+                colors: [DS.Colors.brandPrimary, .orange, .purple],
+                confettiSize: 6,
+                rainHeight: 400,
+                openingAngle: .degrees(40),
+                closingAngle: .degrees(140),
+                radius: 200
+            )
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                confettiTrigger += 1
             }
         }
     }
@@ -218,7 +244,7 @@ struct OnboardingView: View {
         VStack {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "command")
-                Text("Now Command-Tab back to Command Reopen")
+                Text("Now ⌘⇥ back to Command Reopen")
             }
             .font(DS.Typography.bodyMedium)
             .padding(.horizontal, DS.Spacing.lg)
@@ -258,11 +284,11 @@ struct OnboardingView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-                .lineSpacing(2)
+                .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
 
-            Spacer().frame(height: DS.Spacing.xxxl)
+            Spacer().frame(height: DS.Spacing.xl)
 
             content()
 
@@ -315,26 +341,19 @@ private enum OnboardingLayout {
 }
 
 private struct OnboardingStepRow: View {
-    let step: String
-    let title: String
-    let detail: String
+    let number: String
+    let text: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: DS.Spacing.md) {
-            Text(step)
-                .font(DS.Typography.captionMedium)
+        HStack(spacing: DS.Spacing.md) {
+            Text(number)
+                .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)
-                .frame(width: 22, height: 22)
+                .frame(width: 26, height: 26)
                 .background(Circle().fill(DS.Colors.brandPrimary))
 
-            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                Text(title)
-                    .font(DS.Typography.bodyMedium)
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(text)
+                .font(.body)
         }
     }
 }
@@ -373,7 +392,7 @@ private struct OnboardingFlowDiagram: View {
 
             flowStep(
                 icon: "command",
-                label: "⌘ Tab",
+                label: "⌘⇥",
                 sublabel: "switch back",
                 tint: DS.Colors.brandPrimary
             )
@@ -409,9 +428,9 @@ private struct OnboardingFlowDiagram: View {
 
             VStack(spacing: 2) {
                 Text(label)
-                    .font(DS.Typography.captionMedium)
+                    .font(.callout.weight(.medium))
                 Text(sublabel)
-                    .font(DS.Typography.micro)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
@@ -662,7 +681,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
                 activationMonitor: .shared,
                 reopenStatsStore: .shared,
                 accessController: .shared,
-                initialTab: .general
+                initialTab: .about
             )
         }
     }

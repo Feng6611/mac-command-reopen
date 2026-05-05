@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56759C132FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = CF5000022F5900010099C190 /* ConfettiSwiftUI */; };
+		56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = CF5000022F5900010099C190 /* ConfettiSwiftUI */; };
 		7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
@@ -68,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56759C132FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000012F4400010099C190 /* RevenueCatCommerceKit in Frameworks */,
 				9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010062F3401010099C190 /* Defaults in Frameworks */,
@@ -93,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010072F3401010099C190 /* Defaults in Frameworks */,
 			);
@@ -101,6 +105,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		56759C152FAA22EF007FDA28 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		748FCE122EB5027A0099C190 = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +121,7 @@
 				748FCE3A2EB5027D0099C190 /* ComTabUITests */,
 				748FCE1C2EB5027B0099C190 /* Products */,
 				7408919C2F0645A90099E62A /* CommandReopenNew.icon */,
+				56759C152FAA22EF007FDA28 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -146,6 +159,7 @@
 				8D3000032F4400010099C190 /* RevenueCatCommerceKit */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
+				CF5000022F5900010099C190 /* ConfettiSwiftUI */,
 			);
 			productName = ComTab;
 			productReference = 748FCE1B2EB5027B0099C190 /* Command Reopen.app */;
@@ -217,6 +231,7 @@
 			packageProductDependencies = (
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
+				CF5000022F5900010099C190 /* ConfettiSwiftUI */,
 			);
 			productName = ComTabDirect;
 			productReference = 9B1000022F2000010099C190 /* Command Reopen Direct.app */;
@@ -266,6 +281,7 @@
 				8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "RevenueCatCommerceKit" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
+				CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 748FCE1C2EB5027B0099C190 /* Products */;
@@ -1106,6 +1122,14 @@
 				minimumVersion = 9.0.8;
 			};
 		};
+		CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1123,6 +1147,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		CF5000022F5900010099C190 /* ConfettiSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			productName = ConfettiSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

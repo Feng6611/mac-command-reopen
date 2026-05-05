@@ -160,8 +160,11 @@ final class ActivationMonitor: ObservableObject {
         self.selfTriggeredSuppressUntil.removeAll()
     }
 
+    private static let lastExpiredNudgeDateKey = "lastExpiredPaywallNudgeDate"
+
     private func handleActivation(for app: NSRunningApplication) {
-        guard accessController.isCoreFeatureAvailable else {
+        let shouldPresentExpiredNudge = !accessController.isCoreFeatureAvailable
+        if shouldPresentExpiredNudge, !shouldShowExpiredNudge() {
             AppLogger.activation.debug("Ignoring activation; pro status not active.")
             return
         }
@@ -212,14 +215,20 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
-        scheduleReopenEvaluation(forBundleIdentifier: bundleID)
+        scheduleReopenEvaluation(
+            forBundleIdentifier: bundleID,
+            presentsExpiredNudge: shouldPresentExpiredNudge
+        )
     }
 
     deinit {
         stopObserving()
     }
 
-    private func scheduleReopenEvaluation(forBundleIdentifier bundleID: String) {
+    private func scheduleReopenEvaluation(
+        forBundleIdentifier bundleID: String,
+        presentsExpiredNudge: Bool
+    ) {
         DispatchQueue.main.asyncAfter(deadline: .now() + Constants.reopenEvaluationDelay) { [weak self] in
             guard let self else { return }
             guard self.isFeatureEnabled else {
@@ -254,7 +263,38 @@ final class ActivationMonitor: ObservableObject {
                 onScreen=\(report.onScreenWindows) candidates=\(report.visibleCandidateWindows)
                 """
             )
+            if presentsExpiredNudge {
+                guard !self.accessController.isCoreFeatureAvailable else {
+                    self.reopenApplication(withBundleIdentifier: bundleID, at: now)
+                    return
+                }
+                guard self.shouldShowExpiredNudge(now: now) else {
+                    AppLogger.activation.debug("Skipping expired nudge reopen; today's nudge was already recorded.")
+                    return
+                }
+                self.recordExpiredNudge(at: now)
+                self.presentExpiredPaywallNudge()
+                AppLogger.activation.info("Trial expired nudge: allowing one-time reopen and showing paywall.")
+            }
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
+        }
+    }
+
+    private func shouldShowExpiredNudge(now: Date = Date()) -> Bool {
+        let lastNudgeDate = defaults.object(forKey: Self.lastExpiredNudgeDateKey) as? Date
+        return Self.shouldShowExpiredNudge(lastNudgeDate: lastNudgeDate, now: now)
+    }
+
+    private func recordExpiredNudge(at date: Date = Date()) {
+        defaults.set(date, forKey: Self.lastExpiredNudgeDateKey)
+    }
+
+    private func presentExpiredPaywallNudge() {
+        Task { @MainActor in
+            SettingsWindowController.shared.show(
+                initialTab: .about,
+                presentsPaywall: true
+            )
         }
     }
 
@@ -388,6 +428,15 @@ final class ActivationMonitor: ObservableObject {
     static func shouldIgnoreSelfTriggered(until: Date?, now: Date) -> Bool {
         guard let until else { return false }
         return now <= until
+    }
+
+    static func shouldShowExpiredNudge(
+        lastNudgeDate: Date?,
+        now: Date,
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard let lastNudgeDate else { return true }
+        return !calendar.isDate(lastNudgeDate, inSameDayAs: now)
     }
 
     static func hasVisibleWindow(

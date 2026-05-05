@@ -5,48 +5,17 @@
 //  Created by CHEN on 2025/10/31.
 //
 
-import SwiftUI
+import AppKit
 
 @main
-struct ComTabApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var activationMonitor = ActivationMonitor.shared
-    @StateObject private var reopenStatsStore = ReopenStatsStore.shared
-    @StateObject private var accessController = AppAccessController.shared
-    @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
-#if APPSTORE
-    @StateObject private var proStatusManager = ProStatusManager.shared
-#endif
+enum ComTabApp {
+    private static var appDelegate: AppDelegate?
 
-    var body: some Scene {
-        MenuBarExtra {
-            StatusBarMenu()
-                .environmentObject(activationMonitor)
-                .environmentObject(accessController)
-                .background {
-                    if #available(macOS 14.0, *) {
-                        SettingsOpenActionInstaller()
-                    }
-                }
-        } label: {
-            Image(systemName: "command")
-                .background {
-                    if #available(macOS 14.0, *) {
-                        SettingsOpenActionInstaller()
-                    }
-                }
-        }
-        .menuBarExtraStyle(.menu)
-
-        Settings {
-            SettingsView()
-                .environmentObject(activationMonitor)
-                .environmentObject(reopenStatsStore)
-                .environmentObject(accessController)
-                .environmentObject(settingsNavigationModel)
-#if APPSTORE
-                .environmentObject(proStatusManager)
-#endif
-        }
+    static func main() {
+        let application = NSApplication.shared
+        let delegate = AppDelegate()
+        appDelegate = delegate
+        application.delegate = delegate
+        application.run()
     }
 }

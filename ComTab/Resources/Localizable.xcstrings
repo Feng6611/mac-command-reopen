@@ -10,6 +10,9 @@
     "🎉" : {
 
     },
+    "👇" : {
+
+    },
     "About" : {
 
     },
@@ -31,13 +34,13 @@
     "Best Value" : {
 
     },
+    "Choose your plan" : {
+
+    },
     "Close" : {
 
     },
     "Command Reopen helped you **%lld times** during your trial." : {
-
-    },
-    "Contact Developer" : {
 
     },
     "Continue" : {
@@ -70,9 +73,6 @@
     "Hide All Windows" : {
 
     },
-    "Keep Command Reopen" : {
-
-    },
     "Launch at Login" : {
 
     },
@@ -100,13 +100,10 @@
     "No reopen activity yet" : {
 
     },
-    "Now Command-Tab back to Command Reopen" : {
+    "Now ⌘⇥ back to Command Reopen" : {
 
     },
     "Official" : {
-
-    },
-    "Official Website" : {
 
     },
     "Onboarding step %lld of %lld" : {
@@ -165,9 +162,6 @@
 
     },
     "Settings..." : {
-
-    },
-    "Skip for Now" : {
 
     },
     "Start 2-Day Free Trial" : {

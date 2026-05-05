@@ -22,8 +22,14 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
 
     let distributionChannel: DistributionChannel
 
-    private let commerceStateSource: CommerceStateSource?
+    private let commerceStateSourceFactory: (() -> CommerceStateSource?)?
+    private var resolvedCommerceStateSource: CommerceStateSource?
+    private var didResolveCommerceStateSource = false
     private var cancellables: Set<AnyCancellable> = []
+
+    var hasLoadedCommerceStateSource: Bool {
+        didResolveCommerceStateSource
+    }
 
     var isCoreFeatureAvailable: Bool {
         entitlementState.isCoreFeatureAvailable
@@ -39,15 +45,18 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
 
     var shouldShowOnboarding: Bool {
         distributionChannel == .appStore
-            && (commerceStateSource?.isFirstLaunch ?? false)
+            && (resolvedCommerceStateSource?.isFirstLaunch ?? false)
     }
 
     init(
         distributionChannel: DistributionChannel = .current,
-        commerceStateSource: CommerceStateSource? = nil
+        commerceStateSource: CommerceStateSource? = nil,
+        commerceStateSourceFactory: (() -> CommerceStateSource?)? = nil
     ) {
         self.distributionChannel = distributionChannel
-        self.commerceStateSource = commerceStateSource
+        self.commerceStateSourceFactory = commerceStateSourceFactory ?? { commerceStateSource }
+        self.resolvedCommerceStateSource = commerceStateSource
+        self.didResolveCommerceStateSource = commerceStateSource != nil || commerceStateSourceFactory == nil
         self.entitlementState = commerceStateSource?.entitlementState ?? .unrestricted
         self.shouldOpenProSettings = commerceStateSource?.shouldOpenProSettings ?? false
         bindIfNeeded()
@@ -69,13 +78,13 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
     }
 
     private func bindIfNeeded() {
-        commerceStateSource?.entitlementStatePublisher
+        resolvedCommerceStateSource?.entitlementStatePublisher
             .sink { [weak self] state in
                 self?.entitlementState = state
             }
             .store(in: &cancellables)
 
-        commerceStateSource?.proSettingsPromptPublisher
+        resolvedCommerceStateSource?.proSettingsPromptPublisher
             .sink { [weak self] shouldOpen in
                 self?.shouldOpenProSettings = shouldOpen
             }
@@ -83,8 +92,19 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
     }
 
     private func syncFromSource() {
-        entitlementState = commerceStateSource?.entitlementState ?? .unrestricted
-        shouldOpenProSettings = commerceStateSource?.shouldOpenProSettings ?? false
+        entitlementState = resolvedCommerceStateSource?.entitlementState ?? .unrestricted
+        shouldOpenProSettings = resolvedCommerceStateSource?.shouldOpenProSettings ?? false
+    }
+
+    private var commerceStateSource: CommerceStateSource? {
+        if !didResolveCommerceStateSource {
+            resolvedCommerceStateSource = commerceStateSourceFactory?()
+            didResolveCommerceStateSource = true
+            bindIfNeeded()
+            syncFromSource()
+        }
+
+        return resolvedCommerceStateSource
     }
 
     private static func makeShared() -> AppAccessController {
@@ -93,10 +113,9 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
             AppAccessController(distributionChannel: .direct)
         case .appStore:
 #if APPSTORE
-            AppAccessController(
-                distributionChannel: .appStore,
-                commerceStateSource: ProCommerceStateSource.shared
-            )
+            AppAccessController(distributionChannel: .appStore) {
+                ProCommerceStateSource.shared
+            }
 #else
             AppAccessController(distributionChannel: .appStore)
 #endif

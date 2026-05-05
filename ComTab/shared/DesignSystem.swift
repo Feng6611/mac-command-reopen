@@ -52,11 +52,10 @@ enum DS {
         static let cardBackground = Color(nsColor: .windowBackgroundColor)
         static let cardBorder     = Color(nsColor: .separatorColor).opacity(0.4)
 
-        static let accentTint       = Color.accentColor.opacity(0.12)
-        static let accentTintSubtle = Color.accentColor.opacity(0.06)
-        static let proFill          = Color.accentColor.opacity(0.88)
-
         static let brandPrimary = Color(red: 203/255, green: 48/255, blue: 224/255)
+        static let accentTint       = brandPrimary.opacity(0.12)
+        static let accentTintSubtle = brandPrimary.opacity(0.06)
+        static let proFill          = brandPrimary.opacity(0.88)
 
         static let warningTint = Color.orange.opacity(0.12)
     }
