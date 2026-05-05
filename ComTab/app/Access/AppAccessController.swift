@@ -57,7 +57,7 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
         self.commerceStateSourceFactory = commerceStateSourceFactory ?? { commerceStateSource }
         self.resolvedCommerceStateSource = commerceStateSource
         self.didResolveCommerceStateSource = commerceStateSource != nil || commerceStateSourceFactory == nil
-        self.entitlementState = commerceStateSource?.entitlementState ?? .unrestricted
+        self.entitlementState = commerceStateSource?.entitlementState ?? Self.initialEntitlementState(for: distributionChannel)
         self.shouldOpenProSettings = commerceStateSource?.shouldOpenProSettings ?? false
         bindIfNeeded()
     }
@@ -92,7 +92,7 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
     }
 
     private func syncFromSource() {
-        entitlementState = resolvedCommerceStateSource?.entitlementState ?? .unrestricted
+        entitlementState = resolvedCommerceStateSource?.entitlementState ?? Self.initialEntitlementState(for: distributionChannel)
         shouldOpenProSettings = resolvedCommerceStateSource?.shouldOpenProSettings ?? false
     }
 
@@ -119,6 +119,15 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
 #else
             AppAccessController(distributionChannel: .appStore)
 #endif
+        }
+    }
+
+    private static func initialEntitlementState(for distributionChannel: DistributionChannel) -> AccessEntitlementState {
+        switch distributionChannel {
+        case .direct:
+            .unrestricted
+        case .appStore:
+            .trial
         }
     }
 }

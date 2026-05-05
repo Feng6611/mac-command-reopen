@@ -60,30 +60,6 @@ struct SharedApplicationPresenter: ApplicationPresenting {
     }
 }
 
-struct WindowActionApplication {
-    let processIdentifier: pid_t
-    let bundleIdentifier: String?
-    let isTerminated: Bool
-    let hide: () -> Bool
-}
-
-protocol WindowActionApplicationProviding {
-    var runningWindowActionApplications: [WindowActionApplication] { get }
-}
-
-struct WorkspaceWindowActionApplicationProvider: WindowActionApplicationProviding {
-    var runningWindowActionApplications: [WindowActionApplication] {
-        NSWorkspace.shared.runningApplications.map { application in
-            WindowActionApplication(
-                processIdentifier: application.processIdentifier,
-                bundleIdentifier: application.bundleIdentifier,
-                isTerminated: application.isTerminated,
-                hide: { application.hide() }
-            )
-        }
-    }
-}
-
 protocol LaunchAtLoginManaging: AnyObject {
     var isEnabled: Bool { get }
 

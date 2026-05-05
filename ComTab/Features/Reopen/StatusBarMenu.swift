@@ -7,7 +7,6 @@
 
 import AppKit
 import Combine
-import CoreGraphics
 import os
 
 @MainActor
@@ -93,17 +92,6 @@ final class StatusBarMenuController: NSObject {
 
         menu.addItem(.separator())
 
-        let hideAllItem = NSMenuItem(
-            title: "Hide All Windows",
-            action: #selector(hideAllWindows),
-            keyEquivalent: ""
-        )
-        hideAllItem.target = self
-        hideAllItem.isEnabled = model.canHideAllWindows
-        menu.addItem(hideAllItem)
-
-        menu.addItem(.separator())
-
         if presentation.showsUpgradeItem {
             let upgradeItem = NSMenuItem(
                 title: "Upgrade to Pro...",
@@ -171,24 +159,15 @@ final class StatusBarMenuController: NSObject {
         model.setLaunchAtLogin(!model.launchAtLoginEnabled)
     }
 
-    @objc private func hideAllWindows() {
-        model.hideAllWindows()
-    }
-
     @objc private func showUpgradeSettings() {
-        SettingsWindowController.shared.show(
-            activationMonitor: activationMonitor,
-            accessController: accessController,
+        SettingsOpener.shared.open(
             initialTab: .about,
             presentsPaywall: true
         )
     }
 
     @objc private func showSettings() {
-        SettingsWindowController.shared.show(
-            activationMonitor: activationMonitor,
-            accessController: accessController
-        )
+        SettingsOpener.shared.open()
     }
 
     @objc private func openOfficial() {
@@ -229,34 +208,19 @@ private extension NSStatusItem {
 
 @MainActor
 final class StatusBarMenuModel: ObservableObject {
-    private struct VisibleWindowActionTarget {
-        let application: WindowActionApplication
-        let visibleWindowBounds: [CGRect]
-    }
-
     @Published private(set) var launchAtLoginEnabled: Bool
 
-    var canHideAllWindows: Bool {
-        !visibleWindowActionTargets().isEmpty
-    }
-
     private let launchManager: LaunchAtLoginManaging
-    private let windowInfoProvider: WindowInfoListing
-    private let applicationProvider: WindowActionApplicationProviding
     private let urlOpener: URLOpening
     private let applicationPresenter: ApplicationPresenting
 
     init(
         launchManager: LaunchAtLoginManaging? = nil,
-        windowInfoProvider: WindowInfoListing? = nil,
-        applicationProvider: WindowActionApplicationProviding? = nil,
         urlOpener: URLOpening? = nil,
         applicationPresenter: ApplicationPresenting? = nil
     ) {
         let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
         self.launchManager = resolvedLaunchManager
-        self.windowInfoProvider = windowInfoProvider ?? CoreGraphicsWindowInfoProvider()
-        self.applicationProvider = applicationProvider ?? WorkspaceWindowActionApplicationProvider()
         self.urlOpener = urlOpener ?? WorkspaceURLOpener()
         self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
         self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
@@ -269,24 +233,6 @@ final class StatusBarMenuModel: ObservableObject {
     func setLaunchAtLogin(_ isEnabled: Bool) {
         launchManager.setEnabled(isEnabled)
         launchAtLoginEnabled = launchManager.isEnabled
-    }
-
-    func hideAllWindows() {
-        let targetApplications = visibleWindowActionTargets()
-        guard !targetApplications.isEmpty else {
-            AppLogger.windowActions.info("Hide All Windows ignored because there are no eligible visible apps.")
-            return
-        }
-
-        AppLogger.windowActions.notice("Hiding \(targetApplications.count) visible apps on the current desktop.")
-        for target in targetApplications {
-            let bundleID = target.application.bundleIdentifier ?? "unknown app"
-            if target.application.hide() {
-                AppLogger.windowActions.debug("Hide All Windows sent to \(bundleID).")
-            } else {
-                AppLogger.windowActions.error("Hide All Windows failed for \(bundleID).")
-            }
-        }
     }
 
     func showAbout(distributionChannel: DistributionChannel) {
@@ -303,50 +249,5 @@ final class StatusBarMenuModel: ObservableObject {
 
     func quit() {
         applicationPresenter.terminate()
-    }
-
-    private func visibleWindowActionTargets() -> [VisibleWindowActionTarget] {
-        guard let windowInfoList = windowInfoProvider.onScreenWindowInfo() else {
-            AppLogger.windowActions.error("Unable to inspect on-screen windows for manual window actions.")
-            return []
-        }
-
-        let runningApplicationsByPID = Dictionary(
-            uniqueKeysWithValues: applicationProvider.runningWindowActionApplications.map { ($0.processIdentifier, $0) }
-        )
-        var orderedPIDs: [pid_t] = []
-        var visibleBoundsByPID: [pid_t: [CGRect]] = [:]
-
-        for windowInfo in windowInfoList {
-            guard let windowPID = WindowInspector.windowOwnerPID(from: windowInfo),
-            let application = runningApplicationsByPID[windowPID],
-            WindowInspector.hasVisibleWindow(ownerPID: windowPID, windowInfoList: [windowInfo]),
-            let bounds = WindowInspector.windowBounds(from: windowInfo),
-            StatusBarController.canPerformManualWindowAction(
-                frontmostBundleID: application.bundleIdentifier,
-                isTerminated: application.isTerminated
-            ) else {
-                continue
-            }
-
-            if visibleBoundsByPID[windowPID] == nil {
-                orderedPIDs.append(windowPID)
-                visibleBoundsByPID[windowPID] = []
-            }
-            visibleBoundsByPID[windowPID, default: []].append(bounds)
-        }
-
-        return orderedPIDs.compactMap { pid in
-            guard let application = runningApplicationsByPID[pid],
-                  let visibleWindowBounds = visibleBoundsByPID[pid],
-                  !visibleWindowBounds.isEmpty else {
-                return nil
-            }
-
-            return VisibleWindowActionTarget(
-                application: application,
-                visibleWindowBounds: visibleWindowBounds
-            )
-        }
     }
 }

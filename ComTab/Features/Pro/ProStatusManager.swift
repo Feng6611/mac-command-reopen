@@ -56,6 +56,17 @@ final class ProStatusManager: ObservableObject {
         Self.accessEntitlementState(status: status, lastError: lastError)
     }
 
+    static func bootstrapLocalTrialIfNeeded(defaults: UserDefaults = .standard, now: () -> Date = Date.init) {
+        AppDefaults.migrateLegacyKeys(in: defaults)
+        guard defaults[AppDefaults.trialStartDate] == nil else {
+            return
+        }
+
+        let resolvedStartDate = now()
+        defaults[AppDefaults.trialStartDate] = resolvedStartDate
+        AppLogger.purchase.notice("Bootstrapped local trial at \(resolvedStartDate.formatted())")
+    }
+
     init(
         defaults: UserDefaults = .standard,
         commerceClient: (any CommerceClient)? = nil,
@@ -66,11 +77,8 @@ final class ProStatusManager: ObservableObject {
             configuration: RevenueCatConfiguration.commerceConfiguration
         )
         let cachedSnapshot = client.cachedEntitlement
-        if cachedSnapshot == nil,
-           defaults[AppDefaults.trialStartDate] == nil {
-            let resolvedStartDate = now()
-            defaults[AppDefaults.trialStartDate] = resolvedStartDate
-            AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
+        if cachedSnapshot == nil {
+            Self.bootstrapLocalTrialIfNeeded(defaults: defaults, now: now)
         }
         self.defaults = defaults
         self.commerceClient = client

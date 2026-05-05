@@ -23,16 +23,13 @@ final class SettingsNavigationModel: ObservableObject {
 }
 
 @MainActor
-final class SettingsWindowController: NSObject, NSWindowDelegate {
+final class SettingsWindowController {
     static let shared = SettingsWindowController()
 
     private static let frameAutosaveName = NSWindow.FrameAutosaveName("CommandReopen.SettingsWindow")
-    private static let title = "Settings"
-
-    private var window: NSWindow?
 
     var isVisible: Bool {
-        window?.isVisible == true
+        visibleSettingsWindows.isEmpty == false
     }
 
     func prepareForSettingsScene(
@@ -50,6 +47,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if presentsPaywall {
             SettingsNavigationModel.shared.isPaywallSheetPresented = true
         }
+
+        activateApp()
+        DispatchQueue.main.async { [weak self] in
+            self?.restoreSettingsWindowFrame()
+        }
     }
 
     func show(
@@ -59,19 +61,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         initialTab: SettingsTab? = nil,
         presentsPaywall: Bool = false
     ) {
-        prepareForSettingsScene(accessController: accessController, initialTab: initialTab, presentsPaywall: presentsPaywall)
-        if let window {
-            present(window)
-            return
-        }
-
-        let window = makeWindow(
-            activationMonitor: activationMonitor ?? .shared,
-            reopenStatsStore: reopenStatsStore ?? .shared,
-            accessController: accessController ?? .shared
-        )
-        self.window = window
-        present(window)
+        SettingsOpener.shared.open(initialTab: initialTab, presentsPaywall: presentsPaywall)
     }
 
     private func activateApp() {
@@ -84,58 +74,103 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         }
     }
 
-    private func makeWindow(
-        activationMonitor: ActivationMonitor,
-        reopenStatsStore: ReopenStatsStore,
-        accessController: AppAccessController
-    ) -> NSWindow {
-        let rootView = SettingsWindowRootView(
-            activationMonitor: activationMonitor,
-            reopenStatsStore: reopenStatsStore,
-            accessController: accessController,
-            settingsNavigationModel: .shared
-        )
-        let hostingController = NSHostingController(rootView: rootView)
-        let window = NSWindow(contentViewController: hostingController)
-        window.title = Self.title
-        window.delegate = self
-        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.isReleasedWhenClosed = false
-        window.setFrameAutosaveName(Self.frameAutosaveName)
-        if !window.setFrameUsingName(Self.frameAutosaveName) {
-            window.center()
+    private var visibleSettingsWindows: [NSWindow] {
+        NSApp.windows.filter { window in
+            window.isVisible && isSettingsWindow(window)
         }
-        return window
     }
 
-    private func present(_ window: NSWindow) {
-        activateApp()
-        window.makeKeyAndOrderFront(nil)
-        window.setFrameUsingName(Self.frameAutosaveName)
+    private func restoreSettingsWindowFrame() {
+        for window in visibleSettingsWindows {
+            window.contentMinSize = CGSize(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
+            window.center()
+            window.setFrameUsingName(Self.frameAutosaveName)
+            window.setFrameAutosaveName(Self.frameAutosaveName)
+            enforceMinimumContentSize(for: window)
+        }
     }
 
-    func windowWillClose(_ notification: Notification) {
-        window = nil
+    private func enforceMinimumContentSize(for window: NSWindow) {
+        let currentContentSize = window.contentLayoutRect.size
+        let minimumContentSize = CGSize(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
+        guard currentContentSize.width < minimumContentSize.width
+                || currentContentSize.height < minimumContentSize.height else {
+            return
+        }
+
+        var frame = window.frame
+        let targetContentSize = CGSize(
+            width: max(currentContentSize.width, minimumContentSize.width),
+            height: max(currentContentSize.height, minimumContentSize.height)
+        )
+        let targetFrame = window.frameRect(forContentRect: CGRect(origin: .zero, size: targetContentSize))
+        frame.size.width = targetFrame.size.width
+        frame.size.height = targetFrame.size.height
+        window.setFrame(frame, display: true)
+    }
+
+    private func isSettingsWindow(_ window: NSWindow) -> Bool {
+        window.title == "Settings"
     }
 }
 
-private struct SettingsWindowRootView: View {
-    @ObservedObject var activationMonitor: ActivationMonitor
-    @ObservedObject var reopenStatsStore: ReopenStatsStore
-    @ObservedObject var accessController: AppAccessController
-    @ObservedObject var settingsNavigationModel: SettingsNavigationModel
-#if APPSTORE
-    @StateObject private var proStatusManager = ProStatusManager.shared
-#endif
+@MainActor
+final class SettingsOpener {
+    static let shared = SettingsOpener()
 
-    var body: some View {
-        SettingsView()
-            .environmentObject(activationMonitor)
-            .environmentObject(reopenStatsStore)
-            .environmentObject(accessController)
-            .environmentObject(settingsNavigationModel)
-#if APPSTORE
-            .environmentObject(proStatusManager)
-#endif
+    func prepare(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        SettingsWindowController.shared.prepareForSettingsScene(
+            initialTab: initialTab,
+            presentsPaywall: presentsPaywall
+        )
+    }
+
+    func open(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        prepare(initialTab: initialTab, presentsPaywall: presentsPaywall)
+
+        if performMainMenuSettingsItem() {
+            return
+        }
+
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+
+    private func performMainMenuSettingsItem() -> Bool {
+        guard let mainMenu = NSApp.mainMenu else {
+            AppLogger.lifecycle.debug("Unable to open settings through main menu because NSApp.mainMenu is nil.")
+            return false
+        }
+
+        return performSettingsItem(in: mainMenu)
+    }
+
+    private func performSettingsItem(in menu: NSMenu) -> Bool {
+        for (index, item) in menu.items.enumerated() {
+            if isSettingsItem(item), item.isEnabled {
+                menu.performActionForItem(at: index)
+                return true
+            }
+
+            if let submenu = item.submenu,
+               performSettingsItem(in: submenu) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private func isSettingsItem(_ item: NSMenuItem) -> Bool {
+        if item.keyEquivalent == "," {
+            return true
+        }
+
+        let normalizedTitle = item.title
+            .replacingOccurrences(of: "…", with: "...")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        return normalizedTitle == "settings..."
+            || normalizedTitle == "preferences..."
     }
 }

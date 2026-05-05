@@ -7,12 +7,14 @@
 
 import AppKit
 import Combine
+import Defaults
 import os
 
 @MainActor
 final class AppLifecycleCoordinator {
     private enum Constants {
         static let commerceRefreshThrottle: TimeInterval = 5 * 60
+        static let initialCommerceRefreshDelayNanoseconds: UInt64 = 1_000_000_000
     }
 
     static let shared = AppLifecycleCoordinator()
@@ -42,22 +44,19 @@ final class AppLifecycleCoordinator {
         bindUpgradePrompt()
 
 #if APPSTORE
-        let shouldShowOnboardingImmediately = false
-        if shouldShowOnboardingImmediately {
+        bootstrapTrialAccessIfNeeded()
+        if shouldPresentOnboardingOnLaunch {
             OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
             hasCompletedInitialCommerceRefresh = true
+            return
         }
-#else
-        let shouldShowOnboardingImmediately = false
 #endif
 
-        if !shouldShowOnboardingImmediately {
-            // Ensure no windows are visible for the menu-bar-only idle state.
-            NSApp.windows.forEach { $0.orderOut(nil) }
-        }
+        // Ensure no windows are visible for the menu-bar-only idle state.
+        NSApp.windows.forEach { $0.orderOut(nil) }
 
 #if DEBUG
-        if shouldAutoShowSettingsForDebugLaunch, !shouldShowOnboardingImmediately {
+        if shouldAutoShowSettingsForDebugLaunch {
             AppLogger.lifecycle.notice("Debug launch detected. Opening settings window for visibility.")
             SettingsWindowController.shared.show(
                 activationMonitor: .shared,
@@ -67,11 +66,11 @@ final class AppLifecycleCoordinator {
         }
 #endif
 
-        guard !shouldShowOnboardingImmediately else {
-            return
-        }
-
+#if APPSTORE
+        scheduleInitialCommerceRefresh()
+#else
         hasCompletedInitialCommerceRefresh = true
+#endif
     }
 
     func applicationDidBecomeActive() {
@@ -92,6 +91,25 @@ final class AppLifecycleCoordinator {
     private var shouldAutoShowSettingsForDebugLaunch: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["OS_ACTIVITY_DT_MODE"] == "1" || environment["OS_ACTIVITY_DT_MODE"] == "YES"
+    }
+#endif
+
+    private var shouldPresentOnboardingOnLaunch: Bool {
+#if APPSTORE
+        accessController.distributionChannel == .appStore
+            && !UserDefaults.standard[AppDefaults.hasSeenOnboarding]
+#else
+        false
+#endif
+    }
+
+#if APPSTORE
+    private func bootstrapTrialAccessIfNeeded() {
+        guard accessController.distributionChannel == .appStore else {
+            return
+        }
+
+        ProStatusManager.bootstrapLocalTrialIfNeeded()
     }
 #endif
 
@@ -147,6 +165,14 @@ final class AppLifecycleCoordinator {
             }
 
             accessController.markPromptHandled()
+        }
+    }
+
+    private func scheduleInitialCommerceRefresh() {
+        Task { @MainActor [weak self] in
+            await Task.yield()
+            try? await Task.sleep(nanoseconds: Constants.initialCommerceRefreshDelayNanoseconds)
+            await self?.completeInitialCommerceRefresh()
         }
     }
 

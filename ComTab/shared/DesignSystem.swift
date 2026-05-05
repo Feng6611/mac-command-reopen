@@ -35,7 +35,7 @@ enum DS {
 
     enum Window {
         static let settingsWidth:  CGFloat = 540
-        static let settingsHeight: CGFloat = 480
+        static let settingsHeight: CGFloat = 560
     }
 
     // MARK: Corner Radius (semantic)

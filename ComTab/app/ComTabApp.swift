@@ -5,17 +5,23 @@
 //  Created by CHEN on 2025/10/31.
 //
 
-import AppKit
+import SwiftUI
 
 @main
-enum ComTabApp {
-    private static var appDelegate: AppDelegate?
+struct ComTabApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @StateObject private var activationMonitor = ActivationMonitor.shared
+    @StateObject private var reopenStatsStore = ReopenStatsStore.shared
+    @StateObject private var accessController = AppAccessController.shared
+    @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
 
-    static func main() {
-        let application = NSApplication.shared
-        let delegate = AppDelegate()
-        appDelegate = delegate
-        application.delegate = delegate
-        application.run()
+    var body: some Scene {
+        Settings {
+            SettingsView()
+                .environmentObject(activationMonitor)
+                .environmentObject(reopenStatsStore)
+                .environmentObject(accessController)
+                .environmentObject(settingsNavigationModel)
+        }
     }
 }

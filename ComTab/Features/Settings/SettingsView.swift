@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import Combine
 import LaunchAtLogin
 import RevenueCatCommerceKit
 import SwiftUI
@@ -52,18 +53,23 @@ struct SettingsView: View {
                 .tabItem { tabLabel(for: .general) }
                 .tag(SettingsTab.general)
 
-            ReopenStatsView()
+            LazySettingsTabContent(tab: .statistics) {
+                ReopenStatsView()
+            }
                 .tabItem { tabLabel(for: .statistics) }
                 .tag(SettingsTab.statistics)
 
-            AboutTabContent()
+            LazySettingsTabContent(tab: .about) {
+#if APPSTORE
+                AppStoreAboutTabContent()
+#else
+                AboutTabContent()
+#endif
+            }
                 .tabItem { tabLabel(for: .about) }
                 .tag(SettingsTab.about)
         }
         .frame(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
-        .task {
-            await accessController.refresh()
-        }
     }
 
     private var selectedTabBinding: Binding<SettingsTab?> {
@@ -84,6 +90,32 @@ struct SettingsView: View {
         )
     }
 }
+
+private struct LazySettingsTabContent<Content: View>: View {
+    @EnvironmentObject private var navigationModel: SettingsNavigationModel
+
+    let tab: SettingsTab
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        if navigationModel.selectedTab == tab {
+            content()
+        } else {
+            Color.clear
+        }
+    }
+}
+
+#if APPSTORE
+private struct AppStoreAboutTabContent: View {
+    @StateObject private var proStatusManager = ProStatusManager.shared
+
+    var body: some View {
+        AboutTabContent()
+            .environmentObject(proStatusManager)
+    }
+}
+#endif
 
 private extension View {
     func settingsTabPane() -> some View {
@@ -374,27 +406,10 @@ struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
     @State private var selectedBundleToExclude: String?
+    @State private var runningUserApps: [NSRunningApplication] = []
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
-    }
-
-    private var runningUserApps: [NSRunningApplication] {
-        let excluded = activationMonitor.userExcludedBundleIDs
-        let selfBundleID = Bundle.main.bundleIdentifier
-
-        return NSWorkspace.shared.runningApplications
-            .filter { app in
-                guard app.activationPolicy == .regular,
-                      let bundleID = app.bundleIdentifier else {
-                    return false
-                }
-                return !excluded.contains(bundleID) && bundleID != selfBundleID
-            }
-            .sorted {
-                ($0.localizedName ?? $0.bundleIdentifier ?? "")
-                    .localizedCaseInsensitiveCompare($1.localizedName ?? $1.bundleIdentifier ?? "") == .orderedAscending
-            }
     }
 
     var body: some View {
@@ -421,7 +436,7 @@ struct SettingsTabContent: View {
                     ForEach(activationMonitor.sortedUserExcludedBundleIDs, id: \.self) { bundleID in
                         SettingsUI.ApplicationRow(
                             bundleID: bundleID,
-                            removeAction: activationMonitor.removeExcludedBundleID
+                            removeAction: removeExcludedBundleID
                         )
                     }
                 }
@@ -430,12 +445,50 @@ struct SettingsTabContent: View {
                     applications: runningUserApps,
                     selection: $selectedBundleToExclude,
                     isDisabled: isFeatureLocked,
-                    addAction: activationMonitor.addExcludedBundleID
+                    addAction: addExcludedBundleID
                 )
             } header: {
                 Text("Excluded Apps")
             }
             .opacity(isFeatureLocked ? 0.5 : 1)
         }
+        .task {
+            await Task.yield()
+            refreshRunningUserApps()
+        }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { _ in
+            refreshRunningUserApps()
+        }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in
+            refreshRunningUserApps()
+        }
+    }
+
+    private func addExcludedBundleID(_ bundleID: String) {
+        activationMonitor.addExcludedBundleID(bundleID)
+        refreshRunningUserApps()
+    }
+
+    private func removeExcludedBundleID(_ bundleID: String) {
+        activationMonitor.removeExcludedBundleID(bundleID)
+        refreshRunningUserApps()
+    }
+
+    private func refreshRunningUserApps() {
+        let excluded = activationMonitor.userExcludedBundleIDs
+        let selfBundleID = Bundle.main.bundleIdentifier
+
+        runningUserApps = NSWorkspace.shared.runningApplications
+            .filter { app in
+                guard app.activationPolicy == .regular,
+                      let bundleID = app.bundleIdentifier else {
+                    return false
+                }
+                return !excluded.contains(bundleID) && bundleID != selfBundleID
+            }
+            .sorted {
+                ($0.localizedName ?? $0.bundleIdentifier ?? "")
+                    .localizedCaseInsensitiveCompare($1.localizedName ?? $1.bundleIdentifier ?? "") == .orderedAscending
+            }
     }
 }
