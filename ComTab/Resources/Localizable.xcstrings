@@ -1,0 +1,205 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "🎉" : {
+
+    },
+    "👇" : {
+
+    },
+    "About" : {
+
+    },
+    "Add" : {
+
+    },
+    "All features unlocked — thank you for your support." : {
+
+    },
+    "App" : {
+
+    },
+    "Auto-renews annually" : {
+
+    },
+    "Automatically reopen windows when switching apps via Cmd+Tab" : {
+
+    },
+    "Best Value" : {
+
+    },
+    "Choose your plan" : {
+
+    },
+    "Close" : {
+
+    },
+    "Command Reopen helped you **%lld times** during your trial." : {
+
+    },
+    "Continue" : {
+
+    },
+    "Count" : {
+
+    },
+    "Date" : {
+
+    },
+    "Day" : {
+
+    },
+    "Enable Command Reopen" : {
+
+    },
+    "Excluded Apps" : {
+
+    },
+    "General" : {
+
+    },
+    "Get on Mac App Store" : {
+
+    },
+    "GitHub" : {
+
+    },
+    "Launch at Login" : {
+
+    },
+    "Lifetime" : {
+
+    },
+    "Loading purchase options..." : {
+
+    },
+    "Manage Subscription" : {
+
+    },
+    "Minimize Window" : {
+
+    },
+    "Month" : {
+
+    },
+    "No active purchase found on this account." : {
+
+    },
+    "No excluded apps" : {
+
+    },
+    "No reopen activity yet" : {
+
+    },
+    "Now ⌘⇥ back to Command Reopen" : {
+
+    },
+    "Official" : {
+
+    },
+    "Onboarding step %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Onboarding step %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "once" : {
+
+    },
+    "Pay once, use forever" : {
+
+    },
+    "per year" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Pro" : {
+
+    },
+    "Purchase restored." : {
+
+    },
+    "Purchase successful. Pro unlocked." : {
+
+    },
+    "Quit Command Reopen" : {
+
+    },
+    "Rate on App Store" : {
+
+    },
+    "Remove %@" : {
+
+    },
+    "Reopen Pro" : {
+
+    },
+    "Requires Pro to enable." : {
+
+    },
+    "Restore Purchase" : {
+
+    },
+    "Restoring..." : {
+
+    },
+    "Select an app..." : {
+
+    },
+    "Settings..." : {
+
+    },
+    "Start 2-Day Free Trial" : {
+
+    },
+    "Start using Command Reopen to see trends" : {
+
+    },
+    "Status" : {
+
+    },
+    "Terms" : {
+
+    },
+    "Top Apps" : {
+
+    },
+    "total reopens" : {
+
+    },
+    "Trend" : {
+
+    },
+    "Unavailable" : {
+
+    },
+    "Upgrade to Pro..." : {
+
+    },
+    "Week" : {
+
+    },
+    "Works for Safari, Finder, Xcode, and every other app." : {
+
+    },
+    "year" : {
+
+    },
+    "Yearly" : {
+
+    }
+  },
+  "version" : "1.0"
+}

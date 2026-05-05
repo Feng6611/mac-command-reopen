@@ -31,5 +31,4 @@ DESIGN_NOTES.md
 fastlane/
 docs/*
 !docs/icon.svg
-scripts/auto_increment_build_number.sh
 Config/LocalSecrets.xcconfig

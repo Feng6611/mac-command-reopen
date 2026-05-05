@@ -1,0 +1,542 @@
+import AppKit
+import CoreGraphics
+import Foundation
+import Testing
+@testable import Command_Reopen
+
+@MainActor
+private final class RecordingAppReviewPrompter: AppReviewPrompting {
+    private(set) var requestReviewCallCount = 0
+
+    func requestReview() {
+        requestReviewCallCount += 1
+    }
+}
+
+struct ActivationMonitorAndReopenStatsTests {
+    @MainActor
+    private func makeStatsStore(suiteName: String = UUID().uuidString) -> (ReopenStatsStore, UserDefaults, String) {
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        return (ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"), defaults, suiteName)
+    }
+
+    @Test("Ignored bundle IDs include expected system apps")
+    func ignoredBundleIDs() {
+        let expected: Set<String> = [
+            "com.apple.dock",
+            "com.apple.Spotlight",
+            "com.apple.notificationcenterui",
+            "com.apple.controlcenter",
+            "com.apple.loginwindow",
+            "com.apple.SecurityAgent",
+            "com.apple.screencaptureui"
+        ]
+
+        for bundleID in expected {
+            #expect(ActivationMonitor.ignoredBundleIDs.contains(bundleID))
+            #expect(ActivationMonitor.isIgnoredBundleID(bundleID))
+        }
+
+        #expect(!ActivationMonitor.isIgnoredBundleID("com.apple.TextEdit"))
+        #expect(!ActivationMonitor.isIgnoredBundleID("com.google.Chrome"))
+        #expect(!ActivationMonitor.isIgnoredBundleID("com.apple.finder"))
+    }
+
+    @Test("Bundle ID normalization for user exclude list")
+    func normalizeBundleID() {
+        #expect(ActivationMonitor.normalizeBundleID(" com.apple.TextEdit ") == "com.apple.TextEdit")
+        #expect(ActivationMonitor.normalizeBundleID("\n\t") == nil)
+        #expect(ActivationMonitor.normalizeBundleID("") == nil)
+    }
+
+    @MainActor
+    @Test("Activation monitor defaults Finder into the user exclude list")
+    func activationMonitorDefaultsFinderExclusion() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs.contains("com.apple.finder"))
+        #expect(defaults.stringArray(forKey: AppDefaults.RawKey.excludedBundleIDs)?.contains("com.apple.finder") == true)
+    }
+
+    @MainActor
+    @Test("Activation monitor migrates Finder into existing exclude list once")
+    func activationMonitorMigratesFinderIntoExistingExcludeList() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.RawKey.excludedBundleIDs)
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit", "com.apple.finder"])
+    }
+
+    @MainActor
+    @Test("Activation monitor migrates legacy dotted Defaults keys")
+    func activationMonitorMigratesLegacyDefaultsKeys() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(false, forKey: AppDefaults.LegacyRawKey.featureEnabled)
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.LegacyRawKey.excludedBundleIDs)
+        defaults.set(true, forKey: AppDefaults.LegacyRawKey.defaultExcludedBundlesMigrated)
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(!monitor.isFeatureEnabled)
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit"])
+        #expect(defaults.object(forKey: AppDefaults.RawKey.featureEnabled) as? Bool == false)
+        #expect(defaults.stringArray(forKey: AppDefaults.RawKey.excludedBundleIDs) == ["com.apple.TextEdit"])
+        #expect(defaults.object(forKey: AppDefaults.RawKey.defaultExcludedBundlesMigrated) as? Bool == true)
+        #expect(defaults.object(forKey: AppDefaults.LegacyRawKey.featureEnabled) == nil)
+        #expect(defaults.object(forKey: AppDefaults.LegacyRawKey.excludedBundleIDs) == nil)
+    }
+
+    @MainActor
+    @Test("Activation monitor does not re-add Finder after migration completes")
+    func activationMonitorDoesNotReAddFinderAfterMigration() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(["com.apple.TextEdit"], forKey: AppDefaults.RawKey.excludedBundleIDs)
+        defaults.set(true, forKey: AppDefaults.RawKey.defaultExcludedBundlesMigrated)
+
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats"),
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        #expect(monitor.userExcludedBundleIDs == ["com.apple.TextEdit"])
+        #expect(!monitor.userExcludedBundleIDs.contains("com.apple.finder"))
+    }
+
+    @Test("Recent launch suppression helper respects interval bounds")
+    func recentLaunchSuppressionLogic() {
+        let now = Date()
+
+        #expect(ActivationMonitor.shouldSuppressRecentLaunch(
+            launchDate: now.addingTimeInterval(-0.3),
+            now: now,
+            interval: 0.9
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRecentLaunch(
+            launchDate: now.addingTimeInterval(-2.0),
+            now: now,
+            interval: 0.9
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRecentLaunch(
+            launchDate: now.addingTimeInterval(0.1),
+            now: now,
+            interval: 0.9
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRecentLaunch(
+            launchDate: nil,
+            now: now,
+            interval: 0.9
+        ))
+    }
+
+    @Test("Bundle debounce helper suppresses rapid reopen calls")
+    func debounceLogic() {
+        let now = Date()
+
+        #expect(ActivationMonitor.shouldDebounceReopen(
+            lastReopenDate: now.addingTimeInterval(-0.05),
+            now: now,
+            interval: 0.1
+        ))
+
+        #expect(!ActivationMonitor.shouldDebounceReopen(
+            lastReopenDate: now.addingTimeInterval(-0.2),
+            now: now,
+            interval: 0.1
+        ))
+
+        #expect(!ActivationMonitor.shouldDebounceReopen(
+            lastReopenDate: nil,
+            now: now,
+            interval: 0.1
+        ))
+    }
+
+    @Test("Self-trigger suppression helper handles active/expired windows")
+    func selfTriggerSuppressionLogic() {
+        let now = Date()
+
+        #expect(ActivationMonitor.shouldIgnoreSelfTriggered(
+            until: now.addingTimeInterval(0.2),
+            now: now
+        ))
+
+        #expect(!ActivationMonitor.shouldIgnoreSelfTriggered(
+            until: now.addingTimeInterval(-0.2),
+            now: now
+        ))
+
+        #expect(!ActivationMonitor.shouldIgnoreSelfTriggered(
+            until: nil,
+            now: now
+        ))
+    }
+
+    @Test("Expired paywall nudge is allowed when no previous nudge exists")
+    func expiredNudgeAllowsMissingPreviousDate() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 10).date)
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: nil,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge is suppressed on the same calendar day")
+    func expiredNudgeSuppressesSameDay() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let lastNudgeDate = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 9).date)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 22).date)
+
+        #expect(!ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: lastNudgeDate,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge is allowed on a different calendar day")
+    func expiredNudgeAllowsDifferentDay() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let lastNudgeDate = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 23).date)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 6, hour: 1).date)
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: lastNudgeDate,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Expired paywall nudge helper is pure")
+    func expiredNudgeHelperIsPure() throws {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = try #require(DateComponents(calendar: calendar, year: 2026, month: 5, day: 5, hour: 10).date)
+        UserDefaults.standard.set(now, forKey: "lastExpiredPaywallNudgeDate")
+        defer { UserDefaults.standard.removeObject(forKey: "lastExpiredPaywallNudgeDate") }
+
+        #expect(ActivationMonitor.shouldShowExpiredNudge(
+            lastNudgeDate: nil,
+            now: now,
+            calendar: calendar
+        ))
+    }
+
+    @Test("Rapid-return heuristic suppresses short tab-away-and-back cycles")
+    func rapidReturnSuppressionLogic() {
+        let now = Date()
+
+        #expect(ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.Safari",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.TextEdit",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: "com.apple.Safari",
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-3.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+
+        #expect(!ActivationMonitor.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: nil,
+            targetBundleID: "com.apple.TextEdit",
+            targetLastActivationDate: now.addingTimeInterval(-1.0),
+            previousBundleLastActivationDate: now.addingTimeInterval(-0.4),
+            now: now,
+            interval: 2.0
+        ))
+    }
+
+    @Test("Visible window detection only matches onscreen windows for the target app")
+    func visibleWindowDetection() {
+        let targetPID: pid_t = 4242
+        let otherPID: pid_t = 8080
+
+        let visibleWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 40,
+                "Y": 80,
+                "Width": 1024,
+                "Height": 768
+            ]
+        ]
+
+        let hiddenWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: false,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 1024,
+                "Height": 768
+            ]
+        ]
+
+        let tinyOverlay: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: targetPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 12,
+                "Height": 12
+            ]
+        ]
+
+        let otherAppWindow: [String: Any] = [
+            kCGWindowOwnerPID as String: NSNumber(value: otherPID),
+            kCGWindowIsOnscreen as String: true,
+            kCGWindowAlpha as String: 1.0,
+            kCGWindowBounds as String: [
+                "X": 0,
+                "Y": 0,
+                "Width": 1280,
+                "Height": 720
+            ]
+        ]
+
+        #expect(ActivationMonitor.hasVisibleWindow(
+            ownerPID: targetPID,
+            windowInfoList: [visibleWindow, otherAppWindow],
+            minimumDimension: 32
+        ))
+
+        #expect(!ActivationMonitor.hasVisibleWindow(
+            ownerPID: targetPID,
+            windowInfoList: [hiddenWindow, tinyOverlay, otherAppWindow],
+            minimumDimension: 32
+        ))
+    }
+
+    @Test("Window owner PID helper accepts common CoreGraphics number types")
+    func windowOwnerPIDParsing() {
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: NSNumber(value: 123)
+        ]) == 123)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: Int32(456)
+        ]) == 456)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [
+            kCGWindowOwnerPID as String: 789
+        ]) == 789)
+
+        #expect(ActivationMonitor.windowOwnerPID(from: [:]) == nil)
+    }
+
+    @MainActor
+    @Test("Successful reopen stats increment total and per-app counts")
+    func reopenStatsIncrement() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        #expect(store.totalSuccessfulReopens == 1)
+        #expect(store.appStats.count == 1)
+        #expect(store.appStats[0] == .init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1))
+    }
+
+    @MainActor
+    @Test("Successful reopen stats accumulate and sort by count")
+    func reopenStatsSorting() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        store.recordSuccessfulReopen(bundleID: "com.apple.Safari", localizedName: "Safari")
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        #expect(store.totalSuccessfulReopens == 3)
+        #expect(store.appStats.map(\.bundleID) == ["com.apple.TextEdit", "com.apple.Safari"])
+        #expect(store.appStats.map(\.count) == [2, 1])
+    }
+
+    @MainActor
+    @Test("Successful reopen stats persist across store reloads")
+    func reopenStatsPersistence() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let firstStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        firstStore.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        firstStore.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+        let secondStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        #expect(secondStore.totalSuccessfulReopens == 2)
+        #expect(secondStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 2)])
+    }
+
+    @MainActor
+    @Test("App Store review prompt fires once at reopen milestones")
+    func appStoreReviewPromptMilestones() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let reviewPrompter = RecordingAppReviewPrompter()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let store = ReopenStatsStore(
+            defaults: defaults,
+            storageKey: "test.reopenStats",
+            distributionChannel: .appStore,
+            appReviewPrompter: reviewPrompter
+        )
+
+        for index in 1...70 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+            switch index {
+            case 30:
+                #expect(reviewPrompter.requestReviewCallCount == 1)
+            case 50:
+                #expect(reviewPrompter.requestReviewCallCount == 2)
+            case 70:
+                #expect(reviewPrompter.requestReviewCallCount == 3)
+            default:
+                break
+            }
+        }
+
+        #expect(reviewPrompter.requestReviewCallCount == 3)
+    }
+
+    @MainActor
+    @Test("App Store review prompt does not repeat after a prompted milestone")
+    func appStoreReviewPromptDoesNotRepeatMilestone() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let reviewPrompter = RecordingAppReviewPrompter()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let store = ReopenStatsStore(
+            defaults: defaults,
+            storageKey: "test.reopenStats",
+            distributionChannel: .appStore,
+            appReviewPrompter: reviewPrompter
+        )
+
+        for _ in 1...30 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        }
+        #expect(reviewPrompter.requestReviewCallCount == 1)
+
+        store.reset()
+        for _ in 1...30 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        }
+
+        #expect(reviewPrompter.requestReviewCallCount == 1)
+    }
+
+    @MainActor
+    @Test("Reset clears reopen stats")
+    func reopenStatsReset() {
+        let (store, defaults, suiteName) = makeStatsStore()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        store.reset()
+
+        #expect(store.totalSuccessfulReopens == 0)
+        #expect(store.appStats.isEmpty)
+    }
+
+    @MainActor
+    @Test("Activation monitor records stats only for successful reopen completions")
+    func activationMonitorReopenCompletionStats() async {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let statsStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
+        let monitor = ActivationMonitor(
+            notificationCenter: NotificationCenter(),
+            workspace: .shared,
+            defaults: defaults,
+            reopenStatsStore: statsStore,
+            accessController: AppAccessController(distributionChannel: .direct)
+        )
+
+        monitor.handleReopenCompletion(
+            requestedBundleID: "com.apple.TextEdit",
+            openedBundleID: nil,
+            localizedName: nil,
+            openedProcessIdentifier: nil,
+            error: NSError(domain: "Test", code: 1)
+        )
+        await Task.yield()
+        #expect(statsStore.totalSuccessfulReopens == 0)
+
+        monitor.handleReopenCompletion(
+            requestedBundleID: "com.apple.TextEdit",
+            openedBundleID: "com.apple.TextEdit",
+            localizedName: "TextEdit",
+            openedProcessIdentifier: 123,
+            error: nil
+        )
+        await Task.yield()
+        #expect(statsStore.totalSuccessfulReopens == 1)
+        #expect(statsStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 1)])
+    }
+}
