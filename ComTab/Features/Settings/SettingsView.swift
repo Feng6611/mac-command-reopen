@@ -236,12 +236,6 @@ private struct DirectSupportPoint: View {
 
 // MARK: - Settings Tab Content
 
-struct GroupedFormStyleModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content.formStyle(.grouped)
-    }
-}
-
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
@@ -274,7 +268,7 @@ struct SettingsTabContent: View {
     }
 
     var body: some View {
-        Form {
+        SettingsUI.FormPane {
             Section {
                 Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                     .disabled(isFeatureLocked)
@@ -285,6 +279,7 @@ struct SettingsTabContent: View {
                         .foregroundStyle(Color.accentColor)
                 } else {
                     Text("Automatically reopen windows when switching apps via Cmd+Tab")
+                        .settingDescription()
                 }
             }
 
@@ -294,88 +289,44 @@ struct SettingsTabContent: View {
                         .foregroundColor(.secondary)
                 } else {
                     ForEach(activationMonitor.sortedUserExcludedBundleIDs, id: \.self) { bundleID in
-                        HStack(spacing: 8) {
-                            if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) {
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                                    .resizable()
-                                    .frame(width: 16, height: 16)
-                                Text(FileManager.default.displayName(atPath: url.path))
-                                    .font(.caption)
-                                    .help(bundleID)
-                            } else {
-                                Text(bundleID)
-                                    .font(.caption)
-                            }
-                            Spacer()
-                            Button {
-                                activationMonitor.removeExcludedBundleID(bundleID)
-                            } label: {
-                                Image(systemName: "trash")
-                            }
-                            .buttonStyle(.borderless)
-                        }
+                        SettingsUI.ApplicationRow(
+                            bundleID: bundleID,
+                            removeAction: activationMonitor.removeExcludedBundleID
+                        )
                     }
                 }
 
-                HStack {
-                    Picker(selection: $selectedBundleToExclude) {
-                        Text("Select an app...").tag(String?.none)
-                        ForEach(runningUserApps, id: \.bundleIdentifier) { app in
-                            if let bundleID = app.bundleIdentifier {
-                                Text(app.localizedName ?? bundleID)
-                                    .tag(Optional(bundleID))
-                            }
-                        }
-                    } label: {
-                        EmptyView()
-                    }
-                    .labelsHidden()
-                    .disabled(isFeatureLocked)
-
-                    Button("Add") {
-                        if let selectedBundleToExclude {
-                            activationMonitor.addExcludedBundleID(selectedBundleToExclude)
-                            self.selectedBundleToExclude = nil
-                        }
-                    }
-                    .disabled(selectedBundleToExclude == nil || isFeatureLocked)
-                }
+                SettingsUI.ApplicationPicker(
+                    applications: runningUserApps,
+                    selection: $selectedBundleToExclude,
+                    isDisabled: isFeatureLocked,
+                    addAction: activationMonitor.addExcludedBundleID
+                )
             } header: {
                 Text("Excluded Apps")
             }
             .opacity(isFeatureLocked ? 0.5 : 1)
 
             Section {
-                Button("Contact Developer") { openURL(ExternalLinks.contactEmail) }
-                    .buttonStyle(.link)
+                SettingsUI.LinkButton(title: "Contact Developer", urlString: ExternalLinks.contactEmail)
 
                 switch distributionChannel {
                 case .appStore:
-                    Button("Official Website") { openURL(ExternalLinks.officialURL) }
-                        .buttonStyle(.link)
+                    SettingsUI.LinkButton(title: "Official Website", urlString: ExternalLinks.officialURL)
                     Button("Rate on App Store") { requestReview() }
                         .buttonStyle(.link)
 
                 case .direct:
-                    Button("Get on Mac App Store") { openURL(AppStoreLinks.productURL) }
-                        .buttonStyle(.link)
-                    Button("GitHub") { openURL(ExternalLinks.githubURL) }
-                        .buttonStyle(.link)
+                    SettingsUI.LinkButton(title: "Get on Mac App Store", urlString: AppStoreLinks.productURL)
+                    SettingsUI.LinkButton(title: "GitHub", urlString: ExternalLinks.githubURL)
                 }
             } header: {
                 Text("Feedback & Support")
             }
         }
-        .modifier(GroupedFormStyleModifier())
     }
 
     private func requestReview() {
-        openURL(AppStoreLinks.reviewURL)
-    }
-
-    private func openURL(_ urlString: String) {
-        if let url = URL(string: urlString) {
-            NSWorkspace.shared.open(url)
-        }
+        SettingsUI.openURL(AppStoreLinks.reviewURL)
     }
 }
