@@ -111,7 +111,8 @@ struct StatusBarMenu: View {
                 TapGesture().onEnded {
                     SettingsWindowController.shared.prepareForSettingsScene(
                         accessController: accessController,
-                        initialTab: .pro
+                        initialTab: .about,
+                        presentsPaywall: true
                     )
                 }
             )
@@ -120,7 +121,8 @@ struct StatusBarMenu: View {
                 SettingsWindowController.shared.show(
                     activationMonitor: activationMonitor,
                     accessController: accessController,
-                    initialTab: .pro
+                    initialTab: .about,
+                    presentsPaywall: true
                 )
             }
         }

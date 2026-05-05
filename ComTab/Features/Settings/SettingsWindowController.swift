@@ -15,6 +15,7 @@ final class SettingsNavigationModel: ObservableObject {
     static let shared = SettingsNavigationModel()
 
     @Published var selectedTab: SettingsTab
+    @Published var isPaywallSheetPresented = false
 
     init(selectedTab: SettingsTab = .general) {
         self.selectedTab = selectedTab
@@ -39,21 +40,18 @@ final class SettingsWindowController {
 
     func prepareForSettingsScene(
         accessController: AppAccessController? = nil,
-        initialTab: SettingsTab? = nil
+        initialTab: SettingsTab? = nil,
+        presentsPaywall: Bool = false
     ) {
-        let accessController = accessController ?? .shared
-        let resolvedInitialTab = initialTab.flatMap { requestedTab in
-            accessController.showsProTab || requestedTab != .pro ? requestedTab : .general
-        }
-
-        if let resolvedInitialTab {
-            AppLogger.lifecycle.notice("Preparing settings scene. initialTab=\(resolvedInitialTab.rawValue)")
-            SettingsNavigationModel.shared.selectedTab = resolvedInitialTab
-        } else if !accessController.showsProTab && SettingsNavigationModel.shared.selectedTab == .pro {
-            AppLogger.lifecycle.notice("Preparing settings scene. selected pro tab is unavailable; falling back to general.")
-            SettingsNavigationModel.shared.selectedTab = .general
+        if let initialTab {
+            AppLogger.lifecycle.notice("Preparing settings scene. initialTab=\(initialTab.rawValue)")
+            SettingsNavigationModel.shared.selectedTab = initialTab
         } else {
             AppLogger.lifecycle.notice("Preparing settings scene. Restoring existing selected tab.")
+        }
+
+        if presentsPaywall {
+            SettingsNavigationModel.shared.isPaywallSheetPresented = true
         }
 
         activateApp()
@@ -66,9 +64,10 @@ final class SettingsWindowController {
         activationMonitor: ActivationMonitor? = nil,
         reopenStatsStore: ReopenStatsStore? = nil,
         accessController: AppAccessController? = nil,
-        initialTab: SettingsTab? = nil
+        initialTab: SettingsTab? = nil,
+        presentsPaywall: Bool = false
     ) {
-        prepareForSettingsScene(accessController: accessController, initialTab: initialTab)
+        prepareForSettingsScene(accessController: accessController, initialTab: initialTab, presentsPaywall: presentsPaywall)
         if let openSettingsAction {
             openSettingsAction()
         } else {

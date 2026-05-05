@@ -534,6 +534,429 @@ struct ProStatusBadgeView: View {
     }
 }
 
+// MARK: - Paywall Sheet
+
+enum PaywallPresentationContext {
+    case onboarding
+    case settings
+}
+
+struct PaywallSheetView: View {
+    @ObservedObject var proStatusManager: ProStatusManager
+    let context: PaywallPresentationContext
+    var onFinish: () -> Void = {}
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedPlan: CommercePlan = .lifetime
+    @State private var isLoadingOfferings = false
+    @State private var isStartingTrial = false
+
+    private var displayState: ProDisplayState {
+        .live(
+            status: proStatusManager.status,
+            entitlementSnapshot: proStatusManager.currentEntitlementSnapshot
+        )
+    }
+
+    private var selectedProduct: ProPlanProduct {
+        proStatusManager.planProduct(for: selectedPlan)
+    }
+
+    private var isBusy: Bool {
+        isLoadingOfferings
+            || isStartingTrial
+            || proStatusManager.purchaseInProgressPlan != nil
+            || proStatusManager.isRestoringPurchases
+    }
+
+    private var isOnboarding: Bool {
+        context == .onboarding
+    }
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: DS.Spacing.lg) {
+                    sheetHeader
+
+                    if displayState.status.isPro {
+                        ProStatusBadgeView(displayState: displayState)
+                            .environmentObject(proStatusManager)
+                    } else {
+                        benefits
+                        planPicker
+                        messageStack
+                        actionStack
+                    }
+
+                    footer
+                }
+                .padding(sheetPadding)
+            }
+
+            if !isOnboarding {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20, weight: .medium))
+                        .symbolRenderingMode(.hierarchical)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .padding(DS.Spacing.lg)
+                .accessibilityLabel("Close")
+            }
+        }
+        .frame(width: sheetWidth, height: sheetHeight)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .task {
+            guard !isLoadingOfferings else { return }
+            isLoadingOfferings = true
+            await proStatusManager.loadOfferings()
+            syncSelectedPlan()
+            isLoadingOfferings = false
+        }
+        .modifier(OnChangeCompat(value: proStatusManager.availablePlans) {
+            syncSelectedPlan()
+        })
+        .interactiveDismissDisabled(isOnboarding)
+    }
+
+    private var sheetWidth: CGFloat {
+        isOnboarding ? 560 : 500
+    }
+
+    private var sheetHeight: CGFloat {
+        isOnboarding ? 620 : 520
+    }
+
+    private var sheetPadding: CGFloat {
+        isOnboarding ? DS.Spacing.xxl : DS.Spacing.xl
+    }
+
+    private var sheetHeader: some View {
+        VStack(spacing: DS.Spacing.sm) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .shadow(color: .black.opacity(0.10), radius: 8, y: 4)
+
+            Text(headerTitle)
+                .font(DS.Typography.onboardingTitle)
+                .multilineTextAlignment(.center)
+
+            Text(headerSubtitle)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var benefits: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+            PaywallFeatureRow(icon: "checkmark.circle", text: "Never lose a minimized window again")
+            PaywallFeatureRow(icon: "checkmark.circle", text: "Keep Command-Tab focused and predictable")
+            PaywallFeatureRow(icon: "checkmark.circle", text: "Exclude apps that should stay quiet")
+        }
+        .frame(maxWidth: 360, alignment: .leading)
+    }
+
+    private var planPicker: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            ForEach(proStatusManager.availablePlans) { product in
+                PaywallPlanCard(
+                    product: product,
+                    isSelected: selectedPlan == product.plan,
+                    onSelect: { selectedPlan = product.plan }
+                )
+            }
+        }
+        .animation(.easeInOut(duration: 0.15), value: selectedPlan)
+    }
+
+    @ViewBuilder
+    private var messageStack: some View {
+        VStack(spacing: DS.Spacing.xs) {
+            if isLoadingOfferings {
+                Text("Loading purchase options...")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if let paywallErrorMessage = proStatusManager.paywallErrorMessage {
+                Text(paywallErrorMessage)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            if let successMessage = proStatusManager.paywallSuccessMessage {
+                Text(successMessage)
+                    .font(DS.Typography.captionMedium)
+                    .foregroundColor(Color(nsColor: .systemGreen))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var actionStack: some View {
+        VStack(spacing: DS.Spacing.sm) {
+            Button {
+                Task { await purchaseSelectedPlan() }
+            } label: {
+                PaywallActionLabel(
+                    title: purchaseCTA,
+                    isLoading: proStatusManager.purchaseInProgressPlan == selectedPlan,
+                    isProminent: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(isBusy || !selectedProduct.isAvailable)
+            .opacity(isBusy || !selectedProduct.isAvailable ? 0.45 : 1)
+
+            if isOnboarding {
+                Button {
+                    Task { await startTrial() }
+                } label: {
+                    PaywallActionLabel(
+                        title: "Start 2-Day Free Trial",
+                        isLoading: isStartingTrial,
+                        isProminent: false
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(isBusy)
+            }
+        }
+    }
+
+    private var footer: some View {
+        HStack(spacing: DS.Spacing.md) {
+            Button(proStatusManager.isRestoringPurchases ? "Restoring..." : "Restore Purchase") {
+                Task { await restorePurchases() }
+            }
+            .disabled(isBusy)
+
+            DSDotSeparator()
+
+            Button("Terms") { openExternalURL(ExternalLinks.termsURL) }
+
+            DSDotSeparator()
+
+            Button("Privacy") { openExternalURL(ExternalLinks.privacyURL) }
+        }
+        .buttonStyle(.link)
+        .font(.caption)
+    }
+
+    private var headerTitle: String {
+        switch displayState.status {
+        case .pro:
+            return "Command Reopen Pro"
+        case .trial:
+            return isOnboarding ? "Keep Command Reopen" : "Command Reopen Pro"
+        case .expired:
+            return "Keep Command Reopen"
+        }
+    }
+
+    private var headerSubtitle: String {
+        switch displayState.status {
+        case .pro:
+            return "All features are unlocked."
+        case .trial(let daysRemaining, let expiresAt):
+            if isOnboarding {
+                return "Choose yearly or lifetime access, or start your trial."
+            }
+            return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left in your trial, expires \(formattedDate(expiresAt))."
+        case .expired:
+            return "Your trial has ended. Upgrade to keep Command Reopen active."
+        }
+    }
+
+    private var purchaseCTA: String {
+        guard selectedProduct.isAvailable else { return "Unavailable" }
+        switch selectedPlan {
+        case .yearly:
+            return "Subscribe - \(selectedProduct.displayPrice)"
+        case .lifetime:
+            return "Unlock Forever - \(selectedProduct.displayPrice)"
+        }
+    }
+
+    private func syncSelectedPlan() {
+        if proStatusManager.planProduct(for: selectedPlan).isAvailable { return }
+        if let firstAvailablePlan = proStatusManager.availablePlans.first(where: { $0.isAvailable })?.plan {
+            selectedPlan = firstAvailablePlan
+        }
+    }
+
+    private func purchaseSelectedPlan() async {
+        guard selectedProduct.isAvailable else { return }
+
+        do {
+            try await proStatusManager.purchase(selectedPlan)
+            if proStatusManager.status.isPro {
+                finishSuccessfulPaidAction()
+            }
+        } catch {
+            if (error as? ProPurchaseError) != .purchaseCancelled {
+                AppLogger.purchase.error("Paywall purchase failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func startTrial() async {
+        isStartingTrial = true
+        defer { isStartingTrial = false }
+
+        await proStatusManager.startTrial()
+        onFinish()
+    }
+
+    private func restorePurchases() async {
+        do {
+            try await proStatusManager.restorePurchases()
+            if proStatusManager.status.isPro {
+                if isOnboarding {
+                    proStatusManager.finishOnboardingWithoutTrial()
+                }
+                finishSuccessfulPaidAction()
+            }
+        } catch {
+            if (error as? ProPurchaseError) != .purchaseCancelled {
+                AppLogger.purchase.error("Paywall restore failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func finishSuccessfulPaidAction() {
+        if isOnboarding {
+            onFinish()
+        } else {
+            dismiss()
+            onFinish()
+        }
+    }
+
+    private func openExternalURL(_ urlString: String) {
+        guard let url = URL(string: urlString) else {
+            return
+        }
+
+        NSWorkspace.shared.open(url)
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day().year())
+    }
+}
+
+private struct PaywallFeatureRow: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            Image(systemName: icon)
+                .foregroundStyle(DS.Colors.brandPrimary)
+                .frame(width: 18)
+            Text(text)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+private struct PaywallPlanCard: View {
+    let product: ProPlanProduct
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                HStack {
+                    Text(product.title)
+                        .font(DS.Typography.bodyMedium)
+                    Spacer(minLength: 0)
+                    if let badge = product.badge {
+                        Text(badge)
+                            .font(DS.Typography.microSemibold)
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, DS.Spacing.xs)
+                            .padding(.vertical, DS.Spacing.xxs)
+                            .background(
+                                Capsule()
+                                    .fill(DS.Colors.brandPrimary)
+                            )
+                    }
+                }
+
+                Text(product.displayPrice)
+                    .font(DS.Typography.headlineMedium)
+                    .foregroundStyle(.primary)
+
+                Text(product.billingDetail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Text(product.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, minHeight: 112, alignment: .topLeading)
+            .padding(DS.Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .fill(isSelected ? DS.Colors.accentTintSubtle : Color(nsColor: .controlBackgroundColor))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .strokeBorder(isSelected ? DS.Colors.brandPrimary : DS.Colors.cardBorder, lineWidth: isSelected ? 1.2 : 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(!product.isAvailable)
+        .opacity(product.isAvailable ? 1 : 0.45)
+    }
+}
+
+private struct PaywallActionLabel: View {
+    let title: String
+    let isLoading: Bool
+    let isProminent: Bool
+
+    var body: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            if isLoading {
+                ProgressView()
+                    .controlSize(.small)
+            }
+
+            Text(title)
+                .font(.headline)
+        }
+        .foregroundStyle(isProminent ? .white : .primary)
+        .frame(maxWidth: .infinity)
+        .frame(height: 44)
+        .background(
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .fill(isProminent ? DS.Colors.brandPrimary : Color(nsColor: .controlBackgroundColor))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .strokeBorder(isProminent ? Color.clear : DS.Colors.cardBorder, lineWidth: 0.5)
+        )
+    }
+}
+
 
 
 private struct ProLetterView: View {

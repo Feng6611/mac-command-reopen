@@ -114,7 +114,8 @@ final class AppLifecycleCoordinator {
                         activationMonitor: .shared,
                         reopenStatsStore: .shared,
                         accessController: self.accessController,
-                        initialTab: .pro
+                        initialTab: .about,
+                        presentsPaywall: true
                     )
                 }
 
@@ -133,7 +134,8 @@ final class AppLifecycleCoordinator {
                     activationMonitor: .shared,
                     reopenStatsStore: .shared,
                     accessController: accessController,
-                    initialTab: .pro
+                    initialTab: .about,
+                    presentsPaywall: true
                 )
             }
 

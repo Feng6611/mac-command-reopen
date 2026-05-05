@@ -7,6 +7,7 @@
 
 import AppKit
 import LaunchAtLogin
+import RevenueCatCommerceKit
 import SwiftUI
 
 // MARK: - Settings Tab
@@ -14,21 +15,17 @@ import SwiftUI
 enum SettingsTab: Int, CaseIterable {
     case general
     case statistics
-    case pro
+    case about
 
     static func visibleTabs(showProTab: Bool) -> [SettingsTab] {
-        showProTab ? [.general, .statistics, .pro] : [.general, .statistics]
+        [.general, .statistics, .about]
     }
 
     func title(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: return "General"
         case .statistics: return "Stats"
-        case .pro:
-            switch distributionChannel {
-            case .appStore: return "Pro"
-            case .direct: return "Support"
-            }
+        case .about: return "About"
         }
     }
 
@@ -36,11 +33,7 @@ enum SettingsTab: Int, CaseIterable {
         switch self {
         case .general: return "gearshape"
         case .statistics: return "chart.bar.xaxis"
-        case .pro:
-            switch distributionChannel {
-            case .appStore: return "star.circle"
-            case .direct: return "heart.circle"
-            }
+        case .about: return "info.circle"
         }
     }
 
@@ -63,31 +56,13 @@ struct SettingsView: View {
                 .tabItem { tabLabel(for: .statistics) }
                 .tag(SettingsTab.statistics)
 
-            if accessController.showsProTab {
-                Group {
-#if APPSTORE
-                    ProTabContent()
-#else
-                    DirectSupportTabContent()
-#endif
-                }
-                .tabItem { tabLabel(for: .pro) }
-                .tag(SettingsTab.pro)
-            }
+            AboutTabContent()
+                .tabItem { tabLabel(for: .about) }
+                .tag(SettingsTab.about)
         }
         .frame(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
         .task {
             await accessController.refresh()
-        }
-        .onAppear {
-            if !accessController.showsProTab && navigationModel.selectedTab == .pro {
-                navigationModel.selectedTab = .general
-            }
-        }
-        .onChange(of: accessController.showsProTab) { showsProTab in
-            if !showsProTab && navigationModel.selectedTab == .pro {
-                navigationModel.selectedTab = .general
-            }
         }
     }
 
@@ -118,121 +93,293 @@ private extension View {
     }
 }
 
-// MARK: - Pro Tab Content
+// MARK: - About Tab Content
+
+struct AboutTabContent: View {
+    @EnvironmentObject private var accessController: AppAccessController
+    @EnvironmentObject private var navigationModel: SettingsNavigationModel
+#if APPSTORE
+    @EnvironmentObject private var proStatusManager: ProStatusManager
+    @State private var previewMode: ProPreviewMode = .live
+#endif
+
+    var body: some View {
+        Form {
+            Section {
+                appIdentity
+                    .padding(.vertical, DS.Spacing.xl)
+                    .listRowBackground(AboutColors.background)
+            }
+
+            Section {
+                statusRow
 
 #if APPSTORE
-struct ProTabContent: View {
-    var body: some View {
-        ScrollView(showsIndicators: false) {
-            ProSectionView()
-                .padding(.vertical, DS.Spacing.xl)
-        }
-        .padding(.horizontal, DS.Spacing.xl)
-    }
-}
-#else
-struct DirectSupportTabContent: View {
-    var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: DS.Spacing.lg) {
-                supportCard
-                    .padding(.top, DS.Spacing.xl)
-            }
-        }
-        .padding(.horizontal, DS.Spacing.xl)
-    }
-
-    private var supportCard: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: DS.Spacing.md) {
-                DSIconBadge(
-                    systemName: "heart.fill",
-                    iconColor: .accentColor,
-                    backgroundColor: DS.Colors.accentTint,
-                    size: 36,
-                    iconSize: 16
-                )
-
-                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                    Text("Support Command Reopen")
-                        .font(DS.Typography.headlineMedium)
-                    Text("The Mac App Store version is the mainline release for ongoing updates and long-term support.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if accessController.distributionChannel == .appStore,
+                   showsManageSubscriptions {
+                    AboutLinkRow(
+                        title: "Manage Subscriptions",
+                        value: "App Store",
+                        urlString: AppStoreLinks.manageSubscriptionsURL,
+                        systemImage: "creditcard"
+                    )
                 }
-
-                Spacer(minLength: 0)
+#endif
             }
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.top, DS.Spacing.lg)
-            .padding(.bottom, DS.Spacing.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(DS.Colors.accentTintSubtle)
+            .listRowBackground(AboutColors.sectionBackground)
 
-            Divider()
-
-            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                DirectSupportPoint(
-                    title: "Mainline updates",
-                    description: "Bug fixes, polish, and future improvements will continue shipping through the App Store version."
+            Section {
+                AboutLinkRow(
+                    title: "Official",
+                    value: "commandreopen.com",
+                    urlString: ExternalLinks.officialURL,
+                    systemImage: "globe"
                 )
-                DirectSupportPoint(
-                    title: "Support the developer directly",
-                    description: "If Command Reopen is useful in your workflow, using the App Store version is the clearest way to support continued work."
+                AboutLinkRow(
+                    title: "Email",
+                    value: ExternalLinks.contactEmailAddress,
+                    systemImage: "envelope",
+                    trailingSystemImage: "doc.on.doc",
+                    action: copyContactEmail
                 )
-                DirectSupportPoint(
-                    title: "Same focused product direction",
-                    description: "The goal stays the same: keep the app lightweight, reliable, and continuously maintained."
+                AboutLinkRow(
+                    title: "GitHub",
+                    value: "GitHub",
+                    urlString: ExternalLinks.githubURL,
+                    systemImage: "chevron.left.forwardslash.chevron.right"
                 )
             }
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.top, DS.Spacing.md)
-            .padding(.bottom, DS.Spacing.sm)
+            .listRowBackground(AboutColors.sectionBackground)
 
-            HStack(spacing: DS.Spacing.md) {
-                Button {
-                    openURL(AppStoreLinks.productURL)
-                } label: {
-                    Label("Open Mac App Store", systemImage: "bag")
+#if DEBUG && APPSTORE
+            Section {
+                Picker("UI Preview", selection: $previewMode) {
+                    ForEach(ProPreviewMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
+                .pickerStyle(.segmented)
 
                 Button {
-                    openURL(ExternalLinks.githubURL)
+                    OnboardingWindowController.shared.show(proStatusManager: proStatusManager)
                 } label: {
-                    Label("View GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    Label("Trigger Onboarding", systemImage: "sparkles")
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.link)
             }
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.vertical, DS.Spacing.sm)
+            .listRowBackground(AboutColors.sectionBackground)
+#endif
         }
-        .clipShape(RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous))
-        .dsCard()
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(AboutColors.background)
+#if APPSTORE
+        .sheet(isPresented: $navigationModel.isPaywallSheetPresented) {
+            PaywallSheetView(
+                proStatusManager: proStatusManager,
+                context: .settings
+            )
+        }
+#endif
     }
 
-    private func openURL(_ urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        NSWorkspace.shared.open(url)
-    }
-}
+    private var appIdentity: some View {
+        VStack(spacing: DS.Spacing.sm) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 76, height: 76)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .shadow(color: .black.opacity(0.10), radius: 8, y: 4)
 
-private struct DirectSupportPoint: View {
-    let title: String
-    let description: String
+            Text(appName)
+                .font(DS.Typography.headlineMedium)
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-            Text(title)
-                .font(DS.Typography.bodyMedium)
-            Text(description)
-                .font(.caption)
+            Text(versionText)
+                .font(.callout)
                 .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    private var statusRow: some View {
+#if APPSTORE
+        Button {
+            navigationModel.isPaywallSheetPresented = true
+        } label: {
+            HStack(spacing: DS.Spacing.sm) {
+                AboutRowTitle(title: "Status", systemImage: statusIcon)
+                Spacer(minLength: 0)
+                Text(statusSummary)
+                    .foregroundStyle(statusColor)
+                    .lineLimit(1)
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+#else
+        HStack(spacing: DS.Spacing.sm) {
+            Label("Status", systemImage: "heart.circle")
+            Spacer(minLength: 0)
+            Text("Direct version")
+                .foregroundStyle(.secondary)
+        }
+#endif
+    }
+
+    private func copyContactEmail() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(ExternalLinks.contactEmailAddress, forType: .string)
+    }
+
+    private var appName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
+            ?? Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            ?? "Command Reopen"
+    }
+
+    private var versionText: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        return "Version \(version) (\(build))"
+    }
+
+#if APPSTORE
+    private var displayState: ProDisplayState {
+        switch previewMode {
+        case .live:
+            return .live(
+                status: proStatusManager.status,
+                entitlementSnapshot: proStatusManager.currentEntitlementSnapshot
+            )
+        case .notPro, .yearlyPro, .lifetimePro:
+            return .preview(previewMode)
+        }
+    }
+
+    private var showsManageSubscriptions: Bool {
+        if case .pro(let plan, _, _) = displayState.status {
+            return plan == .yearly
+        }
+
+        return false
+    }
+
+    private var statusIcon: String {
+        switch displayState.status {
+        case .trial: return "clock.badge.checkmark"
+        case .expired: return "exclamationmark.triangle"
+        case .pro: return "checkmark.seal"
+        }
+    }
+
+    private var statusColor: Color {
+        switch displayState.status {
+        case .trial, .pro: return .secondary
+        case .expired: return .orange
+        }
+    }
+
+    private var statusSummary: String {
+        switch displayState.status {
+        case .trial(let daysRemaining, let expiresAt):
+            return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left, expires \(formattedDate(expiresAt))"
+        case .expired:
+            return "Trial expired - click to upgrade"
+        case .pro(let plan, let expirationDate, let willRenew):
+            switch plan {
+            case .lifetime:
+                return "Lifetime Pro"
+            case .yearly:
+                guard let expirationDate else { return "Yearly Pro" }
+                return "\(willRenew ? "Renews" : "Ends") \(formattedDate(expirationDate))"
+            }
+        }
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        date.formatted(.dateTime.month(.abbreviated).day().year())
+    }
+#endif
+}
+
+private struct AboutLinkRow: View {
+    let title: String
+    let value: String
+    var urlString: String? = nil
+    let systemImage: String
+    var trailingSystemImage: String = "arrow.up.right"
+    var action: (() -> Void)?
+
+    var body: some View {
+        Button {
+            if let action {
+                action()
+                return
+            }
+
+            guard let urlString,
+                  let url = URL(string: urlString) else { return }
+            NSWorkspace.shared.open(url)
+        } label: {
+            HStack(spacing: DS.Spacing.sm) {
+                AboutRowTitle(title: title, systemImage: systemImage)
+                Spacer(minLength: DS.Spacing.md)
+                Text(value)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                Image(systemName: trailingSystemImage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
-#endif
+
+private struct AboutRowTitle: View {
+    let title: String
+    let systemImage: String
+
+    var body: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            Image(systemName: systemImage)
+                .font(.body)
+                .frame(width: 22, alignment: .leading)
+            Text(title)
+        }
+    }
+}
+
+private enum AboutColors {
+    static var sectionBackground: Color {
+        if #available(macOS 14.0, *) {
+            return Color(nsColor: NSColor.quaternarySystemFill.opaque)
+        }
+
+        return Color(nsColor: .controlBackgroundColor)
+    }
+
+    static var background: Color {
+        if #available(macOS 14.0, *) {
+            return Color(nsColor: NSColor.quinarySystemFill.opaque)
+        }
+
+        return Color(nsColor: .windowBackgroundColor)
+    }
+}
+
+private extension NSColor {
+    var opaque: NSColor {
+        usingColorSpace(.deviceRGB)?.withAlphaComponent(1) ?? withAlphaComponent(1)
+    }
+}
 
 // MARK: - Settings Tab Content
 
@@ -243,10 +390,6 @@ struct SettingsTabContent: View {
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
-    }
-
-    private var distributionChannel: DistributionChannel {
-        accessController.distributionChannel
     }
 
     private var runningUserApps: [NSRunningApplication] {
@@ -306,27 +449,6 @@ struct SettingsTabContent: View {
                 Text("Excluded Apps")
             }
             .opacity(isFeatureLocked ? 0.5 : 1)
-
-            Section {
-                SettingsUI.LinkButton(title: "Contact Developer", urlString: ExternalLinks.contactEmail)
-
-                switch distributionChannel {
-                case .appStore:
-                    SettingsUI.LinkButton(title: "Official Website", urlString: ExternalLinks.officialURL)
-                    Button("Rate on App Store") { requestReview() }
-                        .buttonStyle(.link)
-
-                case .direct:
-                    SettingsUI.LinkButton(title: "Get on Mac App Store", urlString: AppStoreLinks.productURL)
-                    SettingsUI.LinkButton(title: "GitHub", urlString: ExternalLinks.githubURL)
-                }
-            } header: {
-                Text("Feedback & Support")
-            }
         }
-    }
-
-    private func requestReview() {
-        SettingsUI.openURL(AppStoreLinks.reviewURL)
     }
 }

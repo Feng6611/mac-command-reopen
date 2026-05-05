@@ -31,6 +31,9 @@
     "Best Value" : {
 
     },
+    "Close" : {
+
+    },
     "Command Reopen helped you **%lld times** during your trial." : {
 
     },
@@ -49,16 +52,10 @@
     "Day" : {
 
     },
-    "Early Bird · Limited Time" : {
-
-    },
     "Enable Command Reopen" : {
 
     },
     "Excluded Apps" : {
-
-    },
-    "Feedback & Support" : {
 
     },
     "General" : {
@@ -80,6 +77,9 @@
 
     },
     "Lifetime" : {
+
+    },
+    "Loading purchase options..." : {
 
     },
     "Manage Subscription" : {
@@ -122,12 +122,6 @@
     "once" : {
 
     },
-    "One-time purchase · no subscriptions" : {
-
-    },
-    "Open Mac App Store" : {
-
-    },
     "Pay once, use forever" : {
 
     },
@@ -150,6 +144,9 @@
 
     },
     "Rate on App Store" : {
+
+    },
+    "Remove %@" : {
 
     },
     "Reopen Pro" : {
@@ -179,13 +176,10 @@
     "Start using Command Reopen to see trends" : {
 
     },
-    "Support Command Reopen" : {
+    "Status" : {
 
     },
     "Terms" : {
-
-    },
-    "The Mac App Store version is the mainline release for ongoing updates and long-term support." : {
 
     },
     "Top Apps" : {
@@ -201,9 +195,6 @@
 
     },
     "Upgrade to Pro..." : {
-
-    },
-    "View GitHub" : {
 
     },
     "Week" : {
