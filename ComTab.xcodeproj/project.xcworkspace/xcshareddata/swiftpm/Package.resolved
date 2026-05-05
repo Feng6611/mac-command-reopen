@@ -1,10 +1,10 @@
 {
-  "originHash" : "26fce9fd30aa705e56388e0557849ccb7a87002d0c0cb4f41cf2fe9c8860c3bf",
+  "originHash" : "3c0b1753e7135d985cb10eeb8c707bcd6aafbfa83fb319913b7d7599b76ff196",
   "pins" : [
     {
       "identity" : "defaults",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sindresorhus/Defaults",
+      "location" : "https://github.com/Feng6611/Defaults",
       "state" : {
         "revision" : "5bfac4928f000fabdbef7e4ed0251399bb0841c9",
         "version" : "9.0.8"
@@ -13,7 +13,7 @@
     {
       "identity" : "launchatlogin-modern",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sindresorhus/LaunchAtLogin-Modern",
+      "location" : "https://github.com/Feng6611/LaunchAtLogin-Modern",
       "state" : {
         "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc",
         "version" : "1.1.0"
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "a1bf83fc76099c3d801aa7fc2543c3b9e488cd00",
         "version" : "5.67.0"
+      }
+    },
+    {
+      "identity" : "revenuecatcommercekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/RevenueCatCommerceKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "99dd6e57bdefe09966e4f6e27f02ed309605b3ac"
       }
     },
     {

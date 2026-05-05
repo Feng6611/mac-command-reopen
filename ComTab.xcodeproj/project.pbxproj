@@ -266,7 +266,7 @@
 			mainGroup = 748FCE122EB5027A0099C190;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "Packages/RevenueCatCommerceKit" */,
+				8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "RevenueCatCommerceKit" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 			);
@@ -1099,17 +1099,18 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "Packages/RevenueCatCommerceKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Packages/RevenueCatCommerceKit;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
+		8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "RevenueCatCommerceKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Feng6611/RevenueCatCommerceKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			repositoryURL = "https://github.com/Feng6611/LaunchAtLogin-Modern";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.1.0;
@@ -1117,7 +1118,7 @@
 		};
 		9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			repositoryURL = "https://github.com/Feng6611/Defaults";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.0.8;
@@ -1128,7 +1129,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		8D3000032F4400010099C190 /* RevenueCatCommerceKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "Packages/RevenueCatCommerceKit" */;
+			package = 8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "RevenueCatCommerceKit" */;
 			productName = RevenueCatCommerceKit;
 		};
 		9C2010042F3400010099C190 /* LaunchAtLogin */ = {
