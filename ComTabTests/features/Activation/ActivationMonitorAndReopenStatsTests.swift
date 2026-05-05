@@ -4,6 +4,15 @@ import Foundation
 import Testing
 @testable import Command_Reopen
 
+@MainActor
+private final class RecordingAppReviewPrompter: AppReviewPrompting {
+    private(set) var requestReviewCallCount = 0
+
+    func requestReview() {
+        requestReviewCallCount += 1
+    }
+}
+
 struct ActivationMonitorAndReopenStatsTests {
     @MainActor
     private func makeStatsStore(suiteName: String = UUID().uuidString) -> (ReopenStatsStore, UserDefaults, String) {
@@ -417,6 +426,67 @@ struct ActivationMonitorAndReopenStatsTests {
         let secondStore = ReopenStatsStore(defaults: defaults, storageKey: "test.reopenStats")
         #expect(secondStore.totalSuccessfulReopens == 2)
         #expect(secondStore.appStats == [.init(bundleID: "com.apple.TextEdit", displayName: "TextEdit", count: 2)])
+    }
+
+    @MainActor
+    @Test("App Store review prompt fires once at reopen milestones")
+    func appStoreReviewPromptMilestones() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let reviewPrompter = RecordingAppReviewPrompter()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let store = ReopenStatsStore(
+            defaults: defaults,
+            storageKey: "test.reopenStats",
+            distributionChannel: .appStore,
+            appReviewPrompter: reviewPrompter
+        )
+
+        for index in 1...70 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+
+            switch index {
+            case 30:
+                #expect(reviewPrompter.requestReviewCallCount == 1)
+            case 50:
+                #expect(reviewPrompter.requestReviewCallCount == 2)
+            case 70:
+                #expect(reviewPrompter.requestReviewCallCount == 3)
+            default:
+                break
+            }
+        }
+
+        #expect(reviewPrompter.requestReviewCallCount == 3)
+    }
+
+    @MainActor
+    @Test("App Store review prompt does not repeat after a prompted milestone")
+    func appStoreReviewPromptDoesNotRepeatMilestone() {
+        let suiteName = UUID().uuidString
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let reviewPrompter = RecordingAppReviewPrompter()
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let store = ReopenStatsStore(
+            defaults: defaults,
+            storageKey: "test.reopenStats",
+            distributionChannel: .appStore,
+            appReviewPrompter: reviewPrompter
+        )
+
+        for _ in 1...30 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        }
+        #expect(reviewPrompter.requestReviewCallCount == 1)
+
+        store.reset()
+        for _ in 1...30 {
+            store.recordSuccessfulReopen(bundleID: "com.apple.TextEdit", localizedName: "TextEdit")
+        }
+
+        #expect(reviewPrompter.requestReviewCallCount == 1)
     }
 
     @MainActor

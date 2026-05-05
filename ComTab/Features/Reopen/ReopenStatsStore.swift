@@ -7,6 +7,18 @@
 
 import Combine
 import Foundation
+import StoreKit
+
+protocol AppReviewPrompting {
+    @MainActor
+    func requestReview()
+}
+
+struct StoreKitAppReviewPrompter: AppReviewPrompting {
+    func requestReview() {
+        SKStoreReviewController.requestReview()
+    }
+}
 
 @MainActor
 final class ReopenStatsStore: ObservableObject {
@@ -43,6 +55,11 @@ final class ReopenStatsStore: ObservableObject {
         var lastUpdatedAt: Date?
     }
 
+    private enum ReviewPrompt {
+        static let milestones: Set<Int> = [30, 50, 70]
+        static let promptedMilestonesKey = "comtabReviewPromptedReopenMilestones"
+    }
+
     static let shared = ReopenStatsStore()
 
     static let dayKeyFormatter: DateFormatter = {
@@ -56,6 +73,8 @@ final class ReopenStatsStore: ObservableObject {
 
     private let defaults: UserDefaults
     private let storageKey: String
+    private let distributionChannel: DistributionChannel
+    private let appReviewPrompter: any AppReviewPrompting
     private let encoder = JSONEncoder()
 
     var totalSuccessfulReopens: Int {
@@ -178,9 +197,16 @@ final class ReopenStatsStore: ObservableObject {
         }
     }
 
-    init(defaults: UserDefaults = .standard, storageKey: String = "com.comtab.reopenStats") {
+    init(
+        defaults: UserDefaults = .standard,
+        storageKey: String = "com.comtab.reopenStats",
+        distributionChannel: DistributionChannel = .current,
+        appReviewPrompter: any AppReviewPrompting = StoreKitAppReviewPrompter()
+    ) {
         self.defaults = defaults
         self.storageKey = storageKey
+        self.distributionChannel = distributionChannel
+        self.appReviewPrompter = appReviewPrompter
         self.snapshot = Self.loadSnapshot(defaults: defaults, storageKey: storageKey) ?? .empty
     }
 
@@ -202,6 +228,7 @@ final class ReopenStatsStore: ObservableObject {
         next.lastUpdatedAt = Date()
 
         persist(next)
+        requestReviewIfNeeded(totalSuccessfulReopens: next.totalSuccessfulReopens)
     }
 
     func reset() {
@@ -216,6 +243,24 @@ final class ReopenStatsStore: ObservableObject {
             return
         }
         defaults.set(data, forKey: storageKey)
+    }
+
+    private func requestReviewIfNeeded(totalSuccessfulReopens: Int) {
+        guard distributionChannel == .appStore,
+              Self.ReviewPrompt.milestones.contains(totalSuccessfulReopens) else {
+            return
+        }
+
+        var promptedMilestones = Set(
+            defaults.array(forKey: Self.ReviewPrompt.promptedMilestonesKey) as? [Int] ?? []
+        )
+        guard !promptedMilestones.contains(totalSuccessfulReopens) else {
+            return
+        }
+
+        promptedMilestones.insert(totalSuccessfulReopens)
+        defaults.set(promptedMilestones.sorted(), forKey: Self.ReviewPrompt.promptedMilestonesKey)
+        appReviewPrompter.requestReview()
     }
 
     private static func loadSnapshot(defaults: UserDefaults, storageKey: String) -> Snapshot? {
