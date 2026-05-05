@@ -1,5 +1,5 @@
 //
-//  RevenueCatEntitlements.swift
+//  RevenueCatConfiguration.swift
 //  ComTab
 //
 //  Created by Codex on 2026/4/26.
@@ -24,6 +24,7 @@ enum RevenueCatConfiguration {
     nonisolated static let offeringIdentifier = "default"
     nonisolated static let yearlyProductIdentifier = "com.dev.kkuk.CommandReopen.yearly"
     nonisolated static let lifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime"
+    nonisolated static let grandfatheringCutoffVersion = "1.2.0"
 
     nonisolated static var commerceConfiguration: CommerceConfiguration {
         CommerceConfiguration(
@@ -34,58 +35,14 @@ enum RevenueCatConfiguration {
                 .yearly: yearlyProductIdentifier,
                 .lifetime: lifetimeProductIdentifier
             ],
+            legacyPaidApp: .grandfatheredPaidApp(
+                cutoffOriginalAppVersion: grandfatheringCutoffVersion,
+                entitlementIdentifier: entitlementIdentifier,
+                mapsToPlan: .lifetime,
+                productIdentifier: lifetimeProductIdentifier
+            ),
             logSubsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
             logCategory: "Purchase"
-        )
-    }
-}
-
-extension ProPlan {
-    var commercePlan: CommercePlan {
-        switch self {
-        case .yearly:
-            .yearly
-        case .lifetime:
-            .lifetime
-        }
-    }
-}
-
-extension CommercePlan {
-    var proPlan: ProPlan {
-        switch self {
-        case .yearly:
-            .yearly
-        case .lifetime:
-            .lifetime
-        }
-    }
-}
-
-extension CommerceOffering {
-    var proOfferingSnapshot: ProOfferingSnapshot {
-        var metadata: [ProPlan: ProPlanPackageMetadata] = [:]
-
-        for product in products {
-            let plan = product.plan.proPlan
-            metadata[plan] = ProPlanPackageMetadata(
-                displayPrice: product.displayPrice,
-                billingDetail: plan == .yearly ? String(localized: "per year") : String(localized: "once"),
-                isAvailable: product.isAvailable
-            )
-        }
-
-        return ProOfferingSnapshot(packageMetadata: metadata)
-    }
-}
-
-extension CommerceEntitlement {
-    var proEntitlementSnapshot: ProEntitlementSnapshot {
-        ProEntitlementSnapshot(
-            plan: plan.proPlan,
-            expirationDate: expirationDate,
-            willRenew: willRenew,
-            originalPurchaseDate: originalPurchaseDate
         )
     }
 }

@@ -16,6 +16,7 @@ public struct CommerceConfiguration: Sendable {
     public let invalidReceiptRecoveryDelayNanoseconds: UInt64
     public let allowsTestAPIKeyInRelease: Bool
     public let showStoreMessagesAutomatically: Bool
+    public let legacyPaidApp: LegacyPaidAppConfiguration
     public let logSubsystem: String
     public let logCategory: String
 
@@ -29,6 +30,7 @@ public struct CommerceConfiguration: Sendable {
         invalidReceiptRecoveryDelayNanoseconds: UInt64 = 1_000_000_000,
         allowsTestAPIKeyInRelease: Bool = false,
         showStoreMessagesAutomatically: Bool = true,
+        legacyPaidApp: LegacyPaidAppConfiguration = .disabled,
         logSubsystem: String = Bundle.main.bundleIdentifier ?? "RevenueCatCommerceKit",
         logCategory: String = "Commerce"
     ) {
@@ -41,6 +43,7 @@ public struct CommerceConfiguration: Sendable {
         self.invalidReceiptRecoveryDelayNanoseconds = invalidReceiptRecoveryDelayNanoseconds
         self.allowsTestAPIKeyInRelease = allowsTestAPIKeyInRelease
         self.showStoreMessagesAutomatically = showStoreMessagesAutomatically
+        self.legacyPaidApp = legacyPaidApp
         self.logSubsystem = logSubsystem
         self.logCategory = logCategory
     }

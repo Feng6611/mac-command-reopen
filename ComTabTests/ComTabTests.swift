@@ -63,22 +63,22 @@ final class MockCommerceStateSource: CommerceStateSource {
 }
 
 @MainActor
-final class MockRevenueCatService: RevenueCatServicing {
-    var cachedEntitlementSnapshot: ProEntitlementSnapshot?
-    var customerInfoDidChange: ((ProEntitlementSnapshot?) -> Void)?
+final class MockCommerceClient: CommerceClient {
+    var cachedEntitlement: CommerceEntitlement?
+    var entitlementDidChange: ((CommerceEntitlement?) -> Void)?
 
-    var currentOffering: ProOfferingSnapshot?
-    var fetchedEntitlementSnapshot: ProEntitlementSnapshot?
-    var fetchedEntitlementSnapshots: [ProEntitlementSnapshot?] = []
-    var purchaseSnapshot: ProEntitlementSnapshot?
-    var restoreSnapshot: ProEntitlementSnapshot?
+    var currentOffering: CommerceOffering?
+    var fetchedEntitlement: CommerceEntitlement?
+    var fetchedEntitlements: [CommerceEntitlement?] = []
+    var purchaseEntitlement: CommerceEntitlement?
+    var restoreEntitlement: CommerceEntitlement?
     var offeringsError: Error?
     var entitlementError: Error?
     var purchaseError: Error?
     var restoreError: Error?
     var configureCallCount = 0
-    var fetchCurrentOfferingCallCount = 0
-    var fetchEntitlementSnapshotCallCount = 0
+    var loadOfferingCallCount = 0
+    var refreshEntitlementCallCount = 0
     var purchaseDelayNanoseconds: UInt64?
     var restoreDelayNanoseconds: UInt64?
 
@@ -86,8 +86,8 @@ final class MockRevenueCatService: RevenueCatServicing {
         configureCallCount += 1
     }
 
-    func fetchCurrentOffering() async throws -> ProOfferingSnapshot? {
-        fetchCurrentOfferingCallCount += 1
+    func loadOffering() async throws -> CommerceOffering? {
+        loadOfferingCallCount += 1
 
         if let offeringsError {
             throw offeringsError
@@ -96,21 +96,21 @@ final class MockRevenueCatService: RevenueCatServicing {
         return currentOffering
     }
 
-    func fetchEntitlementSnapshot() async throws -> ProEntitlementSnapshot? {
-        fetchEntitlementSnapshotCallCount += 1
+    func refreshEntitlement() async throws -> CommerceEntitlement? {
+        refreshEntitlementCallCount += 1
 
         if let entitlementError {
             throw entitlementError
         }
 
-        if !fetchedEntitlementSnapshots.isEmpty {
-            return fetchedEntitlementSnapshots.removeFirst()
+        if !fetchedEntitlements.isEmpty {
+            return fetchedEntitlements.removeFirst()
         }
 
-        return fetchedEntitlementSnapshot
+        return fetchedEntitlement
     }
 
-    func purchase(plan: ProPlan) async throws -> ProEntitlementSnapshot? {
+    func purchase(_ plan: CommercePlan) async throws -> CommerceEntitlement? {
         if let purchaseDelayNanoseconds {
             try? await Task.sleep(nanoseconds: purchaseDelayNanoseconds)
         }
@@ -119,10 +119,10 @@ final class MockRevenueCatService: RevenueCatServicing {
             throw purchaseError
         }
 
-        return purchaseSnapshot
+        return purchaseEntitlement
     }
 
-    func restorePurchases() async throws -> ProEntitlementSnapshot? {
+    func restorePurchases() async throws -> CommerceEntitlement? {
         if let restoreDelayNanoseconds {
             try? await Task.sleep(nanoseconds: restoreDelayNanoseconds)
         }
@@ -131,26 +131,25 @@ final class MockRevenueCatService: RevenueCatServicing {
             throw restoreError
         }
 
-        return restoreSnapshot
+        return restoreEntitlement
     }
 }
 
-@MainActor
-final class MockLegacyAppPurchaseTracker: LegacyAppPurchaseChecking {
-    var cachedLegacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
-    var refreshedLegacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
-
-    func refreshLegacyAppPurchaseSnapshot() async -> LegacyAppPurchaseSnapshot? {
-        let snapshot = refreshedLegacyAppPurchaseSnapshot ?? cachedLegacyAppPurchaseSnapshot
-
-        guard let snapshot else {
-            return nil
-        }
-
-        return snapshot.originalAppVersion.compare(
-            ProStatusManager.Constants.grandfatheringCutoffVersion,
-            options: .numeric
-        ) == .orderedAscending ? snapshot : nil
+private extension CommerceEntitlement {
+    init(
+        plan: CommercePlan,
+        expirationDate: Date?,
+        willRenew: Bool = false,
+        originalPurchaseDate: Date? = nil
+    ) {
+        self.init(
+            plan: plan,
+            productIdentifier: "test.\(plan.rawValue)",
+            entitlementIdentifier: "pro",
+            expirationDate: expirationDate,
+            willRenew: willRenew,
+            originalPurchaseDate: originalPurchaseDate
+        )
     }
 }
 
@@ -556,13 +555,11 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let mockService = MockRevenueCatService()
-        let legacyTracker = MockLegacyAppPurchaseTracker()
+        let mockService = MockCommerceClient()
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -583,8 +580,7 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -608,8 +604,7 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -628,12 +623,11 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
-        mockService.purchaseSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
+        let mockService = MockCommerceClient()
+        mockService.purchaseEntitlement = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -649,12 +643,11 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.purchaseError = ProPurchaseError.purchaseCancelled
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker()
+            commerceClient: mockService,
         )
 
         await #expect(throws: ProPurchaseError.purchaseCancelled) {
@@ -675,8 +668,7 @@ struct ProStatusManagerTests {
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -697,8 +689,7 @@ struct ProStatusManagerTests {
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -718,8 +709,7 @@ struct ProStatusManagerTests {
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -737,14 +727,11 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
-        let mockService = MockRevenueCatService()
-        mockService.cachedEntitlementSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
+        let mockService = MockCommerceClient()
+        mockService.cachedEntitlement = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -761,17 +748,15 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
-        let legacyTracker = MockLegacyAppPurchaseTracker()
+        let mockService = MockCommerceClient()
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
         manager.configureIfNeeded()
-        mockService.customerInfoDidChange?(
+        mockService.entitlementDidChange?(
             .init(
                 plan: .yearly,
                 expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60),
@@ -798,14 +783,11 @@ struct ProStatusManagerTests {
         let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
-        let mockService = MockRevenueCatService()
-        mockService.cachedEntitlementSnapshot = .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
+        let mockService = MockCommerceClient()
+        mockService.cachedEntitlement = .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -822,14 +804,11 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.purchaseError = ProPurchaseError.network
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -847,14 +826,11 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.purchaseError = ProPurchaseError.purchaseCancelled
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -892,13 +868,12 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.offeringsError = ProPurchaseError.network
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker()
+            commerceClient: mockService,
         )
 
         await manager.loadOfferings()
@@ -914,19 +889,18 @@ struct ProStatusManagerTests {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
-        let mockService = MockRevenueCatService()
-        mockService.fetchedEntitlementSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
+        let mockService = MockCommerceClient()
+        mockService.fetchedEntitlement = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker()
+            commerceClient: mockService,
         )
 
         await manager.refresh()
 
-        #expect(mockService.fetchCurrentOfferingCallCount == 0)
-        #expect(mockService.fetchEntitlementSnapshotCallCount == 1)
+        #expect(mockService.loadOfferingCallCount == 0)
+        #expect(mockService.refreshEntitlementCallCount == 1)
         #expect(manager.status == .pro(plan: .lifetime, expirationDate: nil, willRenew: false))
     }
 
@@ -937,19 +911,16 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.purchaseDelayNanoseconds = 100_000_000
-        mockService.purchaseSnapshot = .init(
+        mockService.purchaseEntitlement = .init(
             plan: .yearly,
             expirationDate: now.addingTimeInterval(365 * 24 * 60 * 60),
             willRenew: true
         )
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -974,15 +945,12 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.restoreDelayNanoseconds = 100_000_000
-        mockService.restoreSnapshot = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
+        mockService.restoreEntitlement = .init(plan: .lifetime, expirationDate: nil, willRenew: false)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -1007,14 +975,11 @@ struct ProStatusManagerTests {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let mockService = MockRevenueCatService()
-        mockService.restoreSnapshot = nil
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
+        let mockService = MockCommerceClient()
+        mockService.restoreEntitlement = nil
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -1023,7 +988,7 @@ struct ProStatusManagerTests {
         #expect(!manager.isRestoringPurchases)
         #expect(!manager.status.isPro)
         #expect(manager.paywallErrorMessage == "No active purchase found on this account.")
-        #expect(mockService.fetchEntitlementSnapshotCallCount == 0)
+        #expect(mockService.refreshEntitlementCallCount == 0)
     }
 
     @MainActor
@@ -1036,25 +1001,22 @@ struct ProStatusManagerTests {
         let expirationDate = now.addingTimeInterval(365 * 24 * 60 * 60)
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
-        let mockService = MockRevenueCatService()
-        mockService.purchaseSnapshot = nil
-        mockService.fetchedEntitlementSnapshots = [
+        let mockService = MockCommerceClient()
+        mockService.purchaseEntitlement = nil
+        mockService.fetchedEntitlements = [
             nil,
             nil,
             .init(plan: .yearly, expirationDate: expirationDate, willRenew: true)
         ]
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
         try await manager.purchase(.yearly)
 
-        #expect(mockService.fetchEntitlementSnapshotCallCount == 3)
+        #expect(mockService.refreshEntitlementCallCount == 3)
         #expect(manager.status == .pro(plan: .yearly, expirationDate: expirationDate, willRenew: true))
         #expect(manager.lastError == nil)
     }
@@ -1068,15 +1030,12 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         defaults.set(now.addingTimeInterval(-(8 * 24 * 60 * 60)), forKey: "com.comtab.trialStartDate")
 
-        let mockService = MockRevenueCatService()
-        mockService.purchaseSnapshot = nil
-        mockService.fetchedEntitlementSnapshots = [nil, nil, nil]
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-
+        let mockService = MockCommerceClient()
+        mockService.purchaseEntitlement = nil
+        mockService.fetchedEntitlements = [nil, nil, nil]
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockService,
             now: { now }
         )
 
@@ -1084,7 +1043,7 @@ struct ProStatusManagerTests {
             try await manager.purchase(.yearly)
         }
 
-        #expect(mockService.fetchEntitlementSnapshotCallCount == 3)
+        #expect(mockService.refreshEntitlementCallCount == 3)
         #expect(manager.lastError == .activationPending)
         #expect(manager.paywallErrorMessage == ProPurchaseError.activationPending.errorDescription)
         #expect(manager.status == .expired)
@@ -1102,8 +1061,7 @@ struct ProStatusManagerTests {
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -1128,8 +1086,7 @@ struct ProStatusManagerTests {
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -1150,8 +1107,7 @@ struct ProStatusManagerTests {
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -1171,14 +1127,13 @@ struct ProStatusManagerTests {
 
         defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
 
-        let mockService = MockRevenueCatService()
+        let mockService = MockCommerceClient()
         mockService.entitlementError = CommercePurchaseError.network
         let now = Date(timeIntervalSince1970: 1_700_000_000)
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: mockService,
-            legacyAppPurchaseTracker: MockLegacyAppPurchaseTracker(),
+            commerceClient: mockService,
             now: { now }
         )
         let source = ProCommerceStateSource(proStatusManager: manager)
@@ -1238,16 +1193,17 @@ struct ProStatusManagerTests {
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
         let purchaseDate = now.addingTimeInterval(-(30 * 24 * 60 * 60))
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-        legacyTracker.refreshedLegacyAppPurchaseSnapshot = .init(
-            originalAppVersion: "1.1.0",
+        let mockCommerce = MockCommerceClient()
+        mockCommerce.fetchedEntitlement = .init(
+            plan: .lifetime,
+            expirationDate: nil,
+            willRenew: false,
             originalPurchaseDate: purchaseDate
         )
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: mockCommerce,
             now: { now }
         )
 
@@ -1263,24 +1219,18 @@ struct ProStatusManagerTests {
     }
 
     @MainActor
-    @Test("Free downloads at 1.2.0 or later use the local trial")
-    func currentFreeDownloadsUseLocalTrial() async {
+    @Test("Downloads without a commerce entitlement use the local trial")
+    func downloadsWithoutCommerceEntitlementUseLocalTrial() async {
         let (defaults, suiteName) = makeDefaults()
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         defaults.set(true, forKey: "com.comtab.hasSeenOnboarding")
 
         let now = Date(timeIntervalSince1970: 1_700_000_000)
-        let legacyTracker = MockLegacyAppPurchaseTracker()
-        legacyTracker.refreshedLegacyAppPurchaseSnapshot = .init(
-            originalAppVersion: "1.2.0",
-            originalPurchaseDate: now.addingTimeInterval(-(2 * 24 * 60 * 60))
-        )
 
         let manager = ProStatusManager(
             defaults: defaults,
-            revenueCatService: MockRevenueCatService(),
-            legacyAppPurchaseTracker: legacyTracker,
+            commerceClient: MockCommerceClient(),
             now: { now }
         )
 
@@ -1406,59 +1356,6 @@ struct OnboardingSessionModelTests {
 
         session.moveToPaywall()
         #expect(session.phase == .paywall)
-    }
-}
-
-struct LegacyAppStoreReceiptParserTests {
-    @Test("Receipt parser extracts original app version from payload")
-    func receiptParserExtractsOriginalAppVersion() throws {
-        let payload = makeReceiptPayload(originalAppVersion: "1.1.0")
-
-        let receipt = try LegacyAppStoreReceiptParser.parse(payloadData: payload)
-
-        #expect(receipt == .init(originalAppVersion: "1.1.0"))
-    }
-
-    @Test("Receipt parser rejects payloads without original app version")
-    func receiptParserRequiresOriginalAppVersion() throws {
-        let payload = wrap(tag: 0x31, content: Data())
-
-        do {
-            _ = try LegacyAppStoreReceiptParser.parse(payloadData: payload)
-            Issue.record("Expected parser to reject payloads without original app version.")
-        } catch let error as ReceiptDecodingError {
-            #expect(error == .missingOriginalAppVersion)
-        }
-    }
-
-    private func makeReceiptPayload(originalAppVersion: String) -> Data {
-        let value = wrap(tag: 0x04, content: wrap(tag: 0x0C, content: Data(originalAppVersion.utf8)))
-        let attribute = wrap(
-            tag: 0x30,
-            content: encodeInteger(19) + encodeInteger(1) + value
-        )
-
-        return wrap(tag: 0x31, content: attribute)
-    }
-
-    private func encodeInteger(_ value: Int) -> Data {
-        wrap(tag: 0x02, content: Data([UInt8(value)]))
-    }
-
-    private func wrap(tag: UInt8, content: Data) -> Data {
-        Data([tag]) + encodeLength(content.count) + content
-    }
-
-    private func encodeLength(_ length: Int) -> Data {
-        if length < 0x80 {
-            return Data([UInt8(length)])
-        }
-
-        let bytes = withUnsafeBytes(of: UInt32(length).bigEndian) { rawBuffer in
-            Data(rawBuffer.drop { $0 == 0 })
-        }
-
-        return Data([0x80 | UInt8(bytes.count)]) + bytes
     }
 }
 

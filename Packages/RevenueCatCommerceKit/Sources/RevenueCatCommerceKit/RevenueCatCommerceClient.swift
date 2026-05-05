@@ -11,11 +11,13 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
     private let configuration: CommerceConfiguration
     private let logger: Logger
     private let sdkClient: any RevenueCatSDKClient
+    private let legacyEntitlementSource: any LegacyPaidAppEntitlementProviding
     private var currentOffering: Offering?
 
     public init(configuration: CommerceConfiguration) {
         self.configuration = configuration
         self.sdkClient = RevenueCatPurchasesSDKClient()
+        self.legacyEntitlementSource = LegacyPaidAppEntitlementSource()
         self.logger = Logger(
             subsystem: configuration.logSubsystem,
             category: configuration.logCategory
@@ -24,9 +26,14 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
         bindSDKClient()
     }
 
-    init(configuration: CommerceConfiguration, sdkClient: any RevenueCatSDKClient) {
+    init(
+        configuration: CommerceConfiguration,
+        sdkClient: any RevenueCatSDKClient,
+        legacyEntitlementSource: (any LegacyPaidAppEntitlementProviding)? = nil
+    ) {
         self.configuration = configuration
         self.sdkClient = sdkClient
+        self.legacyEntitlementSource = legacyEntitlementSource ?? LegacyPaidAppEntitlementSource()
         self.logger = Logger(
             subsystem: configuration.logSubsystem,
             category: configuration.logCategory
@@ -36,15 +43,13 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
     }
 
     public var cachedEntitlement: CommerceEntitlement? {
-        guard isConfigured else {
-            return nil
-        }
-
-        return RevenueCatSnapshotMapper.makeEntitlement(
+        let revenueCatEntitlement = isConfigured ? RevenueCatSnapshotMapper.makeEntitlement(
             from: sdkClient.cachedCustomerInfo,
             configuration: configuration,
             logger: logger
-        )
+        ) : nil
+
+        return revenueCatEntitlement ?? legacyEntitlementSource.cachedLegacyEntitlement
     }
 
     public func configureIfNeeded() {
@@ -94,17 +99,33 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
     }
 
     public func refreshEntitlement() async throws -> CommerceEntitlement? {
-        try ensureConfigured()
-
-        let customerInfo = try await withTimeout("customer info") {
-            try await self.sdkClient.customerInfo(fetchPolicy: .fetchCurrent)
-        }
-
-        return RevenueCatSnapshotMapper.makeEntitlement(
-            from: customerInfo,
+        let legacyEntitlement = await legacyEntitlementSource.refreshLegacyEntitlement(
             configuration: configuration,
             logger: logger
         )
+
+        guard isConfigured else {
+            return legacyEntitlement
+        }
+
+        do {
+            let customerInfo = try await withTimeout("customer info") {
+                try await self.sdkClient.customerInfo(fetchPolicy: .fetchCurrent)
+            }
+
+            return RevenueCatSnapshotMapper.makeEntitlement(
+                from: customerInfo,
+                configuration: configuration,
+                logger: logger
+            ) ?? legacyEntitlement
+        } catch {
+            if let legacyEntitlement {
+                logger.error("RevenueCat customer info refresh failed; using legacy paid-app entitlement.")
+                return legacyEntitlement
+            }
+
+            throw error
+        }
     }
 
     public func purchase(_ plan: CommercePlan) async throws -> CommerceEntitlement? {
@@ -129,7 +150,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
                 from: result.customerInfo,
                 configuration: configuration,
                 logger: logger
-            )
+            ) ?? legacyEntitlementSource.cachedLegacyEntitlement
         } catch {
             if isInvalidReceiptError(error) {
                 logger.error("Purchase returned an invalid receipt for plan=\(plan.rawValue). Attempting entitlement recovery.")
@@ -159,7 +180,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
             from: customerInfo,
             configuration: configuration,
             logger: logger
-        )
+        ) ?? legacyEntitlementSource.cachedLegacyEntitlement
     }
 
     private func ensureConfigured() throws {
@@ -178,7 +199,7 @@ public final class RevenueCatCommerceClient: NSObject, CommerceClient {
                 from: customerInfo,
                 configuration: self.configuration,
                 logger: self.logger
-            )
+            ) ?? self.legacyEntitlementSource.cachedLegacyEntitlement
             self.entitlementDidChange?(entitlement)
         }
     }

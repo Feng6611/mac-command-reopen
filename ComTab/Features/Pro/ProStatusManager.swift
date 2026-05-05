@@ -8,6 +8,7 @@
 import Combine
 import Defaults
 import Foundation
+import RevenueCatCommerceKit
 import os
 
 @MainActor
@@ -16,7 +17,6 @@ final class ProStatusManager: ObservableObject {
         static let trialDuration: TimeInterval = 2 * 24 * 60 * 60
         static let transactionRefreshAttempts = 3
         static let transactionRefreshDelayNanoseconds: UInt64 = 750_000_000
-        static let grandfatheringCutoffVersion = "1.2.0"
     }
 
     private enum StatusUpdateSource {
@@ -28,29 +28,22 @@ final class ProStatusManager: ObservableObject {
     static let shared = ProStatusManager()
 
     @Published private(set) var status: ProStatus
-    @Published private(set) var currentOffering: ProOfferingSnapshot?
+    @Published private(set) var currentOffering: CommerceOffering?
     @Published private(set) var availablePlans: [ProPlanProduct]
     @Published private(set) var lastError: ProPurchaseError?
-    @Published private(set) var purchaseInProgressPlan: ProPlan?
+    @Published private(set) var purchaseInProgressPlan: CommercePlan?
     @Published private(set) var isRestoringPurchases = false
 
-    var currentEntitlementSnapshot: ProEntitlementSnapshot? {
-        Self.resolvedEntitlementSnapshot(
-            revenueCatSnapshot: revenueCatEntitlementSnapshot,
-            legacySnapshot: legacyAppPurchaseSnapshot
-        )
-    }
+    var currentEntitlementSnapshot: CommerceEntitlement? { entitlementSnapshot }
     @Published private(set) var paywallErrorMessage: String?
     @Published private(set) var paywallSuccessMessage: String?
     @Published private(set) var shouldOpenProSettings = false
 
     private let defaults: UserDefaults
-    private let revenueCatService: any RevenueCatServicing
-    private let legacyAppPurchaseTracker: any LegacyAppPurchaseChecking
+    private let commerceClient: any CommerceClient
     private let now: () -> Date
 
-    private var revenueCatEntitlementSnapshot: ProEntitlementSnapshot?
-    private var legacyAppPurchaseSnapshot: LegacyAppPurchaseSnapshot?
+    private var entitlementSnapshot: CommerceEntitlement?
     private var hasConfigured = false
     private var hasCompletedInitialRefresh = false
     private var hasPromptedForExpiredStateThisSession = false
@@ -65,39 +58,30 @@ final class ProStatusManager: ObservableObject {
 
     init(
         defaults: UserDefaults = .standard,
-        revenueCatService: (any RevenueCatServicing)? = nil,
-        legacyAppPurchaseTracker: (any LegacyAppPurchaseChecking)? = nil,
+        commerceClient: (any CommerceClient)? = nil,
         now: @escaping () -> Date = Date.init
     ) {
-        let service = revenueCatService ?? RevenueCatService.shared
-        let cachedSnapshot = service.cachedEntitlementSnapshot
-        let legacyTracker = legacyAppPurchaseTracker ?? LegacyAppPurchaseTracker.shared
-        let cachedLegacySnapshot = legacyTracker.cachedLegacyAppPurchaseSnapshot
-        if Self.resolvedEntitlementSnapshot(
-            revenueCatSnapshot: cachedSnapshot,
-            legacySnapshot: cachedLegacySnapshot
-        ) == nil,
+        let client = commerceClient ?? RevenueCatCommerceClient(
+            configuration: RevenueCatConfiguration.commerceConfiguration
+        )
+        let cachedSnapshot = client.cachedEntitlement
+        if cachedSnapshot == nil,
            defaults[AppDefaults.trialStartDate] == nil {
             let resolvedStartDate = now()
             defaults[AppDefaults.trialStartDate] = resolvedStartDate
             AppLogger.purchase.notice("Started local trial at \(resolvedStartDate.formatted())")
         }
         self.defaults = defaults
-        self.revenueCatService = service
-        self.legacyAppPurchaseTracker = legacyTracker
+        self.commerceClient = client
         self.now = now
-        self.revenueCatEntitlementSnapshot = cachedSnapshot
-        self.legacyAppPurchaseSnapshot = cachedLegacySnapshot
+        self.entitlementSnapshot = cachedSnapshot
         self.currentOffering = nil
         self.availablePlans = ProPlanProduct.fallbackPlans
         self.lastError = nil
         self.purchaseInProgressPlan = nil
         self.paywallErrorMessage = nil
         self.paywallSuccessMessage = nil
-        self.status = Self.computeStatus(entitlementSnapshot: Self.resolvedEntitlementSnapshot(
-            revenueCatSnapshot: cachedSnapshot,
-            legacySnapshot: self.legacyAppPurchaseSnapshot
-        ), defaults: defaults, now: now)
+        self.status = Self.computeStatus(entitlementSnapshot: cachedSnapshot, defaults: defaults, now: now)
     }
 
     func configureIfNeeded() {
@@ -105,12 +89,11 @@ final class ProStatusManager: ObservableObject {
             return
         }
 
-        revenueCatService.customerInfoDidChange = { [weak self] snapshot in
+        commerceClient.entitlementDidChange = { [weak self] snapshot in
             self?.applyEntitlementSnapshot(snapshot, source: .stateChange)
         }
-        revenueCatService.configureIfNeeded()
-        revenueCatEntitlementSnapshot = revenueCatService.cachedEntitlementSnapshot
-        legacyAppPurchaseSnapshot = legacyAppPurchaseTracker.cachedLegacyAppPurchaseSnapshot
+        commerceClient.configureIfNeeded()
+        entitlementSnapshot = commerceClient.cachedEntitlement
         hasConfigured = true
         startTrialIfMissingEntitlement()
         applyStatus(computeStatus(), source: .bootstrap)
@@ -129,10 +112,8 @@ final class ProStatusManager: ObservableObject {
     func refresh() async {
         configureIfNeeded()
 
-        legacyAppPurchaseSnapshot = await legacyAppPurchaseTracker.refreshLegacyAppPurchaseSnapshot()
-
         do {
-            revenueCatEntitlementSnapshot = try await revenueCatService.fetchEntitlementSnapshot()
+            entitlementSnapshot = try await commerceClient.refreshEntitlement()
             lastError = nil
         } catch {
             let purchaseError = ProPurchaseError(error: error)
@@ -153,7 +134,7 @@ final class ProStatusManager: ObservableObject {
 
         var offeringsError: Error?
         do {
-            currentOffering = try await revenueCatService.fetchCurrentOffering()
+            currentOffering = try await commerceClient.loadOffering()
         } catch {
             AppLogger.purchase.error("Failed to load offerings: \(error.localizedDescription)")
             currentOffering = nil
@@ -163,16 +144,16 @@ final class ProStatusManager: ObservableObject {
         availablePlans = Self.resolveAvailablePlans(offering: currentOffering, offeringsError: offeringsError)
     }
 
-    func purchase(_ plan: ProPlan) async throws {
+    func purchase(_ plan: CommercePlan) async throws {
         configureIfNeeded()
         clearPaywallMessages()
         purchaseInProgressPlan = plan
         defer { purchaseInProgressPlan = nil }
 
         do {
-            let snapshot = try await revenueCatService.purchase(plan: plan)
+            let snapshot = try await commerceClient.purchase(plan)
             lastError = nil
-            revenueCatEntitlementSnapshot = snapshot
+            entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
                 let didUnlock = await refreshEntitlementStateAfterTransaction()
@@ -200,9 +181,9 @@ final class ProStatusManager: ObservableObject {
         defer { isRestoringPurchases = false }
 
         do {
-            let snapshot = try await revenueCatService.restorePurchases()
+            let snapshot = try await commerceClient.restorePurchases()
             lastError = nil
-            revenueCatEntitlementSnapshot = snapshot
+            entitlementSnapshot = snapshot
             applyStatus(computeStatus(), source: .stateChange)
             if !status.isPro {
                 if snapshot != nil {
@@ -226,7 +207,7 @@ final class ProStatusManager: ObservableObject {
         }
     }
 
-    func planProduct(for plan: ProPlan) -> ProPlanProduct {
+    func planProduct(for plan: CommercePlan) -> ProPlanProduct {
         availablePlans.first(where: { $0.plan == plan }) ?? .fallback(for: plan)
     }
 
@@ -234,8 +215,8 @@ final class ProStatusManager: ObservableObject {
         shouldOpenProSettings = false
     }
 
-    static func makeAvailablePlans(packageMetadata: [ProPlan: ProPlanPackageMetadata]?, offeringsAttempted: Bool = false) -> [ProPlanProduct] {
-        [ProPlan.yearly, .lifetime].map { plan in
+    static func makeAvailablePlans(packageMetadata: [CommercePlan: ProPlanPackageMetadata]?, offeringsAttempted: Bool = false) -> [ProPlanProduct] {
+        [CommercePlan.yearly, .lifetime].map { plan in
             let fallback = ProPlanProduct.fallback(for: plan, isAvailable: packageMetadata == nil && !offeringsAttempted)
 
             guard let metadata = packageMetadata?[plan] else {
@@ -260,10 +241,7 @@ final class ProStatusManager: ObservableObject {
     }
 
     private func startTrialIfMissingEntitlement() {
-        guard Self.resolvedEntitlementSnapshot(
-            revenueCatSnapshot: revenueCatEntitlementSnapshot,
-            legacySnapshot: legacyAppPurchaseSnapshot
-        ) == nil else {
+        guard entitlementSnapshot == nil else {
             return
         }
 
@@ -285,8 +263,8 @@ final class ProStatusManager: ObservableObject {
     private func refreshEntitlementStateAfterTransaction() async -> Bool {
         for attempt in 1...Constants.transactionRefreshAttempts {
             do {
-                let snapshot = try await revenueCatService.fetchEntitlementSnapshot()
-                revenueCatEntitlementSnapshot = snapshot
+                let snapshot = try await commerceClient.refreshEntitlement()
+                entitlementSnapshot = snapshot
                 applyStatus(computeStatus(), source: .stateChange)
 
                 if status.isPro {
@@ -306,8 +284,8 @@ final class ProStatusManager: ObservableObject {
         return false
     }
 
-    private func applyEntitlementSnapshot(_ snapshot: ProEntitlementSnapshot?, source: StatusUpdateSource) {
-        revenueCatEntitlementSnapshot = snapshot
+    private func applyEntitlementSnapshot(_ snapshot: CommerceEntitlement?, source: StatusUpdateSource) {
+        entitlementSnapshot = snapshot
         applyStatus(computeStatus(), source: source)
     }
 
@@ -352,24 +330,14 @@ final class ProStatusManager: ObservableObject {
 
     private func computeStatus() -> ProStatus {
         Self.computeStatus(
-            entitlementSnapshot: Self.resolvedEntitlementSnapshot(
-                revenueCatSnapshot: revenueCatEntitlementSnapshot,
-                legacySnapshot: legacyAppPurchaseSnapshot
-            ),
+            entitlementSnapshot: entitlementSnapshot,
             defaults: defaults,
             now: now
         )
     }
 
-    private static func resolvedEntitlementSnapshot(
-        revenueCatSnapshot: ProEntitlementSnapshot?,
-        legacySnapshot: LegacyAppPurchaseSnapshot?
-    ) -> ProEntitlementSnapshot? {
-        revenueCatSnapshot ?? legacySnapshot?.asEntitlementSnapshot
-    }
-
     private static func computeStatus(
-        entitlementSnapshot: ProEntitlementSnapshot?,
+        entitlementSnapshot: CommerceEntitlement?,
         defaults: UserDefaults,
         now: () -> Date
     ) -> ProStatus {
@@ -395,15 +363,28 @@ final class ProStatusManager: ObservableObject {
         return .expired
     }
 
-    private static func packageMetadata(from offering: ProOfferingSnapshot?) -> [ProPlan: ProPlanPackageMetadata]? {
+    private static func packageMetadata(from offering: CommerceOffering?) -> [CommercePlan: ProPlanPackageMetadata]? {
         guard let offering else {
             return nil
         }
 
-        return offering.isEmpty ? nil : offering.packageMetadata
+        guard !offering.isEmpty else {
+            return nil
+        }
+
+        return Dictionary(uniqueKeysWithValues: offering.products.map { product in
+            (
+                product.plan,
+                ProPlanPackageMetadata(
+                    displayPrice: product.displayPrice,
+                    billingDetail: product.plan == .yearly ? String(localized: "per year") : String(localized: "once"),
+                    isAvailable: product.isAvailable
+                )
+            )
+        })
     }
 
-    private static func resolveAvailablePlans(offering: ProOfferingSnapshot?, offeringsError: Error?) -> [ProPlanProduct] {
+    private static func resolveAvailablePlans(offering: CommerceOffering?, offeringsError: Error?) -> [ProPlanProduct] {
         let purchaseError = offeringsError.map(ProPurchaseError.init(error:))
         let shouldKeepFallbackAvailable = purchaseError == .network
 

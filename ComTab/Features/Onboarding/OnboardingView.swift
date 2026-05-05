@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import RevenueCatCommerceKit
 import SwiftUI
 import os
 
@@ -207,7 +208,7 @@ struct OnboardingView: View {
         }
     }
 
-    @State private var selectedPlan: ProPlan = .lifetime
+    @State private var selectedPlan: CommercePlan = .lifetime
 
     private var selectedProduct: ProPlanProduct {
         proStatusManager.planProduct(for: selectedPlan)

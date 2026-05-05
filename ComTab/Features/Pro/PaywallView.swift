@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import RevenueCatCommerceKit
 import SwiftUI
 import os
 
@@ -29,13 +30,13 @@ enum ProPreviewMode: String, CaseIterable, Identifiable {
 
 struct ProDisplayState {
     let status: ProStatus
-    let entitlementSnapshot: ProEntitlementSnapshot?
+    let entitlementSnapshot: CommerceEntitlement?
     let isPreviewing: Bool
     let showsStatusChip: Bool
 
     static func live(
         status: ProStatus,
-        entitlementSnapshot: ProEntitlementSnapshot?
+        entitlementSnapshot: CommerceEntitlement?
     ) -> Self {
         .init(
             status: status,
@@ -64,6 +65,8 @@ struct ProDisplayState {
                 status: .pro(plan: .yearly, expirationDate: yearlyExpirationDate, willRenew: true),
                 entitlementSnapshot: .init(
                     plan: .yearly,
+                    productIdentifier: RevenueCatConfiguration.yearlyProductIdentifier,
+                    entitlementIdentifier: RevenueCatConfiguration.entitlementIdentifier,
                     expirationDate: yearlyExpirationDate,
                     willRenew: true,
                     originalPurchaseDate: purchaseDate
@@ -76,6 +79,8 @@ struct ProDisplayState {
                 status: .pro(plan: .lifetime, expirationDate: nil, willRenew: false),
                 entitlementSnapshot: .init(
                     plan: .lifetime,
+                    productIdentifier: RevenueCatConfiguration.lifetimeProductIdentifier,
+                    entitlementIdentifier: RevenueCatConfiguration.entitlementIdentifier,
                     expirationDate: nil,
                     willRenew: false,
                     originalPurchaseDate: purchaseDate
@@ -93,7 +98,7 @@ struct UpgradeCardView: View {
     @EnvironmentObject private var proStatusManager: ProStatusManager
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
     let displayState: ProDisplayState
-    @State private var selectedPlan: ProPlan = .lifetime
+    @State private var selectedPlan: CommercePlan = .lifetime
     @State private var isLoadingOfferings = false
 
     private var displayStatus: ProStatus { displayState.status }
@@ -451,7 +456,7 @@ struct ProStatusBadgeView: View {
         }
     }
 
-    private func proHeader(plan: ProPlan) -> some View {
+    private func proHeader(plan: CommercePlan) -> some View {
         HStack(spacing: DS.Spacing.md) {
             DSIconBadge(
                 systemName: "checkmark.seal.fill",

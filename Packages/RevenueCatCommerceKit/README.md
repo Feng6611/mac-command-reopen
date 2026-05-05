@@ -23,6 +23,7 @@ If an app needs monthly plans, team tiers, consumables, multiple entitlements, o
 - restore purchases
 - RevenueCat delegate updates
 - RevenueCat error mapping
+- optional legacy paid-app entitlement detection
 - request timeouts
 - invalid receipt recovery by refreshing entitlement, then restoring purchases
 
@@ -33,7 +34,6 @@ If an app needs monthly plans, team tiers, consumables, multiple entitlements, o
 - feature locking
 - paywall presentation
 - "expired" prompting
-- grandfathering from a paid download app to IAP
 - direct vs App Store build behavior
 - pricing copy, badges, and app-specific text
 
@@ -155,8 +155,34 @@ Advanced configuration is centralized in `CommerceConfiguration`:
 - `invalidReceiptRecoveryDelayNanoseconds`
 - `allowsTestAPIKeyInRelease`
 - `showStoreMessagesAutomatically`
+- `legacyPaidApp`
 - `logSubsystem`
 - `logCategory`
+
+## Legacy Paid-App Grandfathering
+
+Legacy paid-app support is disabled by default. Enable it only for apps that previously shipped as a paid download and now need to map older paid customers into a lifetime entitlement.
+
+When enabled, the client checks `AppTransaction` on macOS 13+ and falls back to the local App Store receipt payload. If the original app version is lower than the cutoff, the client returns a `CommerceEntitlement` for the configured plan. RevenueCat entitlements still take priority when both sources are active.
+
+```swift
+let commerce = RevenueCatCommerceClient(
+    configuration: CommerceConfiguration(
+        apiKey: revenueCatAPIKey,
+        entitlementIdentifier: "pro",
+        productIdentifiers: [
+            .yearly: "com.example.myapp.pro.yearly",
+            .lifetime: "com.example.myapp.pro.lifetime"
+        ],
+        legacyPaidApp: .grandfatheredPaidApp(
+            cutoffOriginalAppVersion: "1.2.0",
+            entitlementIdentifier: "pro",
+            mapsToPlan: .lifetime,
+            productIdentifier: "com.example.myapp.pro.lifetime"
+        )
+    )
+)
+```
 
 ## Host App Checklist
 

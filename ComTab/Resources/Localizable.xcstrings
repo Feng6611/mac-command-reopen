@@ -7,9 +7,6 @@
     "%lld" : {
 
     },
-    "⌘" : {
-
-    },
     "🎉" : {
 
     },
@@ -35,9 +32,6 @@
 
     },
     "Command Reopen helped you **%lld times** during your trial." : {
-
-    },
-    "Command Reopen is working" : {
 
     },
     "Command Reopen v%@ (%@)" : {
@@ -199,9 +193,6 @@
     "Support Command Reopen" : {
 
     },
-    "Tab" : {
-
-    },
     "Terms" : {
 
     },
@@ -217,9 +208,6 @@
     "Trend" : {
 
     },
-    "Try it once" : {
-
-    },
     "Unavailable" : {
 
     },
@@ -230,6 +218,9 @@
 
     },
     "Week" : {
+
+    },
+    "Works for Safari, Finder, Xcode, and every other app." : {
 
     },
     "year" : {
