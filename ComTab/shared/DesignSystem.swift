@@ -56,8 +56,9 @@ enum DS {
         static let accentTintSubtle = Color.accentColor.opacity(0.06)
         static let proFill          = Color.accentColor.opacity(0.88)
 
+        static let brandPrimary = Color(red: 203/255, green: 48/255, blue: 224/255)
+
         static let warningTint = Color.orange.opacity(0.12)
-        static let warningFill = Color.orange.opacity(0.10)
     }
 
     // MARK: Typography (only non-system fonts)
@@ -65,6 +66,7 @@ enum DS {
 
     enum Typography {
         static let displayHero    = Font.system(size: 36, weight: .bold, design: .rounded)
+        static let onboardingTitle = Font.system(size: 24, weight: .bold)
         static let headlineMedium = Font.system(size: 20, weight: .semibold)
         static let headlineSmall  = Font.system(size: 18, weight: .bold, design: .rounded)
         static let metricValue    = Font.system(size: 16, weight: .semibold, design: .rounded)
@@ -177,7 +179,7 @@ struct StatusPill: View {
     private var fillColor: Color {
         switch tone {
         case .accent:  return DS.Colors.proFill
-        case .warning: return DS.Colors.warningFill
+        case .warning: return DS.Colors.warningTint
         case .neutral: return Color(nsColor: .controlBackgroundColor)
         }
     }

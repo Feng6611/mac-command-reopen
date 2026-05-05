@@ -34,12 +34,6 @@
     "Best Value" : {
 
     },
-    "Bring minimized windows back when you return to an app with Command-Tab." : {
-
-    },
-    "Buy once, or continue your 2-day trial and decide after using it in your own workflow." : {
-
-    },
     "Command Reopen helped you **%lld times** during your trial." : {
 
     },
@@ -63,9 +57,6 @@
     "Continue" : {
 
     },
-    "Continue 2-Day Trial" : {
-
-    },
     "Count" : {
 
     },
@@ -73,6 +64,9 @@
 
     },
     "Day" : {
+
+    },
+    "Early Bird · Limited Time" : {
 
     },
     "Enable Command Reopen" : {
@@ -123,13 +117,29 @@
     "No reopen activity yet" : {
 
     },
+    "Now Command-Tab back to Command Reopen" : {
+
+    },
     "Official" : {
 
     },
     "Official Website" : {
 
     },
+    "Onboarding step %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Onboarding step %1$lld of %2$lld"
+          }
+        }
+      }
+    },
     "once" : {
+
+    },
+    "One-time purchase · no subscriptions" : {
 
     },
     "Open Mac App Store" : {
@@ -180,6 +190,9 @@
     "Skip for Now" : {
 
     },
+    "Start 2-Day Free Trial" : {
+
+    },
     "Start using Command Reopen to see trends" : {
 
     },
@@ -190,9 +203,6 @@
 
     },
     "Terms" : {
-
-    },
-    "That was the core trick: when an app is active but its window is gone, Command Reopen brings it back." : {
 
     },
     "The Mac App Store version is the mainline release for ongoing updates and long-term support." : {
@@ -216,16 +226,10 @@
     "Upgrade to Pro..." : {
 
     },
-    "Use the real macOS flow. We'll bring this window back when you return." : {
-
-    },
     "View GitHub" : {
 
     },
     "Week" : {
-
-    },
-    "Welcome to Command Reopen" : {
 
     },
     "year" : {

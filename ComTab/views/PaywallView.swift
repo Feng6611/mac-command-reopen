@@ -185,7 +185,7 @@ struct UpgradeCardView: View {
             DSIconBadge(
                 systemName: isExpired ? "exclamationmark.triangle.fill" : "checkmark.seal.fill",
                 iconColor: isExpired ? .orange : .accentColor,
-                backgroundColor: isExpired ? DS.Colors.warningFill : DS.Colors.accentTint,
+                backgroundColor: isExpired ? DS.Colors.warningTint : DS.Colors.accentTint,
                 size: 42,
                 iconSize: 18
             )

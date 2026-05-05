@@ -16,7 +16,7 @@
 | Spacing | ≤ 7 | 8（含 xxxl，边缘） |
 | Radius | ≤ 3 | 3（control / card / modal） |
 | Typography 自定义 | ≤ 8 | 8 |
-| Color 自定义 | ≤ 7 | 7 |
+| Color 自定义 | ≤ 7 | 7（warningFill 合并入 warningTint，新增 brandPrimary） |
 | Card modifier | 1 | 1（dsCard，settingsCard 是 alias） |
 
 ---
