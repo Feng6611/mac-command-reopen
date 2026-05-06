@@ -38,10 +38,10 @@
 ## 不涉及的文件（不改动）
 
 `state/`、`services/`、`system/`、`app/` 里的逻辑文件。  
-UI 修改范围：`ComTab/views/` 和 `ComTab/shared/DesignSystem.swift`。
+UI 修改范围：`CmdReopen/Features/` 和 `CmdReopen/shared/DesignSystem.swift`。
 
 ---
 
 ## 调试工具
 
-`ComTab/shared/DesignCatalog.swift`（仅 DEBUG）：打开 Xcode Preview 可一览所有组件的 Light / Dark 效果。
+`CmdReopen/shared/DesignCatalog.swift`（仅 DEBUG）：打开 Xcode Preview 可一览所有组件的 Light / Dark 效果。

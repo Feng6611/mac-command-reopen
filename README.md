@@ -52,7 +52,7 @@ That's exactly what Command Reopen fixes. Every Cmd+Tab switch restores your win
 
 Command Reopen listens for app activation events via `NSWorkspace.didActivateApplicationNotification`. When you Cmd+Tab to an app, it first checks whether that app already has a visible on-screen window by inspecting the public CoreGraphics window list (`CGWindowListCopyWindowInfo`). Only if no visible window is found does it send a restore request through `NSWorkspace.openApplication(at:configuration:)`. This brings back minimized windows and recreates closed ones — all using standard macOS APIs that require no special permissions.
 
-The core logic is ~300 lines in a single file: [ActivationMonitor.swift](ComTab/ActivationMonitor.swift).
+The core logic is ~300 lines in a single file: [ActivationMonitor.swift](CmdReopen/Features/Reopen/ActivationMonitor.swift).
 
 ## FAQ
 

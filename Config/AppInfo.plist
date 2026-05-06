@@ -24,8 +24,8 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>ComTabRevenueCatAPIKey</key>
-	<string>$(COMTAB_REVENUECAT_API_KEY)</string>
+	<key>CmdReopenRevenueCatAPIKey</key>
+	<string>$(CMDREOPEN_REVENUECAT_API_KEY)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>

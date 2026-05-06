@@ -52,7 +52,7 @@
 
 Command Reopen 通过 `NSWorkspace.didActivateApplicationNotification` 监听应用激活事件。当你用 Cmd+Tab 切换到某个应用时，它会先用公开的 CoreGraphics 窗口列表 API（`CGWindowListCopyWindowInfo`）检查这个应用当前是否已经有可见窗口。只有在没有找到可见窗口时，才会通过 `NSWorkspace.openApplication(at:configuration:)` 发送恢复请求。这会恢复最小化的窗口并重新创建已关闭的窗口——全部使用标准 macOS API，无需任何特殊权限。
 
-核心逻辑约 300 行，集中在一个文件中：[ActivationMonitor.swift](ComTab/ActivationMonitor.swift)。
+核心逻辑约 300 行，集中在一个文件中：[ActivationMonitor.swift](CmdReopen/Features/Reopen/ActivationMonitor.swift)。
 
 ## 常见问题
 
