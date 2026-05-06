@@ -31,4 +31,6 @@ DESIGN_NOTES.md
 fastlane/
 docs/*
 !docs/icon.svg
+!docs/CLAUDE.md
+!docs/DESIGN.md
 Config/LocalSecrets.xcconfig
