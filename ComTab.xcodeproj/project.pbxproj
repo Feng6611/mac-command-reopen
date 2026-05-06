@@ -143,6 +143,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "Command Reopen" */;
 			buildPhases = (
+				8D4100012FAA30010099C190 /* Verify RevenueCat API Key */,
 				748FCE172EB5027A0099C190 /* Sources */,
 				748FCE182EB5027A0099C190 /* Frameworks */,
 				748FCE192EB5027A0099C190 /* Resources */,
@@ -330,6 +331,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8D4100012FAA30010099C190 /* Verify RevenueCat API Key */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/verify_revenuecat_api_key.sh",
+				"$(SRCROOT)/Config/BuildNumber.xcconfig",
+			);
+			name = "Verify RevenueCat API Key";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/verify_revenuecat_api_key.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		748FCE172EB5027A0099C190 /* Sources */ = {
