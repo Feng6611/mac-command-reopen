@@ -407,14 +407,18 @@ private enum AboutColors {
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
-    @State private var selectedBundleToExclude: String?
+
+    private let appLookupProvider = ApplicationLookupProvider()
+
     @State private var appLookupQuery = ""
-    @State private var appLookupResult: ExcludedApplicationInfo?
-    @State private var appLookupError: String?
-    @State private var runningUserApps: [NSRunningApplication] = []
+    @State private var applicationCatalog: [ExcludedApplicationInfo] = []
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
+    }
+
+    private var appLookupResults: [ExcludedApplicationInfo] {
+        appLookupProvider.search(query: appLookupQuery, in: applicationCatalog)
     }
 
     var body: some View {
@@ -433,128 +437,125 @@ struct SettingsTabContent: View {
                 }
             }
 
-            Section {
-                if activationMonitor.sortedUserExcludedBundleIDs.isEmpty {
-                    Text("No excluded apps")
-                        .foregroundColor(.secondary)
-                } else {
-                    ForEach(activationMonitor.sortedUserExcludedBundleIDs, id: \.self) { bundleID in
-                        ExcludedApplicationRow(
-                            bundleID: bundleID,
-                            removeAction: removeExcludedBundleID
-                        )
-                    }
-                }
+            ExcludedAppsSection(
+                bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
+                isDisabled: isFeatureLocked,
+                removeAction: removeExcludedBundleID
+            )
+            .opacity(isFeatureLocked ? 0.5 : 1)
 
-                SettingsUI.ApplicationPicker(
-                    applications: runningUserApps,
-                    selection: $selectedBundleToExclude,
-                    isDisabled: isFeatureLocked,
-                    addAction: addExcludedBundleID
-                )
-
-                AppLookupAddRow(
-                    query: $appLookupQuery,
-                    result: appLookupResult,
-                    errorMessage: appLookupError,
-                    isDisabled: isFeatureLocked,
-                    isAlreadyExcluded: appLookupResult.map { activationMonitor.userExcludedBundleIDs.contains($0.bundleID) } ?? false,
-                    lookupAction: lookupApp,
-                    addAction: addLookupResult
-                )
-            } header: {
-                Text("Excluded Apps")
-            } footer: {
-                Text("Search by app name or bundle ID, for example Safari or com.apple.universalcontrol.")
-                    .settingDescription()
-            }
+            AddExclusionSection(
+                query: $appLookupQuery,
+                searchResults: appLookupResults,
+                excludedBundleIDs: activationMonitor.userExcludedBundleIDs,
+                isDisabled: isFeatureLocked,
+                addApplicationAction: addLookupResult
+            )
             .opacity(isFeatureLocked ? 0.5 : 1)
         }
         .task {
             await Task.yield()
-            refreshRunningUserApps()
+            refreshApplicationCatalog()
+            clearInitialFocus()
         }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { _ in
-            refreshRunningUserApps()
+            refreshApplicationCatalog()
         }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in
-            refreshRunningUserApps()
-        }
-        .onChange(of: appLookupQuery) { _ in
-            appLookupResult = nil
-            appLookupError = nil
+            refreshApplicationCatalog()
         }
     }
 
-    private func addExcludedBundleID(_ bundleID: String) {
-        activationMonitor.addExcludedBundleID(bundleID)
-        refreshRunningUserApps()
-    }
-
-    private func lookupApp() {
-        appLookupError = nil
-        appLookupResult = nil
-
-        guard let normalizedQuery = ActivationMonitor.normalizeBundleID(appLookupQuery) else {
-            appLookupError = "Enter an app name or bundle ID."
-            return
-        }
-
-        guard let result = ExcludedApplicationInfo.resolve(query: normalizedQuery, runningApplications: runningUserApps) else {
-            appLookupError = "No app found for \(normalizedQuery)."
-            return
-        }
-
-        appLookupResult = result
-    }
-
-    private func addLookupResult() {
-        if appLookupResult == nil {
-            lookupApp()
-        }
-
-        guard let result = appLookupResult else {
-            return
-        }
-
+    private func addLookupResult(_ result: ExcludedApplicationInfo) {
         guard !activationMonitor.userExcludedBundleIDs.contains(result.bundleID) else {
-            appLookupError = "Already excluded."
             return
         }
 
         activationMonitor.addExcludedBundleID(result.bundleID)
         appLookupQuery = ""
-        appLookupResult = nil
-        refreshRunningUserApps()
+        refreshApplicationCatalog()
     }
 
     private func removeExcludedBundleID(_ bundleID: String) {
         activationMonitor.removeExcludedBundleID(bundleID)
-        refreshRunningUserApps()
+        refreshApplicationCatalog()
     }
 
-    private func refreshRunningUserApps() {
-        let excluded = activationMonitor.userExcludedBundleIDs
+    private func refreshApplicationCatalog() {
         let selfBundleID = Bundle.main.bundleIdentifier
 
-        runningUserApps = NSWorkspace.shared.runningApplications
+        let userApps = NSWorkspace.shared.runningApplications
             .filter { app in
                 guard app.activationPolicy == .regular,
                       let bundleID = app.bundleIdentifier else {
                     return false
                 }
-                return !excluded.contains(bundleID) && bundleID != selfBundleID
+                return bundleID != selfBundleID
             }
-            .sorted {
-                ($0.localizedName ?? $0.bundleIdentifier ?? "")
-                    .localizedCaseInsensitiveCompare($1.localizedName ?? $1.bundleIdentifier ?? "") == .orderedAscending
-            }
+
+        applicationCatalog = appLookupProvider.applicationCatalog(runningApplications: userApps)
+    }
+
+    private func clearInitialFocus() {
+        DispatchQueue.main.async {
+            NSApp.keyWindow?.makeFirstResponder(nil)
+        }
     }
 
 }
 
+private struct ExcludedAppsSection: View {
+    let bundleIDs: [String]
+    let isDisabled: Bool
+    let removeAction: (String) -> Void
+
+    var body: some View {
+        Section {
+            if bundleIDs.isEmpty {
+                Text("No excluded apps")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(bundleIDs, id: \.self) { bundleID in
+                    ExcludedApplicationRow(
+                        bundleID: bundleID,
+                        isDisabled: isDisabled,
+                        removeAction: removeAction
+                    )
+                }
+            }
+        } header: {
+            Text("Excluded Apps")
+        }
+    }
+}
+
+private struct AddExclusionSection: View {
+    @Binding var query: String
+    let searchResults: [ExcludedApplicationInfo]
+    let excludedBundleIDs: Set<String>
+    let isDisabled: Bool
+    let addApplicationAction: (ExcludedApplicationInfo) -> Void
+
+    var body: some View {
+        Section {
+            LabeledContent("Search") {
+                ApplicationSearchControl(
+                    query: $query,
+                    results: searchResults,
+                    excludedBundleIDs: excludedBundleIDs,
+                    isDisabled: isDisabled,
+                    addAction: addApplicationAction
+                )
+            }
+        } header: {
+            Text("Add Exclusion")
+        }
+    }
+}
+
 private struct ExcludedApplicationRow: View {
     let bundleID: String
+    let isDisabled: Bool
     let removeAction: (String) -> Void
 
     private var applicationInfo: ExcludedApplicationInfo {
@@ -573,125 +574,78 @@ private struct ExcludedApplicationRow: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(.borderless)
+            .disabled(isDisabled)
             .help("Remove \(applicationInfo.displayName)")
             .accessibilityLabel("Remove \(applicationInfo.displayName)")
         }
     }
 }
 
-private struct AppLookupAddRow: View {
+private struct ApplicationSearchControl: View {
     @Binding var query: String
-    let result: ExcludedApplicationInfo?
-    let errorMessage: String?
+    let results: [ExcludedApplicationInfo]
+    let excludedBundleIDs: Set<String>
     let isDisabled: Bool
-    let isAlreadyExcluded: Bool
-    let lookupAction: () -> Void
-    let addAction: () -> Void
+    let addAction: (ExcludedApplicationInfo) -> Void
 
     private var trimmedQuery: String {
         query.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-            HStack(spacing: DS.Spacing.sm) {
-                TextField("Bundle ID or App Name", text: $query)
-                    .textFieldStyle(.roundedBorder)
-                    .disabled(isDisabled)
-                    .onSubmit(lookupAction)
+        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+            TextField("", text: $query, prompt: Text("App name or bundle ID"))
+                .textFieldStyle(.roundedBorder)
+                .disabled(isDisabled)
+                .accessibilityLabel("App name or bundle ID")
+                .onSubmit(addFirstAvailableResult)
 
-                Button("Find", action: lookupAction)
-                    .disabled(trimmedQuery.isEmpty || isDisabled)
-            }
-
-            if let result {
-                HStack(spacing: DS.Spacing.sm) {
-                    ApplicationInfoLabel(applicationInfo: result)
-
-                    Spacer(minLength: 0)
-
-                    Button(isAlreadyExcluded ? "Added" : "Add", action: addAction)
-                        .disabled(isAlreadyExcluded || isDisabled)
+            if !trimmedQuery.isEmpty {
+                if results.isEmpty {
+                    Text("No matching apps found.")
+                        .settingDescription()
+                } else {
+                    VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                        ForEach(results) { result in
+                            ApplicationSearchResultRow(
+                                applicationInfo: result,
+                                isAlreadyExcluded: excludedBundleIDs.contains(result.bundleID),
+                                isDisabled: isDisabled,
+                                addAction: addAction
+                            )
+                        }
+                    }
                 }
             }
-
-            if let errorMessage {
-                Text(errorMessage)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
         }
+    }
+
+    private func addFirstAvailableResult() {
+        guard let result = results.first(where: { !excludedBundleIDs.contains($0.bundleID) }) else {
+            return
+        }
+        addAction(result)
     }
 }
 
-private struct ExcludedApplicationInfo {
-    let bundleID: String
-    let applicationURL: URL?
+private struct ApplicationSearchResultRow: View {
+    let applicationInfo: ExcludedApplicationInfo
+    let isAlreadyExcluded: Bool
+    let isDisabled: Bool
+    let addAction: (ExcludedApplicationInfo) -> Void
 
-    var displayName: String {
-        guard let applicationURL else {
-            return bundleID
-        }
+    var body: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            ApplicationInfoLabel(applicationInfo: applicationInfo)
 
-        let bundle = Bundle(url: applicationURL)
-        return bundle?.localizedInfoDictionary?["CFBundleDisplayName"] as? String
-            ?? bundle?.localizedInfoDictionary?["CFBundleName"] as? String
-            ?? bundle?.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
-            ?? bundle?.object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? FileManager.default.displayName(atPath: applicationURL.path)
-    }
+            Spacer(minLength: DS.Spacing.sm)
 
-    init(bundleID: String) {
-        self.bundleID = bundleID
-        self.applicationURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-    }
-
-    init(bundleID: String, applicationURL: URL?) {
-        self.bundleID = bundleID
-        self.applicationURL = applicationURL
-    }
-
-    static func resolve(query: String, runningApplications: [NSRunningApplication]) -> ExcludedApplicationInfo? {
-        if let info = resolve(bundleID: query) {
-            return info
-        }
-
-        if let runningApp = runningApplications.first(where: { app in
-            guard let localizedName = app.localizedName else { return false }
-            return localizedName.localizedCaseInsensitiveCompare(query) == .orderedSame
-        }), let bundleID = runningApp.bundleIdentifier {
-            return ExcludedApplicationInfo(
-                bundleID: bundleID,
-                applicationURL: runningApp.bundleURL
-                    ?? NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-            )
-        }
-
-        if let applicationPath = NSWorkspace.shared.fullPath(forApplication: query) {
-            let applicationURL = URL(fileURLWithPath: applicationPath)
-            if let bundleID = Bundle(url: applicationURL)?.bundleIdentifier {
-                return ExcludedApplicationInfo(bundleID: bundleID, applicationURL: applicationURL)
+            Button(isAlreadyExcluded ? "Added" : "Add") {
+                addAction(applicationInfo)
             }
+            .disabled(isAlreadyExcluded || isDisabled)
         }
-
-        if looksLikeBundleID(query) {
-            return ExcludedApplicationInfo(bundleID: query, applicationURL: nil)
-        }
-
-        return nil
-    }
-
-    private static func resolve(bundleID: String) -> ExcludedApplicationInfo? {
-        guard looksLikeBundleID(bundleID) else {
-            return nil
-        }
-
-        let applicationURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
-        return ExcludedApplicationInfo(bundleID: bundleID, applicationURL: applicationURL)
-    }
-
-    private static func looksLikeBundleID(_ value: String) -> Bool {
-        value.contains(".") && value.rangeOfCharacter(from: .whitespacesAndNewlines) == nil
+        .padding(.vertical, DS.Spacing.xxs)
     }
 }
 

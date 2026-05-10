@@ -19,10 +19,19 @@
     "Add" : {
 
     },
+    "Add Exclusion" : {
+
+    },
+    "Added" : {
+
+    },
     "All features unlocked — thank you for your support." : {
 
     },
     "App" : {
+
+    },
+    "App name or bundle ID" : {
 
     },
     "Auto-renews annually" : {
@@ -53,6 +62,9 @@
 
     },
     "Day" : {
+
+    },
+    "Direct version" : {
 
     },
     "Enable Command Reopen" : {
@@ -92,6 +104,9 @@
 
     },
     "No excluded apps" : {
+
+    },
+    "No matching apps found." : {
 
     },
     "No reopen activity yet" : {
@@ -155,7 +170,7 @@
     "Restoring..." : {
 
     },
-    "Select an app..." : {
+    "Search" : {
 
     },
     "Settings..." : {
