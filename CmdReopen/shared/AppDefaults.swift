@@ -13,6 +13,7 @@ enum AppDefaults {
         static let featureEnabled = "cmdreopenAutoHelpEnabled"
         static let excludedBundleIDs = "cmdreopenExcludedBundleIDs"
         static let defaultExcludedBundlesMigrated = "cmdreopenDefaultExcludedBundlesMigrated"
+        static let universalControlExcludedMigrated = "cmdreopenUniversalControlExcludedMigrated"
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
     }
@@ -21,6 +22,7 @@ enum AppDefaults {
         static let featureEnabled = "comtabAutoHelpEnabled"
         static let excludedBundleIDs = "comtabExcludedBundleIDs"
         static let defaultExcludedBundlesMigrated = "comtabDefaultExcludedBundlesMigrated"
+        static let universalControlExcludedMigrated = "comtabUniversalControlExcludedMigrated"
         static let trialStartDate = "comtabTrialStartDate"
         static let hasSeenOnboarding = "comtabHasSeenOnboarding"
     }
@@ -29,6 +31,7 @@ enum AppDefaults {
         static let featureEnabled = "com.comtab.autoHelpEnabled"
         static let excludedBundleIDs = "com.comtab.excludedBundleIDs"
         static let defaultExcludedBundlesMigrated = "com.comtab.defaultExcludedBundlesMigrated"
+        static let universalControlExcludedMigrated = "com.comtab.universalControlExcludedMigrated"
         static let trialStartDate = "com.comtab.trialStartDate"
         static let hasSeenOnboarding = "com.comtab.hasSeenOnboarding"
     }
@@ -36,6 +39,7 @@ enum AppDefaults {
     static let featureEnabled = Defaults.Key<Bool>(RawKey.featureEnabled, default: true)
     static let excludedBundleIDs = Defaults.Key<[String]>(RawKey.excludedBundleIDs, default: [])
     static let defaultExcludedBundlesMigrated = Defaults.Key<Bool>(RawKey.defaultExcludedBundlesMigrated, default: false)
+    static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
 
@@ -43,11 +47,13 @@ enum AppDefaults {
         migrate(from: LegacyRawKey.featureEnabled, to: RawKey.featureEnabled, in: defaults)
         migrate(from: LegacyRawKey.excludedBundleIDs, to: RawKey.excludedBundleIDs, in: defaults)
         migrate(from: LegacyRawKey.defaultExcludedBundlesMigrated, to: RawKey.defaultExcludedBundlesMigrated, in: defaults)
+        migrate(from: LegacyRawKey.universalControlExcludedMigrated, to: RawKey.universalControlExcludedMigrated, in: defaults)
         migrate(from: LegacyRawKey.trialStartDate, to: RawKey.trialStartDate, in: defaults)
         migrate(from: LegacyRawKey.hasSeenOnboarding, to: RawKey.hasSeenOnboarding, in: defaults)
         migrate(from: NamespacedLegacyRawKey.featureEnabled, to: RawKey.featureEnabled, in: defaults)
         migrate(from: NamespacedLegacyRawKey.excludedBundleIDs, to: RawKey.excludedBundleIDs, in: defaults)
         migrate(from: NamespacedLegacyRawKey.defaultExcludedBundlesMigrated, to: RawKey.defaultExcludedBundlesMigrated, in: defaults)
+        migrate(from: NamespacedLegacyRawKey.universalControlExcludedMigrated, to: RawKey.universalControlExcludedMigrated, in: defaults)
         migrate(from: NamespacedLegacyRawKey.trialStartDate, to: RawKey.trialStartDate, in: defaults)
         migrate(from: NamespacedLegacyRawKey.hasSeenOnboarding, to: RawKey.hasSeenOnboarding, in: defaults)
     }

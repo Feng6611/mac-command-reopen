@@ -33,8 +33,11 @@ final class ActivationMonitor: ObservableObject {
     ]
 
     static let defaultExcludedBundleIDs: Set<String> = [
-        "com.apple.finder"
+        "com.apple.finder",
+        "com.apple.universalcontrol"
     ]
+
+    private static let universalControlBundleID = "com.apple.universalcontrol"
 
     static let shared = ActivationMonitor()
 
@@ -88,12 +91,19 @@ final class ActivationMonitor: ObservableObject {
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
         let hasStoredExcludedBundles = defaults.object(forKey: AppDefaults.RawKey.excludedBundleIDs) != nil
         let hasMigratedDefaultExcludedBundles = defaults[AppDefaults.defaultExcludedBundlesMigrated]
+        let hasMigratedUniversalControlExclusion = defaults[AppDefaults.universalControlExcludedMigrated]
         var initialExcluded = hasStoredExcludedBundles ? storedExcluded : Self.defaultExcludedBundleIDs
 
         if !hasMigratedDefaultExcludedBundles {
             initialExcluded.formUnion(Self.defaultExcludedBundleIDs)
             defaults[AppDefaults.excludedBundleIDs] = Array(initialExcluded).sorted()
             defaults[AppDefaults.defaultExcludedBundlesMigrated] = true
+        }
+
+        if !hasMigratedUniversalControlExclusion {
+            initialExcluded.insert(Self.universalControlBundleID)
+            defaults[AppDefaults.excludedBundleIDs] = Array(initialExcluded).sorted()
+            defaults[AppDefaults.universalControlExcludedMigrated] = true
         }
 
         _isFeatureEnabled = Published(initialValue: storedValue)
