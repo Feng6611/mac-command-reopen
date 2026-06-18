@@ -35,6 +35,7 @@ enum RevenueCatConfiguration {
                 .yearly: yearlyProductIdentifier,
                 .lifetime: lifetimeProductIdentifier
             ],
+            entitlementMatchingPolicy: .configuredEntitlementOrProductOnly,
             legacyPaidApp: .grandfatheredPaidApp(
                 cutoffOriginalAppVersion: grandfatheringCutoffVersion,
                 entitlementIdentifier: entitlementIdentifier,
