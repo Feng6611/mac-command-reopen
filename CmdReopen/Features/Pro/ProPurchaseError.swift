@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RevenueCatCommerceKit
+import KikiCommerceCore
 
 enum ProPurchaseError: Error, Equatable {
     case notConfigured

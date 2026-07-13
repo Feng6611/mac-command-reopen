@@ -9,6 +9,9 @@ import AppKit
 import Combine
 import Defaults
 import os
+#if APPSTORE
+import KikiCommerceCore
+#endif
 
 @MainActor
 final class AppLifecycleCoordinator {
@@ -42,15 +45,6 @@ final class AppLifecycleCoordinator {
             accessController: accessController
         )
         bindUpgradePrompt()
-
-#if APPSTORE
-        bootstrapTrialAccessIfNeeded()
-        if shouldPresentOnboardingOnLaunch {
-            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
-            hasCompletedInitialCommerceRefresh = true
-            return
-        }
-#endif
 
         // Ensure no windows are visible for the menu-bar-only idle state.
         NSApp.windows.forEach { $0.orderOut(nil) }
@@ -94,25 +88,6 @@ final class AppLifecycleCoordinator {
     }
 #endif
 
-    private var shouldPresentOnboardingOnLaunch: Bool {
-#if APPSTORE
-        accessController.distributionChannel == .appStore
-            && !UserDefaults.standard[AppDefaults.hasSeenOnboarding]
-#else
-        false
-#endif
-    }
-
-#if APPSTORE
-    private func bootstrapTrialAccessIfNeeded() {
-        guard accessController.distributionChannel == .appStore else {
-            return
-        }
-
-        ProStatusManager.bootstrapLocalTrialIfNeeded()
-    }
-#endif
-
     private func bindUpgradePrompt() {
         guard cancellables.isEmpty else {
             return
@@ -153,6 +128,14 @@ final class AppLifecycleCoordinator {
         await refreshCommerceStateIfNeeded(force: true, reason: "initialLaunch")
         hasCompletedInitialCommerceRefresh = true
 
+#if APPSTORE
+        if CommandAccessModel.shared.readiness.allowsAutomaticPresentation,
+           accessController.shouldShowOnboarding {
+            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
+            return
+        }
+#endif
+
         if accessController.shouldOpenProSettings, !isOnboardingVisible {
             if !SettingsWindowController.shared.isVisible {
                 SettingsWindowController.shared.show(
@@ -185,11 +168,6 @@ final class AppLifecycleCoordinator {
     }
 
     private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {
-        if accessController.shouldShowOnboarding && !hasCompletedInitialCommerceRefresh {
-            AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because onboarding is pending.")
-            return
-        }
-
         if isRefreshingCommerce {
             AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because another refresh is already running.")
             return

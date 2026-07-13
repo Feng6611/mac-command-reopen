@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import RevenueCatCommerceKit
+import KikiCommerceCore
+import KikiRevenueCat
 
 enum RevenueCatConfiguration {
     nonisolated static let apiKeyInfoKey = "CmdReopenRevenueCatAPIKey"
@@ -28,9 +29,7 @@ enum RevenueCatConfiguration {
 
     nonisolated static var commerceConfiguration: CommerceConfiguration {
         CommerceConfiguration(
-            apiKey: apiKey,
             entitlementIdentifier: entitlementIdentifier,
-            offeringIdentifier: offeringIdentifier,
             productIdentifiers: [
                 .yearly: yearlyProductIdentifier,
                 .lifetime: lifetimeProductIdentifier
@@ -44,6 +43,45 @@ enum RevenueCatConfiguration {
             ),
             logSubsystem: Bundle.main.bundleIdentifier ?? "com.dev.kkuk.CmdReopen",
             logCategory: "Purchase"
+        )
+    }
+
+    nonisolated static var providerConfiguration: KikiRevenueCat.RevenueCatConfiguration {
+        KikiRevenueCat.RevenueCatConfiguration(
+            apiKey: apiKey,
+            offeringIdentifier: offeringIdentifier
+        )
+    }
+
+    nonisolated static var accessConfiguration: KikiAccessConfiguration {
+        KikiAccessConfiguration(
+            plans: [
+                KikiAccessPlan(
+                    id: CommercePlan.yearly.rawValue,
+                    commercePlan: .yearly,
+                    title: String(localized: "Yearly"),
+                    fallbackDisplayPrice: "$5.99",
+                    billingDetail: String(localized: "per year"),
+                    subtitle: String(localized: "Auto-renews annually")
+                ),
+                KikiAccessPlan(
+                    id: CommercePlan.lifetime.rawValue,
+                    commercePlan: .lifetime,
+                    title: String(localized: "Lifetime"),
+                    fallbackDisplayPrice: "$10.99",
+                    billingDetail: String(localized: "once"),
+                    subtitle: String(localized: "Pay once, use forever"),
+                    badge: String(localized: "Best Value")
+                )
+            ],
+            defaultPlanID: CommercePlan.lifetime.rawValue,
+            commerceConfiguration: commerceConfiguration,
+            trialPolicy: .autoStart(duration: 2 * 24 * 60 * 60),
+            storageKeys: KikiAccessStorageKeys(
+                trialStartedAt: "cmdreopenTrialStartDate",
+                debugProAccessOverride: "CmdReopen.Access.debugOverride",
+                usageCountPrefix: "CmdReopen.Access.usage"
+            )
         )
     }
 }

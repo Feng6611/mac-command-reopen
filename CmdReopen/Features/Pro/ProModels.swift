@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RevenueCatCommerceKit
+import KikiCommerceCore
 
 enum ProStatus: Equatable {
     case trial(daysRemaining: Int, expiresAt: Date)
@@ -103,6 +103,16 @@ struct ProPlanProduct: Equatable, Identifiable {
                 subtitle: String(localized: "Pay once, use forever"),
                 badge: String(localized: "Best Value"),
                 isAvailable: isAvailable
+            )
+        default:
+            return .init(
+                plan: plan,
+                title: plan.rawValue.capitalized,
+                displayPrice: "—",
+                billingDetail: "",
+                subtitle: "",
+                badge: nil,
+                isAvailable: false
             )
         }
     }

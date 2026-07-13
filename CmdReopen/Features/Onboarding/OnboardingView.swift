@@ -5,150 +5,114 @@
 //  Created by CHEN on 2026/3/28.
 //
 
+#if APPSTORE
 import AppKit
 import Combine
 import ConfettiSwiftUI
+import KikiOnboarding
 import SwiftUI
 import os
 
-enum OnboardingPhase: Equatable {
-    case welcome
-    case tryMinimize
-    case success
-    case paywall
-
-    var progressIndex: Int {
-        switch self {
-        case .welcome: return 0
-        case .tryMinimize: return 1
-        case .success: return 2
-        case .paywall: return 3
-        }
-    }
-}
+// MARK: - Flow
 
 @MainActor
-final class OnboardingSessionModel: ObservableObject {
-    @Published var phase: OnboardingPhase = .welcome
+enum CommandReopenOnboardingFlow {
+    static let windowSize = CGSize(width: 680, height: 680)
+    static let stepCount = 4
 
-    var isWaitingForCommandTabReturn: Bool {
-        phase == .tryMinimize
+    enum StepID {
+        static let welcome = "welcome"
+        static let tryMinimize = "tryMinimize"
+        static let success = "success"
+        static let paywall = "paywall"
     }
 
-    func moveToTryMinimize() {
-        phase = .tryMinimize
-    }
+    static var tryMinimizeStepID: String { "custom.\(StepID.tryMinimize)" }
 
-    func markWindowReturned() {
-        phase = .success
-    }
+    static func makeCoordinator(
+        accessModel: CommandAccessModel,
+        onMinimize: @escaping () -> Void,
+        onFinished: @escaping @MainActor () -> Void
+    ) -> KikiOnboardingCoordinator {
+        let steps: [KikiOnboardingStep] = [
+            .custom(id: StepID.welcome) { navigation in
+                AnyView(WelcomeStepView(navigation: navigation))
+            },
+            .custom(id: StepID.tryMinimize) { _ in
+                AnyView(TryMinimizeStepView(onMinimize: onMinimize))
+            },
+            .custom(id: StepID.success) { navigation in
+                AnyView(SuccessStepView(navigation: navigation))
+            },
+            .custom(id: StepID.paywall) { navigation in
+                AnyView(PaywallStepView(accessModel: accessModel, navigation: navigation))
+            }
+        ]
 
-    func moveToPaywall() {
-        phase = .paywall
+        return KikiOnboardingCoordinator(
+            configuration: KikiOnboardingConfiguration(
+                appName: "Command Reopen",
+                steps: steps,
+                // Same storage the paywall actions and isFirstLaunch already use.
+                completionKey: AppDefaults.RawKey.hasSeenOnboarding,
+                canSkip: false,
+                tint: DS.Colors.brandPrimary,
+                windowAutosaveName: "CmdReopen.OnboardingWindow",
+                windowTitle: "Welcome",
+                windowSize: windowSize,
+                minimumWindowSize: windowSize,
+                closeDisposition: .keepPending
+            ),
+            onFinished: onFinished
+        )
     }
 }
 
-struct OnboardingView: View {
-    @ObservedObject var session: OnboardingSessionModel
-    @ObservedObject var proStatusManager: ProStatusManager
+// MARK: - Step Views
 
-    var onMinimize: () -> Void
-    var onFinish: () -> Void
-
-    @State private var showMinimizeReturnHint = false
-    @State private var isPaywallSheetPresented = false
-    @State private var confettiTrigger = 0
+private struct WelcomeStepView: View {
+    let navigation: KikiOnboardingNavigation
 
     var body: some View {
-        ZStack {
-            switch session.phase {
-            case .welcome:
-                welcomePage
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
-            case .tryMinimize:
-                tryMinimizePage
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
-            case .success:
-                successPage
-                    .transition(.scale(scale: 0.96).combined(with: .opacity))
-            case .paywall:
-                successPage
-                    .transition(.scale(scale: 0.96).combined(with: .opacity))
-            }
-
-            if showMinimizeReturnHint {
-                minimizeReturnHint
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .zIndex(1)
-            }
-        }
-        .animation(.easeInOut(duration: 0.22), value: session.phase)
-        .animation(.easeInOut(duration: 0.18), value: showMinimizeReturnHint)
-        .frame(width: 680, height: 680)
-        .background {
-            ZStack {
-                Color(nsColor: .windowBackgroundColor)
-                RadialGradient(
-                    colors: [DS.Colors.brandPrimary.opacity(0.06), .clear],
-                    center: .top,
-                    startRadius: 0,
-                    endRadius: 400
-                )
-            }
-            .ignoresSafeArea()
-            .overlay(.ultraThinMaterial.opacity(0.5))
-        }
-        .modifier(OnChangeCompat(value: session.phase) {
-            if session.phase != .tryMinimize {
-                showMinimizeReturnHint = false
-            }
-
-            if session.phase == .paywall {
-                isPaywallSheetPresented = true
-            }
-        })
-        .onAppear {
-            if session.phase == .paywall {
-                isPaywallSheetPresented = true
-            }
-        }
-        .sheet(isPresented: $isPaywallSheetPresented, onDismiss: handlePaywallDismiss) {
-            PaywallSheetView(
-                proStatusManager: proStatusManager,
-                context: .onboarding,
-                onFinish: onFinish
-            )
-        }
-    }
-
-    private var welcomePage: some View {
-        onboardingPage(
+        KikiOnboardingScaffold(
+            appName: "Command Reopen",
             title: "Fix ⌘⇥ for minimized and closed windows",
-            subtitle: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that."
+            bodyText: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that.",
+            appIcon: NSApp.applicationIconImage,
+            primaryAction: KikiOnboardingAction(title: "Continue", action: navigation.advance),
+            tint: DS.Colors.brandPrimary,
+            size: CommandReopenOnboardingFlow.windowSize,
+            stepIndex: 0,
+            stepCount: CommandReopenOnboardingFlow.stepCount
         ) {
-            Image(nsImage: NSApp.applicationIconImage)
-                .resizable()
-                .frame(width: 88, height: 88)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .shadow(color: .black.opacity(0.08), radius: 10, y: 5)
-        } content: {
             OnboardingFlowDiagram()
-                .padding(.horizontal, OnboardingLayout.diagramHorizontalPadding)
-        } footer: {
-            onboardingPrimaryButton("Continue", width: OnboardingLayout.primaryButtonWidth) {
-                session.moveToTryMinimize()
-            }
+                .padding(.horizontal, DS.Spacing.xxxl)
         }
     }
+}
 
-    private var tryMinimizePage: some View {
-        onboardingPage(
+private struct TryMinimizeStepView: View {
+    let onMinimize: () -> Void
+
+    @State private var showMinimizeReturnHint = false
+
+    var body: some View {
+        KikiOnboardingScaffold(
+            appName: "Command Reopen",
             title: "Try it yourself",
-            subtitle: "See the magic in two steps."
+            bodyText: "See the magic in two steps.",
+            iconSystemName: "hand.point.down.fill",
+            primaryAction: KikiOnboardingAction(title: "Minimize Window") {
+                showMinimizeReturnHint = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                    onMinimize()
+                }
+            },
+            tint: DS.Colors.brandPrimary,
+            size: CommandReopenOnboardingFlow.windowSize,
+            stepIndex: 1,
+            stepCount: CommandReopenOnboardingFlow.stepCount
         ) {
-            Text("👇")
-                .font(.system(size: 56))
-        } content: {
             VStack(spacing: DS.Spacing.lg) {
                 OnboardingStepRow(
                     number: "1",
@@ -159,34 +123,48 @@ struct OnboardingView: View {
                     text: "Press ⌘⇥ to switch back here"
                 )
             }
-            .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
-        } footer: {
-            Button {
-                showMinimizeReturnHint = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                    onMinimize()
-                }
-            } label: {
-                Label("Minimize Window", systemImage: "minus")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .frame(width: OnboardingLayout.primaryButtonWidth)
-                    .frame(height: 44)
-                    .background(
-                        RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-                            .fill(DS.Colors.brandPrimary)
-                    )
-            }
-            .buttonStyle(.plain)
         }
+        .overlay(alignment: .top) {
+            if showMinimizeReturnHint {
+                minimizeReturnHint
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.18), value: showMinimizeReturnHint)
     }
 
-    private var successPage: some View {
-        onboardingPage(
+    private var minimizeReturnHint: some View {
+        HStack(spacing: DS.Spacing.sm) {
+            Image(systemName: "command")
+            Text("Now ⌘⇥ back to Command Reopen")
+        }
+        .font(.callout.weight(.medium))
+        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.vertical, DS.Spacing.sm)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(DS.Colors.cardBorder, lineWidth: 0.5))
+        .padding(.top, DS.Spacing.xl)
+    }
+}
+
+private struct SuccessStepView: View {
+    let navigation: KikiOnboardingNavigation
+
+    @State private var confettiTrigger = 0
+
+    var body: some View {
+        KikiOnboardingScaffold(
+            appName: "Command Reopen",
             title: "It works!",
-            subtitle: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."
+            bodyText: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear.",
+            appIcon: NSApp.applicationIconImage,
+            primaryAction: KikiOnboardingAction(title: "Continue", action: navigation.advance),
+            tint: DS.Colors.brandPrimary,
+            size: CommandReopenOnboardingFlow.windowSize,
+            stepIndex: 2,
+            stepCount: CommandReopenOnboardingFlow.stepCount
         ) {
-            ZStack {
+            VStack(spacing: DS.Spacing.lg) {
                 CelebrationMark()
                     .scaleEffect(0.68)
                     .confettiCannon(
@@ -198,32 +176,16 @@ struct OnboardingView: View {
                         rainHeight: 500,
                         radius: 300
                     )
+
+                HStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "macwindow.on.rectangle")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(DS.Colors.brandPrimary)
+                    Text("Works for Safari, Finder, Xcode, and every other app.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
             }
-        } content: {
-            HStack(spacing: DS.Spacing.sm) {
-                Image(systemName: "macwindow.on.rectangle")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(DS.Colors.brandPrimary)
-                Text("Works for Safari, Finder, Xcode, and every other app.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
-        } footer: {
-            onboardingPrimaryButton("Continue", width: OnboardingLayout.primaryButtonWidth) {
-                session.moveToPaywall()
-            }
-            .confettiCannon(
-                trigger: $confettiTrigger,
-                num: 20,
-                confettis: [.shape(.circle)],
-                colors: [DS.Colors.brandPrimary, .orange, .purple],
-                confettiSize: 6,
-                rainHeight: 400,
-                openingAngle: .degrees(40),
-                closingAngle: .degrees(140),
-                radius: 200
-            )
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -231,114 +193,55 @@ struct OnboardingView: View {
             }
         }
     }
+}
 
-    private var appIconMark: some View {
-        Image(nsImage: NSApp.applicationIconImage)
-            .resizable()
-            .frame(width: 64, height: 64)
-            .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-            .shadow(color: .black.opacity(0.10), radius: 8, y: 4)
-    }
+private struct PaywallStepView: View {
+    @ObservedObject var accessModel: CommandAccessModel
+    let navigation: KikiOnboardingNavigation
 
-    private var minimizeReturnHint: some View {
-        VStack {
-            HStack(spacing: DS.Spacing.sm) {
-                Image(systemName: "command")
-                Text("Now ⌘⇥ back to Command Reopen")
-            }
-            .font(DS.Typography.bodyMedium)
-            .padding(.horizontal, DS.Spacing.lg)
-            .padding(.vertical, DS.Spacing.sm)
-            .background(.regularMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(DS.Colors.cardBorder, lineWidth: 0.5))
-            .padding(.top, OnboardingLayout.titlebarInset + DS.Spacing.lg)
+    @State private var isPaywallSheetPresented = false
+    @State private var didFinish = false
 
-            Spacer()
+    var body: some View {
+        KikiOnboardingScaffold(
+            appName: "Command Reopen",
+            title: "It works!",
+            bodyText: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear.",
+            appIcon: NSApp.applicationIconImage,
+            primaryAction: KikiOnboardingAction(title: "Continue") {
+                isPaywallSheetPresented = true
+            },
+            tint: DS.Colors.brandPrimary,
+            size: CommandReopenOnboardingFlow.windowSize,
+            stepIndex: 3,
+            stepCount: CommandReopenOnboardingFlow.stepCount
+        ) {
+            EmptyView()
         }
-    }
-
-    private func onboardingPage<Hero: View, Content: View, Footer: View>(
-        title: String,
-        subtitle: String,
-        @ViewBuilder hero: () -> Hero,
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder footer: () -> Footer
-    ) -> some View {
-        VStack(spacing: 0) {
-            Spacer().frame(height: OnboardingLayout.topPadding)
-
-            hero()
-                .frame(height: OnboardingLayout.heroHeight)
-
-            Spacer().frame(height: DS.Spacing.xl)
-
-            Text(title)
-                .font(DS.Typography.onboardingTitle)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
-
-            Spacer().frame(height: DS.Spacing.sm)
-
-            Text(subtitle)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(3)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, OnboardingLayout.contentHorizontalPadding)
-
-            Spacer().frame(height: DS.Spacing.xl)
-
-            content()
-
-            Spacer()
-
-            OnboardingProgressDots(currentIndex: session.phase.progressIndex)
-
-            Spacer().frame(height: DS.Spacing.lg)
-
-            footer()
-
-            Spacer().frame(height: OnboardingLayout.bottomPadding)
+        .onAppear {
+            isPaywallSheetPresented = true
         }
-    }
-
-    private func onboardingPrimaryButton(
-        _ title: String,
-        width: CGFloat,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(width: width)
-                .frame(height: 44)
-                .background(
-                    RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-                        .fill(DS.Colors.brandPrimary)
-                )
+        .sheet(isPresented: $isPaywallSheetPresented, onDismiss: handlePaywallDismiss) {
+            PaywallSheetView(
+                accessModel: accessModel,
+                context: .onboarding,
+                onFinish: {
+                    didFinish = true
+                    navigation.finish()
+                }
+            )
         }
-        .buttonStyle(.plain)
     }
 
     private func handlePaywallDismiss() {
-        if session.phase == .paywall {
-            session.markWindowReturned()
+        guard !didFinish else {
+            return
         }
+        navigation.back()
     }
 }
 
-private enum OnboardingLayout {
-    static let titlebarInset: CGFloat = 12
-    static let topPadding: CGFloat = 48 + titlebarInset
-    static let bottomPadding: CGFloat = 36
-    static let heroHeight: CGFloat = 88
-    static let contentHorizontalPadding: CGFloat = 100
-    static let primaryButtonWidth: CGFloat = 200
-    static let diagramHorizontalPadding: CGFloat = 60
-}
+// MARK: - Product Content
 
 private struct OnboardingStepRow: View {
     let number: String
@@ -355,24 +258,6 @@ private struct OnboardingStepRow: View {
             Text(text)
                 .font(.body)
         }
-    }
-}
-
-private struct OnboardingProgressDots: View {
-    let currentIndex: Int
-    private let count = 4
-
-    var body: some View {
-        HStack(spacing: DS.Spacing.sm) {
-            ForEach(0..<count, id: \.self) { index in
-                Circle()
-                    .fill(index == currentIndex ? DS.Colors.brandPrimary : Color.secondary.opacity(0.2))
-                    .frame(width: 6, height: 6)
-                    .animation(.easeInOut(duration: 0.18), value: currentIndex)
-            }
-        }
-        .frame(height: 10)
-        .accessibilityLabel("Onboarding step \(currentIndex + 1) of \(count)")
     }
 }
 
@@ -483,129 +368,74 @@ private struct CelebrationMark: View {
     }
 }
 
-// MARK: - Window Controller
+// MARK: - Window Session
 
+/// Owns the product side of onboarding: activation-policy switching for the
+/// ⌘⇥ tutorial, the minimize-and-return session, and post-finish routing.
+/// Window creation, step navigation, progress, and completion storage belong
+/// to `KikiOnboardingCoordinator`.
 @MainActor
-final class OnboardingWindowController: NSObject, NSWindowDelegate {
-    private enum WindowMetrics {
-        static let title = "Welcome"
-        static let size = NSSize(width: 680, height: 680)
-    }
-
+final class OnboardingWindowController {
     static let shared = OnboardingWindowController()
 
-    private var window: NSWindow?
-    private var session: OnboardingSessionModel?
-    private var proStatusManager: ProStatusManager?
+    private var coordinator: KikiOnboardingCoordinator?
     private var appToReturnToAfterMinimize: NSRunningApplication?
-    private var didBecomeActiveObserver: NSObjectProtocol?
+    private var observers: [NSObjectProtocol] = []
     private var previousActivationPolicy: NSApplication.ActivationPolicy = .accessory
     private var shouldRestoreActivationPolicyOnClose = false
-    private var isFinishing = false
 
     var isVisible: Bool {
-        window?.isVisible == true
+        coordinator?.isVisible == true
     }
 
-    func showIfNeeded(proStatusManager: ProStatusManager) {
+    func showIfNeeded(proStatusManager: CommandAccessModel) {
         guard proStatusManager.isFirstLaunch else { return }
         show(proStatusManager: proStatusManager)
     }
 
-    func show(proStatusManager: ProStatusManager) {
-        guard window == nil else {
-            presentExistingWindow()
+    func show(proStatusManager: CommandAccessModel) {
+        if let coordinator, coordinator.isVisible {
+            NSApplication.shared.activate(ignoringOtherApps: true)
+            coordinator.window?.makeKeyAndOrderFront(nil)
             return
         }
 
         prepareRegularOnboardingSession()
 
-        let session = OnboardingSessionModel()
-        let contentView = makeContentView(session: session, proStatusManager: proStatusManager)
-        let window = makeWindow(contentView: contentView)
-
-        self.session = session
-        self.proStatusManager = proStatusManager
-        self.window = window
-        self.isFinishing = false
-        installActivationObserver()
-        present(window)
+        let coordinator = CommandReopenOnboardingFlow.makeCoordinator(
+            accessModel: proStatusManager,
+            onMinimize: { [weak self] in
+                self?.coordinator?.window?.miniaturize(nil)
+            },
+            onFinished: { [weak self] in
+                self?.handleFinished()
+            }
+        )
+        self.coordinator = coordinator
+        coordinator.start()
+        installObservers()
     }
 
     func close() {
-        window?.close()
+        coordinator?.close()
     }
 
-    private func presentExistingWindow() {
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        window?.makeKeyAndOrderFront(nil)
+    private var isWaitingForCommandTabReturn: Bool {
+        coordinator?.currentStep?.id == CommandReopenOnboardingFlow.tryMinimizeStepID
     }
 
     private func prepareRegularOnboardingSession() {
         appToReturnToAfterMinimize = Self.bestReturnTargetBeforeActivatingSelf()
-        hideExistingAppWindowsForOnboarding()
+        NSApp.windows.forEach { $0.orderOut(nil) }
         previousActivationPolicy = NSApp.activationPolicy()
         shouldRestoreActivationPolicyOnClose = true
         NSApp.setActivationPolicy(.regular)
     }
 
-    private func makeContentView(
-        session: OnboardingSessionModel,
-        proStatusManager: ProStatusManager
-    ) -> OnboardingView {
-        OnboardingView(
-            session: session,
-            proStatusManager: proStatusManager,
-            onMinimize: { [weak self] in
-                self?.window?.miniaturize(nil)
-            },
-            onFinish: { [weak self] in
-                self?.finishAndClose()
-            }
-        )
-    }
+    private func installObservers() {
+        removeObservers()
 
-    private func makeWindow(contentView: OnboardingView) -> NSWindow {
-        let hostingController = NSHostingController(rootView: contentView)
-        let window = NSWindow(contentViewController: hostingController)
-        configure(window)
-        return window
-    }
-
-    private func configure(_ window: NSWindow) {
-        window.title = WindowMetrics.title
-        window.delegate = self
-        window.styleMask = [.titled, .miniaturizable, .fullSizeContentView]
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
-        window.isMovableByWindowBackground = true
-        window.backgroundColor = .windowBackgroundColor
-        window.isReleasedWhenClosed = false
-        window.setContentSize(WindowMetrics.size)
-        window.center()
-
-        window.standardWindowButton(.closeButton)?.isHidden = true
-        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        window.standardWindowButton(.zoomButton)?.isHidden = true
-    }
-
-    private func present(_ window: NSWindow) {
-        NSApplication.shared.activate(ignoringOtherApps: true)
-        window.makeKeyAndOrderFront(nil)
-    }
-
-    private func hideExistingAppWindowsForOnboarding() {
-        NSApp.windows.forEach { existingWindow in
-            guard existingWindow != window else {
-                return
-            }
-
-            existingWindow.orderOut(nil)
-        }
-    }
-
-    private func installActivationObserver() {
-        didBecomeActiveObserver = NotificationCenter.default.addObserver(
+        observers.append(NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification,
             object: nil,
             queue: .main
@@ -613,28 +443,93 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
             Task { @MainActor [weak self] in
                 self?.handleApplicationDidBecomeActive()
             }
+        })
+
+        if let window = coordinator?.window {
+            observers.append(NotificationCenter.default.addObserver(
+                forName: NSWindow.didMiniaturizeNotification,
+                object: window,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleWindowDidMiniaturize()
+                }
+            })
+
+            observers.append(NotificationCenter.default.addObserver(
+                forName: NSWindow.willCloseNotification,
+                object: window,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.handleWindowWillClose()
+                }
+            })
         }
     }
 
+    private func removeObservers() {
+        observers.forEach { NotificationCenter.default.removeObserver($0) }
+        observers.removeAll()
+    }
+
     private func handleApplicationDidBecomeActive() {
-        guard let window,
-              let session,
-              session.isWaitingForCommandTabReturn,
+        guard let coordinator,
+              let window = coordinator.window,
+              isWaitingForCommandTabReturn,
               window.isMiniaturized else {
             return
         }
 
         window.deminiaturize(nil)
         window.makeKeyAndOrderFront(nil)
-        session.markWindowReturned()
+        coordinator.advance()
     }
 
-    private func shiftFocusAwayAfterOnboardingMinimize() {
+    private func handleWindowDidMiniaturize() {
+        guard isWaitingForCommandTabReturn else {
+            return
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
             Task { @MainActor [weak self] in
                 self?.activateReturnTargetOrFinder()
             }
         }
+    }
+
+    private func handleWindowWillClose() {
+        removeObservers()
+        appToReturnToAfterMinimize = nil
+        restoreActivationPolicyIfNeeded()
+    }
+
+    private func handleFinished() {
+        restoreActivationPolicyIfNeeded()
+        coordinator = nil
+
+        NSApp.windows.forEach { window in
+            if window.title != "Settings" {
+                window.orderOut(nil)
+            }
+        }
+
+        DispatchQueue.main.async {
+            SettingsWindowController.shared.show(
+                activationMonitor: .shared,
+                reopenStatsStore: .shared,
+                accessController: .shared,
+                initialTab: .about
+            )
+        }
+    }
+
+    private func restoreActivationPolicyIfNeeded() {
+        guard shouldRestoreActivationPolicyOnClose else {
+            return
+        }
+        NSApp.setActivationPolicy(previousActivationPolicy)
+        shouldRestoreActivationPolicyOnClose = false
     }
 
     private func activateReturnTargetOrFinder() {
@@ -671,53 +566,5 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
         return !ActivationMonitor.isIgnoredBundleID(bundleID)
     }
-
-    private func finishAndClose() {
-        isFinishing = true
-        close()
-
-        DispatchQueue.main.async {
-            SettingsWindowController.shared.show(
-                activationMonitor: .shared,
-                reopenStatsStore: .shared,
-                accessController: .shared,
-                initialTab: .about
-            )
-        }
-    }
-
-    func windowDidMiniaturize(_ notification: Notification) {
-        guard let session,
-              session.isWaitingForCommandTabReturn else {
-            return
-        }
-
-        shiftFocusAwayAfterOnboardingMinimize()
-    }
-
-    func windowWillClose(_ notification: Notification) {
-        if let didBecomeActiveObserver {
-            NotificationCenter.default.removeObserver(didBecomeActiveObserver)
-            self.didBecomeActiveObserver = nil
-        }
-
-        window = nil
-        session = nil
-        proStatusManager = nil
-        appToReturnToAfterMinimize = nil
-
-        if shouldRestoreActivationPolicyOnClose {
-            NSApp.setActivationPolicy(previousActivationPolicy)
-            shouldRestoreActivationPolicyOnClose = false
-        }
-
-        if isFinishing {
-            NSApp.windows.forEach { window in
-                if window.title != "Settings" {
-                    window.orderOut(nil)
-                }
-            }
-        }
-        isFinishing = false
-    }
 }
+#endif

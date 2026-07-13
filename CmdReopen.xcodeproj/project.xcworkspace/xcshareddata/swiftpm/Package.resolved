@@ -1,5 +1,5 @@
 {
-  "originHash" : "ebe153f666ee01117b66eb9be93e57bed485c5164abe3885a37c568a5516e099",
+  "originHash" : "cd648274600c0b1beefa1f19f11b9a7941d9db36be18f404135ee1037342837b",
   "pins" : [
     {
       "identity" : "confettiswiftui",
@@ -20,6 +20,24 @@
       }
     },
     {
+      "identity" : "kiki_mackit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/Kiki_mackit.git",
+      "state" : {
+        "revision" : "1a81f0a9426a09a98e79a309a7592d7f605d93fa",
+        "version" : "0.8.0"
+      }
+    },
+    {
+      "identity" : "kikicommercekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/KikiCommerceKit.git",
+      "state" : {
+        "revision" : "d772a6050029b4962c655db02147ff44934a79db",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "launchatlogin-modern",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Feng6611/LaunchAtLogin-Modern",
@@ -35,15 +53,6 @@
       "state" : {
         "revision" : "a1bf83fc76099c3d801aa7fc2543c3b9e488cd00",
         "version" : "5.67.0"
-      }
-    },
-    {
-      "identity" : "revenuecatcommercekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Feng6611/RevenueCatCommerceKit",
-      "state" : {
-        "branch" : "main",
-        "revision" : "b9349751e6223cb795ff2a9700889b9b7c9bd5da"
       }
     },
     {

@@ -7,27 +7,17 @@
 
 import AppKit
 import Combine
+import KikiMenuBar
 import os
 
 @MainActor
-final class StatusBarMenuController: NSObject {
+final class StatusBarMenuController {
     static let shared = StatusBarMenuController()
 
-    private let statusItem: NSStatusItem
-    private let model: StatusBarMenuModel
+    private var menuBarController: KikiMenuBarController?
+    private let model = StatusBarMenuModel()
     private weak var activationMonitor: ActivationMonitor?
     private weak var accessController: AppAccessController?
-
-    override init() {
-        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.model = StatusBarMenuModel()
-        super.init()
-        configureStatusItem()
-    }
-
-    deinit {
-        NSStatusBar.system.removeStatusItem(statusItem)
-    }
 
     func install(
         activationMonitor: ActivationMonitor,
@@ -35,116 +25,94 @@ final class StatusBarMenuController: NSObject {
     ) {
         self.activationMonitor = activationMonitor
         self.accessController = accessController
-        updateButtonImage()
-    }
 
-    private func configureStatusItem() {
-        statusItem.autosaveName = "CommandReopen.StatusItem"
-        guard let button = statusItem.button else {
+        guard menuBarController == nil else {
             return
         }
-        button.target = self
-        button.action = #selector(showMenu)
-        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        button.toolTip = "Command Reopen"
-        updateButtonImage()
-    }
 
-    private func updateButtonImage() {
-        guard let button = statusItem.button else {
-            return
+        menuBarController = KikiMenuBarController(
+            title: "Command Reopen",
+            autosaveName: "CommandReopen.StatusItem",
+            systemImageName: "command",
+            accessibilityDescription: "Command Reopen",
+            tooltip: "Command Reopen"
+        ) { [weak self] in
+            self?.makeItems() ?? []
         }
-        let image = NSImage(systemSymbolName: "command", accessibilityDescription: "Command Reopen")
-        image?.isTemplate = true
-        button.image = image
     }
 
-    @objc private func showMenu() {
+    private func makeItems() -> [KikiMenuItem] {
         model.refresh()
-        statusItem.showMenu(makeMenu())
-    }
-
-    private func makeMenu() -> NSMenu {
-        let menu = NSMenu(title: "Command Reopen")
-        menu.autoenablesItems = false
 
         let accessController = accessController ?? .shared
         let presentation = StatusBarController.presentation(for: accessController)
 
-        let featureItem = NSMenuItem(
-            title: "Enable Command Reopen",
-            action: #selector(toggleFeatureEnabled),
-            keyEquivalent: ""
-        )
-        featureItem.target = self
-        featureItem.state = activationMonitor?.isFeatureEnabled == true ? .on : .off
-        featureItem.isEnabled = presentation.canToggleAutoReopen
-        menu.addItem(featureItem)
-
-        let launchItem = NSMenuItem(
-            title: "Launch at Login",
-            action: #selector(toggleLaunchAtLogin),
-            keyEquivalent: ""
-        )
-        launchItem.target = self
-        launchItem.state = model.launchAtLoginEnabled ? .on : .off
-        menu.addItem(launchItem)
-
-        menu.addItem(.separator())
+        var items: [KikiMenuItem] = [
+            .toggle(
+                title: "Enable Command Reopen",
+                isOn: activationMonitor?.isFeatureEnabled == true,
+                isEnabled: presentation.canToggleAutoReopen,
+                action: { [weak self] in
+                    self?.toggleFeatureEnabled()
+                }
+            ),
+            .toggle(
+                title: "Launch at Login",
+                isOn: model.launchAtLoginEnabled,
+                action: { [weak self] in
+                    guard let model = self?.model else { return }
+                    model.setLaunchAtLogin(!model.launchAtLoginEnabled)
+                }
+            ),
+            .separator
+        ]
 
         if presentation.showsUpgradeItem {
-            let upgradeItem = NSMenuItem(
-                title: "Upgrade to Pro...",
-                action: #selector(showUpgradeSettings),
-                keyEquivalent: ""
-            )
-            upgradeItem.target = self
-            menu.addItem(upgradeItem)
+            items.append(.action(title: "Upgrade to Pro...") {
+                SettingsOpener.shared.open(
+                    initialTab: .about,
+                    presentsPaywall: true
+                )
+            })
         }
 
-        let settingsItem = NSMenuItem(
-            title: "Settings...",
-            action: #selector(showSettings),
-            keyEquivalent: ","
-        )
-        settingsItem.target = self
-        settingsItem.keyEquivalentModifierMask = .command
-        menu.addItem(settingsItem)
-
-        menu.addItem(.separator())
+        items.append(.settings(title: "Settings...") {
+            SettingsOpener.shared.open()
+        })
+        items.append(.separator)
 
         switch accessController.distributionChannel {
         case .appStore:
-            menu.addItem(actionItem(title: "Official", action: #selector(openOfficial)))
-            menu.addItem(actionItem(title: "Rate on App Store", action: #selector(openAppStoreReview)))
+            items.append(.action(title: "Official") { [weak self] in
+                self?.model.openURL(ExternalLinks.officialURL)
+            })
+            items.append(.action(title: "Rate on App Store") { [weak self] in
+                self?.model.openURL(AppStoreLinks.reviewURL)
+            })
         case .direct:
-            menu.addItem(actionItem(title: "Get on Mac App Store", action: #selector(openMacAppStore)))
-            menu.addItem(actionItem(title: "GitHub", action: #selector(openGitHub)))
+            items.append(.action(title: "Get on Mac App Store") { [weak self] in
+                self?.model.openURL(AppStoreLinks.productURL)
+            })
+            items.append(.action(title: "GitHub") { [weak self] in
+                self?.model.openURL(ExternalLinks.githubURL)
+            })
         }
 
-        menu.addItem(actionItem(title: "About", action: #selector(showAbout)))
+        items.append(.about(title: "About") { [weak self] in
+            guard let self else { return }
+            self.model.showAbout(
+                distributionChannel: (self.accessController ?? .shared).distributionChannel
+            )
+        })
+        items.append(.separator)
+        items.append(.quit(appName: "Command Reopen") { [weak self] in
+            self?.model.quit()
+        })
 
-        menu.addItem(.separator())
-
-        let quitItem = NSMenuItem(
-            title: "Quit Command Reopen",
-            action: #selector(quit),
-            keyEquivalent: "q"
-        )
-        quitItem.target = self
-        quitItem.keyEquivalentModifierMask = .command
-        menu.addItem(quitItem)
-
-        return menu
+        return items
     }
 
-    private func actionItem(title: String, action: Selector) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
-        item.target = self
-        return item
-    }
-
-    @objc private func toggleFeatureEnabled() {
+    private func toggleFeatureEnabled() {
         guard let activationMonitor else {
             return
         }
@@ -153,56 +121,6 @@ final class StatusBarMenuController: NSObject {
             return
         }
         activationMonitor.isFeatureEnabled.toggle()
-    }
-
-    @objc private func toggleLaunchAtLogin() {
-        model.setLaunchAtLogin(!model.launchAtLoginEnabled)
-    }
-
-    @objc private func showUpgradeSettings() {
-        SettingsOpener.shared.open(
-            initialTab: .about,
-            presentsPaywall: true
-        )
-    }
-
-    @objc private func showSettings() {
-        SettingsOpener.shared.open()
-    }
-
-    @objc private func openOfficial() {
-        model.openURL(ExternalLinks.officialURL)
-    }
-
-    @objc private func openAppStoreReview() {
-        model.openURL(AppStoreLinks.reviewURL)
-    }
-
-    @objc private func openMacAppStore() {
-        model.openURL(AppStoreLinks.productURL)
-    }
-
-    @objc private func openGitHub() {
-        model.openURL(ExternalLinks.githubURL)
-    }
-
-    @objc private func showAbout() {
-        model.showAbout(distributionChannel: (accessController ?? .shared).distributionChannel)
-    }
-
-    @objc private func quit() {
-        model.quit()
-    }
-}
-
-private extension NSStatusItem {
-    func showMenu(_ menu: NSMenu) {
-        let originalMenu = self.menu
-        defer {
-            self.menu = originalMenu
-        }
-        self.menu = menu
-        button?.performClick(nil)
     }
 }
 
