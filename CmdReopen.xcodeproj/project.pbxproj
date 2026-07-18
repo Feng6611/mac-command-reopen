@@ -169,10 +169,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "Command Reopen" */;
 			buildPhases = (
-				8D4100012FAA30010099C190 /* Verify RevenueCat API Key */,
 				748FCE172EB5027A0099C190 /* Sources */,
 				748FCE182EB5027A0099C190 /* Frameworks */,
 				748FCE192EB5027A0099C190 /* Resources */,
+				8D4100012FAA30010099C190 /* Verify RevenueCat API Key */,
 			);
 			buildRules = (
 			);
@@ -386,6 +386,7 @@
 			inputPaths = (
 				"$(SRCROOT)/scripts/verify_revenuecat_api_key.sh",
 				"$(SRCROOT)/Config/BuildNumber.xcconfig",
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
 			);
 			name = "Verify RevenueCat API Key";
 			outputFileListPaths = (
@@ -510,7 +511,7 @@
 			};
 			name = Debug;
 		};
-		748FCE402EB5027D0099C190 /* Release-MAS */ = {
+		748FCE402EB5027D0099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -569,7 +570,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = APPSTORE;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
-			name = "Release-MAS";
+			name = Release;
 		};
 		748FCE422EB5027D0099C190 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -578,6 +579,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = CommandReopenNew;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = CmdReopen/Resources/CmdReopen.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 29;
@@ -616,7 +619,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPSTORE $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPSTORE APPLE_SANDBOX $(inherited)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -625,7 +628,7 @@
 			};
 			name = Debug;
 		};
-		748FCE432EB5027D0099C190 /* Release-MAS */ = {
+		748FCE432EB5027D0099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */;
 			buildSettings = {
@@ -676,7 +679,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = "Release-MAS";
+			name = Release;
 		};
 		748FCE452EB5027D0099C190 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -700,7 +703,7 @@
 			};
 			name = Debug;
 		};
-		748FCE462EB5027D0099C190 /* Release-MAS */ = {
+		748FCE462EB5027D0099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -720,7 +723,7 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Command Reopen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Command Reopen";
 			};
-			name = "Release-MAS";
+			name = Release;
 		};
 		748FCE482EB5027D0099C190 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -743,7 +746,7 @@
 			};
 			name = Debug;
 		};
-		748FCE492EB5027D0099C190 /* Release-MAS */ = {
+		748FCE492EB5027D0099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -762,7 +765,7 @@
 				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = "Command Reopen";
 			};
-			name = "Release-MAS";
+			name = Release;
 		};
 		74FF0EC82F09581A0007D992 /* Release-Direct */ = {
 			isa = XCBuildConfiguration;
@@ -986,7 +989,7 @@
 			};
 			name = Debug;
 		};
-		9B1000082F2000010099C190 /* Release-MAS */ = {
+		9B1000082F2000010099C190 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */;
 			buildSettings = {
@@ -1046,7 +1049,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
-			name = "Release-MAS";
+			name = Release;
 		};
 		9B1000092F2000010099C190 /* Release-Direct */ = {
 			isa = XCBuildConfiguration;
@@ -1119,47 +1122,47 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				748FCE3F2EB5027D0099C190 /* Debug */,
-				748FCE402EB5027D0099C190 /* Release-MAS */,
+				748FCE402EB5027D0099C190 /* Release */,
 				74FF0EC82F09581A0007D992 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release-MAS";
+			defaultConfigurationName = Release;
 		};
 		748FCE412EB5027D0099C190 /* Build configuration list for PBXNativeTarget "Command Reopen" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				748FCE422EB5027D0099C190 /* Debug */,
-				748FCE432EB5027D0099C190 /* Release-MAS */,
+				748FCE432EB5027D0099C190 /* Release */,
 				74FF0EC92F09581A0007D992 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release-MAS";
+			defaultConfigurationName = Release;
 		};
 		748FCE442EB5027D0099C190 /* Build configuration list for PBXNativeTarget "CmdReopenTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				748FCE452EB5027D0099C190 /* Debug */,
-				748FCE462EB5027D0099C190 /* Release-MAS */,
+				748FCE462EB5027D0099C190 /* Release */,
 				74FF0ECA2F09581A0007D992 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release-MAS";
+			defaultConfigurationName = Release;
 		};
 		748FCE472EB5027D0099C190 /* Build configuration list for PBXNativeTarget "CmdReopenUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				748FCE482EB5027D0099C190 /* Debug */,
-				748FCE492EB5027D0099C190 /* Release-MAS */,
+				748FCE492EB5027D0099C190 /* Release */,
 				74FF0ECB2F09581A0007D992 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release-MAS";
+			defaultConfigurationName = Release;
 		};
 		9B10000A2F2000010099C190 /* Build configuration list for PBXNativeTarget "Command Reopen Direct" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9B1000072F2000010099C190 /* Debug */,
-				9B1000082F2000010099C190 /* Release-MAS */,
+				9B1000082F2000010099C190 /* Release */,
 				9B1000092F2000010099C190 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;

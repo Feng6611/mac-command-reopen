@@ -67,7 +67,7 @@ extension ProPurchaseError {
         self = .unknown(nsError.localizedDescription)
     }
 
-    private init(commerceError: CommercePurchaseError) {
+    init(commerceError: CommercePurchaseError) {
         switch commerceError {
         case .notConfigured, .invalidConfiguration:
             self = .notConfigured

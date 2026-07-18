@@ -86,6 +86,25 @@ struct SettingsView: View {
 
     private var accessPresentation: KikiAccessStatusPresentation {
 #if APPSTORE
+        switch accessModel.readiness {
+        case .idle, .loading:
+            return KikiAccessStatusPresentation(
+                tone: .neutral,
+                title: "Checking purchases…",
+                subtitle: "Verifying your Command Reopen Pro access.",
+                actionTitle: nil
+            )
+        case .degraded:
+            return KikiAccessStatusPresentation(
+                tone: .neutral,
+                title: "Purchases unavailable",
+                subtitle: "We couldn't verify your purchase status. Try again when you're online.",
+                actionTitle: "View options"
+            )
+        case .ready:
+            break
+        }
+
         switch accessModel.status {
         case .notStarted:
             return KikiAccessStatusPresentation(
