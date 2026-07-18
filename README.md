@@ -29,6 +29,7 @@
 - **Zero permissions for core reopen** — the main Cmd+Tab reopen behavior needs no Accessibility or Screen Recording permission
 - **Native switcher preserved** — works invisibly behind the stock Cmd+Tab UI
 - **Configurable exclude list** for apps you don't want restored
+- **Daily reopen count** — see today's total at a glance in the menu
 - **Lightweight** menu bar app, <2 MB, near-zero CPU
 - **Open source** (MIT) and fully auditable
 
