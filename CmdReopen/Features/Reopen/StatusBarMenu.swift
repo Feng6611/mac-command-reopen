@@ -13,7 +13,6 @@ import os
 @MainActor
 final class StatusBarMenuController {
     static let shared = StatusBarMenuController()
-    static let systemImageName = "command.square.fill"
 
     private var menuBarController: KikiMenuBarController?
     private let model = StatusBarMenuModel()
@@ -34,7 +33,7 @@ final class StatusBarMenuController {
         menuBarController = KikiMenuBarController(
             title: "Command Reopen",
             autosaveName: "CommandReopen.StatusItem",
-            systemImageName: Self.systemImageName,
+            systemImageName: "command",
             accessibilityDescription: "Command Reopen",
             tooltip: "Command Reopen"
         ) { [weak self] in
@@ -49,8 +48,6 @@ final class StatusBarMenuController {
         let presentation = StatusBarController.presentation(for: accessController)
 
         var items: [KikiMenuItem] = [
-            .status(title: model.todayReopenStatusTitle),
-            .separator,
             .toggle(
                 title: "Enable Command Reopen",
                 isOn: activationMonitor?.isFeatureEnabled == true,
@@ -130,38 +127,25 @@ final class StatusBarMenuController {
 @MainActor
 final class StatusBarMenuModel: ObservableObject {
     @Published private(set) var launchAtLoginEnabled: Bool
-    @Published private(set) var todayReopenCount: Int
 
     private let launchManager: LaunchAtLoginManaging
     private let urlOpener: URLOpening
     private let applicationPresenter: ApplicationPresenting
-    private let todayReopenCountProvider: () -> Int
-
-    var todayReopenStatusTitle: String {
-        "Today: \(todayReopenCount)"
-    }
 
     init(
         launchManager: LaunchAtLoginManaging? = nil,
         urlOpener: URLOpening? = nil,
-        applicationPresenter: ApplicationPresenting? = nil,
-        todayReopenCountProvider: (() -> Int)? = nil
+        applicationPresenter: ApplicationPresenting? = nil
     ) {
         let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
-        let resolvedTodayReopenCountProvider = todayReopenCountProvider ?? {
-            ReopenStatsStore.shared.todayCount
-        }
         self.launchManager = resolvedLaunchManager
         self.urlOpener = urlOpener ?? WorkspaceURLOpener()
         self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
-        self.todayReopenCountProvider = resolvedTodayReopenCountProvider
         self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
-        self.todayReopenCount = resolvedTodayReopenCountProvider()
     }
 
     func refresh() {
         launchAtLoginEnabled = launchManager.isEnabled
-        todayReopenCount = todayReopenCountProvider()
     }
 
     func setLaunchAtLogin(_ isEnabled: Bool) {
