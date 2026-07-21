@@ -204,6 +204,15 @@ final class ActivationMonitor: ObservableObject {
             return
         }
 
+        if HelperProcessFilter.isHelperLike(
+            bundleID: bundleID,
+            bundleURL: app.bundleURL,
+            localizedName: app.localizedName
+        ) {
+            AppLogger.activation.debug("Ignoring activation for helper-like process \(bundleID).")
+            return
+        }
+
         if userExcludedBundleIDs.contains(bundleID) {
             AppLogger.activation.debug("Ignoring activation for user-excluded bundle id \(bundleID).")
             return
@@ -372,7 +381,8 @@ final class ActivationMonitor: ObservableObject {
                 openedBundleID: openedApp?.bundleIdentifier,
                 localizedName: openedApp?.localizedName,
                 openedProcessIdentifier: openedApp?.processIdentifier,
-                error: error
+                error: error,
+                openedBundleURL: openedApp?.bundleURL
             )
         }
     }
@@ -382,7 +392,8 @@ final class ActivationMonitor: ObservableObject {
         openedBundleID: String?,
         localizedName: String?,
         openedProcessIdentifier: pid_t?,
-        error: Error?
+        error: Error?,
+        openedBundleURL: URL? = nil
     ) {
         if let error {
             AppLogger.activation.error("Failed to re-open \(requestedBundleID): \(error.localizedDescription)")
@@ -393,7 +404,8 @@ final class ActivationMonitor: ObservableObject {
         Task { @MainActor [reopenStatsStore] in
             reopenStatsStore.recordSuccessfulReopen(
                 bundleID: recordedBundleID,
-                localizedName: localizedName
+                localizedName: localizedName,
+                bundleURL: openedBundleURL
             )
         }
 

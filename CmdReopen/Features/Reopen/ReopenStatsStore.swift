@@ -61,6 +61,14 @@ final class ReopenStatsStore: ObservableObject {
         static let legacyPromptedMilestonesKey = "comtabReviewPromptedReopenMilestones"
     }
 
+    /// The menu bar pulse teaches attribution while the behavior is new, then
+    /// stays silent — only the first few restores of each day are signalled.
+    nonisolated static let dailyMenuBarPulseLimit = 10
+
+    nonisolated static func shouldPulseMenuBarIcon(todayCount: Int) -> Bool {
+        todayCount > 0 && todayCount <= dailyMenuBarPulseLimit
+    }
+
     private enum LegacyStorageKey {
         static let reopenStats = "com.comtab.reopenStats"
     }
@@ -212,9 +220,14 @@ final class ReopenStatsStore: ObservableObject {
         self.storageKey = storageKey
         self.distributionChannel = distributionChannel
         self.appReviewPrompter = appReviewPrompter
-        self.snapshot = Self.loadSnapshot(defaults: defaults, storageKey: storageKey)
+        let loaded = Self.loadSnapshot(defaults: defaults, storageKey: storageKey)
             ?? Self.migrateSnapshot(defaults: defaults, from: LegacyStorageKey.reopenStats, to: storageKey)
             ?? .empty
+        let sanitized = Self.removingHelperEntries(from: loaded)
+        self.snapshot = sanitized
+        if sanitized != loaded {
+            persist(sanitized)
+        }
         Self.migrateArray(
             defaults: defaults,
             from: ReviewPrompt.legacyPromptedMilestonesKey,
@@ -222,8 +235,15 @@ final class ReopenStatsStore: ObservableObject {
         )
     }
 
-    func recordSuccessfulReopen(bundleID: String, localizedName: String?) {
+    func recordSuccessfulReopen(bundleID: String, localizedName: String?, bundleURL: URL? = nil) {
         guard let normalizedBundleID = Self.normalize(bundleID) else {
+            return
+        }
+        guard !HelperProcessFilter.isHelperLike(
+            bundleID: normalizedBundleID,
+            bundleURL: bundleURL,
+            localizedName: localizedName
+        ) else {
             return
         }
 
@@ -273,6 +293,48 @@ final class ReopenStatsStore: ObservableObject {
         promptedMilestones.insert(totalSuccessfulReopens)
         defaults.set(promptedMilestones.sorted(), forKey: Self.ReviewPrompt.promptedMilestonesKey)
         appReviewPrompter.requestReview()
+    }
+
+    /// One-time subtractive cleanup for snapshots recorded before helper
+    /// processes were excluded: removes helper entries and subtracts their
+    /// counts so historical totals stay consistent. Days that only exist in
+    /// `dailyCounts` (no per-app breakdown) are left untouched because the
+    /// helper share cannot be attributed.
+    private static func removingHelperEntries(from snapshot: Snapshot) -> Snapshot {
+        let helperBundleIDs = snapshot.perAppCounts.keys.filter { bundleID in
+            HelperProcessFilter.isHelperLike(
+                bundleID: bundleID,
+                bundleURL: nil,
+                localizedName: snapshot.perAppDisplayName[bundleID]
+            )
+        }
+        guard !helperBundleIDs.isEmpty else { return snapshot }
+
+        var next = snapshot
+        var removedTotal = 0
+        for bundleID in helperBundleIDs {
+            removedTotal += next.perAppCounts[bundleID] ?? 0
+            next.perAppCounts.removeValue(forKey: bundleID)
+            next.perAppDisplayName.removeValue(forKey: bundleID)
+        }
+        next.totalSuccessfulReopens = max(0, next.totalSuccessfulReopens - removedTotal)
+
+        if var dailyAppCounts = next.dailyAppCounts {
+            for (dayKey, counts) in dailyAppCounts {
+                var counts = counts
+                var removedInDay = 0
+                for bundleID in helperBundleIDs {
+                    removedInDay += counts[bundleID] ?? 0
+                    counts.removeValue(forKey: bundleID)
+                }
+                dailyAppCounts[dayKey] = counts
+                if removedInDay > 0 {
+                    next.dailyCounts[dayKey] = max(0, (next.dailyCounts[dayKey] ?? 0) - removedInDay)
+                }
+            }
+            next.dailyAppCounts = dailyAppCounts
+        }
+        return next
     }
 
     private static func loadSnapshot(defaults: UserDefaults, storageKey: String) -> Snapshot? {

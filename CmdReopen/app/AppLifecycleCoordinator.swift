@@ -42,7 +42,8 @@ final class AppLifecycleCoordinator {
         NSApp.setActivationPolicy(.accessory)
         statusBarController.install(
             activationMonitor: .shared,
-            accessController: accessController
+            accessController: accessController,
+            reopenStatsStore: .shared
         )
         bindUpgradePrompt()
 

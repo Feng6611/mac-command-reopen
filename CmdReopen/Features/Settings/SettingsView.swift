@@ -21,6 +21,7 @@ struct SettingsTabContent: View {
 
     private let appLookupProvider = ApplicationLookupProvider()
 
+    @AppStorage(AppDefaults.RawKey.menuBarPulseEnabled) private var menuBarPulseEnabled = true
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
 
@@ -46,6 +47,13 @@ struct SettingsTabContent: View {
                     Text("Automatically reopen windows when switching apps via Cmd+Tab")
                         .kikiSettingDescription()
                 }
+            }
+
+            Section {
+                Toggle("Pulse Menu Bar Icon on Reopen", isOn: $menuBarPulseEnabled)
+            } footer: {
+                Text("Gently pulses the icon for the first 10 reopens each day.")
+                    .kikiSettingDescription()
             }
 
             ExcludedAppsSection(

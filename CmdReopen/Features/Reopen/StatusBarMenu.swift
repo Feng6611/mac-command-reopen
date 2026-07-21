@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import Defaults
 import KikiMenuBar
 import os
 
@@ -16,12 +17,19 @@ final class StatusBarMenuController {
 
     private var menuBarController: KikiMenuBarController?
     private let model = StatusBarMenuModel()
+    private let defaults: UserDefaults
+    private var statsCancellable: AnyCancellable?
     private weak var activationMonitor: ActivationMonitor?
     private weak var accessController: AppAccessController?
 
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
     func install(
         activationMonitor: ActivationMonitor,
-        accessController: AppAccessController
+        accessController: AppAccessController,
+        reopenStatsStore: ReopenStatsStore
     ) {
         self.activationMonitor = activationMonitor
         self.accessController = accessController
@@ -39,6 +47,26 @@ final class StatusBarMenuController {
         ) { [weak self] in
             self?.makeItems() ?? []
         }
+
+        statsCancellable = reopenStatsStore.$snapshot
+            .map { snapshot in
+                snapshot.dailyCounts[ReopenStatsStore.dayKeyFormatter.string(from: Date())] ?? 0
+            }
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] todayCount in
+                self?.handleSuccessfulReopenRecorded(todayCount: todayCount)
+            }
+    }
+
+    private func handleSuccessfulReopenRecorded(todayCount: Int) {
+        guard defaults[AppDefaults.menuBarPulseEnabled] else {
+            return
+        }
+        guard ReopenStatsStore.shouldPulseMenuBarIcon(todayCount: todayCount) else {
+            return
+        }
+        menuBarController?.pulseButton()
     }
 
     private func makeItems() -> [KikiMenuItem] {

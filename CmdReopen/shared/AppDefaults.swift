@@ -16,6 +16,7 @@ enum AppDefaults {
         static let universalControlExcludedMigrated = "cmdreopenUniversalControlExcludedMigrated"
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
+        static let menuBarPulseEnabled = "cmdreopenMenuBarPulseEnabled"
     }
 
     enum LegacyRawKey {
@@ -42,6 +43,7 @@ enum AppDefaults {
     static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
+    static let menuBarPulseEnabled = Defaults.Key<Bool>(RawKey.menuBarPulseEnabled, default: true)
 
     static func migrateLegacyKeys(in defaults: UserDefaults = .standard) {
         migrate(from: LegacyRawKey.featureEnabled, to: RawKey.featureEnabled, in: defaults)
