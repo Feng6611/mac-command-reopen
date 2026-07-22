@@ -77,7 +77,7 @@ final class StatusBarMenuController {
 
         var items: [KikiMenuItem] = [
             .toggle(
-                title: "Enable Command Reopen",
+                title: String(localized: "Enable Command Reopen"),
                 isOn: activationMonitor?.isFeatureEnabled == true,
                 isEnabled: presentation.canToggleAutoReopen,
                 action: { [weak self] in
@@ -85,7 +85,7 @@ final class StatusBarMenuController {
                 }
             ),
             .toggle(
-                title: "Launch at Login",
+                title: String(localized: "Launch at Login"),
                 isOn: model.launchAtLoginEnabled,
                 action: { [weak self] in
                     guard let model = self?.model else { return }
@@ -96,7 +96,7 @@ final class StatusBarMenuController {
         ]
 
         if presentation.showsUpgradeItem {
-            items.append(.action(title: "Upgrade to Pro...") {
+            items.append(.action(title: String(localized: "Upgrade to Pro…")) {
                 SettingsOpener.shared.open(
                     initialTab: .about,
                     presentsPaywall: true
@@ -104,35 +104,41 @@ final class StatusBarMenuController {
             })
         }
 
-        items.append(.settings(title: "Settings...") {
+        items.append(.settings(title: String(localized: "Settings…")) {
             SettingsOpener.shared.open()
         })
         items.append(.separator)
 
         switch accessController.distributionChannel {
         case .appStore:
-            items.append(.action(title: "Official") { [weak self] in
+            items.append(.action(title: String(localized: "Official")) { [weak self] in
                 self?.model.openURL(ExternalLinks.officialURL)
             })
-            items.append(.action(title: "Rate on App Store") { [weak self] in
+            items.append(.action(title: String(localized: "Rate on App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.reviewURL)
             })
         case .direct:
-            items.append(.action(title: "Get on Mac App Store") { [weak self] in
+            items.append(.action(title: String(localized: "Get on Mac App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.productURL)
             })
-            items.append(.action(title: "GitHub") { [weak self] in
+            items.append(.action(title: String(localized: "GitHub")) { [weak self] in
                 self?.model.openURL(ExternalLinks.githubURL)
             })
         }
 
-        items.append(.about(title: "About") { [weak self] in
+        items.append(.about(title: String(localized: "About")) { [weak self] in
             guard let self else { return }
             self.model.showAbout(
                 distributionChannel: (self.accessController ?? .shared).distributionChannel
             )
         })
         items.append(.separator)
+#if DEBUG
+        items.append(.action(title: "Design Catalog…") {
+            DesignCatalogPresenter.show()
+        })
+        items.append(.separator)
+#endif
         items.append(.quit(appName: "Command Reopen") { [weak self] in
             self?.model.quit()
         })

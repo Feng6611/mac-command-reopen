@@ -14,6 +14,7 @@ struct CmdReopenApp: App {
     @StateObject private var reopenStatsStore = ReopenStatsStore.shared
     @StateObject private var accessController = AppAccessController.shared
     @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
+    @StateObject private var languagePreference = LanguagePreference.shared
 
     var body: some Scene {
         Settings {
@@ -22,6 +23,7 @@ struct CmdReopenApp: App {
                 .environmentObject(reopenStatsStore)
                 .environmentObject(accessController)
                 .environmentObject(settingsNavigationModel)
+                .environmentObject(languagePreference)
         }
     }
 }

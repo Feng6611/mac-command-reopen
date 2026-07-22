@@ -18,12 +18,14 @@ import SwiftUI
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
+    @EnvironmentObject private var languagePreference: LanguagePreference
 
     private let appLookupProvider = ApplicationLookupProvider()
 
     @AppStorage(AppDefaults.RawKey.menuBarPulseEnabled) private var menuBarPulseEnabled = true
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
+    @State private var isLanguageRestartAlertPresented = false
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
@@ -36,9 +38,27 @@ struct SettingsTabContent: View {
     var body: some View {
         KikiSettingsPane {
             Section {
+                Picker(selection: $languagePreference.selection) {
+                    ForEach(AppLanguage.allCases) { language in
+                        // Native-language labels so users can always find their own language,
+                        // regardless of the current UI language.
+                        Text(verbatim: language.displayName).tag(language)
+                    }
+                } label: {
+                    Text("Language")
+                }
+                .onChange(of: languagePreference.selection) { _ in
+                    isLanguageRestartAlertPresented = true
+                }
+            } footer: {
+                Text("Choose System to follow macOS. Restart Command Reopen to apply the change.")
+                    .kikiSettingDescription()
+            }
+
+            Section {
                 Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                     .disabled(isFeatureLocked)
-                KikiSettings.LaunchAtLogin.Toggle("Launch at Login")
+                KikiSettings.LaunchAtLogin.Toggle { Text("Launch at Login") }
             } footer: {
                 if isFeatureLocked {
                     Text("Requires Pro to enable.")
@@ -71,6 +91,15 @@ struct SettingsTabContent: View {
                 addApplicationAction: addLookupResult
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
+        }
+        .alert(
+            "Restart to apply the language change",
+            isPresented: $isLanguageRestartAlertPresented
+        ) {
+            Button("Quit") { NSApp.terminate(nil) }
+            Button("Later", role: .cancel) { }
+        } message: {
+            Text("Command Reopen needs to restart before the new language takes effect.")
         }
         .task {
             await Task.yield()

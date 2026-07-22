@@ -58,7 +58,7 @@ enum CommandReopenOnboardingFlow {
                 canSkip: false,
                 tint: DS.Colors.brandPrimary,
                 windowAutosaveName: "CmdReopen.OnboardingWindow",
-                windowTitle: "Welcome",
+                windowTitle: String(localized: "Welcome", comment: "Onboarding window title."),
                 windowSize: windowSize,
                 minimumWindowSize: windowSize,
                 closeDisposition: .keepPending
@@ -76,10 +76,10 @@ private struct WelcomeStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: "Fix ⌘⇥ for minimized and closed windows",
-            bodyText: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that.",
+            title: String(localized: "Fix ⌘⇥ for minimized and closed windows"),
+            bodyText: String(localized: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: "Continue", action: navigation.advance),
+            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 0,
@@ -99,10 +99,10 @@ private struct TryMinimizeStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: "Try it yourself",
-            bodyText: "See the magic in two steps.",
+            title: String(localized: "Try it yourself"),
+            bodyText: String(localized: "See the magic in two steps."),
             iconSystemName: "hand.point.down.fill",
-            primaryAction: KikiOnboardingAction(title: "Minimize Window") {
+            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize Window")) {
                 showMinimizeReturnHint = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                     onMinimize()
@@ -116,11 +116,11 @@ private struct TryMinimizeStepView: View {
             VStack(spacing: DS.Spacing.lg) {
                 OnboardingStepRow(
                     number: "1",
-                    text: "Click \"Minimize Window\" below"
+                    text: String(localized: "Click \"Minimize Window\" below", comment: "Onboarding step 1; the quoted text is the button title below and must match its translation.")
                 )
                 OnboardingStepRow(
                     number: "2",
-                    text: "Press ⌘⇥ to switch back here"
+                    text: String(localized: "Press ⌘⇥ to switch back here")
                 )
             }
         }
@@ -155,10 +155,10 @@ private struct SuccessStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: "It works!",
-            bodyText: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear.",
+            title: String(localized: "It works!"),
+            bodyText: String(localized: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: "Continue", action: navigation.advance),
+            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 2,
@@ -205,10 +205,10 @@ private struct PaywallStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: "It works!",
-            bodyText: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear.",
+            title: String(localized: "It works!"),
+            bodyText: String(localized: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: "Continue") {
+            primaryAction: KikiOnboardingAction(title: String(localized: "Continue")) {
                 isPaywallSheetPresented = true
             },
             tint: DS.Colors.brandPrimary,

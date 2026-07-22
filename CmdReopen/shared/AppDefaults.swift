@@ -17,6 +17,7 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let menuBarPulseEnabled = "cmdreopenMenuBarPulseEnabled"
+        static let preferredLanguage = "cmdreopenPreferredLanguage"
     }
 
     enum LegacyRawKey {

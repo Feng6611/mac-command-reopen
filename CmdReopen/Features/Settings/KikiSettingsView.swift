@@ -15,9 +15,9 @@ enum SettingsTab: Int, CaseIterable, Hashable {
 
     func title(for distributionChannel: DistributionChannel) -> String {
         switch self {
-        case .general: "General"
-        case .statistics: "Stats"
-        case .about: "About"
+        case .general: String(localized: "General")
+        case .statistics: String(localized: "Stats", comment: "Settings tab title; short form of Statistics.")
+        case .about: String(localized: "About")
         }
     }
 
@@ -90,16 +90,16 @@ struct SettingsView: View {
         case .idle, .loading:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: "Checking purchases…",
-                subtitle: "Verifying your Command Reopen Pro access.",
+                title: String(localized: "Checking purchases…"),
+                subtitle: String(localized: "Verifying your Command Reopen Pro access."),
                 actionTitle: nil
             )
         case .degraded:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: "Purchases unavailable",
-                subtitle: "We couldn't verify your purchase status. Try again when you're online.",
-                actionTitle: "View options"
+                title: String(localized: "Purchases unavailable"),
+                subtitle: String(localized: "We couldn't verify your purchase status. Try again when you're online."),
+                actionTitle: String(localized: "View options")
             )
         case .ready:
             break
@@ -109,30 +109,30 @@ struct SettingsView: View {
         case .notStarted:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: "Trial not started",
-                subtitle: "Start the free trial when you are ready.",
-                actionTitle: "View options"
+                title: String(localized: "Trial not started"),
+                subtitle: String(localized: "Start the free trial when you are ready."),
+                actionTitle: String(localized: "View options")
             )
         case .trial(.time(let daysRemaining, _)):
             return KikiAccessStatusPresentation(
                 tone: .trial,
-                title: "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") left",
-                subtitle: "Command Reopen Pro is active during the trial.",
-                actionTitle: "View plans"
+                title: String(localized: "\(daysRemaining) days left", comment: "Trial time remaining in the About pane; plural-aware in the catalog."),
+                subtitle: String(localized: "Command Reopen Pro is active during the trial."),
+                actionTitle: String(localized: "View plans")
             )
         case .trial(.usage(_, let used, let limit)):
             return KikiAccessStatusPresentation(
                 tone: .trial,
-                title: "\(max(0, limit - used)) uses left",
-                subtitle: "Command Reopen Pro is active during the trial.",
-                actionTitle: "View plans"
+                title: String(localized: "\(max(0, limit - used)) uses left", comment: "Trial usage remaining in the About pane; plural-aware in the catalog."),
+                subtitle: String(localized: "Command Reopen Pro is active during the trial."),
+                actionTitle: String(localized: "View plans")
             )
         case .expired:
             return KikiAccessStatusPresentation(
                 tone: .expired,
-                title: "Trial ended",
-                subtitle: "Upgrade to continue automatic window reopening.",
-                actionTitle: "Upgrade"
+                title: String(localized: "Trial ended"),
+                subtitle: String(localized: "Upgrade to continue automatic window reopening."),
+                actionTitle: String(localized: "Upgrade")
             )
         case .pro(let plan, _):
             return KikiAccessStatusPresentation(
@@ -145,8 +145,8 @@ struct SettingsView: View {
 #else
         return KikiAccessStatusPresentation(
             tone: .active,
-            title: "Direct version",
-            subtitle: "All Command Reopen features are available.",
+            title: String(localized: "Direct version"),
+            subtitle: String(localized: "All Command Reopen features are available."),
             actionTitle: nil
         )
 #endif

@@ -36,9 +36,9 @@ extension ProPurchaseError: LocalizedError {
         case .purchaseNotAllowed:
             "Purchases are not allowed on this Mac."
         case .activationPending:
-            "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase."
+            String(localized: "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .invalidReceipt:
-            "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase."
+            String(localized: "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .network:
             "A network connection is required to load purchases."
         case .invalidCredentials:

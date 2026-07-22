@@ -6,7 +6,33 @@
 //  and components side-by-side in Light / Dark mode.
 //
 #if DEBUG
+import AppKit
+import KikiWindow
 import SwiftUI
+
+@MainActor
+enum DesignCatalogPresenter {
+    private static var controller: KikiSingleWindowController<DesignCatalog>?
+
+    static func show() {
+        if let controller {
+            controller.show()
+            return
+        }
+        let new = KikiSingleWindowController(
+            configuration: .utility(
+                title: "Design Catalog (DEBUG)",
+                size: CGSize(width: 760, height: 720),
+                minimumSize: CGSize(width: 720, height: 480),
+                frameAutosaveName: "CmdReopen.DesignCatalogWindow"
+            )
+        ) {
+            DesignCatalog()
+        }
+        controller = new
+        new.show()
+    }
+}
 
 struct DesignCatalog: View {
     var body: some View {

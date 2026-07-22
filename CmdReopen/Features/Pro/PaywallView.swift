@@ -24,16 +24,28 @@ struct PaywallSheetView: View {
             manager: accessModel.accessManager,
             context: context.kikiContext,
             copy: KikiAccessPaywallCopy(
-                title: "Command Reopen Pro",
-                proSubtitle: "Your Pro access is active.",
-                trialSubtitle: "Keep minimized windows easy to recover.",
-                expiredSubtitle: "Upgrade to continue automatic window reopening.",
-                notStartedSubtitle: "Try every Pro feature free for 2 days.",
+                title: String(localized: "Command Reopen Pro", comment: "Product tier name — do not translate."),
+                proSubtitle: String(localized: "Your Pro access is active."),
+                trialSubtitle: String(localized: "Keep minimized windows easy to recover."),
+                expiredSubtitle: String(localized: "Upgrade to continue automatic window reopening."),
+                notStartedSubtitle: String(localized: "Try every Pro feature free for 2 days."),
                 features: [
-                    "Never lose a minimized window again",
-                    "Keep Command-Tab focused and predictable",
-                    "Exclude apps that should stay quiet"
-                ]
+                    String(localized: "Never lose a minimized window again"),
+                    String(localized: "Keep Command-Tab focused and predictable"),
+                    String(localized: "Exclude apps that should stay quiet")
+                ],
+                purchaseActionTitle: String(localized: "Unlock forever"),
+                trialActionTitle: String(localized: "Start free trial"),
+                restoreActionTitle: String(localized: "Restore Purchase"),
+                doneActionTitle: String(localized: "Done"),
+                loadingOptionsMessage: String(localized: "Loading purchase options…"),
+                unavailableOptionsMessage: String(localized: "Purchase options are unavailable right now. Try again later or restore an existing purchase."),
+                purchaseSuccessMessage: String(localized: "Purchase successful. Pro unlocked."),
+                restoreSuccessMessage: String(localized: "Purchase restored."),
+                noActivePurchaseMessage: String(localized: "No active purchase found on this account."),
+                purchaseErrorMessage: String(localized: "The purchase couldn't be completed."),
+                restoreErrorMessage: String(localized: "Purchases couldn't be restored."),
+                trialErrorMessage: String(localized: "The free trial couldn't be started.")
             ),
             footerLinks: footerLinks,
             tint: DS.Colors.brandPrimary,
@@ -43,9 +55,9 @@ struct PaywallSheetView: View {
 
     private var footerLinks: [KikiAccessPaywallLink] {
         [
-            makeLink(id: "terms", title: "Terms", value: ExternalLinks.termsURL),
-            makeLink(id: "privacy", title: "Privacy", value: ExternalLinks.privacyURL),
-            makeLink(id: "support", title: "Support", value: ExternalLinks.contactEmail)
+            makeLink(id: "terms", title: String(localized: "Terms"), value: ExternalLinks.termsURL),
+            makeLink(id: "privacy", title: String(localized: "Privacy"), value: ExternalLinks.privacyURL),
+            makeLink(id: "support", title: String(localized: "Support"), value: ExternalLinks.contactEmail)
         ].compactMap { $0 }
     }
 
