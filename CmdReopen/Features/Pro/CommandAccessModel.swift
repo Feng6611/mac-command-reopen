@@ -61,6 +61,9 @@ final class CommandAccessModel: ObservableObject {
     }
     var isRestoringPurchases: Bool { accessManager.isRestoringPurchases }
     var currentEntitlementSnapshot: CommerceEntitlement? { accessManager.currentEntitlementSnapshot }
+#if DEBUG
+    var debugProAccessOverride: KikiAccessDebugMode? { accessManager.debugProAccessOverride }
+#endif
 
     var isFirstLaunch: Bool {
         !defaults[AppDefaults.hasSeenOnboarding]
@@ -121,6 +124,16 @@ final class CommandAccessModel: ObservableObject {
     func markExpiredPromptHandled() {
         shouldOpenProSettings = false
     }
+
+#if DEBUG
+    func setDebugProAccessOverride(_ mode: KikiAccessDebugMode) {
+        accessManager.setDebugProAccessOverride(mode)
+    }
+
+    func clearDebugProAccessOverride() {
+        accessManager.clearDebugProAccessOverride()
+    }
+#endif
 
     private func bindAccessState() {
         accessManager.objectWillChange

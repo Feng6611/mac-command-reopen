@@ -7,7 +7,6 @@
 
 import AppKit
 import Combine
-import Defaults
 import KikiMenuBar
 import os
 
@@ -16,20 +15,15 @@ final class StatusBarMenuController {
     static let shared = StatusBarMenuController()
 
     private var menuBarController: KikiMenuBarController?
-    private let model = StatusBarMenuModel()
-    private let defaults: UserDefaults
-    private var statsCancellable: AnyCancellable?
+    private let model = StatusBarMenuModel(reviewPromptRequester: { trigger in
+        _ = ReopenStatsStore.shared.requestReviewIfEligible(for: trigger)
+    })
     private weak var activationMonitor: ActivationMonitor?
     private weak var accessController: AppAccessController?
 
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-    }
-
     func install(
         activationMonitor: ActivationMonitor,
-        accessController: AppAccessController,
-        reopenStatsStore: ReopenStatsStore
+        accessController: AppAccessController
     ) {
         self.activationMonitor = activationMonitor
         self.accessController = accessController
@@ -47,26 +41,6 @@ final class StatusBarMenuController {
         ) { [weak self] in
             self?.makeItems() ?? []
         }
-
-        statsCancellable = reopenStatsStore.$snapshot
-            .map { snapshot in
-                snapshot.dailyCounts[ReopenStatsStore.dayKeyFormatter.string(from: Date())] ?? 0
-            }
-            .removeDuplicates()
-            .dropFirst()
-            .sink { [weak self] todayCount in
-                self?.handleSuccessfulReopenRecorded(todayCount: todayCount)
-            }
-    }
-
-    private func handleSuccessfulReopenRecorded(todayCount: Int) {
-        guard defaults[AppDefaults.menuBarPulseEnabled] else {
-            return
-        }
-        guard ReopenStatsStore.shouldPulseMenuBarIcon(todayCount: todayCount) else {
-            return
-        }
-        menuBarController?.pulseButton()
     }
 
     private func makeItems() -> [KikiMenuItem] {
@@ -133,12 +107,6 @@ final class StatusBarMenuController {
             )
         })
         items.append(.separator)
-#if DEBUG
-        items.append(.action(title: "Design Catalog…") {
-            DesignCatalogPresenter.show()
-        })
-        items.append(.separator)
-#endif
         items.append(.quit(appName: "Command Reopen") { [weak self] in
             self?.model.quit()
         })
@@ -165,16 +133,19 @@ final class StatusBarMenuModel: ObservableObject {
     private let launchManager: LaunchAtLoginManaging
     private let urlOpener: URLOpening
     private let applicationPresenter: ApplicationPresenting
+    private let reviewPromptRequester: (ReviewPromptTrigger) -> Void
 
     init(
         launchManager: LaunchAtLoginManaging? = nil,
         urlOpener: URLOpening? = nil,
-        applicationPresenter: ApplicationPresenting? = nil
+        applicationPresenter: ApplicationPresenting? = nil,
+        reviewPromptRequester: @escaping (ReviewPromptTrigger) -> Void
     ) {
         let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
         self.launchManager = resolvedLaunchManager
         self.urlOpener = urlOpener ?? WorkspaceURLOpener()
         self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
+        self.reviewPromptRequester = reviewPromptRequester
         self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
     }
 
@@ -183,8 +154,12 @@ final class StatusBarMenuModel: ObservableObject {
     }
 
     func setLaunchAtLogin(_ isEnabled: Bool) {
+        let wasEnabled = launchAtLoginEnabled
         launchManager.setEnabled(isEnabled)
         launchAtLoginEnabled = launchManager.isEnabled
+        if !wasEnabled, launchAtLoginEnabled {
+            reviewPromptRequester(.launchAtLoginEnabled)
+        }
     }
 
     func showAbout(distributionChannel: DistributionChannel) {

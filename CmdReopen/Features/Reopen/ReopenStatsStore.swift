@@ -14,6 +14,19 @@ protocol AppReviewPrompting {
     func requestReview()
 }
 
+enum ReviewPromptTrigger: Equatable {
+    /// A purchase is a high-confidence moment of customer satisfaction and
+    /// does not require a reopen-count threshold.
+    case purchaseCompleted
+    case statsOpened
+    case launchAtLoginEnabled
+    case applicationLaunched
+
+    fileprivate var requiresReopenHistory: Bool {
+        self != .purchaseCompleted
+    }
+}
+
 struct StoreKitAppReviewPrompter: AppReviewPrompting {
     func requestReview() {
         SKStoreReviewController.requestReview()
@@ -56,17 +69,16 @@ final class ReopenStatsStore: ObservableObject {
     }
 
     private enum ReviewPrompt {
-        static let milestones: Set<Int> = [30, 50, 70]
+        static let minimumSuccessfulReopens = 20
+        static let maximumRequestsPerYear = 3
+        static let rollingWindow: TimeInterval = 365 * 24 * 60 * 60
+        static let requestTimestampsKey = "cmdreopenReviewPromptRequestTimestamps"
+        static let migratedHistoryKey = "cmdreopenReviewPromptMigratedHistory"
+
+        // Previous builds stored milestones rather than dates. Retain these
+        // keys only to migrate their request count into the rolling cap.
         static let promptedMilestonesKey = "cmdreopenReviewPromptedReopenMilestones"
         static let legacyPromptedMilestonesKey = "comtabReviewPromptedReopenMilestones"
-    }
-
-    /// The menu bar pulse teaches attribution while the behavior is new, then
-    /// stays silent — only the first few restores of each day are signalled.
-    nonisolated static let dailyMenuBarPulseLimit = 10
-
-    nonisolated static func shouldPulseMenuBarIcon(todayCount: Int) -> Bool {
-        todayCount > 0 && todayCount <= dailyMenuBarPulseLimit
     }
 
     private enum LegacyStorageKey {
@@ -89,6 +101,7 @@ final class ReopenStatsStore: ObservableObject {
     private let distributionChannel: DistributionChannel
     private let appReviewPrompter: any AppReviewPrompting
     private let encoder = JSONEncoder()
+    private var hasRequestedReviewThisLaunch = false
 
     var totalSuccessfulReopens: Int {
         snapshot.totalSuccessfulReopens
@@ -214,12 +227,12 @@ final class ReopenStatsStore: ObservableObject {
         defaults: UserDefaults = .standard,
         storageKey: String = "com.cmdreopen.reopenStats",
         distributionChannel: DistributionChannel = .current,
-        appReviewPrompter: any AppReviewPrompting = StoreKitAppReviewPrompter()
+        appReviewPrompter: (any AppReviewPrompting)? = nil
     ) {
         self.defaults = defaults
         self.storageKey = storageKey
         self.distributionChannel = distributionChannel
-        self.appReviewPrompter = appReviewPrompter
+        self.appReviewPrompter = appReviewPrompter ?? StoreKitAppReviewPrompter()
         let loaded = Self.loadSnapshot(defaults: defaults, storageKey: storageKey)
             ?? Self.migrateSnapshot(defaults: defaults, from: LegacyStorageKey.reopenStats, to: storageKey)
             ?? .empty
@@ -233,6 +246,7 @@ final class ReopenStatsStore: ObservableObject {
             from: ReviewPrompt.legacyPromptedMilestonesKey,
             to: ReviewPrompt.promptedMilestonesKey
         )
+        Self.migrateReviewPromptHistoryIfNeeded(defaults: defaults)
     }
 
     func recordSuccessfulReopen(bundleID: String, localizedName: String?, bundleURL: URL? = nil) {
@@ -260,7 +274,39 @@ final class ReopenStatsStore: ObservableObject {
         next.lastUpdatedAt = Date()
 
         persist(next)
-        requestReviewIfNeeded(totalSuccessfulReopens: next.totalSuccessfulReopens)
+    }
+
+    /// Requests an App Store review only at an intentional product moment.
+    /// StoreKit may still decide not to show the system dialog.
+    @discardableResult
+    func requestReviewIfEligible(
+        for trigger: ReviewPromptTrigger,
+        now: Date = Date()
+    ) -> Bool {
+        guard distributionChannel == .appStore,
+              !hasRequestedReviewThisLaunch else {
+            return false
+        }
+
+        if trigger.requiresReopenHistory,
+           totalSuccessfulReopens <= ReviewPrompt.minimumSuccessfulReopens {
+            return false
+        }
+
+        let cutoff = now.addingTimeInterval(-ReviewPrompt.rollingWindow).timeIntervalSince1970
+        var requestTimestamps = (defaults.array(forKey: ReviewPrompt.requestTimestampsKey) as? [Double] ?? [])
+            .filter { $0 > cutoff }
+
+        guard requestTimestamps.count < ReviewPrompt.maximumRequestsPerYear else {
+            defaults.set(requestTimestamps, forKey: ReviewPrompt.requestTimestampsKey)
+            return false
+        }
+
+        requestTimestamps.append(now.timeIntervalSince1970)
+        defaults.set(requestTimestamps, forKey: ReviewPrompt.requestTimestampsKey)
+        hasRequestedReviewThisLaunch = true
+        appReviewPrompter.requestReview()
+        return true
     }
 
     func reset() {
@@ -275,24 +321,6 @@ final class ReopenStatsStore: ObservableObject {
             return
         }
         defaults.set(data, forKey: storageKey)
-    }
-
-    private func requestReviewIfNeeded(totalSuccessfulReopens: Int) {
-        guard distributionChannel == .appStore,
-              Self.ReviewPrompt.milestones.contains(totalSuccessfulReopens) else {
-            return
-        }
-
-        var promptedMilestones = Set(
-            defaults.array(forKey: Self.ReviewPrompt.promptedMilestonesKey) as? [Int] ?? []
-        )
-        guard !promptedMilestones.contains(totalSuccessfulReopens) else {
-            return
-        }
-
-        promptedMilestones.insert(totalSuccessfulReopens)
-        defaults.set(promptedMilestones.sorted(), forKey: Self.ReviewPrompt.promptedMilestonesKey)
-        appReviewPrompter.requestReview()
     }
 
     /// One-time subtractive cleanup for snapshots recorded before helper
@@ -381,6 +409,35 @@ final class ReopenStatsStore: ObservableObject {
 
         defaults.set(legacyValue, forKey: currentKey)
         defaults.removeObject(forKey: legacyKey)
+    }
+
+    private static func migrateReviewPromptHistoryIfNeeded(defaults: UserDefaults) {
+        guard !defaults.bool(forKey: ReviewPrompt.migratedHistoryKey) else {
+            return
+        }
+
+        defer { defaults.set(true, forKey: ReviewPrompt.migratedHistoryKey) }
+
+        guard defaults.object(forKey: ReviewPrompt.requestTimestampsKey) == nil else {
+            return
+        }
+
+        let legacyRequestCount = min(
+            ReviewPrompt.maximumRequestsPerYear,
+            (defaults.array(forKey: ReviewPrompt.promptedMilestonesKey) as? [Int] ?? []).count
+        )
+        guard legacyRequestCount > 0 else {
+            return
+        }
+
+        // The former implementation did not record dates. Treat its known
+        // requests conservatively so this release cannot immediately exceed
+        // Apple's rolling annual limit after upgrading.
+        let timestamp = Date().timeIntervalSince1970
+        defaults.set(
+            Array(repeating: timestamp, count: legacyRequestCount),
+            forKey: ReviewPrompt.requestTimestampsKey
+        )
     }
 
     private static func normalize(_ value: String?) -> String? {

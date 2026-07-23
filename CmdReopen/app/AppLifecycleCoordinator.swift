@@ -18,6 +18,7 @@ final class AppLifecycleCoordinator {
     private enum Constants {
         static let commerceRefreshThrottle: TimeInterval = 5 * 60
         static let initialCommerceRefreshDelayNanoseconds: UInt64 = 1_000_000_000
+        static let reviewPromptDelayNanoseconds: UInt64 = 1_500_000_000
     }
 
     static let shared = AppLifecycleCoordinator()
@@ -42,10 +43,10 @@ final class AppLifecycleCoordinator {
         NSApp.setActivationPolicy(.accessory)
         statusBarController.install(
             activationMonitor: .shared,
-            accessController: accessController,
-            reopenStatsStore: .shared
+            accessController: accessController
         )
         bindUpgradePrompt()
+        scheduleLaunchReviewRequest()
 
         // Ensure no windows are visible for the menu-bar-only idle state.
         NSApp.windows.forEach { $0.orderOut(nil) }
@@ -157,6 +158,13 @@ final class AppLifecycleCoordinator {
             await Task.yield()
             try? await Task.sleep(nanoseconds: Constants.initialCommerceRefreshDelayNanoseconds)
             await self?.completeInitialCommerceRefresh()
+        }
+    }
+
+    private func scheduleLaunchReviewRequest() {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: Constants.reviewPromptDelayNanoseconds)
+            _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .applicationLaunched)
         }
     }
 

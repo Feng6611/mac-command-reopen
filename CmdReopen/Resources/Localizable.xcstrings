@@ -370,11 +370,6 @@
         }
       }
     },
-    "Card content example" : {
-      "comment" : "DEBUG-only DesignCatalog preview text; not shipped to end users.",
-      "extractionState" : "manual",
-      "shouldTranslate" : false
-    },
     "Checking purchases…" : {
       "localizations" : {
         "de" : {
@@ -420,25 +415,24 @@
         }
       }
     },
-    "Click \"Minimize Window\" below" : {
-      "comment" : "Onboarding step 1; the quoted text is the button title below and must match its translation.",
+    "Minimize & Return" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klicken Sie unten auf „Fenster minimieren“"
+            "value" : "Minimieren und zurückkehren"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cliquez sur « Réduire la fenêtre » ci-dessous"
+            "value" : "Réduire et revenir"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下の「ウインドウをしまう」をクリック"
+            "value" : "最小化して戻る"
           }
         }
       }
@@ -1022,24 +1016,24 @@
         }
       }
     },
-    "Minimize Window" : {
+    "This window will minimize, then you’ll switch back with ⌘ Tab." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fenster minimieren"
+            "value" : "Dieses Fenster wird minimiert. Danach wechseln Sie mit ⌘ Tab zurück."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réduire la fenêtre"
+            "value" : "Cette fenêtre va se réduire, puis vous reviendrez avec ⌘ Tab."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ウインドウをしまう"
+            "value" : "このウインドウが最小化され、⌘ Tab で戻ります。"
           }
         }
       }
@@ -1199,25 +1193,25 @@
         }
       }
     },
-    "Now ⌘⇥ back to Command Reopen" : {
+    "Now press ⌘ Tab once to return to Command Reopen" : {
       "comment" : "Instructional hint after the user minimizes a window during onboarding.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drücken Sie jetzt ⌘⇥, um zu Command Reopen zurückzukehren"
+            "value" : "Drücken Sie jetzt einmal ⌘ Tab, um zu Command Reopen zurückzukehren"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Appuyez sur ⌘⇥ pour revenir à Command Reopen"
+            "value" : "Appuyez maintenant une fois sur ⌘ Tab pour revenir à Command Reopen"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘⇥ で Command Reopen に戻ってください"
+            "value" : "⌘ Tab を1回押して Command Reopen に戻ってください"
           }
         }
       }
@@ -1267,29 +1261,24 @@
         }
       }
     },
-    "Picker placeholder" : {
-      "comment" : "DEBUG-only DesignCatalog preview text; not shipped to end users.",
-      "extractionState" : "manual",
-      "shouldTranslate" : false
-    },
-    "Press ⌘⇥ to switch back here" : {
+    "Then press ⌘ Tab once to return." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drücken Sie ⌘⇥, um hierher zurückzuwechseln"
+            "value" : "Drücken Sie dann einmal ⌘ Tab, um zurückzukehren."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Appuyez sur ⌘⇥ pour revenir ici"
+            "value" : "Appuyez ensuite une fois sur ⌘ Tab pour revenir."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘⇥ を押してここに戻ります"
+            "value" : "次に ⌘ Tab を1回押して戻ります。"
           }
         }
       }
@@ -1651,24 +1640,24 @@
         }
       }
     },
-    "See the magic in two steps." : {
+    "See it work" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entdecken Sie den Effekt in zwei Schritten."
+            "value" : "So funktioniert es"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Découvrez la magie en deux étapes."
+            "value" : "Voyez le résultat"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2つのステップで体験できます。"
+            "value" : "動きを確認しましょう"
           }
         }
       }
@@ -2053,24 +2042,24 @@
         }
       }
     },
-    "Try it yourself" : {
+    "This window will reappear automatically." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Probieren Sie es selbst aus"
+            "value" : "Dieses Fenster wird automatisch wieder angezeigt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essayez par vous-même"
+            "value" : "Cette fenêtre réapparaîtra automatiquement."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自分で試してみましょう"
+            "value" : "このウインドウは自動的に再表示されます。"
           }
         }
       }
@@ -2251,11 +2240,6 @@
           }
         }
       }
-    },
-    "Warning-tinted card" : {
-      "comment" : "DEBUG-only DesignCatalog preview text; not shipped to end users.",
-      "extractionState" : "manual",
-      "shouldTranslate" : false
     },
     "We couldn't verify your purchase status. Try again when you're online." : {
       "localizations" : {

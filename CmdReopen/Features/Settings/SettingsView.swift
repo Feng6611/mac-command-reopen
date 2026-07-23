@@ -8,9 +8,6 @@
 import AppKit
 import Combine
 import KikiSettings
-#if APPSTORE
-import KikiCommerceCore
-#endif
 import SwiftUI
 
 // MARK: - Settings Tab Content
@@ -22,7 +19,7 @@ struct SettingsTabContent: View {
 
     private let appLookupProvider = ApplicationLookupProvider()
 
-    @AppStorage(AppDefaults.RawKey.menuBarPulseEnabled) private var menuBarPulseEnabled = true
+    @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
     @State private var isLanguageRestartAlertPresented = false
@@ -50,30 +47,16 @@ struct SettingsTabContent: View {
                 .onChange(of: languagePreference.selection) { _ in
                     isLanguageRestartAlertPresented = true
                 }
-            } footer: {
-                Text("Choose System to follow macOS. Restart Command Reopen to apply the change.")
-                    .kikiSettingDescription()
             }
 
             Section {
                 Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                     .disabled(isFeatureLocked)
-                KikiSettings.LaunchAtLogin.Toggle { Text("Launch at Login") }
-            } footer: {
-                if isFeatureLocked {
-                    Text("Requires Pro to enable.")
-                        .foregroundStyle(Color.accentColor)
-                } else {
-                    Text("Automatically reopen windows when switching apps via Cmd+Tab")
-                        .kikiSettingDescription()
-                }
-            }
-
-            Section {
-                Toggle("Pulse Menu Bar Icon on Reopen", isOn: $menuBarPulseEnabled)
-            } footer: {
-                Text("Gently pulses the icon for the first 10 reopens each day.")
-                    .kikiSettingDescription()
+                Toggle("Launch at Login", isOn: launchAtLoginManager.binding)
+                    .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
+                        guard isEnabled else { return }
+                        _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
+                    }
             }
 
             ExcludedAppsSection(

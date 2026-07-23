@@ -60,28 +60,106 @@ struct SettingsView: View {
         }
 #if APPSTORE
         .sheet(isPresented: $route.isPaywallSheetPresented) {
-            PaywallSheetView(accessModel: accessModel, context: .settings)
+            PaywallSheetView(
+                accessModel: accessModel,
+                context: .settings,
+                onPurchaseCompleted: {
+                    _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
+                }
+            )
         }
 #endif
     }
 
     private var aboutPane: some View {
-        KikiStandardAboutPane(
-            metadata: .bundle(),
-            accessStatus: accessPresentation,
-            onAccessAction: accessAction,
-            links: KikiStandardAboutLinks(
-                website: URL(string: ExternalLinks.officialURL),
-                feedback: URL(string: ExternalLinks.contactEmail),
-                github: URL(string: ExternalLinks.githubURL)
-            ),
-            tint: DS.Colors.brandPrimary
+        // KikiStandardAboutPane has no extension slot. Compose the same public
+        // Kiki atoms so the DEBUG-only controls can be their own final section.
+        KikiSettingsPane {
+            Section {
+                KikiAppIdentityView(
+                    appName: aboutMetadata.appName,
+                    versionText: aboutMetadata.displayVersion
+                )
+                .padding(.vertical, DS.Spacing.xl)
+                .listRowBackground(Color(nsColor: .windowBackgroundColor))
+            }
+
+            Section {
+                KikiSettingsStatusRow(
+                    title: "Status",
+                    value: accessPresentation.title,
+                    systemImage: "info.circle",
+                    valueSystemImage: accessPresentation.tone == .neutral ? nil : accessPresentation.tone.systemImage,
+                    tone: accessPresentation.tone.settingsTone,
+                    tint: DS.Colors.brandPrimary,
+                    showsBadge: false,
+                    trailingSystemImage: accessAction == nil ? nil : "chevron.right",
+                    action: accessAction
+                )
+            }
+
+            Section {
+                ForEach(aboutLinks.orderedLinks) { link in
+                    aboutLinkRow(link)
+                }
+                if let copyright = aboutMetadata.copyright, !copyright.isEmpty {
+                    Text(copyright)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+#if DEBUG && APPSTORE
+            Section {
+                ProAccessDebugRows(
+                    onPresentOnboarding: {
+                        OnboardingWindowController.shared.show(proStatusManager: accessModel)
+                    },
+                    onPresentPaywall: {
+                        route.presentPaywall()
+                    }
+                )
+            } header: {
+                Text("Developer Testing")
+            } footer: {
+                KikiSettingsHelperText("Debug only. Live clears the Pro access override.")
+            }
+#endif
+        }
+    }
+
+    private var aboutMetadata: KikiAppMetadata { .bundle() }
+
+    private var aboutLinks: KikiStandardAboutLinks {
+        KikiStandardAboutLinks(
+            website: URL(string: ExternalLinks.officialURL),
+            feedback: URL(string: ExternalLinks.contactEmail),
+            github: URL(string: ExternalLinks.githubURL)
         )
+    }
+
+    @ViewBuilder
+    private func aboutLinkRow(_ link: KikiStandardAboutLink) -> some View {
+        switch link.kind {
+        case .link:
+            KikiSettingsLinkRow(
+                title: link.title,
+                value: link.value,
+                urlString: link.url.absoluteString,
+                systemImage: link.systemImage ?? "link"
+            )
+        case .copy:
+            KikiSettingsCopyRow(
+                title: link.title,
+                value: link.value,
+                systemImage: link.systemImage ?? "envelope"
+            )
+        }
     }
 
     private var accessAction: (@MainActor () -> Void)? {
         guard accessController.distributionChannel == .appStore else { return nil }
-        return { route.isPaywallSheetPresented = true }
+        return { route.presentPaywall() }
     }
 
     private var accessPresentation: KikiAccessStatusPresentation {

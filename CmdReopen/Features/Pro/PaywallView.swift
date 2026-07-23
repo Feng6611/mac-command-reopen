@@ -1,4 +1,5 @@
 #if APPSTORE
+import KikiCommerceCore
 import KikiCommercePresentation
 import SwiftUI
 
@@ -18,6 +19,7 @@ struct PaywallSheetView: View {
     @ObservedObject var accessModel: CommandAccessModel
     let context: PaywallPresentationContext
     var onFinish: () -> Void = {}
+    var onPurchaseCompleted: () -> Void = {}
 
     var body: some View {
         KikiAccessPaywallSheet(
@@ -43,13 +45,17 @@ struct PaywallSheetView: View {
                 purchaseSuccessMessage: String(localized: "Purchase successful. Pro unlocked."),
                 restoreSuccessMessage: String(localized: "Purchase restored."),
                 noActivePurchaseMessage: String(localized: "No active purchase found on this account."),
-                purchaseErrorMessage: String(localized: "The purchase couldn't be completed."),
-                restoreErrorMessage: String(localized: "Purchases couldn't be restored."),
-                trialErrorMessage: String(localized: "The free trial couldn't be started.")
+                purchaseErrorMessage: String(localized: "The purchase couldn't be completed.")
             ),
             footerLinks: footerLinks,
             tint: DS.Colors.brandPrimary,
-            onFinish: onFinish
+            onFinish: {
+                let didCompletePurchase = accessModel.accessManager.commerceFeedback == .purchaseSucceeded
+                onFinish()
+
+                guard context == .settings, didCompletePurchase else { return }
+                DispatchQueue.main.async(execute: onPurchaseCompleted)
+            }
         )
     }
 

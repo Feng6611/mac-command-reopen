@@ -41,7 +41,3 @@
 UI 修改范围：`CmdReopen/Features/` 和 `CmdReopen/shared/DesignSystem.swift`。
 
 ---
-
-## 调试工具
-
-`CmdReopen/shared/DesignCatalog.swift`（仅 DEBUG）：打开 Xcode Preview 可一览所有组件的 Light / Dark 效果。

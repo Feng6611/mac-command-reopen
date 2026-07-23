@@ -7,6 +7,10 @@ import os
 final class SettingsNavigationModel: ObservableObject {
     static let shared = SettingsNavigationModel()
     @Published var isPaywallSheetPresented = false
+
+    func presentPaywall() {
+        isPaywallSheetPresented = true
+    }
 }
 
 @MainActor
@@ -39,7 +43,7 @@ final class SettingsWindowController {
 
         if presentsPaywall {
             coordinator.select(.about)
-            SettingsNavigationModel.shared.isPaywallSheetPresented = true
+            SettingsNavigationModel.shared.presentPaywall()
         }
 
         coordinator.prepare()

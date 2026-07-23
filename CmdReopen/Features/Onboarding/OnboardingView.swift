@@ -99,10 +99,12 @@ private struct TryMinimizeStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "Try it yourself"),
-            bodyText: String(localized: "See the magic in two steps."),
+            title: String(localized: "See it work"),
+            bodyText: String(
+                localized: "This window will minimize, then you’ll switch back with ⌘ Tab."
+            ),
             iconSystemName: "hand.point.down.fill",
-            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize Window")) {
+            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize & Return")) {
                 showMinimizeReturnHint = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                     onMinimize()
@@ -113,16 +115,15 @@ private struct TryMinimizeStepView: View {
             stepIndex: 1,
             stepCount: CommandReopenOnboardingFlow.stepCount
         ) {
-            VStack(spacing: DS.Spacing.lg) {
-                OnboardingStepRow(
-                    number: "1",
-                    text: String(localized: "Click \"Minimize Window\" below", comment: "Onboarding step 1; the quoted text is the button title below and must match its translation.")
-                )
-                OnboardingStepRow(
-                    number: "2",
-                    text: String(localized: "Press ⌘⇥ to switch back here")
-                )
+            VStack(spacing: DS.Spacing.xs) {
+                Text(String(localized: "Then press ⌘ Tab once to return."))
+                    .font(.headline)
+
+                Text(String(localized: "This window will reappear automatically."))
+                    .font(.body)
+                    .foregroundStyle(.secondary)
             }
+            .multilineTextAlignment(.center)
         }
         .overlay(alignment: .top) {
             if showMinimizeReturnHint {
@@ -136,7 +137,7 @@ private struct TryMinimizeStepView: View {
     private var minimizeReturnHint: some View {
         HStack(spacing: DS.Spacing.sm) {
             Image(systemName: "command")
-            Text("Now ⌘⇥ back to Command Reopen")
+            Text(String(localized: "Now press ⌘ Tab once to return to Command Reopen"))
         }
         .font(.callout.weight(.medium))
         .padding(.horizontal, DS.Spacing.lg)
@@ -242,24 +243,6 @@ private struct PaywallStepView: View {
 }
 
 // MARK: - Product Content
-
-private struct OnboardingStepRow: View {
-    let number: String
-    let text: String
-
-    var body: some View {
-        HStack(spacing: DS.Spacing.md) {
-            Text(number)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(width: 26, height: 26)
-                .background(Circle().fill(DS.Colors.brandPrimary))
-
-            Text(text)
-                .font(.body)
-        }
-    }
-}
 
 private struct OnboardingFlowDiagram: View {
     @State private var showRestored = false
@@ -370,6 +353,29 @@ private struct CelebrationMark: View {
 
 // MARK: - Window Session
 
+/// Tracks the product-owned half of the minimize tutorial. AppKit can restore a
+/// miniaturized window before `NSApplication.didBecomeActiveNotification`, so
+/// the activation handler must not infer this state from `NSWindow` alone.
+struct OnboardingMinimizeReturnSession {
+    private(set) var isAwaitingApplicationReturn = false
+
+    mutating func recordWindowDidMiniaturize() {
+        isAwaitingApplicationReturn = true
+    }
+
+    mutating func consumeApplicationReturn() -> Bool {
+        guard isAwaitingApplicationReturn else {
+            return false
+        }
+        isAwaitingApplicationReturn = false
+        return true
+    }
+
+    mutating func reset() {
+        isAwaitingApplicationReturn = false
+    }
+}
+
 /// Owns the product side of onboarding: activation-policy switching for the
 /// ⌘⇥ tutorial, the minimize-and-return session, and post-finish routing.
 /// Window creation, step navigation, progress, and completion storage belong
@@ -381,6 +387,7 @@ final class OnboardingWindowController {
     private var coordinator: KikiOnboardingCoordinator?
     private var appToReturnToAfterMinimize: NSRunningApplication?
     private var observers: [NSObjectProtocol] = []
+    private var minimizeReturnSession = OnboardingMinimizeReturnSession()
     private var previousActivationPolicy: NSApplication.ActivationPolicy = .accessory
     private var shouldRestoreActivationPolicyOnClose = false
 
@@ -405,7 +412,7 @@ final class OnboardingWindowController {
         let coordinator = CommandReopenOnboardingFlow.makeCoordinator(
             accessModel: proStatusManager,
             onMinimize: { [weak self] in
-                self?.coordinator?.window?.miniaturize(nil)
+                self?.miniaturizeTutorialWindow()
             },
             onFinished: { [weak self] in
                 self?.handleFinished()
@@ -422,6 +429,24 @@ final class OnboardingWindowController {
 
     private var isWaitingForCommandTabReturn: Bool {
         coordinator?.currentStep?.id == CommandReopenOnboardingFlow.tryMinimizeStepID
+    }
+
+    /// Kiki's transparent onboarding window is intentionally borderless. This
+    /// tutorial is the product-specific exception: it must be miniaturizable
+    /// so users can exercise Command Reopen's Cmd+Tab behavior.
+    private func miniaturizeTutorialWindow() {
+        guard let window = coordinator?.window else {
+            return
+        }
+
+        window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
+        window.miniaturize(nil)
+    }
+
+    static func styleMaskEnablingMiniaturization(
+        _ styleMask: NSWindow.StyleMask
+    ) -> NSWindow.StyleMask {
+        styleMask.union(.miniaturizable)
     }
 
     private func prepareRegularOnboardingSession() {
@@ -477,13 +502,16 @@ final class OnboardingWindowController {
         guard let coordinator,
               let window = coordinator.window,
               isWaitingForCommandTabReturn,
-              window.isMiniaturized else {
+              minimizeReturnSession.consumeApplicationReturn() else {
             return
         }
 
-        window.deminiaturize(nil)
+        if window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
         window.makeKeyAndOrderFront(nil)
         coordinator.advance()
+        AppLogger.lifecycle.notice("Onboarding minimize tutorial completed after app activation.")
     }
 
     private func handleWindowDidMiniaturize() {
@@ -491,6 +519,8 @@ final class OnboardingWindowController {
             return
         }
 
+        minimizeReturnSession.recordWindowDidMiniaturize()
+        AppLogger.lifecycle.debug("Onboarding minimize tutorial is awaiting app activation.")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
             Task { @MainActor [weak self] in
                 self?.activateReturnTargetOrFinder()
@@ -501,12 +531,14 @@ final class OnboardingWindowController {
     private func handleWindowWillClose() {
         removeObservers()
         appToReturnToAfterMinimize = nil
+        minimizeReturnSession.reset()
         restoreActivationPolicyIfNeeded()
     }
 
     private func handleFinished() {
         restoreActivationPolicyIfNeeded()
         coordinator = nil
+        minimizeReturnSession.reset()
 
         NSApp.windows.forEach { window in
             if window.title != "Settings" {

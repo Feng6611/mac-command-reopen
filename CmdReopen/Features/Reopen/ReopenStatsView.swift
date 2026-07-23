@@ -77,6 +77,7 @@ struct ReopenStatsView: View {
         .onAppear {
             guard !appeared else { return }
             appeared = true
+            _ = reopenStatsStore.requestReviewIfEligible(for: .statsOpened)
             withAnimation(.easeOut(duration: 0.8).delay(0.15)) {
                 heroTarget = Double(reopenStatsStore.totalSuccessfulReopens)
             }
