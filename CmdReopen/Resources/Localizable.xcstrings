@@ -415,24 +415,48 @@
         }
       }
     },
-    "Minimize & Return" : {
+    "Click below, then press Cmd+Tab once — the window comes right back." : {
+      "comment" : "Onboarding tutorial instruction, single line under the key-cap visual. Keep Cmd+Tab in Latin.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Minimieren und zurückkehren"
+            "value" : "Klicken Sie unten und drücken Sie dann einmal Cmd+Tab – das Fenster kommt sofort zurück."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réduire et revenir"
+            "value" : "Cliquez ci-dessous, puis appuyez une fois sur Cmd+Tab — la fenêtre revient aussitôt."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最小化して戻る"
+            "value" : "下のボタンをクリックし、Cmd+Tab を1回押すと、ウインドウはすぐに戻ってきます。"
+          }
+        }
+      }
+    },
+    "Cmd+Tab now brings your windows back." : {
+      "comment" : "Onboarding success step body. Keep Cmd+Tab in Latin.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab bringt Ihre Fenster jetzt zurück."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab ramène désormais vos fenêtres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これからは Cmd+Tab でウインドウが戻ってきます。"
           }
         }
       }
@@ -501,28 +525,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しい言語を反映するには Command Reopen を再起動してください。"
-          }
-        }
-      }
-    },
-    "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen läuft im Hintergrund für jede App – sobald Sie mit ⌘⇥ zurückwechseln, erscheinen minimierte Fenster wieder."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen s’exécute en arrière-plan pour chaque app — dès que vous revenez avec ⌘⇥, les fenêtres réduites réapparaissent."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen はすべてのAppに対してバックグラウンドで動作します。⌘⇥ で戻るたびに、最小化したウインドウが再表示されます。"
           }
         }
       }
@@ -616,6 +618,29 @@
         }
       }
     },
+    "Didn’t come back? No worries — try again." : {
+      "comment" : "Gentle retry hint shown if the user does not return with a single Cmd+Tab press during onboarding.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht zurückgekommen? Kein Problem – versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas revenu ? Pas de souci — réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻ってこなかった？ 大丈夫、もう一度お試しください。"
+          }
+        }
+      }
+    },
     "Direct version" : {
       "comment" : "'Direct' is the non-App-Store distribution channel; keep as a proper noun.",
       "localizations" : {
@@ -683,24 +708,24 @@
         }
       }
     },
-    "Exclude apps that should stay quiet" : {
+    "Exclude apps you don’t want restored" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apps ausschließen, die still bleiben sollen"
+            "value" : "Apps ausschließen, die nicht wiederhergestellt werden sollen"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exclure les apps qui doivent rester discrètes"
+            "value" : "Exclure les apps que vous ne voulez pas restaurer"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "静かにしておきたいAppを除外"
+            "value" : "復元したくないAppを除外"
           }
         }
       }
@@ -727,24 +752,24 @@
         }
       }
     },
-    "Fix ⌘⇥ for minimized and closed windows" : {
+    "Fix Cmd+Tab for minimized and closed windows" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘⇥ für minimierte und geschlossene Fenster reparieren"
+            "value" : "Cmd+Tab für minimierte und geschlossene Fenster reparieren"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réparer ⌘⇥ pour les fenêtres réduites et fermées"
+            "value" : "Réparer Cmd+Tab pour les fenêtres réduites et fermées"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最小化・閉じたウインドウも ⌘⇥ で復元"
+            "value" : "最小化・閉じたウインドウも Cmd+Tab で復元"
           }
         }
       }
@@ -855,50 +880,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "できました！"
-          }
-        }
-      }
-    },
-    "Keep Command-Tab focused and predictable" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘⇥ fokussiert und vorhersehbar halten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Garder ⌘⇥ précis et prévisible"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘⇥ を常に正確で予測どおりに"
-          }
-        }
-      }
-    },
-    "Keep minimized windows easy to recover." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimierte Fenster bleiben leicht wiederherstellbar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les fenêtres réduites restent faciles à retrouver."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最小化したウインドウをいつでも簡単に復元できます。"
           }
         }
       }
@@ -1016,24 +997,24 @@
         }
       }
     },
-    "This window will minimize, then you’ll switch back with ⌘ Tab." : {
+    "Minimize This Window" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dieses Fenster wird minimiert. Danach wechseln Sie mit ⌘ Tab zurück."
+            "value" : "Dieses Fenster minimieren"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette fenêtre va se réduire, puis vous reviendrez avec ⌘ Tab."
+            "value" : "Réduire cette fenêtre"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このウインドウが最小化され、⌘ Tab で戻ります。"
+            "value" : "このウインドウを最小化"
           }
         }
       }
@@ -1060,24 +1041,25 @@
         }
       }
     },
-    "Never lose a minimized window again" : {
+    "No Accessibility. No Screen Recording. Nothing to grant." : {
+      "comment" : "Onboarding success step hero card subtitle.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie wieder ein minimiertes Fenster verlieren"
+            "value" : "Keine Bedienungshilfen. Keine Bildschirmaufnahme. Nichts zu erteilen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ne plus jamais perdre une fenêtre réduite"
+            "value" : "Pas d’Accessibilité. Pas d’enregistrement de l’écran. Rien à accorder."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最小化したウインドウを二度と見失わない"
+            "value" : "アクセシビリティも画面収録も不要。許可するものはありません。"
           }
         }
       }
@@ -1193,29 +1175,6 @@
         }
       }
     },
-    "Now press ⌘ Tab once to return to Command Reopen" : {
-      "comment" : "Instructional hint after the user minimizes a window during onboarding.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drücken Sie jetzt einmal ⌘ Tab, um zu Command Reopen zurückzukehren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appuyez maintenant une fois sur ⌘ Tab pour revenir à Command Reopen"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘ Tab を1回押して Command Reopen に戻ってください"
-          }
-        }
-      }
-    },
     "Official" : {
       "comment" : "Section heading in the status-bar menu for official links.",
       "localizations" : {
@@ -1257,28 +1216,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一度の支払いで、ずっと使えます"
-          }
-        }
-      }
-    },
-    "Then press ⌘ Tab once to return." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drücken Sie dann einmal ⌘ Tab, um zurückzukehren."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appuyez ensuite une fois sur ⌘ Tab pour revenir."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次に ⌘ Tab を1回押して戻ります。"
           }
         }
       }
@@ -1618,6 +1555,28 @@
         }
       }
     },
+    "Restores minimized and closed windows on Cmd+Tab" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellt minimierte und geschlossene Fenster per Cmd+Tab wieder her"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaure les fenêtres réduites et fermées avec Cmd+Tab"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化・閉じたウインドウを Cmd+Tab で復元"
+          }
+        }
+      }
+    },
     "Search" : {
       "localizations" : {
         "de" : {
@@ -1769,6 +1728,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Command Reopen を使い始めるとトレンドが表示されます"
+          }
+        }
+      }
+    },
+    "Start your free trial to keep automatic reopening on." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starten Sie Ihre kostenlose Testphase, damit das automatische Wiederöffnen aktiv bleibt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrez votre essai gratuit pour garder la réouverture automatique activée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルを開始して、自動再オープンを有効なままにしましょう。"
           }
         }
       }
@@ -2020,46 +2001,24 @@
         }
       }
     },
-    "Try every Pro feature free for 2 days." : {
+    "Try every Pro feature free for 2 days. No payment now — nothing auto-renews." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Testen Sie alle Pro-Funktionen 2 Tage kostenlos."
+            "value" : "Testen Sie alle Pro-Funktionen 2 Tage kostenlos. Keine Zahlung jetzt – nichts verlängert sich automatisch."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essayez gratuitement toutes les fonctionnalités Pro pendant 2 jours."
+            "value" : "Essayez gratuitement toutes les fonctionnalités Pro pendant 2 jours. Aucun paiement maintenant — rien ne se renouvelle automatiquement."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべてのPro機能を2日間無料でお試しいただけます。"
-          }
-        }
-      }
-    },
-    "This window will reappear automatically." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieses Fenster wird automatisch wieder angezeigt."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette fenêtre réapparaîtra automatiquement."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このウインドウは自動的に再表示されます。"
+            "value" : "すべてのPro機能を2日間無料でお試しいただけます。今すぐの支払いはなく、自動更新もありません。"
           }
         }
       }
@@ -2308,28 +2267,6 @@
         }
       }
     },
-    "Works for Safari, Finder, Xcode, and every other app." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Funktioniert mit Safari, Finder, Xcode und jeder anderen App."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fonctionne avec Safari, Finder, Xcode et toutes les autres apps."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Safari、Finder、Xcode、その他すべてのAppで動作します。"
-          }
-        }
-      }
-    },
     "Yearly" : {
       "localizations" : {
         "de" : {
@@ -2352,24 +2289,24 @@
         }
       }
     },
-    "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that." : {
+    "You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sie minimieren ein Fenster, wechseln mit ⌘⇥ zurück – aber das Fenster ist weg. Command Reopen behebt das."
+            "value" : "Sie minimieren ein Fenster, wechseln mit Cmd+Tab zurück – aber das Fenster ist weg. Command Reopen behebt das."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous réduisez une fenêtre, revenez avec ⌘⇥, mais la fenêtre a disparu. Command Reopen corrige cela."
+            "value" : "Vous réduisez une fenêtre, revenez avec Cmd+Tab, mais la fenêtre a disparu. Command Reopen corrige cela."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ウインドウを最小化して ⌘⇥ で戻ると、ウインドウが消えています。Command Reopen はこれを解決します。"
+            "value" : "ウインドウを最小化して Cmd+Tab で戻ると、ウインドウが消えています。Command Reopen はこれを解決します。"
           }
         }
       }
@@ -2392,6 +2329,95 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Proアクセスは有効です。"
+          }
+        }
+      }
+    },
+    "Your free trial is active." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre kostenlose Testphase ist aktiv."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre essai gratuit est actif."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルが有効です。"
+          }
+        }
+      }
+    },
+    "You’re all set" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est prêt"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備完了"
+          }
+        }
+      }
+    },
+    "Zero permissions" : {
+      "comment" : "Onboarding success step hero card title — the product's key differentiator.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Berechtigungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zéro autorisation"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限は一切不要"
+          }
+        }
+      }
+    },
+    "Zero permissions — sandboxed, nothing to grant" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Berechtigungen – sandboxed, nichts freizugeben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune autorisation — sandboxé, rien à accorder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限は不要 — サンドボックス化され、許可するものはありません"
           }
         }
       }

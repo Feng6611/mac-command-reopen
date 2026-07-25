@@ -17,7 +17,6 @@ import KikiCommerceCore
 final class AppLifecycleCoordinator {
     private enum Constants {
         static let commerceRefreshThrottle: TimeInterval = 5 * 60
-        static let initialCommerceRefreshDelayNanoseconds: UInt64 = 1_000_000_000
         static let reviewPromptDelayNanoseconds: UInt64 = 1_500_000_000
     }
 
@@ -29,6 +28,9 @@ final class AppLifecycleCoordinator {
     private var hasCompletedInitialCommerceRefresh = false
     private var lastCommerceRefreshAt: Date?
     private var isRefreshingCommerce = false
+#if DEBUG
+    private var isRelaunchedForOnboarding = false
+#endif
 
     init(accessController: AppAccessController? = nil,
          statusBarController: StatusBarMenuController? = nil) {
@@ -36,11 +38,24 @@ final class AppLifecycleCoordinator {
         self.statusBarController = statusBarController ?? .shared
     }
 
+    func applicationWillFinishLaunching() {
+#if APPSTORE
+#if DEBUG
+        isRelaunchedForOnboarding = OnboardingLaunchRequest.consume()
+        let shouldStartRegular = isRelaunchedForOnboarding || CommandAccessModel.shared.isFirstLaunch
+#else
+        let shouldStartRegular = CommandAccessModel.shared.isFirstLaunch
+#endif
+        NSApp.setActivationPolicy(shouldStartRegular ? .regular : .accessory)
+#else
+        NSApp.setActivationPolicy(.accessory)
+#endif
+    }
+
     func applicationDidFinishLaunching() {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
-        NSApp.setActivationPolicy(.accessory)
         statusBarController.install(
             activationMonitor: .shared,
             accessController: accessController
@@ -52,7 +67,7 @@ final class AppLifecycleCoordinator {
         NSApp.windows.forEach { $0.orderOut(nil) }
 
 #if DEBUG
-        if shouldAutoShowSettingsForDebugLaunch {
+        if shouldAutoShowSettingsForDebugLaunch && !isRelaunchedForOnboarding {
             AppLogger.lifecycle.notice("Debug launch detected. Opening settings window for visibility.")
             SettingsWindowController.shared.show(
                 activationMonitor: .shared,
@@ -131,6 +146,14 @@ final class AppLifecycleCoordinator {
         hasCompletedInitialCommerceRefresh = true
 
 #if APPSTORE
+#if DEBUG
+        if isRelaunchedForOnboarding {
+            isRelaunchedForOnboarding = false
+            OnboardingWindowController.shared.showAfterDebugRelaunch(proStatusManager: .shared)
+            return
+        }
+#endif
+
         if CommandAccessModel.shared.readiness.allowsAutomaticPresentation,
            accessController.shouldShowOnboarding {
             OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
@@ -156,7 +179,6 @@ final class AppLifecycleCoordinator {
     private func scheduleInitialCommerceRefresh() {
         Task { @MainActor [weak self] in
             await Task.yield()
-            try? await Task.sleep(nanoseconds: Constants.initialCommerceRefreshDelayNanoseconds)
             await self?.completeInitialCommerceRefresh()
         }
     }

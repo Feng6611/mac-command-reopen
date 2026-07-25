@@ -113,7 +113,7 @@ struct SettingsView: View {
             Section {
                 ProAccessDebugRows(
                     onPresentOnboarding: {
-                        OnboardingWindowController.shared.show(proStatusManager: accessModel)
+                        OnboardingWindowController.shared.replayFromDebugSettings()
                     },
                     onPresentPaywall: {
                         route.presentPaywall()

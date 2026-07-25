@@ -28,13 +28,13 @@ struct PaywallSheetView: View {
             copy: KikiAccessPaywallCopy(
                 title: String(localized: "Command Reopen Pro", comment: "Product tier name — do not translate."),
                 proSubtitle: String(localized: "Your Pro access is active."),
-                trialSubtitle: String(localized: "Keep minimized windows easy to recover."),
+                trialSubtitle: String(localized: "Your free trial is active."),
                 expiredSubtitle: String(localized: "Upgrade to continue automatic window reopening."),
-                notStartedSubtitle: String(localized: "Try every Pro feature free for 2 days."),
+                notStartedSubtitle: String(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
                 features: [
-                    String(localized: "Never lose a minimized window again"),
-                    String(localized: "Keep Command-Tab focused and predictable"),
-                    String(localized: "Exclude apps that should stay quiet")
+                    String(localized: "Restores minimized and closed windows on Cmd+Tab"),
+                    String(localized: "Zero permissions — sandboxed, nothing to grant"),
+                    String(localized: "Exclude apps you don’t want restored")
                 ],
                 purchaseActionTitle: String(localized: "Unlock forever"),
                 trialActionTitle: String(localized: "Start free trial"),

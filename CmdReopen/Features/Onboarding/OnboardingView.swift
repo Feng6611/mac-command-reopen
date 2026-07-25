@@ -17,7 +17,7 @@ import os
 
 @MainActor
 enum CommandReopenOnboardingFlow {
-    static let windowSize = CGSize(width: 680, height: 680)
+    static let windowSize = CGSize(width: 680, height: 600)
     static let stepCount = 4
 
     enum StepID {
@@ -31,6 +31,7 @@ enum CommandReopenOnboardingFlow {
 
     static func makeCoordinator(
         accessModel: CommandAccessModel,
+        tryMinimizeModel: OnboardingTryMinimizeModel,
         onMinimize: @escaping () -> Void,
         onFinished: @escaping @MainActor () -> Void
     ) -> KikiOnboardingCoordinator {
@@ -39,7 +40,7 @@ enum CommandReopenOnboardingFlow {
                 AnyView(WelcomeStepView(navigation: navigation))
             },
             .custom(id: StepID.tryMinimize) { _ in
-                AnyView(TryMinimizeStepView(onMinimize: onMinimize))
+                AnyView(TryMinimizeStepView(model: tryMinimizeModel, onMinimize: onMinimize))
             },
             .custom(id: StepID.success) { navigation in
                 AnyView(SuccessStepView(navigation: navigation))
@@ -76,36 +77,35 @@ private struct WelcomeStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "Fix ⌘⇥ for minimized and closed windows"),
-            bodyText: String(localized: "You minimize a window, ⌘⇥ back — but the window is gone. Command Reopen fixes that."),
+            title: String(localized: "Fix Cmd+Tab for minimized and closed windows"),
+            bodyText: String(localized: "You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that."),
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 0,
-            stepCount: CommandReopenOnboardingFlow.stepCount
+            stepCount: CommandReopenOnboardingFlow.stepCount,
+            background: .plain,
+            contentAlignment: .centered
         ) {
             OnboardingFlowDiagram()
                 .padding(.horizontal, DS.Spacing.xxxl)
+                .padding(.top, DS.Spacing.lg)
         }
     }
 }
 
 private struct TryMinimizeStepView: View {
+    @ObservedObject var model: OnboardingTryMinimizeModel
     let onMinimize: () -> Void
-
-    @State private var showMinimizeReturnHint = false
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
             title: String(localized: "See it work"),
-            bodyText: String(
-                localized: "This window will minimize, then you’ll switch back with ⌘ Tab."
-            ),
-            iconSystemName: "hand.point.down.fill",
-            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize & Return")) {
-                showMinimizeReturnHint = true
+            appIcon: NSApp.applicationIconImage,
+            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize This Window")) {
+                model.clearRetryHint()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                     onMinimize()
                 }
@@ -113,31 +113,64 @@ private struct TryMinimizeStepView: View {
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 1,
-            stepCount: CommandReopenOnboardingFlow.stepCount
+            stepCount: CommandReopenOnboardingFlow.stepCount,
+            background: .plain,
+            contentAlignment: .centered
         ) {
-            VStack(spacing: DS.Spacing.xs) {
-                Text(String(localized: "Then press ⌘ Tab once to return."))
-                    .font(.headline)
+            VStack(spacing: DS.Spacing.xl) {
+                HStack(spacing: DS.Spacing.sm) {
+                    keyCap(glyph: "⌘", label: "command")
+                    keyCap(glyph: "⇥", label: "tab")
+                }
+                .padding(.top, DS.Spacing.lg)
 
-                Text(String(localized: "This window will reappear automatically."))
+                Text(String(localized: "Click below, then press Cmd+Tab once — the window comes right back."))
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
             .multilineTextAlignment(.center)
         }
         .overlay(alignment: .top) {
-            if showMinimizeReturnHint {
-                minimizeReturnHint
+            if model.showsRetryHint {
+                retryHint
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.18), value: showMinimizeReturnHint)
+        .animation(.easeInOut(duration: 0.18), value: model.showsRetryHint)
     }
 
-    private var minimizeReturnHint: some View {
+    /// Key caps drawn like real Apple keyboard keys: opaque key face with a
+    /// hard bottom "lip" shadow for depth, the glyph centered above a small
+    /// lowercase legend — matching the legend layout of Apple keyboards.
+    /// Glyphs and legends stay verbatim across locales, like the keys do.
+    private func keyCap(glyph: String, label: String) -> some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            Text(verbatim: glyph)
+                .font(.title)
+            Spacer(minLength: 0)
+            Text(verbatim: label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, DS.Spacing.md)
+        .padding(.bottom, DS.Spacing.sm)
+        .frame(width: 88, height: 84)
+        .background(
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+                .shadow(color: .black.opacity(0.22), radius: 0.5, y: 1.5)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private var retryHint: some View {
         HStack(spacing: DS.Spacing.sm) {
-            Image(systemName: "command")
-            Text(String(localized: "Now press ⌘ Tab once to return to Command Reopen"))
+            Image(systemName: "arrow.uturn.backward")
+            Text(String(localized: "Didn’t come back? No worries — try again."))
         }
         .font(.callout.weight(.medium))
         .padding(.horizontal, DS.Spacing.lg)
@@ -151,44 +184,74 @@ private struct TryMinimizeStepView: View {
 private struct SuccessStepView: View {
     let navigation: KikiOnboardingNavigation
 
+    @State private var showsWedge = false
     @State private var confettiTrigger = 0
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
             title: String(localized: "It works!"),
-            bodyText: String(localized: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."),
+            bodyText: String(localized: "Cmd+Tab now brings your windows back."),
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 2,
-            stepCount: CommandReopenOnboardingFlow.stepCount
+            stepCount: CommandReopenOnboardingFlow.stepCount,
+            background: .plain,
+            contentAlignment: .centered
         ) {
-            VStack(spacing: DS.Spacing.lg) {
-                CelebrationMark()
-                    .scaleEffect(0.68)
+            // The single takeaway of this step: the product's wedge. A quiet
+            // material panel (not a stark white card) keeps it native. The
+            // confetti cannon fires from an invisible anchor — celebration
+            // without a celebratory icon competing with the content.
+            VStack(spacing: DS.Spacing.sm) {
+                Color.clear
+                    .frame(width: 1, height: 1)
                     .confettiCannon(
                         trigger: $confettiTrigger,
                         num: 30,
                         confettis: [.shape(.circle), .shape(.roundedCross)],
                         colors: [DS.Colors.brandPrimary, .orange, .purple, .pink],
                         confettiSize: 8,
-                        rainHeight: 500,
-                        radius: 300
+                        rainHeight: 420,
+                        radius: 260
                     )
 
-                HStack(spacing: DS.Spacing.sm) {
-                    Image(systemName: "macwindow.on.rectangle")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(DS.Colors.brandPrimary)
-                    Text("Works for Safari, Finder, Xcode, and every other app.")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                }
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.system(size: 40, weight: .medium))
+                    .foregroundStyle(DS.Colors.brandPrimary)
+                    .padding(.bottom, DS.Spacing.xs)
+
+                Text("Zero permissions")
+                    .font(.title2.bold())
+
+                Text("No Accessibility. No Screen Recording. Nothing to grant.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .padding(.vertical, DS.Spacing.xxl)
+            .padding(.horizontal, DS.Spacing.xxl)
+            .frame(maxWidth: .infinity)
+            .background(
+                .thinMaterial,
+                in: RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                    .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
+            )
+            .padding(.top, DS.Spacing.lg)
+            .scaleEffect(showsWedge ? 1 : 0.94)
+            .opacity(showsWedge ? 1 : 0)
         }
         .onAppear {
+            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.8).delay(0.15)) {
+                showsWedge = true
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 confettiTrigger += 1
             }
@@ -206,8 +269,8 @@ private struct PaywallStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "It works!"),
-            bodyText: String(localized: "Command Reopen runs in the background for every app — whenever you ⌘⇥ back, minimized windows reappear."),
+            title: String(localized: "You’re all set"),
+            bodyText: String(localized: "Start your free trial to keep automatic reopening on."),
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(title: String(localized: "Continue")) {
                 isPaywallSheetPresented = true
@@ -215,7 +278,9 @@ private struct PaywallStepView: View {
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 3,
-            stepCount: CommandReopenOnboardingFlow.stepCount
+            stepCount: CommandReopenOnboardingFlow.stepCount,
+            background: .plain,
+            contentAlignment: .centered
         ) {
             EmptyView()
         }
@@ -260,7 +325,7 @@ private struct OnboardingFlowDiagram: View {
 
             flowStep(
                 icon: "command",
-                label: "⌘⇥",
+                label: "Cmd+Tab",
                 sublabel: "switch back",
                 tint: DS.Colors.brandPrimary
             )
@@ -312,46 +377,33 @@ private struct OnboardingFlowDiagram: View {
     }
 }
 
-private struct CelebrationMark: View {
-    @State private var animate = false
+// MARK: - Window Session
 
-    var body: some View {
-        ZStack {
-            ForEach(0..<14, id: \.self) { index in
-                Circle()
-                    .fill(confettiColor(index))
-                    .frame(width: index.isMultiple(of: 3) ? 8 : 6, height: index.isMultiple(of: 3) ? 8 : 6)
-                    .offset(
-                        x: animate ? cos(CGFloat(index) * .pi / 7) * 58 : 0,
-                        y: animate ? sin(CGFloat(index) * .pi / 7) * 58 : 0
-                    )
-                    .opacity(animate ? 1 : 0)
-            }
-
-            Text("🎉")
-                .font(.system(size: 64))
-                .scaleEffect(animate ? 1 : 0.8)
-        }
-        .frame(width: 132, height: 132)
-        .onAppear {
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.62)) {
-                animate = true
-            }
-            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
-        }
+#if DEBUG
+/// One-shot hand-off used only by the Debug Settings replay. It makes the
+/// replay start under the same fresh-process condition as real onboarding.
+enum OnboardingLaunchRequest {
+    static func markPending(in defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: AppDefaults.RawKey.pendingOnboardingRelaunch)
+        defaults.synchronize()
     }
 
-    private func confettiColor(_ index: Int) -> Color {
-        switch index % 4 {
-        case 0: return DS.Colors.brandPrimary
-        case 1: return DS.Colors.brandPrimary.opacity(0.5)
-        case 2: return Color.orange.opacity(0.6)
-        default: return Color.secondary.opacity(0.4)
+    static func consume(in defaults: UserDefaults = .standard) -> Bool {
+        guard defaults.bool(forKey: AppDefaults.RawKey.pendingOnboardingRelaunch) else {
+            return false
         }
+
+        defaults.removeObject(forKey: AppDefaults.RawKey.pendingOnboardingRelaunch)
+        defaults.synchronize()
+        return true
+    }
+
+    static func clear(in defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: AppDefaults.RawKey.pendingOnboardingRelaunch)
+        defaults.synchronize()
     }
 }
-
-// MARK: - Window Session
+#endif
 
 /// Tracks the product-owned half of the minimize tutorial. AppKit can restore a
 /// miniaturized window before `NSApplication.didBecomeActiveNotification`, so
@@ -371,8 +423,36 @@ struct OnboardingMinimizeReturnSession {
         return true
     }
 
+    /// The return timeout fired. Returns `true` when the user has not yet come
+    /// back (so the caller should recover the window and offer a retry) and
+    /// clears the awaiting flag — the recovery re-activates our own app, and a
+    /// self-activation must not be mistaken for a completed tutorial.
+    mutating func recordReturnTimeout() -> Bool {
+        guard isAwaitingApplicationReturn else {
+            return false
+        }
+        isAwaitingApplicationReturn = false
+        return true
+    }
+
     mutating func reset() {
         isAwaitingApplicationReturn = false
+    }
+}
+
+/// View-facing state for the minimize tutorial. The window controller owns the
+/// timeout logic and surfaces the retry hint here when the user does not return
+/// with a single Cmd+Tab press.
+@MainActor
+final class OnboardingTryMinimizeModel: ObservableObject {
+    @Published private(set) var showsRetryHint = false
+
+    func showRetryHint() {
+        showsRetryHint = true
+    }
+
+    func clearRetryHint() {
+        showsRetryHint = false
     }
 }
 
@@ -388,8 +468,14 @@ final class OnboardingWindowController {
     private var appToReturnToAfterMinimize: NSRunningApplication?
     private var observers: [NSObjectProtocol] = []
     private var minimizeReturnSession = OnboardingMinimizeReturnSession()
-    private var previousActivationPolicy: NSApplication.ActivationPolicy = .accessory
+    private let tryMinimizeModel = OnboardingTryMinimizeModel()
+    private var activationConfirmationTask: Task<Void, Never>?
+    private var returnTimeoutWorkItem: DispatchWorkItem?
+    private let returnTimeout: TimeInterval = 10
     private var shouldRestoreActivationPolicyOnClose = false
+#if DEBUG
+    private var isRelaunchingForOnboarding = false
+#endif
 
     var isVisible: Bool {
         coordinator?.isVisible == true
@@ -397,20 +483,35 @@ final class OnboardingWindowController {
 
     func showIfNeeded(proStatusManager: CommandAccessModel) {
         guard proStatusManager.isFirstLaunch else { return }
-        show(proStatusManager: proStatusManager)
+        present(proStatusManager: proStatusManager)
     }
 
-    func show(proStatusManager: CommandAccessModel) {
-        if let coordinator, coordinator.isVisible {
+#if DEBUG
+    /// Replays onboarding from the Debug-only Settings row under the same
+    /// fresh-process launch condition as the real first-launch flow.
+    func replayFromDebugSettings() {
+        relaunchForOnboarding()
+    }
+
+    func showAfterDebugRelaunch(proStatusManager: CommandAccessModel) {
+        present(proStatusManager: proStatusManager)
+    }
+#endif
+
+    private func present(proStatusManager: CommandAccessModel) {
+        if let existingCoordinator = coordinator, existingCoordinator.isVisible {
             NSApplication.shared.activate(ignoringOtherApps: true)
-            coordinator.window?.makeKeyAndOrderFront(nil)
+            existingCoordinator.window?.makeKeyAndOrderFront(nil)
             return
         }
+        coordinator = nil
 
+        ActivationMonitor.shared.setOnboardingSessionActive(true)
         prepareRegularOnboardingSession()
 
         let coordinator = CommandReopenOnboardingFlow.makeCoordinator(
             accessModel: proStatusManager,
+            tryMinimizeModel: tryMinimizeModel,
             onMinimize: { [weak self] in
                 self?.miniaturizeTutorialWindow()
             },
@@ -434,13 +535,47 @@ final class OnboardingWindowController {
     /// Kiki's transparent onboarding window is intentionally borderless. This
     /// tutorial is the product-specific exception: it must be miniaturizable
     /// so users can exercise Command Reopen's Cmd+Tab behavior.
+    ///
+    /// The activation hand-off happens BEFORE the window miniaturizes: the
+    /// Cmd+Tab switcher's first slot is the frontmost app, so Command Reopen
+    /// must already be the *previous* app by the time the user can press
+    /// Cmd+Tab. Handing off first closes the race where a fast user pressed
+    /// Cmd+Tab while we were still frontmost.
     private func miniaturizeTutorialWindow() {
-        guard let window = coordinator?.window else {
+        guard coordinator?.window != nil else {
             return
         }
 
-        window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
-        window.miniaturize(nil)
+        tryMinimizeModel.clearRetryHint()
+        guard let target = returnTargetOrFinder() else {
+            tryMinimizeModel.showRetryHint()
+            AppLogger.lifecycle.error("Onboarding activation hand-off has no eligible return target.")
+            return
+        }
+
+        confirmActivation(of: target) { [weak self] didActivate in
+            guard let self else { return }
+            guard didActivate else {
+                self.tryMinimizeModel.showRetryHint()
+                AppLogger.lifecycle.error("Onboarding return-target activation was not confirmed.")
+                return
+            }
+            guard self.isWaitingForCommandTabReturn,
+                  let window = self.coordinator?.window else {
+                return
+            }
+
+            window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
+            window.animationBehavior = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+                ? .none
+                : .documentWindow
+            // Keep the return target frontmost for Cmd+Tab ordering, but put
+            // the inactive onboarding window onscreen so AppKit's native Dock
+            // animation remains visible.
+            window.orderFrontRegardless()
+            window.displayIfNeeded()
+            window.miniaturize(nil)
+        }
     }
 
     static func styleMaskEnablingMiniaturization(
@@ -452,10 +587,52 @@ final class OnboardingWindowController {
     private func prepareRegularOnboardingSession() {
         appToReturnToAfterMinimize = Self.bestReturnTargetBeforeActivatingSelf()
         NSApp.windows.forEach { $0.orderOut(nil) }
-        previousActivationPolicy = NSApp.activationPolicy()
         shouldRestoreActivationPolicyOnClose = true
-        NSApp.setActivationPolicy(.regular)
     }
+
+#if DEBUG
+    /// LaunchServices owns Cmd+Tab's process ordering. The Debug Settings replay
+    /// launches a fresh foreground instance instead of promoting the existing
+    /// accessory process, matching the real first-launch condition.
+    private func relaunchForOnboarding() {
+        guard !isRelaunchingForOnboarding else {
+            return
+        }
+
+        isRelaunchingForOnboarding = true
+        OnboardingLaunchRequest.markPending()
+
+        let currentProcessIdentifier = ProcessInfo.processInfo.processIdentifier
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        configuration.createsNewApplicationInstance = true
+
+        NSWorkspace.shared.openApplication(
+            at: Bundle.main.bundleURL,
+            configuration: configuration
+        ) { [weak self] application, error in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+
+                guard error == nil,
+                      let application,
+                      application.processIdentifier != currentProcessIdentifier else {
+                    OnboardingLaunchRequest.clear()
+                    self.isRelaunchingForOnboarding = false
+                    AppLogger.lifecycle.error(
+                        "Unable to launch a fresh foreground instance for onboarding: \(error?.localizedDescription ?? "no new process")."
+                    )
+                    return
+                }
+
+                AppLogger.lifecycle.notice(
+                    "Fresh onboarding instance launched. Terminating previous menu-bar process."
+                )
+                NSApp.terminate(nil)
+            }
+        }
+    }
+#endif
 
     private func installObservers() {
         removeObservers()
@@ -506,6 +683,8 @@ final class OnboardingWindowController {
             return
         }
 
+        cancelReturnTimeout()
+        tryMinimizeModel.clearRetryHint()
         if window.isMiniaturized {
             window.deminiaturize(nil)
         }
@@ -519,25 +698,68 @@ final class OnboardingWindowController {
             return
         }
 
+        tryMinimizeModel.clearRetryHint()
         minimizeReturnSession.recordWindowDidMiniaturize()
+        scheduleReturnTimeout()
         AppLogger.lifecycle.debug("Onboarding minimize tutorial is awaiting app activation.")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+    }
+
+    /// If the user does not return with a single Cmd+Tab press, recover the
+    /// window so the tutorial is never a dead end: bring it back to the front,
+    /// stay on the same step, and surface a gentle retry hint.
+    private func handleReturnTimeout() {
+        guard isWaitingForCommandTabReturn,
+              minimizeReturnSession.recordReturnTimeout() else {
+            return
+        }
+        returnTimeoutWorkItem = nil
+
+        guard let window = coordinator?.window else {
+            return
+        }
+        if window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        tryMinimizeModel.showRetryHint()
+        AppLogger.lifecycle.notice("Onboarding minimize tutorial timed out; recovered window for retry.")
+    }
+
+    private func scheduleReturnTimeout() {
+        returnTimeoutWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
             Task { @MainActor [weak self] in
-                self?.activateReturnTargetOrFinder()
+                self?.handleReturnTimeout()
             }
         }
+        returnTimeoutWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + returnTimeout, execute: workItem)
+    }
+
+    private func cancelReturnTimeout() {
+        returnTimeoutWorkItem?.cancel()
+        returnTimeoutWorkItem = nil
     }
 
     private func handleWindowWillClose() {
         removeObservers()
+        cancelActivationConfirmation()
+        cancelReturnTimeout()
+        tryMinimizeModel.clearRetryHint()
         appToReturnToAfterMinimize = nil
         minimizeReturnSession.reset()
+        ActivationMonitor.shared.setOnboardingSessionActive(false)
         restoreActivationPolicyIfNeeded()
     }
 
     private func handleFinished() {
+        ActivationMonitor.shared.setOnboardingSessionActive(false)
         restoreActivationPolicyIfNeeded()
         coordinator = nil
+        cancelActivationConfirmation()
+        cancelReturnTimeout()
+        tryMinimizeModel.clearRetryHint()
         minimizeReturnSession.reset()
 
         NSApp.windows.forEach { window in
@@ -560,22 +782,76 @@ final class OnboardingWindowController {
         guard shouldRestoreActivationPolicyOnClose else {
             return
         }
-        NSApp.setActivationPolicy(previousActivationPolicy)
+        // The steady state of this menu bar app is always .accessory — on
+        // first launch the app deliberately starts as .regular for the
+        // Cmd+Tab tutorial, so "restore" must not return to that.
+        NSApp.setActivationPolicy(.accessory)
         shouldRestoreActivationPolicyOnClose = false
     }
 
-    private func activateReturnTargetOrFinder() {
-        if let appToReturnToAfterMinimize,
-           Self.isEligibleReturnTarget(appToReturnToAfterMinimize) {
-            appToReturnToAfterMinimize.activate(options: [.activateIgnoringOtherApps])
-            return
+    /// Requests activation and waits for `NSWorkspace` to confirm the target is
+    /// truly frontmost. Activation is cooperative on current macOS releases, so
+    /// a request alone is not a safe ordering boundary for Cmd+Tab.
+    private func confirmActivation(
+        of target: NSRunningApplication,
+        completion: @escaping @MainActor (Bool) -> Void
+    ) {
+        cancelActivationConfirmation()
+
+        activationConfirmationTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            let maximumChecks = 30
+            for check in 0..<maximumChecks {
+                guard !Task.isCancelled else { return }
+
+                if check.isMultiple(of: 5) {
+                    Self.requestActivation(of: target)
+                }
+
+                if NSWorkspace.shared.frontmostApplication?.processIdentifier
+                    == target.processIdentifier {
+                    self.activationConfirmationTask = nil
+                    completion(true)
+                    return
+                }
+
+                try? await Task.sleep(nanoseconds: 100_000_000)
+            }
+
+            guard !Task.isCancelled else { return }
+            self.activationConfirmationTask = nil
+            completion(false)
+        }
+    }
+
+    private func cancelActivationConfirmation() {
+        activationConfirmationTask?.cancel()
+        activationConfirmationTask = nil
+    }
+
+    private static func requestActivation(of target: NSRunningApplication) {
+        let current = NSRunningApplication.current
+
+        if #available(macOS 14.0, *) {
+            NSApp.yieldActivation(to: target)
+            if target.activate(from: current, options: []) {
+                return
+            }
         }
 
-        if let finder = NSRunningApplication.runningApplications(
-            withBundleIdentifier: "com.apple.finder"
-        ).first {
-            finder.activate(options: [.activateIgnoringOtherApps])
+        _ = target.activate(options: [.activateIgnoringOtherApps])
+    }
+
+    private func returnTargetOrFinder() -> NSRunningApplication? {
+        if let appToReturnToAfterMinimize,
+           Self.isEligibleReturnTarget(appToReturnToAfterMinimize) {
+            return appToReturnToAfterMinimize
         }
+
+        return NSRunningApplication.runningApplications(
+            withBundleIdentifier: "com.apple.finder"
+        ).first
     }
 
     private static func bestReturnTargetBeforeActivatingSelf() -> NSRunningApplication? {

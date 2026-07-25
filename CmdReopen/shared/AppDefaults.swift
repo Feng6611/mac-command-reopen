@@ -17,6 +17,9 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let preferredLanguage = "cmdreopenPreferredLanguage"
+#if DEBUG
+        static let pendingOnboardingRelaunch = "cmdreopenPendingOnboardingRelaunch"
+#endif
     }
 
     enum LegacyRawKey {

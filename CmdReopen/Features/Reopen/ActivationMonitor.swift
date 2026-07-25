@@ -58,6 +58,10 @@ final class ActivationMonitor: ObservableObject {
         }
     }
 
+    /// Onboarding owns its own Cmd+Tab restore behavior. While it is visible,
+    /// normal reopen requests for other apps must stay out of that interaction.
+    private(set) var isReopenSuppressedForOnboarding = false
+
     var sortedUserExcludedBundleIDs: [String] {
         userExcludedBundleIDs.sorted()
     }
@@ -134,6 +138,14 @@ final class ActivationMonitor: ObservableObject {
         userExcludedBundleIDs.remove(bundleID)
     }
 
+    func setOnboardingSessionActive(_ isActive: Bool) {
+        guard isReopenSuppressedForOnboarding != isActive else { return }
+        isReopenSuppressedForOnboarding = isActive
+        AppLogger.activation.debug(
+            "External reopen requests \(isActive ? "suppressed" : "restored") for onboarding."
+        )
+    }
+
     private func updateObservationState() {
         if isFeatureEnabled {
             startObservingIfNeeded()
@@ -173,6 +185,11 @@ final class ActivationMonitor: ObservableObject {
     private static let lastExpiredNudgeDateKey = "lastExpiredPaywallNudgeDate"
 
     private func handleActivation(for app: NSRunningApplication) {
+        guard !isReopenSuppressedForOnboarding else {
+            AppLogger.activation.debug("Ignoring external activation while onboarding owns reopen behavior.")
+            return
+        }
+
         let shouldPresentExpiredNudge = !accessController.isCoreFeatureAvailable
         if shouldPresentExpiredNudge, !shouldShowExpiredNudge() {
             AppLogger.activation.debug("Ignoring activation; pro status not active.")
@@ -252,6 +269,10 @@ final class ActivationMonitor: ObservableObject {
             guard let self else { return }
             guard self.isFeatureEnabled else {
                 AppLogger.activation.info("Reopen evaluation ignored because feature is disabled.")
+                return
+            }
+            guard !self.isReopenSuppressedForOnboarding else {
+                AppLogger.activation.debug("Queued reopen evaluation ignored while onboarding is active.")
                 return
             }
             guard let frontApp = self.workspace.frontmostApplication,

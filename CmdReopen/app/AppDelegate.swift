@@ -10,6 +10,10 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let lifecycleCoordinator = AppLifecycleCoordinator.shared
 
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        lifecycleCoordinator.applicationWillFinishLaunching()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         lifecycleCoordinator.applicationDidFinishLaunching()
     }
