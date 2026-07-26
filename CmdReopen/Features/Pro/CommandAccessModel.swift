@@ -99,11 +99,6 @@ final class CommandAccessModel: ObservableObject {
         await accessManager.refresh()
     }
 
-    func startTrial() async {
-        defaults[AppDefaults.hasSeenOnboarding] = true
-        await accessManager.startTrial()
-    }
-
     func finishOnboardingWithoutTrial() {
         defaults[AppDefaults.hasSeenOnboarding] = true
         objectWillChange.send()

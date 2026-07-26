@@ -53,3 +53,21 @@ Cmd+Tab most-recently-used ordering and window miniaturization.
 Unit tests cover the one-shot Debug process hand-off request, onboarding window
 session, and non-persisted activation-monitor suppression. A real Cmd+Tab smoke
 test is still required because macOS owns the switcher ordering.
+
+## D-002 — Start the trial independently of onboarding completion
+
+- Date: 2026-07-26
+- Status: Accepted
+
+Command Reopen uses Kiki Commerce's automatic time trial, which writes the
+trial start time when the app's access manager is first created. Onboarding
+must not start, extend, or otherwise gate that trial.
+
+The final onboarding step is therefore a product completion screen that calls
+the onboarding coordinator's `finish` action directly. It neither presents a
+paywall nor reaches into the access model. Paywalls remain available from their
+normal post-onboarding routes after the trial expires or when a user opens them
+explicitly.
+
+This separation makes onboarding completion reliable even though trial access
+was already granted during app launch.

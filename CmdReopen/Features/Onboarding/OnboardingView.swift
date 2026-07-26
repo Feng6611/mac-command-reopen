@@ -25,13 +25,12 @@ enum CommandReopenOnboardingFlow {
         static let welcome = "welcome"
         static let tryMinimize = "tryMinimize"
         static let success = "success"
-        static let paywall = "paywall"
+        static let finish = "finish"
     }
 
     static var tryMinimizeStepID: String { "custom.\(StepID.tryMinimize)" }
 
     static func makeCoordinator(
-        accessModel: CommandAccessModel,
         tryMinimizeModel: OnboardingTryMinimizeModel,
         onMinimize: @escaping () -> Void,
         onFinished: @escaping @MainActor () -> Void
@@ -46,8 +45,8 @@ enum CommandReopenOnboardingFlow {
             .custom(id: StepID.success) { navigation in
                 AnyView(SuccessStepView(navigation: navigation))
             },
-            .custom(id: StepID.paywall) { navigation in
-                AnyView(PaywallStepView(accessModel: accessModel, navigation: navigation))
+            .custom(id: StepID.finish) { navigation in
+                AnyView(FinishStepView(navigation: navigation))
             }
         ]
 
@@ -55,7 +54,7 @@ enum CommandReopenOnboardingFlow {
             configuration: KikiOnboardingConfiguration(
                 appName: "Command Reopen",
                 steps: steps,
-                // Same storage the paywall actions and isFirstLaunch already use.
+                // Same storage isFirstLaunch uses.
                 completionKey: AppDefaults.RawKey.hasSeenOnboarding,
                 canSkip: false,
                 tint: DS.Colors.brandPrimary,
@@ -260,22 +259,16 @@ private struct SuccessStepView: View {
     }
 }
 
-private struct PaywallStepView: View {
-    @ObservedObject var accessModel: CommandAccessModel
+private struct FinishStepView: View {
     let navigation: KikiOnboardingNavigation
-
-    @State private var isPaywallSheetPresented = false
-    @State private var didFinish = false
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
             title: String(localized: "You’re all set"),
-            bodyText: String(localized: "Start your free trial to keep automatic reopening on."),
+            bodyText: String(localized: "Your free trial is active."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: String(localized: "Continue")) {
-                isPaywallSheetPresented = true
-            },
+            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.finish),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 3,
@@ -285,27 +278,6 @@ private struct PaywallStepView: View {
         ) {
             EmptyView()
         }
-        .onAppear {
-            isPaywallSheetPresented = true
-        }
-        .sheet(isPresented: $isPaywallSheetPresented, onDismiss: handlePaywallDismiss) {
-            PaywallSheetView(
-                accessModel: accessModel,
-                context: .onboarding,
-                source: .onboarding,
-                onFinish: {
-                    didFinish = true
-                    navigation.finish()
-                }
-            )
-        }
-    }
-
-    private func handlePaywallDismiss() {
-        guard !didFinish else {
-            return
-        }
-        navigation.back()
     }
 }
 
@@ -527,7 +499,6 @@ final class OnboardingWindowController {
         prepareRegularOnboardingSession()
 
         let coordinator = CommandReopenOnboardingFlow.makeCoordinator(
-            accessModel: proStatusManager,
             tryMinimizeModel: tryMinimizeModel,
             onMinimize: { [weak self] in
                 self?.miniaturizeTutorialWindow()
