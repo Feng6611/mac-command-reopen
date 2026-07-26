@@ -17,6 +17,19 @@ enum ExternalLinks {
     }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
+
+    /// Values come from `sale/brand/identity.md`, which is the single source
+    /// for the developer identity across every asset — a buyer checking who
+    /// wrote this should meet the same name here, on GitHub and on the site.
+    static let developerName = "chenfeng"
+    static let developerURL = "https://github.com/Feng6611"
+    static let websiteDisplayName = "commandreopen.com"
+
+    /// The repository name without its owner. Dropping `Feng6611/` evens out
+    /// the About column and, more importantly, stops the pane introducing a
+    /// fourth name for the same person — the row above already says who made
+    /// this, and the account handle differs from that name.
+    static let repositoryDisplayName = "mac-command-reopen"
 }
 
 enum AppStoreLinks {

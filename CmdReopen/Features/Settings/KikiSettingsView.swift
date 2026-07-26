@@ -99,14 +99,44 @@ struct SettingsView: View {
                 )
             }
 
+            // Someone who opens About is checking who wrote this and whether
+            // the permission claim holds. The rows are ordered as that check
+            // runs: who, where they publish, how to reach them, and the source
+            // that makes the claim verifiable rather than a promise.
             Section {
-                ForEach(aboutLinks.orderedLinks) { link in
-                    aboutLinkRow(link)
-                }
-                if let copyright = aboutMetadata.copyright, !copyright.isEmpty {
-                    Text(copyright)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                KikiSettingsLinkRow(
+                    title: String(localized: "Made by"),
+                    value: ExternalLinks.developerName,
+                    urlString: ExternalLinks.developerURL,
+                    systemImage: "person"
+                )
+                KikiSettingsLinkRow(
+                    title: String(localized: "Website"),
+                    value: ExternalLinks.websiteDisplayName,
+                    urlString: ExternalLinks.officialURL,
+                    systemImage: "globe"
+                )
+                KikiSettingsCopyRow(
+                    title: String(localized: "Email"),
+                    value: ExternalLinks.contactEmailAddress,
+                    systemImage: "envelope"
+                )
+                KikiSettingsLinkRow(
+                    title: String(localized: "Source"),
+                    value: ExternalLinks.repositoryDisplayName,
+                    urlString: ExternalLinks.githubURL,
+                    systemImage: "chevron.left.forwardslash.chevron.right"
+                )
+            } footer: {
+                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    KikiSettingsHelperText(
+                        "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it."
+                    )
+                    if let copyright = aboutMetadata.copyright, !copyright.isEmpty {
+                        Text(copyright)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
 
@@ -130,33 +160,6 @@ struct SettingsView: View {
     }
 
     private var aboutMetadata: KikiAppMetadata { .bundle() }
-
-    private var aboutLinks: KikiStandardAboutLinks {
-        KikiStandardAboutLinks(
-            website: URL(string: ExternalLinks.officialURL),
-            feedback: URL(string: ExternalLinks.contactEmail),
-            github: URL(string: ExternalLinks.githubURL)
-        )
-    }
-
-    @ViewBuilder
-    private func aboutLinkRow(_ link: KikiStandardAboutLink) -> some View {
-        switch link.kind {
-        case .link:
-            KikiSettingsLinkRow(
-                title: link.title,
-                value: link.value,
-                urlString: link.url.absoluteString,
-                systemImage: link.systemImage ?? "link"
-            )
-        case .copy:
-            KikiSettingsCopyRow(
-                title: link.title,
-                value: link.value,
-                systemImage: link.systemImage ?? "envelope"
-            )
-        }
-    }
 
     private var accessAction: (@MainActor () -> Void)? {
         guard accessController.distributionChannel == .appStore else { return nil }
@@ -218,7 +221,7 @@ struct SettingsView: View {
                 tone: .active,
                 title: plan.title,
                 subtitle: plan.billingDetail,
-                actionTitle: "View plans"
+                actionTitle: String(localized: "View plans")
             )
         }
 #else

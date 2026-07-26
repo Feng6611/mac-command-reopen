@@ -43,16 +43,12 @@ struct SharedApplicationPresenter: ApplicationPresenting {
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
 
+    /// The system's own About panel: name, icon, version, copyright, nothing
+    /// else. Contact details live in Settings ▸ About, where they can be
+    /// copied; repeating them here only made the panel taller.
     func showAbout(distributionChannel: DistributionChannel) {
         activateIgnoringOtherApps()
-        switch distributionChannel {
-        case .appStore:
-            NSApplication.shared.orderFrontStandardAboutPanel(options: [
-                .credits: NSAttributedString(string: "Contact: \(ExternalLinks.contactEmailAddress)")
-            ])
-        case .direct:
-            NSApplication.shared.orderFrontStandardAboutPanel(nil)
-        }
+        NSApplication.shared.orderFrontStandardAboutPanel(nil)
     }
 
     func terminate() {

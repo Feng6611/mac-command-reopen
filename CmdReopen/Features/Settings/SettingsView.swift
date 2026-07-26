@@ -62,15 +62,10 @@ struct SettingsTabContent: View {
             ExcludedAppsSection(
                 bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
                 isDisabled: isFeatureLocked,
-                removeAction: removeExcludedBundleID
-            )
-            .opacity(isFeatureLocked ? 0.5 : 1)
-
-            AddExclusionSection(
+                removeAction: removeExcludedBundleID,
                 query: $appLookupQuery,
                 searchResults: appLookupResults,
                 excludedBundleIDs: activationMonitor.userExcludedBundleIDs,
-                isDisabled: isFeatureLocked,
                 addApplicationAction: addLookupResult
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
@@ -135,10 +130,19 @@ struct SettingsTabContent: View {
 
 }
 
+/// The exclusion list and the control that adds to it are one feature, so they
+/// share one section: the search field is how this list grows, not a separate
+/// setting. Adding sits below the list, where a "+" control sits in the system
+/// settings panes this pane imitates.
 private struct ExcludedAppsSection: View {
     let bundleIDs: [String]
     let isDisabled: Bool
     let removeAction: (String) -> Void
+
+    @Binding var query: String
+    let searchResults: [ExcludedApplicationInfo]
+    let excludedBundleIDs: Set<String>
+    let addApplicationAction: (ExcludedApplicationInfo) -> Void
 
     var body: some View {
         Section {
@@ -154,22 +158,8 @@ private struct ExcludedAppsSection: View {
                     )
                 }
             }
-        } header: {
-            Text("Excluded Apps")
-        }
-    }
-}
 
-private struct AddExclusionSection: View {
-    @Binding var query: String
-    let searchResults: [ExcludedApplicationInfo]
-    let excludedBundleIDs: Set<String>
-    let isDisabled: Bool
-    let addApplicationAction: (ExcludedApplicationInfo) -> Void
-
-    var body: some View {
-        Section {
-            LabeledContent("Search") {
+            LabeledContent("Add") {
                 ApplicationSearchControl(
                     query: $query,
                     results: searchResults,
@@ -179,7 +169,11 @@ private struct AddExclusionSection: View {
                 )
             }
         } header: {
-            Text("Add Exclusion")
+            Text("Excluded Apps")
+        } footer: {
+            Text("Excluded apps keep the standard Cmd+Tab behaviour.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 }

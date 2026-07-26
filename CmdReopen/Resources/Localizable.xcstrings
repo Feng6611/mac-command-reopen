@@ -146,68 +146,47 @@
       }
     },
     "About" : {
-      "comment" : "Standalone tab / menu label; not preceded by app name.",
+      "comment" : "Menu item opening the system About panel.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Info"
+            "state" : "needs_review",
+            "value" : "Über"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "À propos"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "情報"
+            "state" : "needs_review",
+            "value" : "このアプリについて"
           }
         }
       }
     },
     "Add" : {
+      "comment" : "Row label for the control that adds an app to the exclusion list.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Hinzufügen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Ajouter"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "追加"
-          }
-        }
-      }
-    },
-    "Add Exclusion" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausschluss hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter une exclusion"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "除外項目を追加"
           }
         }
       }
@@ -752,6 +731,29 @@
         }
       }
     },
+    "Excluded apps keep the standard Cmd+Tab behaviour." : {
+      "comment" : "Footer under the exclusion list, explaining what excluding an app does.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Für ausgeschlossene Apps gilt weiterhin das normale Cmd+Tab-Verhalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les apps exclues conservent le comportement standard de Cmd+Tab."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "除外したアプリでは、Cmd+Tab は通常どおりの動作になります。"
+          }
+        }
+      }
+    },
     "Fix Cmd+Tab for minimized and closed windows" : {
       "localizations" : {
         "de" : {
@@ -840,28 +842,6 @@
         }
       }
     },
-    "GitHub" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub"
-          }
-        }
-      }
-    },
     "It works!" : {
       "localizations" : {
         "de" : {
@@ -880,6 +860,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "できました！"
+          }
+        }
+      }
+    },
+    "Keep it working" : {
+      "comment" : "Purchase button while the feature is still running on a trial.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Weiter nutzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Continuer à l'utiliser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使い続ける"
           }
         }
       }
@@ -993,6 +996,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入オプションを読み込み中…"
+          }
+        }
+      }
+    },
+    "Made by" : {
+      "comment" : "About-pane row label for the developer.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Entwickelt von"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Développé par"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "開発者"
           }
         }
       }
@@ -1175,25 +1201,25 @@
         }
       }
     },
-    "Official" : {
-      "comment" : "Section heading in the status-bar menu for official links.",
+    "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it." : {
+      "comment" : "About-pane footer tying the zero-permission claim to the public source.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offiziell"
+            "state" : "needs_review",
+            "value" : "Open Source unter MIT-Lizenz. Command Reopen benötigt keine Systemberechtigungen — und Sie müssen uns das nicht glauben, sondern können es im Quellcode nachprüfen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Officiel"
+            "state" : "needs_review",
+            "value" : "Open source sous licence MIT. Command Reopen ne demande aucune autorisation système — et vous pouvez le vérifier dans le code plutôt que nous croire sur parole."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "公式"
+            "state" : "needs_review",
+            "value" : "MIT ライセンスのオープンソースです。Command Reopen はシステム権限を一切必要としません。その点はソースコードでご確認いただけます。"
           }
         }
       }
@@ -1555,6 +1581,29 @@
         }
       }
     },
+    "Restored in your trial" : {
+      "comment" : "Caption under the trial reopen count on the paywall; one line only.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "In Ihrer Testphase wiederhergestellt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurées pendant l'essai"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "トライアル中に復元"
+          }
+        }
+      }
+    },
     "Restores minimized and closed windows on Cmd+Tab" : {
       "localizations" : {
         "de" : {
@@ -1573,28 +1622,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最小化・閉じたウインドウを Cmd+Tab で復元"
-          }
-        }
-      }
-    },
-    "Search" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検索"
           }
         }
       }
@@ -1662,6 +1689,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定…"
+          }
+        }
+      }
+    },
+    "Source" : {
+      "comment" : "About-pane row label for the source repository.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Quellcode"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code source"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ソースコード"
           }
         }
       }
@@ -1750,6 +1800,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料トライアルを開始して、自動再オープンを有効なままにしましょう。"
+          }
+        }
+      }
+    },
+    "Statistics" : {
+      "comment" : "Menu item opening the stats pane; the count rides in a trailing menu badge.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistik"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistiques"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "統計"
+          }
+        }
+      }
+    },
+    "Statistics — %lld restored" : {
+      "comment" : "Menu item opening the stats pane, carrying the lifetime reopen count.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistik — %lld wiederhergestellt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistiques — %lld restaurées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "統計 — %lld 件を復元"
           }
         }
       }
@@ -2023,6 +2119,29 @@
         }
       }
     },
+    "Turn it back on" : {
+      "comment" : "Purchase button after the trial ended, when the feature has already stopped.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wieder aktivieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réactiver"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "もう一度有効にする"
+          }
+        }
+      }
+    },
     "Unavailable" : {
       "comment" : "Kiki commerce readiness value — user cannot buy or restore right now.",
       "localizations" : {
@@ -2042,28 +2161,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "利用不可"
-          }
-        }
-      }
-    },
-    "Unlock forever" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dauerhaft freischalten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Débloquer à vie"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "永久にアンロック"
           }
         }
       }
@@ -2222,6 +2319,29 @@
         }
       }
     },
+    "Website" : {
+      "comment" : "About-pane row label for the product site.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Website"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Site web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ウェブサイト"
+          }
+        }
+      }
+    },
     "Week" : {
       "localizations" : {
         "de" : {
@@ -2263,6 +2383,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ようこそ"
+          }
+        }
+      }
+    },
+    "Windows restored" : {
+      "comment" : "Caption under the lifetime reopen count on the paywall; one line only.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fenster wiederhergestellt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fenêtres restaurées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "復元したウインドウ"
+          }
+        }
+      }
+    },
+    "Without Pro, Cmd+Tab leaves them minimized again." : {
+      "comment" : "Second sentence of the expired-trial paywall subtitle, naming what stopped working.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ohne Pro bleiben sie bei Cmd+Tab wieder minimiert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sans Pro, Cmd+Tab les laisse à nouveau réduites."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro なしでは Cmd+Tab で最小化されたままになります。"
           }
         }
       }
@@ -2311,24 +2477,71 @@
         }
       }
     },
-    "Your Pro access is active." : {
+    "Your Pro access ends on %@. Everything keeps working until then." : {
+      "comment" : "Paywall subtitle for a subscriber who turned off auto-renew.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ihr Pro-Zugriff ist aktiv."
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang endet am %@. Bis dahin funktioniert alles weiter."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre accès Pro est actif."
+            "state" : "needs_review",
+            "value" : "Votre accès Pro prend fin le %@. Tout continue de fonctionner jusque-là."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Proアクセスは有効です。"
+            "state" : "needs_review",
+            "value" : "Pro アクセスは %@ に終了します。それまではすべてご利用いただけます。"
+          }
+        }
+      }
+    },
+    "Your Pro access never expires. Thank you for buying it." : {
+      "comment" : "Paywall subtitle for a one-time purchase, which has no renewal date.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang läuft nie ab. Vielen Dank für Ihren Kauf."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre accès Pro n'expire jamais. Merci pour votre achat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro アクセスに期限はありません。ご購入ありがとうございます。"
+          }
+        }
+      }
+    },
+    "Your Pro access renews on %@." : {
+      "comment" : "Paywall subtitle for a subscriber whose plan auto-renews.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang verlängert sich am %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre accès Pro se renouvelle le %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro アクセスは %@ に更新されます。"
           }
         }
       }
@@ -2351,6 +2564,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料トライアルが有効です。"
+          }
+        }
+      }
+    },
+    "Your plan" : {
+      "comment" : "Caption under the purchased plan name on the paywall; one line only.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Plan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre formule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ご利用プラン"
           }
         }
       }

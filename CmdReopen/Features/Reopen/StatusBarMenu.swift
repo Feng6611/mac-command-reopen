@@ -69,6 +69,16 @@ final class StatusBarMenuController {
             .separator
         ]
 
+        items.append(
+            .action(title: model.statisticsItemTitle, badgeCount: model.statisticsBadgeCount) {
+                SettingsOpener.shared.open(initialTab: .statistics)
+            }
+        )
+
+        items.append(.settings(title: String(localized: "Settings…")) {
+            SettingsOpener.shared.open()
+        })
+
         if presentation.showsUpgradeItem {
             items.append(.action(title: String(localized: "Upgrade to Pro…")) {
                 SettingsOpener.shared.open(
@@ -78,26 +88,16 @@ final class StatusBarMenuController {
                 )
             })
         }
-
-        items.append(.settings(title: String(localized: "Settings…")) {
-            SettingsOpener.shared.open()
-        })
         items.append(.separator)
 
         switch accessController.distributionChannel {
         case .appStore:
-            items.append(.action(title: String(localized: "Official")) { [weak self] in
-                self?.model.openURL(ExternalLinks.officialURL)
-            })
             items.append(.action(title: String(localized: "Rate on App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.reviewURL)
             })
         case .direct:
             items.append(.action(title: String(localized: "Get on Mac App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.productURL)
-            })
-            items.append(.action(title: String(localized: "GitHub")) { [weak self] in
-                self?.model.openURL(ExternalLinks.githubURL)
             })
         }
 
@@ -129,29 +129,73 @@ final class StatusBarMenuController {
 
 @MainActor
 final class StatusBarMenuModel: ObservableObject {
+    /// Below this the count is too small to be worth stating, and a menu is the
+    /// wrong place to tell someone the app has barely done anything.
+    static let minimumReopensForMenuCount = 10
+
     @Published private(set) var launchAtLoginEnabled: Bool
+    @Published private(set) var totalReopens: Int
 
     private let launchManager: LaunchAtLoginManaging
     private let urlOpener: URLOpening
     private let applicationPresenter: ApplicationPresenting
     private let reviewPromptRequester: (ReviewPromptTrigger) -> Void
+    private let totalReopensProvider: () -> Int
+
+    /// Carries the running total on the item that leads to the full breakdown,
+    /// rather than as a line of its own: a number nobody can act on takes the
+    /// most prominent slot in the menu and leaves the curiosity it creates
+    /// nowhere to go. The lifetime total is used rather than today's, which
+    /// reads as 0 or 1 on a quiet morning.
+    ///
+    /// From macOS 14 the count is a trailing menu badge, which is both the
+    /// system treatment and the reading order we want — the label, then the
+    /// number sitting alone against the right edge. On macOS 13 there is no
+    /// badge, so it falls back into the title.
+    var statisticsItemTitle: String {
+        guard showsReopenCount, statisticsBadgeCount == nil else {
+            return String(localized: "Statistics")
+        }
+        return String(
+            localized: "Statistics — \(totalReopens.formatted()) restored",
+            comment: "Menu item opening the stats pane on macOS 13, where a menu badge is unavailable."
+        )
+    }
+
+    var statisticsBadgeCount: Int? {
+        guard showsReopenCount, #available(macOS 14.0, *) else {
+            return nil
+        }
+        return totalReopens
+    }
+
+    private var showsReopenCount: Bool {
+        totalReopens >= Self.minimumReopensForMenuCount
+    }
 
     init(
         launchManager: LaunchAtLoginManaging? = nil,
         urlOpener: URLOpening? = nil,
         applicationPresenter: ApplicationPresenting? = nil,
-        reviewPromptRequester: @escaping (ReviewPromptTrigger) -> Void
+        reviewPromptRequester: @escaping (ReviewPromptTrigger) -> Void,
+        totalReopensProvider: (() -> Int)? = nil
     ) {
         let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
+        let resolvedTotalReopensProvider = totalReopensProvider ?? {
+            ReopenStatsStore.shared.totalSuccessfulReopens
+        }
         self.launchManager = resolvedLaunchManager
         self.urlOpener = urlOpener ?? WorkspaceURLOpener()
         self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
         self.reviewPromptRequester = reviewPromptRequester
+        self.totalReopensProvider = resolvedTotalReopensProvider
         self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
+        self.totalReopens = resolvedTotalReopensProvider()
     }
 
     func refresh() {
         launchAtLoginEnabled = launchManager.isEnabled
+        totalReopens = totalReopensProvider()
     }
 
     func setLaunchAtLogin(_ isEnabled: Bool) {

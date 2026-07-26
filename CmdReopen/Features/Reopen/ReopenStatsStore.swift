@@ -156,6 +156,19 @@ final class ReopenStatsStore: ObservableObject {
         .map { $0 }
     }
 
+    /// Total reopens recorded on `startDate` and after.
+    ///
+    /// Counts are stored per day, so a window that opens mid-day includes that
+    /// whole day. For the trial receipt that is the intended reading: the trial
+    /// starts on first launch, which is also the first day with any counts.
+    func totalReopens(since startDate: Date) -> Int {
+        let startKey = Self.dayKeyFormatter.string(from: startDate)
+        return snapshot.dailyCounts.reduce(into: 0) { total, entry in
+            guard entry.key >= startKey else { return }
+            total += entry.value
+        }
+    }
+
     var maxAppCount: Int {
         snapshot.perAppCounts.values.max() ?? 0
     }
@@ -275,6 +288,7 @@ final class ReopenStatsStore: ObservableObject {
         next.lastUpdatedAt = Date()
 
         persist(next)
+        return true
     }
 
     /// Requests an App Store review only at an intentional product moment.

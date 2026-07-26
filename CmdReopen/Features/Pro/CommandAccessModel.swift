@@ -69,6 +69,13 @@ final class CommandAccessModel: ObservableObject {
         !defaults[AppDefaults.hasSeenOnboarding]
     }
 
+    /// Start of the automatic trial, written by the access engine on first
+    /// launch. Exposed so the paywall can scope its receipt to the user's own
+    /// trial window; `nil` only before that first write.
+    var trialStartedAt: Date? {
+        defaults[AppDefaults.trialStartDate]
+    }
+
     var accessEntitlementState: AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
             return .trial
