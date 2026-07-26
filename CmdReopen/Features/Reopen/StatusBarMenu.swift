@@ -51,7 +51,7 @@ final class StatusBarMenuController {
 
         var items: [KikiMenuItem] = [
             .toggle(
-                title: String(localized: "Enable Command Reopen"),
+                title: AppLanguage.shared.string("Enable Command Reopen"),
                 isOn: activationMonitor?.isFeatureEnabled == true,
                 isEnabled: presentation.canToggleAutoReopen,
                 action: { [weak self] in
@@ -59,7 +59,7 @@ final class StatusBarMenuController {
                 }
             ),
             .toggle(
-                title: String(localized: "Launch at Login"),
+                title: AppLanguage.shared.string("Launch at Login"),
                 isOn: model.launchAtLoginEnabled,
                 action: { [weak self] in
                     guard let model = self?.model else { return }
@@ -75,12 +75,12 @@ final class StatusBarMenuController {
             }
         )
 
-        items.append(.settings(title: String(localized: "Settings…")) {
+        items.append(.settings(title: AppLanguage.shared.string("Settings…")) {
             SettingsOpener.shared.open()
         })
 
         if presentation.showsUpgradeItem {
-            items.append(.action(title: String(localized: "Upgrade to Pro…")) {
+            items.append(.action(title: AppLanguage.shared.string("Upgrade to Pro…")) {
                 SettingsOpener.shared.open(
                     initialTab: .about,
                     presentsPaywall: true,
@@ -92,23 +92,23 @@ final class StatusBarMenuController {
 
         switch accessController.distributionChannel {
         case .appStore:
-            items.append(.action(title: String(localized: "Rate on App Store")) { [weak self] in
+            items.append(.action(title: AppLanguage.shared.string("Rate on App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.reviewURL)
             })
         case .direct:
-            items.append(.action(title: String(localized: "Get on Mac App Store")) { [weak self] in
+            items.append(.action(title: AppLanguage.shared.string("Get on Mac App Store")) { [weak self] in
                 self?.model.openURL(AppStoreLinks.productURL)
             })
         }
 
-        items.append(.about(title: String(localized: "About")) { [weak self] in
+        items.append(.about(title: AppLanguage.shared.string("About")) { [weak self] in
             guard let self else { return }
             self.model.showAbout(
                 distributionChannel: (self.accessController ?? .shared).distributionChannel
             )
         })
         items.append(.separator)
-        items.append(.quit(appName: "Command Reopen") { [weak self] in
+        items.append(.action(title: AppLanguage.shared.string("Quit Command Reopen"), shortcut: .quit) { [weak self] in
             self?.model.quit()
         })
 
@@ -154,9 +154,9 @@ final class StatusBarMenuModel: ObservableObject {
     /// badge, so it falls back into the title.
     var statisticsItemTitle: String {
         guard showsReopenCount, statisticsBadgeCount == nil else {
-            return String(localized: "Statistics")
+            return AppLanguage.shared.string("Statistics")
         }
-        return String(
+        return AppLanguage.shared.string(
             localized: "Statistics — \(totalReopens.formatted()) restored",
             comment: "Menu item opening the stats pane on macOS 13, where a menu badge is unavailable."
         )

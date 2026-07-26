@@ -7,7 +7,7 @@ import SwiftUI
 /// `.system` follows the macOS preferred language chain. Every other case
 /// pins the app to a specific locale regardless of the system setting.
 /// Case order defines the order shown in the Picker.
-enum AppLanguage: String, CaseIterable, Identifiable {
+enum SupportedLanguage: String, CaseIterable, Identifiable {
     case system = ""
     case english = "en"
     case japanese = "ja"
@@ -30,44 +30,63 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-/// Persists the user's UI-language choice and mirrors it to CFBundle via
-/// `AppleLanguages` so the next launch resolves resources in that language.
-///
-/// The change does not take effect until the app is relaunched — SwiftUI /
-/// AppKit views composed against the current CFBundle resource chain do not
-/// re-resolve mid-run. Callers should present a restart prompt after the
-/// user picks a new language.
-///
-/// `.system` clears the override and lets macOS fall back to its normal
-/// preferred-language chain. If none of the supported localizations match
-/// the system chain, Bundle resolves to the development region (`en`).
+/// The app-owned, live localization service. Views receive its locale through
+/// the SwiftUI environment; AppKit/Kiki callers resolve their String values
+/// through `string(_:)` when they construct a menu or presentation model.
 @MainActor
-final class LanguagePreference: ObservableObject {
-    static let shared = LanguagePreference()
+final class AppLanguage: ObservableObject {
+    static let shared = AppLanguage()
 
-    @Published var selection: AppLanguage {
+    @Published var selected: SupportedLanguage {
         didSet {
-            guard selection != oldValue else { return }
-            defaults.set(selection.rawValue, forKey: Self.storageKey)
-            applyToAppleLanguages(selection)
+            guard selected != oldValue else { return }
+            defaults.set(selected.rawValue, forKey: Self.storageKey)
+            clearLegacyLanguageOverride()
         }
+    }
+
+    var locale: Locale {
+        selected == .system ? systemLocale : Locale(identifier: selected.rawValue)
     }
 
     private let defaults: UserDefaults
     private static let storageKey = AppDefaults.RawKey.preferredLanguage
-    private static let appleLanguagesKey = "AppleLanguages"
+    /// Versions before the live language service used this process-wide
+    /// override and asked the user to restart. It shadows macOS's actual
+    /// language even after the user selects "System", so it must never survive
+    /// the migration.
+    private static let legacyAppleLanguagesKey = "AppleLanguages"
+    private static let globalDomainName = "NSGlobalDomain"
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let raw = defaults.string(forKey: Self.storageKey) ?? ""
-        self.selection = AppLanguage(rawValue: raw) ?? .system
+        self.selected = SupportedLanguage(rawValue: raw) ?? .system
+        clearLegacyLanguageOverride()
     }
 
-    private func applyToAppleLanguages(_ language: AppLanguage) {
-        if language == .system {
-            defaults.removeObject(forKey: Self.appleLanguagesKey)
-        } else {
-            defaults.set([language.rawValue], forKey: Self.appleLanguagesKey)
-        }
+    func string(_ resource: LocalizedStringResource) -> String {
+        var resource = resource
+        resource.locale = locale
+        return String(localized: resource)
+    }
+
+    func string(localized resource: LocalizedStringResource, comment: String? = nil) -> String {
+        string(resource)
+    }
+
+    private func clearLegacyLanguageOverride() {
+        defaults.removeObject(forKey: Self.legacyAppleLanguagesKey)
+    }
+
+    /// Do not ask `Locale.current` for this value. If a previous app version
+    /// wrote `AppleLanguages`, Foundation can retain that process-local locale
+    /// snapshot even after the preference is removed. The global domain is the
+    /// authoritative macOS language chain and is unaffected by our app's old
+    /// override.
+    private var systemLocale: Locale {
+        let globalDomain = defaults.persistentDomain(forName: Self.globalDomainName)
+        let identifier = (globalDomain?[Self.legacyAppleLanguagesKey] as? [String])?.first
+        return identifier.map(Locale.init(identifier:)) ?? .autoupdatingCurrent
     }
 }

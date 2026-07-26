@@ -20,7 +20,7 @@ final class SettingsWindowController {
     static let shared = SettingsWindowController()
 
     let coordinator = KikiSettingsCoordinator(
-        tabs: SettingsTab.kikiTabs,
+        tabs: SettingsTab.kikiTabs(language: .shared),
         initialTab: SettingsTab.general,
         windowController: KikiSettingsWindowController(
             frameAutosaveName: "CommandReopen.SettingsWindow",
@@ -32,6 +32,10 @@ final class SettingsWindowController {
     )
 
     var isVisible: Bool { coordinator.isVisible }
+
+    func refreshLocalizedTabs() {
+        coordinator.updateTabs(SettingsTab.kikiTabs(language: .shared))
+    }
 
     func prepareForSettingsScene(
         accessController: AppAccessController? = nil,

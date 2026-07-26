@@ -15,14 +15,13 @@ import SwiftUI
 struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
-    @EnvironmentObject private var languagePreference: LanguagePreference
+    @EnvironmentObject private var appLanguage: AppLanguage
 
     private let appLookupProvider = ApplicationLookupProvider()
 
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
-    @State private var isLanguageRestartAlertPresented = false
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
@@ -35,17 +34,14 @@ struct SettingsTabContent: View {
     var body: some View {
         KikiSettingsPane {
             Section {
-                Picker(selection: $languagePreference.selection) {
-                    ForEach(AppLanguage.allCases) { language in
+                Picker(selection: $appLanguage.selected) {
+                    ForEach(SupportedLanguage.allCases) { language in
                         // Native-language labels so users can always find their own language,
                         // regardless of the current UI language.
                         Text(verbatim: language.displayName).tag(language)
                     }
                 } label: {
                     Text("Language")
-                }
-                .onChange(of: languagePreference.selection) { _ in
-                    isLanguageRestartAlertPresented = true
                 }
             }
 
@@ -70,14 +66,8 @@ struct SettingsTabContent: View {
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
         }
-        .alert(
-            "Restart to apply the language change",
-            isPresented: $isLanguageRestartAlertPresented
-        ) {
-            Button("Quit") { NSApp.terminate(nil) }
-            Button("Later", role: .cancel) { }
-        } message: {
-            Text("Command Reopen needs to restart before the new language takes effect.")
+        .onChange(of: appLanguage.selected) { _ in
+            SettingsWindowController.shared.refreshLocalizedTabs()
         }
         .task {
             await Task.yield()

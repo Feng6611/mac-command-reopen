@@ -24,29 +24,31 @@ enum ProPurchaseError: Error, Equatable {
 
 extension ProPurchaseError: LocalizedError {
     var errorDescription: String? {
-        switch self {
+        MainActor.assumeIsolated {
+            switch self {
         case .notConfigured:
-            "Purchases are not configured yet."
+            AppLanguage.shared.string("Purchases are not configured yet.")
         case .offeringUnavailable:
-            "No products are currently available."
+            AppLanguage.shared.string("No products are currently available.")
         case .packageNotFound(let plan):
-            "The \(plan.rawValue) product is not available in the current offering."
+            AppLanguage.shared.string(localized: "The \(plan.rawValue) product is not available in the current offering.")
         case .purchaseCancelled:
-            "The purchase was cancelled."
+            AppLanguage.shared.string("The purchase was cancelled.")
         case .purchaseNotAllowed:
-            "Purchases are not allowed on this Mac."
+            AppLanguage.shared.string("Purchases are not allowed on this Mac.")
         case .activationPending:
-            String(localized: "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
+            AppLanguage.shared.string(localized: "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .invalidReceipt:
-            String(localized: "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
+            AppLanguage.shared.string(localized: "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .network:
-            "A network connection is required to load purchases."
+            AppLanguage.shared.string("A network connection is required to load purchases.")
         case .invalidCredentials:
-            "The RevenueCat API key is invalid."
+            AppLanguage.shared.string("The RevenueCat API key is invalid.")
         case .productUnavailable:
-            "This product is not available for purchase."
+            AppLanguage.shared.string("This product is not available for purchase.")
         case .unknown(let message):
             message
+            }
         }
     }
 }

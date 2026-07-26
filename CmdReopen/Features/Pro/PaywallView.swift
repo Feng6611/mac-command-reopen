@@ -1,6 +1,7 @@
 #if APPSTORE
 import KikiCommerceCore
 import KikiCommercePresentation
+import KikiPaywall
 import SwiftUI
 
 enum PaywallPresentationContext {
@@ -25,6 +26,7 @@ enum PaywallSource: String {
 
 struct PaywallSheetView: View {
     @ObservedObject var accessModel: CommandAccessModel
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let context: PaywallPresentationContext
     let source: PaywallSource
     var onFinish: () -> Void = {}
@@ -47,37 +49,35 @@ struct PaywallSheetView: View {
             manager: accessModel.accessManager,
             context: context.kikiContext,
             copy: KikiAccessPaywallCopy(
-                title: String(localized: "Command Reopen Pro", comment: "Product tier name — do not translate."),
+                title: appLanguage.string(localized: "Command Reopen Pro", comment: "Product tier name — do not translate."),
                 proSubtitle: proSubtitle,
-                trialSubtitle: String(localized: "Your free trial is active."),
+                trialSubtitle: appLanguage.string(localized: "Your free trial is active."),
                 // With a receipt the figures above already make the case, so
                 // this line only has to name what stops.
                 expiredSubtitle: receipt == nil
-                    ? String(localized: "Upgrade to continue automatic window reopening.")
-                    : String(
-                        localized: "Without Pro, Cmd+Tab leaves them minimized again.",
-                        comment: "Expired-trial paywall subtitle, naming what stopped working."
-                    ),
-                notStartedSubtitle: String(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
+                    ? appLanguage.string(localized: "Upgrade to continue automatic window reopening.")
+                    : appLanguage.string(localized: "Without Pro, Cmd+Tab leaves them minimized again.", comment: "Expired-trial paywall subtitle, naming what stopped working."),
+                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
                 features: [
-                    String(localized: "Restores minimized and closed windows on Cmd+Tab"),
-                    String(localized: "Zero permissions — sandboxed, nothing to grant"),
-                    String(localized: "Exclude apps you don’t want restored")
+                    appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab"),
+                    appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"),
+                    appLanguage.string(localized: "Exclude apps you don’t want restored")
                 ],
                 purchaseActionTitle: purchaseActionTitle,
-                trialActionTitle: String(localized: "Start free trial"),
-                restoreActionTitle: String(localized: "Restore Purchase"),
-                doneActionTitle: String(localized: "Done"),
-                loadingOptionsMessage: String(localized: "Loading purchase options…"),
-                unavailableOptionsMessage: String(localized: "Purchase options are unavailable right now. Try again later or restore an existing purchase."),
-                purchaseSuccessMessage: String(localized: "Purchase successful. Pro unlocked."),
-                restoreSuccessMessage: String(localized: "Purchase restored."),
-                noActivePurchaseMessage: String(localized: "No active purchase found on this account."),
-                purchaseErrorMessage: String(localized: "The purchase couldn't be completed.")
+                trialActionTitle: appLanguage.string(localized: "Start free trial"),
+                restoreActionTitle: appLanguage.string(localized: "Restore Purchase"),
+                doneActionTitle: appLanguage.string(localized: "Done"),
+                loadingOptionsMessage: appLanguage.string(localized: "Loading purchase options…"),
+                unavailableOptionsMessage: appLanguage.string(localized: "Purchase options are unavailable right now. Try again later or restore an existing purchase."),
+                purchaseSuccessMessage: appLanguage.string(localized: "Purchase successful. Pro unlocked."),
+                restoreSuccessMessage: appLanguage.string(localized: "Purchase restored."),
+                noActivePurchaseMessage: appLanguage.string(localized: "No active purchase found on this account."),
+                purchaseErrorMessage: appLanguage.string(localized: "The purchase couldn't be completed.")
             ),
             stats: ownedAccessStats ?? trialStats(for: receipt),
             footerLinks: footerLinks,
             tint: DS.Colors.brandPrimary,
+            planPresentation: localizedPlanPresentation,
             onFinish: {
                 CommandReopenAnalytics.shared.capturePaywallAction(
                     sessionID: paywallSessionID,
@@ -120,6 +120,39 @@ struct PaywallSheetView: View {
             availablePlans: plans.filter(\.isAvailable).map(\.id),
             totalSuccessfulReopens: ReopenStatsStore.shared.totalSuccessfulReopens,
             entitlementState: accessModel.accessEntitlementState.analyticsValue
+        )
+    }
+
+    private func localizedPlanPresentation(
+        _ product: KikiAccessPlanProduct
+    ) -> KikiPaywallPlanPresentation {
+        let language = appLanguage
+        let title: String
+        let billingDetail: String
+        let badge: String?
+
+        switch product.plan.commercePlan {
+        case .yearly:
+            title = language.string("Yearly")
+            billingDetail = language.string("per year")
+            badge = nil
+        case .lifetime:
+            title = language.string("Lifetime")
+            billingDetail = language.string("once")
+            badge = language.string("Best Value")
+        default:
+            title = product.title
+            billingDetail = product.billingDetail
+            badge = product.badge
+        }
+
+        return KikiPaywallPlanPresentation(
+            id: product.id,
+            title: title,
+            displayPrice: product.displayPrice,
+            billingDetail: billingDetail,
+            badge: badge,
+            isAvailable: product.isAvailable
         )
     }
 
@@ -195,15 +228,9 @@ struct PaywallSheetView: View {
     /// belongs on the plan cards, which state it per plan.
     private var purchaseActionTitle: String {
         if case .expired = accessModel.status {
-            return String(
-                localized: "Turn it back on",
-                comment: "Purchase button after the trial ended, when the feature has already stopped."
-            )
+            return appLanguage.string(localized: "Turn it back on", comment: "Purchase button after the trial ended, when the feature has already stopped.")
         }
-        return String(
-            localized: "Keep it working",
-            comment: "Purchase button while the feature is still running on a trial."
-        )
+        return appLanguage.string(localized: "Keep it working", comment: "Purchase button while the feature is still running on a trial.")
     }
 
     /// What someone who already paid opened this sheet to check: whether the
@@ -212,19 +239,16 @@ struct PaywallSheetView: View {
     private var proSubtitle: String {
         switch accessModel.status.renewalState {
         case .renews(let date, _, _):
-            return String(
-                localized: "Your Pro access renews on \(Self.format(date)).",
+            return appLanguage.string(localized: "Your Pro access renews on \(format(date)).",
                 comment: "Paywall subtitle for a subscriber whose plan auto-renews."
             )
         case .ends(let date, _, _):
-            return String(
-                localized: "Your Pro access ends on \(Self.format(date)). Everything keeps working until then.",
+            return appLanguage.string(localized: "Your Pro access ends on \(format(date)). Everything keeps working until then.",
                 comment: "Paywall subtitle for a subscriber who turned off auto-renew."
             )
         case nil:
             // Lifetime, and anything else with no expiry to report.
-            return String(
-                localized: "Your Pro access never expires. Thank you for buying it.",
+            return appLanguage.string(localized: "Your Pro access never expires. Thank you for buying it.",
                 comment: "Paywall subtitle for a one-time purchase, which has no renewal date."
             )
         }
@@ -245,12 +269,12 @@ struct PaywallSheetView: View {
                 KikiAccessPaywallStat(
                     id: "restored",
                     value: restored.formatted(),
-                    label: String(localized: "Windows restored")
+                    label: appLanguage.string(localized: "Windows restored")
                 )
             )
         }
         stats.append(
-            KikiAccessPaywallStat(id: "plan", value: plan.title, label: String(localized: "Your plan"))
+            KikiAccessPaywallStat(id: "plan", value: localizedPlanTitle(for: plan), label: appLanguage.string(localized: "Your plan"))
         )
         return stats
     }
@@ -268,8 +292,7 @@ struct PaywallSheetView: View {
             KikiAccessPaywallStat(
                 id: "trialRestored",
                 value: receipt.formattedCount,
-                label: String(
-                    localized: "Restored in your trial",
+                label: appLanguage.string(localized: "Restored in your trial",
                     comment: "Caption under the trial reopen count on the paywall; one line only."
                 )
             )
@@ -289,15 +312,23 @@ struct PaywallSheetView: View {
         return stats
     }
 
-    private static func format(_ date: Date) -> String {
-        date.formatted(date: .abbreviated, time: .omitted)
+    private func format(_ date: Date) -> String {
+        date.formatted(.dateTime.year().month(.abbreviated).day().locale(appLanguage.locale))
+    }
+
+    private func localizedPlanTitle(for plan: KikiAccessPlan) -> String {
+        switch plan.commercePlan {
+        case .yearly: appLanguage.string("Yearly")
+        case .lifetime: appLanguage.string("Lifetime")
+        default: plan.title
+        }
     }
 
     private var footerLinks: [KikiAccessPaywallLink] {
         [
-            makeLink(id: "terms", title: String(localized: "Terms"), value: ExternalLinks.termsURL),
-            makeLink(id: "privacy", title: String(localized: "Privacy"), value: ExternalLinks.privacyURL),
-            makeLink(id: "support", title: String(localized: "Support"), value: ExternalLinks.contactEmail)
+            makeLink(id: "terms", title: appLanguage.string(localized: "Terms"), value: ExternalLinks.termsURL),
+            makeLink(id: "privacy", title: appLanguage.string(localized: "Privacy"), value: ExternalLinks.privacyURL),
+            makeLink(id: "support", title: appLanguage.string(localized: "Support"), value: ExternalLinks.contactEmail)
         ].compactMap { $0 }
     }
 

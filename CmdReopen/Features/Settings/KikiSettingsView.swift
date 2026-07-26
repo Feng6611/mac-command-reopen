@@ -4,6 +4,7 @@ import SwiftUI
 import KikiCommerceCore
 #endif
 
+@MainActor
 enum SettingsTab: Int, CaseIterable, Hashable {
     case general
     case statistics
@@ -13,11 +14,11 @@ enum SettingsTab: Int, CaseIterable, Hashable {
         allCases
     }
 
-    func title(for distributionChannel: DistributionChannel) -> String {
+    func title(for distributionChannel: DistributionChannel, language: AppLanguage) -> String {
         switch self {
-        case .general: String(localized: "General")
-        case .statistics: String(localized: "Stats", comment: "Settings tab title; short form of Statistics.")
-        case .about: String(localized: "About")
+        case .general: language.string("General")
+        case .statistics: language.string("Stats")
+        case .about: language.string("About")
         }
     }
 
@@ -29,11 +30,11 @@ enum SettingsTab: Int, CaseIterable, Hashable {
         }
     }
 
-    static var kikiTabs: [KikiSettingsTabSpec<SettingsTab>] {
+    static func kikiTabs(language: AppLanguage) -> [KikiSettingsTabSpec<SettingsTab>] {
         allCases.map { tab in
             KikiSettingsTabSpec(
                 tab,
-                title: tab.title(for: .current),
+                title: tab.title(for: .current, language: language),
                 systemImage: tab.icon(for: .current)
             )
         }
@@ -43,6 +44,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
 struct SettingsView: View {
     @EnvironmentObject private var accessController: AppAccessController
     @ObservedObject private var route = SettingsNavigationModel.shared
+    @EnvironmentObject private var appLanguage: AppLanguage
 #if APPSTORE
     @StateObject private var accessModel = CommandAccessModel.shared
 #endif
@@ -58,6 +60,7 @@ struct SettingsView: View {
                 aboutPane
             }
         }
+        .id(appLanguage.selected)
 #if APPSTORE
         .sheet(isPresented: $route.isPaywallSheetPresented) {
             PaywallSheetView(
@@ -87,7 +90,7 @@ struct SettingsView: View {
 
             Section {
                 KikiSettingsStatusRow(
-                    title: "Status",
+                    title: appLanguage.string("Status"),
                     value: accessPresentation.title,
                     systemImage: "info.circle",
                     valueSystemImage: accessPresentation.tone == .neutral ? nil : accessPresentation.tone.systemImage,
@@ -105,24 +108,24 @@ struct SettingsView: View {
             // that makes the claim verifiable rather than a promise.
             Section {
                 KikiSettingsLinkRow(
-                    title: String(localized: "Made by"),
+                    title: appLanguage.string("Made by"),
                     value: ExternalLinks.developerName,
                     urlString: ExternalLinks.developerURL,
                     systemImage: "person"
                 )
                 KikiSettingsLinkRow(
-                    title: String(localized: "Website"),
+                    title: appLanguage.string("Website"),
                     value: ExternalLinks.websiteDisplayName,
                     urlString: ExternalLinks.officialURL,
                     systemImage: "globe"
                 )
                 KikiSettingsCopyRow(
-                    title: String(localized: "Email"),
+                    title: appLanguage.string("Email"),
                     value: ExternalLinks.contactEmailAddress,
                     systemImage: "envelope"
                 )
                 KikiSettingsLinkRow(
-                    title: String(localized: "Source"),
+                    title: appLanguage.string("Source"),
                     value: ExternalLinks.repositoryDisplayName,
                     urlString: ExternalLinks.githubURL,
                     systemImage: "chevron.left.forwardslash.chevron.right"
@@ -130,7 +133,7 @@ struct SettingsView: View {
             } footer: {
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
                     KikiSettingsHelperText(
-                        "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it."
+                        appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
                     )
                     if let copyright = aboutMetadata.copyright, !copyright.isEmpty {
                         Text(copyright)
@@ -151,9 +154,9 @@ struct SettingsView: View {
                     }
                 )
             } header: {
-                Text("Developer Testing")
+                Text(appLanguage.string("Developer Testing"))
             } footer: {
-                KikiSettingsHelperText("Debug only. Live clears the Pro access override.")
+                KikiSettingsHelperText(appLanguage.string("Debug only. Live clears the Pro access override."))
             }
 #endif
         }
@@ -167,21 +170,22 @@ struct SettingsView: View {
     }
 
     private var accessPresentation: KikiAccessStatusPresentation {
+        let language = AppLanguage.shared
 #if APPSTORE
         switch accessModel.readiness {
         case .idle, .loading:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: String(localized: "Checking purchases…"),
-                subtitle: String(localized: "Verifying your Command Reopen Pro access."),
+                title: language.string(localized: "Checking purchases…"),
+                subtitle: language.string(localized: "Verifying your Command Reopen Pro access."),
                 actionTitle: nil
             )
         case .degraded:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: String(localized: "Purchases unavailable"),
-                subtitle: String(localized: "We couldn't verify your purchase status. Try again when you're online."),
-                actionTitle: String(localized: "View options")
+                title: language.string(localized: "Purchases unavailable"),
+                subtitle: language.string(localized: "We couldn't verify your purchase status. Try again when you're online."),
+                actionTitle: language.string(localized: "View options")
             )
         case .ready:
             break
@@ -191,46 +195,64 @@ struct SettingsView: View {
         case .notStarted:
             return KikiAccessStatusPresentation(
                 tone: .neutral,
-                title: String(localized: "Trial not started"),
-                subtitle: String(localized: "Start the free trial when you are ready."),
-                actionTitle: String(localized: "View options")
+                title: language.string(localized: "Trial not started"),
+                subtitle: language.string(localized: "Start the free trial when you are ready."),
+                actionTitle: language.string(localized: "View options")
             )
         case .trial(.time(let daysRemaining, _)):
             return KikiAccessStatusPresentation(
                 tone: .trial,
-                title: String(localized: "\(daysRemaining) days left", comment: "Trial time remaining in the About pane; plural-aware in the catalog."),
-                subtitle: String(localized: "Command Reopen Pro is active during the trial."),
-                actionTitle: String(localized: "View plans")
+                title: language.string(localized: "\(daysRemaining) days left", comment: "Trial time remaining in the About pane; plural-aware in the catalog."),
+                subtitle: language.string(localized: "Command Reopen Pro is active during the trial."),
+                actionTitle: language.string(localized: "View plans")
             )
         case .trial(.usage(_, let used, let limit)):
             return KikiAccessStatusPresentation(
                 tone: .trial,
-                title: String(localized: "\(max(0, limit - used)) uses left", comment: "Trial usage remaining in the About pane; plural-aware in the catalog."),
-                subtitle: String(localized: "Command Reopen Pro is active during the trial."),
-                actionTitle: String(localized: "View plans")
+                title: language.string(localized: "\(max(0, limit - used)) uses left", comment: "Trial usage remaining in the About pane; plural-aware in the catalog."),
+                subtitle: language.string(localized: "Command Reopen Pro is active during the trial."),
+                actionTitle: language.string(localized: "View plans")
             )
         case .expired:
             return KikiAccessStatusPresentation(
                 tone: .expired,
-                title: String(localized: "Trial ended"),
-                subtitle: String(localized: "Upgrade to continue automatic window reopening."),
-                actionTitle: String(localized: "Upgrade")
+                title: language.string(localized: "Trial ended"),
+                subtitle: language.string(localized: "Upgrade to continue automatic window reopening."),
+                actionTitle: language.string(localized: "Upgrade")
             )
         case .pro(let plan, _):
             return KikiAccessStatusPresentation(
                 tone: .active,
-                title: plan.title,
-                subtitle: plan.billingDetail,
-                actionTitle: String(localized: "View plans")
+                title: localizedPlanTitle(for: plan),
+                subtitle: localizedPlanBillingDetail(for: plan),
+                actionTitle: language.string(localized: "View plans")
             )
         }
 #else
         return KikiAccessStatusPresentation(
             tone: .active,
-            title: String(localized: "Direct version"),
-            subtitle: String(localized: "All Command Reopen features are available."),
+            title: language.string(localized: "Direct version"),
+            subtitle: language.string(localized: "All Command Reopen features are available."),
             actionTitle: nil
         )
 #endif
     }
+
+#if APPSTORE
+    private func localizedPlanTitle(for plan: KikiAccessPlan) -> String {
+        switch plan.commercePlan {
+        case .yearly: appLanguage.string("Yearly")
+        case .lifetime: appLanguage.string("Lifetime")
+        default: plan.title
+        }
+    }
+
+    private func localizedPlanBillingDetail(for plan: KikiAccessPlan) -> String {
+        switch plan.commercePlan {
+        case .yearly: appLanguage.string("per year")
+        case .lifetime: appLanguage.string("once")
+        default: plan.billingDetail
+        }
+    }
+#endif
 }

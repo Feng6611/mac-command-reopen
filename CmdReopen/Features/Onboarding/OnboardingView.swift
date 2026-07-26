@@ -59,7 +59,7 @@ enum CommandReopenOnboardingFlow {
                 canSkip: false,
                 tint: DS.Colors.brandPrimary,
                 windowAutosaveName: "CmdReopen.OnboardingWindow",
-                windowTitle: String(localized: "Welcome", comment: "Onboarding window title."),
+                windowTitle: AppLanguage.shared.string("Welcome"),
                 windowSize: windowSize,
                 minimumWindowSize: windowSize,
                 closeDisposition: .keepPending
@@ -72,15 +72,16 @@ enum CommandReopenOnboardingFlow {
 // MARK: - Step Views
 
 private struct WelcomeStepView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let navigation: KikiOnboardingNavigation
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "Fix Cmd+Tab for minimized and closed windows"),
-            bodyText: String(localized: "You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that."),
+            title: AppLanguage.shared.string("Fix Cmd+Tab for minimized and closed windows"),
+            bodyText: AppLanguage.shared.string("You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
+            primaryAction: KikiOnboardingAction(title: AppLanguage.shared.string("Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 0,
@@ -96,15 +97,16 @@ private struct WelcomeStepView: View {
 }
 
 private struct TryMinimizeStepView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     @ObservedObject var model: OnboardingTryMinimizeModel
     let onMinimize: () -> Void
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "See it work"),
+            title: AppLanguage.shared.string("See it work"),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: String(localized: "Minimize This Window")) {
+            primaryAction: KikiOnboardingAction(title: AppLanguage.shared.string("Minimize This Window")) {
                 model.clearRetryHint()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                     onMinimize()
@@ -124,7 +126,7 @@ private struct TryMinimizeStepView: View {
                 }
                 .padding(.top, DS.Spacing.lg)
 
-                Text(String(localized: "Click below, then press Cmd+Tab once — the window comes right back."))
+                Text(appLanguage.string("Click below, then press Cmd+Tab once — the window comes right back."))
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
@@ -170,7 +172,7 @@ private struct TryMinimizeStepView: View {
     private var retryHint: some View {
         HStack(spacing: DS.Spacing.sm) {
             Image(systemName: "arrow.uturn.backward")
-            Text(String(localized: "Didn’t come back? No worries — try again."))
+            Text(appLanguage.string("Didn’t come back? No worries — try again."))
         }
         .font(.callout.weight(.medium))
         .padding(.horizontal, DS.Spacing.lg)
@@ -182,6 +184,7 @@ private struct TryMinimizeStepView: View {
 }
 
 private struct SuccessStepView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let navigation: KikiOnboardingNavigation
 
     @State private var showsWedge = false
@@ -190,10 +193,10 @@ private struct SuccessStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "It works!"),
-            bodyText: String(localized: "Cmd+Tab now brings your windows back."),
+            title: AppLanguage.shared.string("It works!"),
+            bodyText: AppLanguage.shared.string("Cmd+Tab now brings your windows back."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.advance),
+            primaryAction: KikiOnboardingAction(title: AppLanguage.shared.string("Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 2,
@@ -223,10 +226,10 @@ private struct SuccessStepView: View {
                     .foregroundStyle(DS.Colors.brandPrimary)
                     .padding(.bottom, DS.Spacing.xs)
 
-                Text("Zero permissions")
+                Text(appLanguage.string("Zero permissions"))
                     .font(.title2.bold())
 
-                Text("No Accessibility. No Screen Recording. Nothing to grant.")
+                Text(appLanguage.string("No Accessibility. No Screen Recording. Nothing to grant."))
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -260,15 +263,19 @@ private struct SuccessStepView: View {
 }
 
 private struct FinishStepView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let navigation: KikiOnboardingNavigation
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: String(localized: "You’re all set"),
-            bodyText: String(localized: "Your free trial is active."),
+            title: AppLanguage.shared.string("You’re all set"),
+            bodyText: AppLanguage.shared.string("Your free trial is active."),
             appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: String(localized: "Continue"), action: navigation.finish),
+            primaryAction: KikiOnboardingAction(
+                title: AppLanguage.shared.string("Continue"),
+                action: navigation.finish
+            ),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
             stepIndex: 3,
@@ -284,14 +291,15 @@ private struct FinishStepView: View {
 // MARK: - Product Content
 
 private struct OnboardingFlowDiagram: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     @State private var showRestored = false
 
     var body: some View {
         HStack(spacing: 0) {
             flowStep(
                 icon: "minus.circle",
-                label: "Minimized",
-                sublabel: "window hidden",
+                label: appLanguage.string("Minimized"),
+                sublabel: appLanguage.string("window hidden"),
                 tint: .orange
             )
 
@@ -299,8 +307,8 @@ private struct OnboardingFlowDiagram: View {
 
             flowStep(
                 icon: "command",
-                label: "Cmd+Tab",
-                sublabel: "switch back",
+                label: appLanguage.string("Cmd+Tab"),
+                sublabel: appLanguage.string("switch back"),
                 tint: DS.Colors.brandPrimary
             )
 
@@ -308,8 +316,8 @@ private struct OnboardingFlowDiagram: View {
 
             flowStep(
                 icon: "macwindow",
-                label: "Restored",
-                sublabel: "automatically",
+                label: appLanguage.string("Restored"),
+                sublabel: appLanguage.string("automatically"),
                 tint: .green
             )
             .opacity(showRestored ? 1 : 0.4)
