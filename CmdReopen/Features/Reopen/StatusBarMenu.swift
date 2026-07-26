@@ -73,7 +73,8 @@ final class StatusBarMenuController {
             items.append(.action(title: String(localized: "Upgrade to Pro…")) {
                 SettingsOpener.shared.open(
                     initialTab: .about,
-                    presentsPaywall: true
+                    presentsPaywall: true,
+                    paywallSource: .statusBar
                 )
             })
         }

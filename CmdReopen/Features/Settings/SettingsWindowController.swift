@@ -7,8 +7,10 @@ import os
 final class SettingsNavigationModel: ObservableObject {
     static let shared = SettingsNavigationModel()
     @Published var isPaywallSheetPresented = false
+    @Published private(set) var paywallSource: PaywallSource = .settings
 
-    func presentPaywall() {
+    func presentPaywall(source: PaywallSource = .settings) {
+        paywallSource = source
         isPaywallSheetPresented = true
     }
 }
@@ -34,7 +36,8 @@ final class SettingsWindowController {
     func prepareForSettingsScene(
         accessController: AppAccessController? = nil,
         initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
+        presentsPaywall: Bool = false,
+        paywallSource: PaywallSource = .settings
     ) {
         if let initialTab {
             AppLogger.lifecycle.notice("Preparing settings scene. initialTab=\(initialTab.rawValue)")
@@ -43,7 +46,7 @@ final class SettingsWindowController {
 
         if presentsPaywall {
             coordinator.select(.about)
-            SettingsNavigationModel.shared.presentPaywall()
+            SettingsNavigationModel.shared.presentPaywall(source: paywallSource)
         }
 
         coordinator.prepare()
@@ -54,12 +57,14 @@ final class SettingsWindowController {
         reopenStatsStore: ReopenStatsStore? = nil,
         accessController: AppAccessController? = nil,
         initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
+        presentsPaywall: Bool = false,
+        paywallSource: PaywallSource = .settings
     ) {
         prepareForSettingsScene(
             accessController: accessController,
             initialTab: initialTab,
-            presentsPaywall: presentsPaywall
+            presentsPaywall: presentsPaywall,
+            paywallSource: paywallSource
         )
         coordinator.open()
     }
@@ -69,17 +74,27 @@ final class SettingsWindowController {
 final class SettingsOpener {
     static let shared = SettingsOpener()
 
-    func prepare(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+    func prepare(
+        initialTab: SettingsTab? = nil,
+        presentsPaywall: Bool = false,
+        paywallSource: PaywallSource = .settings
+    ) {
         SettingsWindowController.shared.prepareForSettingsScene(
             initialTab: initialTab,
-            presentsPaywall: presentsPaywall
+            presentsPaywall: presentsPaywall,
+            paywallSource: paywallSource
         )
     }
 
-    func open(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+    func open(
+        initialTab: SettingsTab? = nil,
+        presentsPaywall: Bool = false,
+        paywallSource: PaywallSource = .settings
+    ) {
         SettingsWindowController.shared.show(
             initialTab: initialTab,
-            presentsPaywall: presentsPaywall
+            presentsPaywall: presentsPaywall,
+            paywallSource: paywallSource
         )
     }
 }

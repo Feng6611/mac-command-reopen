@@ -27,6 +27,7 @@
 		8D30001A2F4400010099C190 /* KikiPaywall in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000B2F4400010099C190 /* KikiPaywall */; };
 		8D30001B2F4400010099C190 /* KikiWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000C2F4400010099C190 /* KikiWindow */; };
 		8D30001C2F4400010099C190 /* KikiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000D2F4400010099C190 /* KikiDesign */; };
+		A90100012F9CCB6D0099C190 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = A90100022F9CCB6D0099C190 /* PostHog */; };
 		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
@@ -94,6 +95,7 @@
 				8D3000172F4400010099C190 /* KikiDesign in Frameworks */,
 				9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010062F3401010099C190 /* Defaults in Frameworks */,
+				A90100012F9CCB6D0099C190 /* PostHog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +197,7 @@
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
 				CF5000022F5900010099C190 /* ConfettiSwiftUI */,
+				A90100022F9CCB6D0099C190 /* PostHog */,
 			);
 			productName = CmdReopen;
 			productReference = 748FCE1B2EB5027B0099C190 /* Command Reopen.app */;
@@ -328,6 +331,7 @@
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 				CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
+				A90100032F9CCB6D0099C190 /* XCRemoteSwiftPackageReference "PostHog" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 748FCE1C2EB5027B0099C190 /* Products */;
@@ -1207,6 +1211,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		A90100032F9CCB6D0099C190 /* XCRemoteSwiftPackageReference "PostHog" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = exactVersion;
+				version = 3.59.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1238,6 +1250,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
 			productName = ConfettiSwiftUI;
+		};
+		A90100022F9CCB6D0099C190 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A90100032F9CCB6D0099C190 /* XCRemoteSwiftPackageReference "PostHog" */;
+			productName = PostHog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

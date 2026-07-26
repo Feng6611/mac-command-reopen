@@ -249,16 +249,17 @@ final class ReopenStatsStore: ObservableObject {
         Self.migrateReviewPromptHistoryIfNeeded(defaults: defaults)
     }
 
-    func recordSuccessfulReopen(bundleID: String, localizedName: String?, bundleURL: URL? = nil) {
+    @discardableResult
+    func recordSuccessfulReopen(bundleID: String, localizedName: String?, bundleURL: URL? = nil) -> Bool {
         guard let normalizedBundleID = Self.normalize(bundleID) else {
-            return
+            return false
         }
         guard !HelperProcessFilter.isHelperLike(
             bundleID: normalizedBundleID,
             bundleURL: bundleURL,
             localizedName: localizedName
         ) else {
-            return
+            return false
         }
 
         var next = snapshot

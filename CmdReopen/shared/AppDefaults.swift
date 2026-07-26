@@ -17,6 +17,7 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let preferredLanguage = "cmdreopenPreferredLanguage"
+        static let analyticsInstallationID = "cmdreopen.analytics.installationID.v1"
 #if DEBUG
         static let pendingOnboardingRelaunch = "cmdreopenPendingOnboardingRelaunch"
 #endif

@@ -333,7 +333,8 @@ final class ActivationMonitor: ObservableObject {
         Task { @MainActor in
             SettingsWindowController.shared.show(
                 initialTab: .about,
-                presentsPaywall: true
+                presentsPaywall: true,
+                paywallSource: .expiredReopenNudge
             )
         }
     }
@@ -423,10 +424,15 @@ final class ActivationMonitor: ObservableObject {
 
         let recordedBundleID = openedBundleID ?? requestedBundleID
         Task { @MainActor [reopenStatsStore] in
-            reopenStatsStore.recordSuccessfulReopen(
+            let didRecord = reopenStatsStore.recordSuccessfulReopen(
                 bundleID: recordedBundleID,
                 localizedName: localizedName,
                 bundleURL: openedBundleURL
+            )
+            guard didRecord else { return }
+            CommandReopenAnalytics.shared.captureReopenActiveDay(
+                totalSuccessfulReopens: reopenStatsStore.totalSuccessfulReopens,
+                entitlementState: AppAccessController.shared.entitlementState.analyticsValue
             )
         }
 

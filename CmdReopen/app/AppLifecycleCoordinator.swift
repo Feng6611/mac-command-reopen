@@ -60,6 +60,10 @@ final class AppLifecycleCoordinator {
             activationMonitor: .shared,
             accessController: accessController
         )
+        CommandReopenAnalytics.shared.configureIfPossible()
+        CommandReopenAnalytics.shared.captureFirstOpen(
+            entitlementState: accessController.entitlementState.analyticsValue
+        )
         bindUpgradePrompt()
         scheduleLaunchReviewRequest()
 
@@ -132,7 +136,8 @@ final class AppLifecycleCoordinator {
                         reopenStatsStore: .shared,
                         accessController: self.accessController,
                         initialTab: .about,
-                        presentsPaywall: true
+                        presentsPaywall: true,
+                        paywallSource: .trialExpiredLaunch
                     )
                 }
 
@@ -168,7 +173,8 @@ final class AppLifecycleCoordinator {
                     reopenStatsStore: .shared,
                     accessController: accessController,
                     initialTab: .about,
-                    presentsPaywall: true
+                    presentsPaywall: true,
+                    paywallSource: .trialExpiredLaunch
                 )
             }
 

@@ -4,13 +4,13 @@ Last updated: April 4, 2026
 
 This Privacy Policy applies to Command Reopen, a macOS menu bar app.
 
-Command Reopen is designed to keep your data on your Mac. The app does not collect, store, sell, or share your personal data for advertising or analytics purposes.
+Command Reopen is designed to keep sensitive product data on your Mac. It does not sell personal data or use it for advertising or cross-app tracking.
 
 ## Information We Process
 
 Command Reopen observes app activation events and window visibility on your Mac so it can decide when to reopen a window after you switch apps with Cmd+Tab.
 
-This activity is processed locally on-device. It is not transmitted to the developer.
+This activity is processed locally on-device. The identity of other apps, their bundle IDs, window titles, URLs, activation history, and per-app reopen statistics are not transmitted to the developer.
 
 The app also stores local settings such as:
 
@@ -21,6 +21,12 @@ The app also stores local settings such as:
 - trial fallback state used for App Store access control
 
 This data stays on your device unless you delete the app or reset its local container.
+
+## Anonymous Analytics
+
+The Mac App Store version uses PostHog to understand whether Command Reopen is working and useful. It sends a random installation ID, app version and build, operating-system and device context, locale, network and IP-derived geographic context, app lifecycle/screen context, aggregate daily reopen activity, onboarding steps, and paywall or purchase-flow outcomes.
+
+This information is used only for product analytics. It is not linked to your Apple Account, email address, hardware identifier, or identity across other apps, and it is not used for tracking or advertising. The Direct version does not send PostHog analytics.
 
 ## Purchases
 
@@ -38,6 +44,7 @@ For Mac App Store billing and entitlement management, Command Reopen relies on:
 
 - Apple App Store / StoreKit
 - RevenueCat
+- PostHog (anonymous product analytics for the Mac App Store version)
 
 Those services operate under their own privacy terms.
 

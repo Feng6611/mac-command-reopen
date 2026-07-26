@@ -26,6 +26,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CmdReopenRevenueCatAPIKey</key>
 	<string>$(CMDREOPEN_REVENUECAT_API_KEY)</string>
+	<key>CmdReopenPostHogProjectToken</key>
+	<string>$(CMDREOPEN_POSTHOG_PROJECT_TOKEN)</string>
+	<key>CmdReopenPostHogHost</key>
+	<string>$(CMDREOPEN_POSTHOG_HOST)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>

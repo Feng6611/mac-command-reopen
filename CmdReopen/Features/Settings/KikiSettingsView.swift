@@ -63,6 +63,7 @@ struct SettingsView: View {
             PaywallSheetView(
                 accessModel: accessModel,
                 context: .settings,
+                source: route.paywallSource,
                 onPurchaseCompleted: {
                     _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
                 }
