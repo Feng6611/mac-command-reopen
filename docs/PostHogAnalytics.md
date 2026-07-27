@@ -81,7 +81,7 @@ trial.
 
 | Current owner | Capture point to add | Important constraint |
 | --- | --- | --- |
-| `AppLifecycleCoordinator` | Configure analytics early in `applicationDidFinishLaunching`, then emit `app_first_opened`. | A missing release token disables analytics safely; it must not affect reopening or commerce. |
+| `CommandReopenAnalytics` | Configure PostHog only when the first product event is ready to send; it emits `app_first_opened` first when needed. | An idle menu-bar session does not create PostHog queues or periodic flush timers; a missing release token remains a safe no-op. |
 | `OnboardingWindowController` and `OnboardingTryMinimizeModel` | `started` when a first-launch coordinator is presented; `demo_started` from the Minimize action; `demo_succeeded` only after the existing real Cmd+Tab return succeeds; `completed` from the coordinator completion. | The onboarding demo is not a real reopen and never emits `reopen_active_day`. |
 | `ActivationMonitor.handleReopenCompletion` / `ReopenStatsStore` | Notify analytics only after `recordSuccessfulReopen` accepts the result. | The analytics API receives only a sanitized day, count bucket, and derived index. It never receives `bundleID`, `localizedName`, URL, or per-app counts. |
 | `PaywallSheetView` and its callers | Allocate the session before presentation and capture the view once. Pass a product-owned source through all callers. | Current callers do not distinguish `settings`, `status_bar`, `onboarding`, `trial_expired_launch`, and `expired_reopen_nudge`; this propagation is required before capture. |
@@ -146,11 +146,11 @@ change.
    server credential lives only in Worker/secret storage.
 
 The PostHog SDK supports Swift Package Manager configuration and queues events
-while offline. This release retains its standard app lifecycle, screen, device,
-OS, locale, version, network, and IP-derived geographic context collection. It
-disables person profiles, feature flag event collection, and automatic error
-capture. Session replay, surveys, and identity-linking collection require a
-separate reviewed decision. See the official [iOS SDK documentation](https://posthog.com/docs/libraries/ios)
+while offline. This release disables automatic lifecycle and screen events,
+method swizzling, person profiles, feature flag event collection, and automatic
+error capture. Its explicit product-event queue flushes no more often than once
+per 15 minutes. Session replay, surveys, and identity-linking collection require
+a separate reviewed decision. See the official [iOS SDK documentation](https://posthog.com/docs/libraries/ios)
 and [privacy guidance](https://posthog.com/docs/privacy).
 
 ## Privacy contract

@@ -60,10 +60,6 @@ final class AppLifecycleCoordinator {
             activationMonitor: .shared,
             accessController: accessController
         )
-        CommandReopenAnalytics.shared.configureIfPossible()
-        CommandReopenAnalytics.shared.captureFirstOpen(
-            entitlementState: accessController.entitlementState.analyticsValue
-        )
         bindUpgradePrompt()
         scheduleLaunchReviewRequest()
 
@@ -100,6 +96,7 @@ final class AppLifecycleCoordinator {
 
     func applicationWillTerminate() {
         AppLogger.lifecycle.notice("Application will terminate.")
+        ReopenStatsStore.shared.flush()
     }
 
 #if DEBUG

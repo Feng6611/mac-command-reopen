@@ -77,6 +77,7 @@ final class ActivationMonitor: ObservableObject {
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
     private var lastActivationDates: [String: Date] = [:]
     private var lastFrontmostBundleID: String?
+    private var pendingReopenEvaluation: DispatchWorkItem?
 
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
@@ -141,6 +142,9 @@ final class ActivationMonitor: ObservableObject {
     func setOnboardingSessionActive(_ isActive: Bool) {
         guard isReopenSuppressedForOnboarding != isActive else { return }
         isReopenSuppressedForOnboarding = isActive
+        if isActive {
+            cancelPendingReopenEvaluation()
+        }
         AppLogger.activation.debug(
             "External reopen requests \(isActive ? "suppressed" : "restored") for onboarding."
         )
@@ -180,6 +184,7 @@ final class ActivationMonitor: ObservableObject {
             AppLogger.activation.debug("Stopped observing activation notifications.")
         }
         self.selfTriggeredSuppressUntil.removeAll()
+        cancelPendingReopenEvaluation()
     }
 
     private static let lastExpiredNudgeDateKey = "lastExpiredPaywallNudgeDate"
@@ -265,7 +270,8 @@ final class ActivationMonitor: ObservableObject {
         forBundleIdentifier bundleID: String,
         presentsExpiredNudge: Bool
     ) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.reopenEvaluationDelay) { [weak self] in
+        cancelPendingReopenEvaluation()
+        let evaluation = DispatchWorkItem { [weak self] in
             guard let self else { return }
             guard self.isFeatureEnabled else {
                 AppLogger.activation.info("Reopen evaluation ignored because feature is disabled.")
@@ -286,23 +292,12 @@ final class ActivationMonitor: ObservableObject {
                 return
             }
 
-            let report = self.visibleWindowReport(for: frontApp)
-            if report.hasVisibleWindow {
-                AppLogger.activation.notice(
-                    """
-                    Skip reopen for \(bundleID): visibleWindow=true total=\(report.totalWindowsForApp) \
-                    onScreen=\(report.onScreenWindows) candidates=\(report.visibleCandidateWindows)
-                    """
-                )
+            if self.hasVisibleWindow(for: frontApp) {
+                AppLogger.activation.debug("Skip reopen for \(bundleID): visible window found.")
                 return
             }
 
-            AppLogger.activation.notice(
-                """
-                Reopen needed for \(bundleID): visibleWindow=false total=\(report.totalWindowsForApp) \
-                onScreen=\(report.onScreenWindows) candidates=\(report.visibleCandidateWindows)
-                """
-            )
+            AppLogger.activation.info("Reopen needed for \(bundleID): no visible window found.")
             if presentsExpiredNudge {
                 guard !self.accessController.isCoreFeatureAvailable else {
                     self.reopenApplication(withBundleIdentifier: bundleID, at: now)
@@ -318,6 +313,16 @@ final class ActivationMonitor: ObservableObject {
             }
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
+        pendingReopenEvaluation = evaluation
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + Constants.reopenEvaluationDelay,
+            execute: evaluation
+        )
+    }
+
+    private func cancelPendingReopenEvaluation() {
+        pendingReopenEvaluation?.cancel()
+        pendingReopenEvaluation = nil
     }
 
     private func shouldShowExpiredNudge(now: Date = Date()) -> Bool {
@@ -352,21 +357,13 @@ final class ActivationMonitor: ObservableObject {
         return true
     }
 
-    private func visibleWindowReport(for app: NSRunningApplication) -> WindowInspectionReport {
+    private func hasVisibleWindow(for app: NSRunningApplication) -> Bool {
         guard let windowInfoList = windowInfoProvider.onScreenWindowInfo() else {
             AppLogger.activation.error("Unable to inspect window list for \(app.bundleIdentifier ?? "unknown").")
-            return WindowInspectionReport(
-                hasVisibleWindow: false,
-                totalWindowsForApp: 0,
-                onScreenWindows: 0,
-                visibleCandidateWindows: 0,
-                transparentWindows: 0,
-                nonStandardLayerWindows: 0,
-                tinyWindows: 0
-            )
+            return false
         }
 
-        return WindowInspector.visibleWindowReport(
+        return WindowInspector.hasVisibleWindow(
             ownerPID: app.processIdentifier,
             windowInfoList: windowInfoList
         )

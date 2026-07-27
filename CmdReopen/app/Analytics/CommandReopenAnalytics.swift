@@ -60,9 +60,10 @@ final class CommandReopenAnalytics {
         self.transport = transport
     }
 
-    /// Configures only the App Store target. A missing project token is an
-    /// intentional no-op so analytics can never block Command Reopen itself.
-    func configureIfPossible() {
+    /// Configures only the App Store target. This is deliberately called by
+    /// the first product event, not application launch, so an idle menu-bar
+    /// app does not install PostHog queues or their periodic flush timers.
+    private func configureIfPossible() {
         guard transport == nil else { return }
 
 #if APPSTORE
@@ -78,6 +79,7 @@ final class CommandReopenAnalytics {
     }
 
     func captureFirstOpen(entitlementState: String) {
+        configureIfPossible()
         guard transport != nil,
               !defaults.bool(forKey: StorageKey.didCaptureFirstOpen) else {
             return
@@ -219,6 +221,11 @@ final class CommandReopenAnalytics {
         properties: [String: AnalyticsValue],
         entitlementState: String = "unrestricted"
     ) {
+        if name != .appFirstOpened,
+           !defaults.bool(forKey: StorageKey.didCaptureFirstOpen) {
+            captureFirstOpen(entitlementState: entitlementState)
+        }
+        configureIfPossible()
         guard let transport else { return }
 
         var commonProperties: [String: AnalyticsValue] = [
@@ -302,18 +309,27 @@ private struct PostHogConfiguration {
 
 @MainActor
 private final class PostHogTransport: CommandReopenAnalytics.Transport {
+    private enum Constants {
+        static let flushIntervalSeconds: TimeInterval = 15 * 60
+    }
+
     private let sdk = PostHogSDK.shared
 
     init(configuration: PostHogConfiguration) {
         let config = PostHogConfig(projectToken: configuration.projectToken, host: configuration.host)
-        // Keep the SDK's standard app, device, locale, network, and lifecycle
-        // context. Product-owned events never include an app/window identity
-        // or any free-form user text.
+        // Command Reopen captures only its explicit product events. Disabling
+        // automatic capture keeps the menu-bar idle state free of lifecycle,
+        // screen-view, and swizzling work.
         config.preloadFeatureFlags = false
         config.sendFeatureFlagEvent = false
         config.setDefaultPersonProperties = false
         config.personProfiles = .never
         config.errorTrackingConfig.autoCapture = false
+        config.captureApplicationLifecycleEvents = false
+        config.captureScreenViews = false
+        config.enableSwizzling = false
+        config.flushIntervalSeconds = Constants.flushIntervalSeconds
+        config.logs.flushIntervalSeconds = Constants.flushIntervalSeconds
         sdk.setup(config)
     }
 

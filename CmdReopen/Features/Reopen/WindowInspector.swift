@@ -90,11 +90,30 @@ enum WindowInspector {
         windowInfoList: [[String: Any]],
         minimumDimension: CGFloat = minimumVisibleWindowDimension
     ) -> Bool {
-        visibleWindowReport(
-            ownerPID: ownerPID,
-            windowInfoList: windowInfoList,
-            minimumDimension: minimumDimension
-        ).hasVisibleWindow
+        for windowInfo in windowInfoList {
+            guard let windowPID = windowOwnerPID(from: windowInfo),
+                  windowPID == ownerPID,
+                  ((windowInfo[kCGWindowIsOnscreen as String] as? Bool) ?? true) else {
+                continue
+            }
+
+            let alpha = (windowInfo[kCGWindowAlpha as String] as? NSNumber)?.doubleValue
+                ?? (windowInfo[kCGWindowAlpha as String] as? Double)
+                ?? 1
+            guard alpha > 0 else { continue }
+
+            let layer = (windowInfo[kCGWindowLayer as String] as? NSNumber)?.intValue
+                ?? (windowInfo[kCGWindowLayer as String] as? Int)
+                ?? 0
+            guard layer == 0,
+                  let bounds = windowBounds(from: windowInfo),
+                  bounds.width >= minimumDimension,
+                  bounds.height >= minimumDimension else {
+                continue
+            }
+            return true
+        }
+        return false
     }
 
     static func windowOwnerPID(from windowInfo: [String: Any]) -> pid_t? {

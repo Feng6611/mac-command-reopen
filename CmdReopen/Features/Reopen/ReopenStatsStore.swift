@@ -35,6 +35,11 @@ struct StoreKitAppReviewPrompter: AppReviewPrompting {
 
 @MainActor
 final class ReopenStatsStore: ObservableObject {
+    private enum Persistence {
+        static let debounceNanoseconds: UInt64 = 2_000_000_000
+        static let retainedDailyHistoryDays = 400
+    }
+
     struct Snapshot: Equatable, Codable {
         var totalSuccessfulReopens: Int
         var perAppCounts: [String: Int]
@@ -102,6 +107,7 @@ final class ReopenStatsStore: ObservableObject {
     private let appReviewPrompter: any AppReviewPrompting
     private let encoder = JSONEncoder()
     private var hasRequestedReviewThisLaunch = false
+    private var pendingPersistenceTask: Task<Void, Never>?
 
     var totalSuccessfulReopens: Int {
         snapshot.totalSuccessfulReopens
@@ -249,7 +255,9 @@ final class ReopenStatsStore: ObservableObject {
         let loaded = Self.loadSnapshot(defaults: defaults, storageKey: storageKey)
             ?? Self.migrateSnapshot(defaults: defaults, from: LegacyStorageKey.reopenStats, to: storageKey)
             ?? .empty
-        let sanitized = Self.removingHelperEntries(from: loaded)
+        let sanitized = Self.trimmingDailyHistory(
+            from: Self.removingHelperEntries(from: loaded)
+        )
         self.snapshot = sanitized
         if sanitized != loaded {
             persist(sanitized)
@@ -287,7 +295,8 @@ final class ReopenStatsStore: ObservableObject {
         next.dailyAppCounts![dayKey, default: [:]][normalizedBundleID, default: 0] += 1
         next.lastUpdatedAt = Date()
 
-        persist(next)
+        snapshot = Self.trimmingDailyHistory(from: next)
+        schedulePersistence()
         return true
     }
 
@@ -325,8 +334,26 @@ final class ReopenStatsStore: ObservableObject {
     }
 
     func reset() {
+        pendingPersistenceTask?.cancel()
+        pendingPersistenceTask = nil
         snapshot = .empty
         defaults.removeObject(forKey: storageKey)
+    }
+
+    func flush() {
+        pendingPersistenceTask?.cancel()
+        pendingPersistenceTask = nil
+        persist(snapshot)
+    }
+
+    private func schedulePersistence() {
+        pendingPersistenceTask?.cancel()
+        pendingPersistenceTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: Persistence.debounceNanoseconds)
+            guard !Task.isCancelled, let self else { return }
+            self.pendingPersistenceTask = nil
+            self.persist(self.snapshot)
+        }
     }
 
     private func persist(_ snapshot: Snapshot) {
@@ -376,6 +403,27 @@ final class ReopenStatsStore: ObservableObject {
                 }
             }
             next.dailyAppCounts = dailyAppCounts
+        }
+        return next
+    }
+
+    static func trimmingDailyHistory(
+        from snapshot: Snapshot,
+        now: Date = Date(),
+        calendar: Calendar = .current
+    ) -> Snapshot {
+        guard let earliestRetainedDate = calendar.date(
+            byAdding: .day,
+            value: -(Persistence.retainedDailyHistoryDays - 1),
+            to: calendar.startOfDay(for: now)
+        ) else {
+            return snapshot
+        }
+        let earliestRetainedKey = dayKeyFormatter.string(from: earliestRetainedDate)
+        var next = snapshot
+        next.dailyCounts = next.dailyCounts.filter { $0.key >= earliestRetainedKey }
+        next.dailyAppCounts = next.dailyAppCounts.map { counts in
+            counts.filter { $0.key >= earliestRetainedKey }
         }
         return next
     }
