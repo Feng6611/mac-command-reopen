@@ -161,7 +161,7 @@ private struct ExcludedAppsSection: View {
         } header: {
             Text("Excluded Apps")
         } footer: {
-            Text("Excluded apps keep the standard Cmd+Tab behaviour.")
+            Text("Excluded apps keep the standard Cmd+Tab behavior.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

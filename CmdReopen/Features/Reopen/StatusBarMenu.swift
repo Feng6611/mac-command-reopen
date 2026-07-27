@@ -14,6 +14,10 @@ import os
 final class StatusBarMenuController {
     static let shared = StatusBarMenuController()
 
+    /// Never localized — it is the product name, and it also fills the `%@` in
+    /// the shared `Quit %@` menu string.
+    private static let appDisplayName = "Command Reopen"
+
     private var menuBarController: KikiMenuBarController?
     private let model = StatusBarMenuModel(reviewPromptRequester: { trigger in
         _ = ReopenStatsStore.shared.requestReviewIfEligible(for: trigger)
@@ -108,7 +112,14 @@ final class StatusBarMenuController {
             )
         })
         items.append(.separator)
-        items.append(.action(title: AppLanguage.shared.string("Quit Command Reopen"), shortcut: .quit) { [weak self] in
+        // Built from Kiki's `Quit %@` key rather than a literal "Quit Command
+        // Reopen", so this item uses the same translations as every other Kiki
+        // menu bar app.
+        let quitTitle = AppLanguage.shared.string(
+            localized: "Quit \(Self.appDisplayName)",
+            comment: "Menu item. %@ is the app display name."
+        )
+        items.append(.action(title: quitTitle, shortcut: .quit) { [weak self] in
             self?.model.quit()
         })
 

@@ -23,29 +23,40 @@ enum ProPurchaseError: Error, Equatable {
 }
 
 extension ProPurchaseError: LocalizedError {
+    /// These are read by someone trying to pay, so each one says what is wrong
+    /// in their terms and what they can do next. Cases the user cannot act on
+    /// — a missing or rejected API key, a plan absent from the offering — name
+    /// the situation rather than our configuration, and never expose the
+    /// commerce vendor or a raw plan identifier.
     var errorDescription: String? {
         MainActor.assumeIsolated {
             switch self {
-        case .notConfigured:
-            AppLanguage.shared.string("Purchases are not configured yet.")
-        case .offeringUnavailable:
-            AppLanguage.shared.string("No products are currently available.")
-        case .packageNotFound(let plan):
-            AppLanguage.shared.string(localized: "The \(plan.rawValue) product is not available in the current offering.")
+        case .notConfigured, .invalidCredentials:
+            AppLanguage.shared.string(
+                localized: "Purchases aren’t available in this build. Please contact support.",
+                comment: "Shown when the app's commerce configuration is missing or rejected; the user cannot fix this."
+            )
+        case .offeringUnavailable, .packageNotFound, .productUnavailable:
+            AppLanguage.shared.string(
+                localized: "The App Store isn’t offering this plan right now. Try again later.",
+                comment: "Shown when the store returns no purchasable product for a plan."
+            )
         case .purchaseCancelled:
             AppLanguage.shared.string("The purchase was cancelled.")
         case .purchaseNotAllowed:
-            AppLanguage.shared.string("Purchases are not allowed on this Mac.")
+            AppLanguage.shared.string(
+                localized: "Purchases are turned off on this Mac. Check your Screen Time content and privacy restrictions.",
+                comment: "StoreKit reports payments are not allowed, which on macOS is a Screen Time restriction."
+            )
         case .activationPending:
             AppLanguage.shared.string(localized: "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .invalidReceipt:
             AppLanguage.shared.string(localized: "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase.", comment: "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.")
         case .network:
-            AppLanguage.shared.string("A network connection is required to load purchases.")
-        case .invalidCredentials:
-            AppLanguage.shared.string("The RevenueCat API key is invalid.")
-        case .productUnavailable:
-            AppLanguage.shared.string("This product is not available for purchase.")
+            AppLanguage.shared.string(
+                localized: "No internet connection. Connect and try again to load purchases.",
+                comment: "Shown when the store cannot be reached."
+            )
         case .unknown(let message):
             message
             }

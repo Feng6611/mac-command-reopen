@@ -318,6 +318,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 				ja,
 				de,
 				fr,

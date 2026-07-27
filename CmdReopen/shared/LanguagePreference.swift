@@ -10,6 +10,7 @@ import SwiftUI
 enum SupportedLanguage: String, CaseIterable, Identifiable {
     case system = ""
     case english = "en"
+    case chinese = "zh-Hans"
     case japanese = "ja"
     case german = "de"
     case french = "fr"
@@ -23,6 +24,7 @@ enum SupportedLanguage: String, CaseIterable, Identifiable {
         switch self {
         case .system:   "System"
         case .english:  "English"
+        case .chinese:  "简体中文"
         case .japanese: "日本語"
         case .german:   "Deutsch"
         case .french:   "Français"

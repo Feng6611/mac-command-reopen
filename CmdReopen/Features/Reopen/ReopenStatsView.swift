@@ -13,11 +13,15 @@ enum StatTimeRange: CaseIterable {
     case week
     case month
 
+    /// Resolved through `AppLanguage`, not a bare `String(localized:)`: this
+    /// title is built outside a SwiftUI `Text`, so nothing else would apply the
+    /// language chosen in Settings.
+    @MainActor
     var title: String {
         switch self {
-        case .day:   return String(localized: "Day")
-        case .week:  return String(localized: "Week")
-        case .month: return String(localized: "Month")
+        case .day:   return AppLanguage.shared.string("Day")
+        case .week:  return AppLanguage.shared.string("Week")
+        case .month: return AppLanguage.shared.string("Month")
         }
     }
 }
@@ -44,6 +48,10 @@ private struct AnimatingNumber: View, Animatable {
 
 struct ReopenStatsView: View {
     @EnvironmentObject private var reopenStatsStore: ReopenStatsStore
+    /// `SectionHeader`, `MetricTile`, and `EmptyStateView` take plain `String`,
+    /// so their copy has to be resolved here rather than by `Text`'s
+    /// environment locale.
+    @ObservedObject private var appLanguage = AppLanguage.shared
 
     @State private var timeRange: StatTimeRange = .day
     @State private var heroTarget: Double = 0
@@ -105,14 +113,17 @@ struct ReopenStatsView: View {
 
                 HStack(spacing: DS.Spacing.sm) {
                     MetricTile(
-                        title: "Today",
-                        value: "\(reopenStatsStore.todayCount)",
+                        title: appLanguage.string("Today"),
+                        value: reopenStatsStore.todayCount.formatted(),
                         systemImage: "sun.max.fill",
                         tint: .orange
                     )
                     MetricTile(
-                        title: "Active",
-                        value: "\(activeDaysInLast30)d",
+                        title: appLanguage.string("Active"),
+                        value: appLanguage.string(
+                            localized: "\(activeDaysInLast30)d",
+                            comment: "Compact day count on the Active stat tile, e.g. '12d'. Use the locale's shortest natural day unit."
+                        ),
                         systemImage: "calendar",
                         tint: .teal
                     )
@@ -131,7 +142,7 @@ struct ReopenStatsView: View {
     private var trendSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                SectionHeader(title: "Trend", subtitle: timeRangeSubtitle) {
+                SectionHeader(title: appLanguage.string("Trend"), subtitle: timeRangeSubtitle) {
                     Picker("", selection: $timeRange) {
                         ForEach(StatTimeRange.allCases, id: \.self) { range in
                             Text(range.title).tag(range)
@@ -153,7 +164,10 @@ struct ReopenStatsView: View {
 #endif
 
                     if allZero {
-                        EmptyStateView(systemImage: "chart.bar", text: "Start using Command Reopen to see trends")
+                        EmptyStateView(
+                            systemImage: "chart.bar",
+                            text: appLanguage.string("Start using Command Reopen to see trends")
+                        )
                     }
                 }
                 .animation(.easeInOut(duration: 0.3), value: timeRange)
@@ -188,7 +202,7 @@ struct ReopenStatsView: View {
     private var topAppsSubtitle: String {
         let filtered = reopenStatsStore.topApps(5, since: topAppsStartDate)
         if filtered.isEmpty {
-            return "All time"
+            return appLanguage.string("All time")
         }
         return timeRangeSubtitle
     }
@@ -196,12 +210,15 @@ struct ReopenStatsView: View {
     private var topAppsSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                SectionHeader(title: "Top Apps", subtitle: topAppsSubtitle)
+                SectionHeader(title: appLanguage.string("Top Apps"), subtitle: topAppsSubtitle)
 
                 let topApps = topAppsForTimeRange
                 if topApps.isEmpty {
-                    EmptyStateView(systemImage: "app.dashed", text: "No reopen activity yet")
-                        .frame(height: 58)
+                    EmptyStateView(
+                        systemImage: "app.dashed",
+                        text: appLanguage.string("No reopen activity yet")
+                    )
+                    .frame(height: 58)
                 } else {
 #if canImport(Charts)
                     ChartsTopAppsView(apps: topApps)
@@ -221,9 +238,9 @@ struct ReopenStatsView: View {
 
     private var timeRangeSubtitle: String {
         switch timeRange {
-        case .day:   return "Last 30 days"
-        case .week:  return "Last 12 weeks"
-        case .month: return "Last 12 months"
+        case .day:   return appLanguage.string("Last 30 days")
+        case .week:  return appLanguage.string("Last 12 weeks")
+        case .month: return appLanguage.string("Last 12 months")
         }
     }
 }
@@ -232,6 +249,7 @@ struct ReopenStatsView: View {
 
 #if canImport(Charts)
 private struct ChartsTrendView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let data: [(date: Date, count: Int)]
     let timeRange: StatTimeRange
 
@@ -239,8 +257,8 @@ private struct ChartsTrendView: View {
         Chart {
             ForEach(Array(data.enumerated()), id: \.offset) { _, item in
                 BarMark(
-                    x: .value("Date", item.date, unit: calendarUnit),
-                    y: .value("Count", item.count)
+                    x: .value(appLanguage.string("Date"), item.date, unit: calendarUnit),
+                    y: .value(appLanguage.string("Count"), item.count)
                 )
                 .foregroundStyle(item.count > 0 ? Color.accentColor : Color.secondary.opacity(0.18))
                 .cornerRadius(3)
@@ -282,14 +300,15 @@ private struct ChartsTrendView: View {
 // MARK: - Charts Top Apps
 
 private struct ChartsTopAppsView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let apps: [ReopenStatsStore.AppStat]
 
     var body: some View {
         Chart {
             ForEach(Array(apps.enumerated()), id: \.element.id) { index, app in
                 BarMark(
-                    x: .value("Count", app.count),
-                    y: .value("App", app.displayName)
+                    x: .value(appLanguage.string("Count"), app.count),
+                    y: .value(appLanguage.string("App"), app.displayName)
                 )
                 .foregroundStyle(topAppColor(at: index))
                 .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
@@ -321,6 +340,7 @@ private struct ChartsTopAppsView: View {
 // MARK: - Fallback Trend
 
 private struct FallbackTrendView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let data: [(date: Date, count: Int)]
     let maxCount: Int
     let timeRange: StatTimeRange
@@ -363,15 +383,16 @@ private struct FallbackTrendView: View {
         }
     }
 
+    /// A fixed `dateFormat` would render "Jul 27" in every language. The
+    /// locale-aware style also has to be the app's chosen language, not the
+    /// system's.
     private func formatLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
         switch timeRange {
         case .day, .week:
-            formatter.dateFormat = "MMM d"
+            return date.formatted(.dateTime.month(.abbreviated).day().locale(appLanguage.locale))
         case .month:
-            formatter.dateFormat = "MMM"
+            return date.formatted(.dateTime.month(.abbreviated).locale(appLanguage.locale))
         }
-        return formatter.string(from: date)
     }
 }
 
