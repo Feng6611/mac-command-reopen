@@ -76,7 +76,7 @@ enum RevenueCatConfiguration {
             ],
             defaultPlanID: CommercePlan.lifetime.rawValue,
             commerceConfiguration: commerceConfiguration,
-            trialPolicy: .autoStart(duration: 2 * 24 * 60 * 60),
+            trialPolicy: .autoStart(duration: 14 * 24 * 60 * 60),
             storageKeys: KikiAccessStorageKeys(
                 trialStartedAt: "cmdreopenTrialStartDate",
                 debugProAccessOverride: "CmdReopen.Access.debugOverride",

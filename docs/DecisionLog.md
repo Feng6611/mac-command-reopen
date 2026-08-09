@@ -71,3 +71,57 @@ explicitly.
 
 This separation makes onboarding completion reliable even though trial access
 was already granted during app launch.
+
+## D-003 — Make one offer when the user closes the paywall after their trial ended
+
+- Date: 2026-08-09
+- Status: Accepted
+
+### Context
+
+Closing the paywall on an expired trial is the only moment Command Reopen knows
+for certain that a user decided not to pay, and the last one before they either
+forget the app or delete it. With product analytics removed in 1.4.2, it is
+also the only place the app can still learn *why* — nothing else is measured.
+
+### Decision
+
+Present `TrialExitOfferView` once per machine at that moment, offering three
+routes in a deliberate order:
+
+1. **Another 14 days**, the same length as the original trial. First because
+   the user is already leaving and this costs them nothing; staying installed
+   is what makes the other two possible later. A shorter "last chance" window
+   would read as a haggle — the problem is that they never reached a decision,
+   and the honest fix is the same run again.
+2. **Feedback by email**, prefilled with the one question worth asking now. The
+   app's only remaining signal. The card promises a discount code by reply.
+3. **The free Community edition**, as a footer link. Honest to offer, but it
+   must not outrank a route that could still end in a sale.
+
+The offer is withheld unless `TrialReceipt` resolves — below five restores the
+card has no argument, and a second free fortnight spent on someone who never
+adopted the feature buys neither a sale nor a signal. It is withheld once shown
+or once an extension was taken: a trial that can always be renewed is not a
+trial, and a card that reappeared until the user took one of its deals is the
+nag this feature exists to avoid. Declining is an answer.
+
+The discount code is sent by human reply rather than redeemed in the app.
+macOS has no in-app offer-code redemption sheet, so an automated flow would end
+at "here is a code, go find the App Store's redeem screen" — worse than an
+email that is already a conversation.
+
+Trial extension is a Commerce Kit mechanism (`KikiAccessManager.extendTrial`),
+which preserves the original `trialStartedAt`. Whether to offer one, to whom,
+and on what terms is app policy and lives in `TrialExitOffer`. The card itself
+is composed from `KikiPaywall` atoms rather than the paywall sheet: it sells
+nothing and has no plans, so reusing the sheet would have meant a purchase
+layout with the purchase removed.
+
+### Verification
+
+`TrialExitOfferTests` covers each condition that withholds the offer, the
+extension length, and the prefilled feedback mail.
+`KikiAccessManagerTests` covers extension arithmetic, the preserved start date,
+and the policies that ignore it. A manual pass is still required for the
+paywall-close-to-card transition, which crosses two sheets.

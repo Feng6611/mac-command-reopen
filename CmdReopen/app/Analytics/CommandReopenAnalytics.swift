@@ -1,9 +1,5 @@
 import Foundation
 
-#if APPSTORE
-import PostHog
-#endif
-
 /// The product-owned boundary between Command Reopen's behaviour and its
 /// analytics transport. It deliberately accepts only schema-defined values,
 /// never the app/window identity that a reopen operation handled.
@@ -32,6 +28,7 @@ final class CommandReopenAnalytics {
 
     protocol Transport: AnyObject {
         func capture(_ event: Event, distinctID: String)
+        func flush()
     }
 
     static let shared = CommandReopenAnalytics()
@@ -60,18 +57,11 @@ final class CommandReopenAnalytics {
         self.transport = transport
     }
 
-    /// Configures only the App Store target. This is deliberately called by
-    /// the first product event, not application launch, so an idle menu-bar
-    /// app does not install PostHog queues or their periodic flush timers.
+    /// Analytics transport is intentionally disabled in the product build.
+    /// The injectable seam remains so the event schema can still be tested
+    /// without collecting any user data.
     private func configureIfPossible() {
-        guard transport == nil else { return }
-
-#if APPSTORE
-        guard let configuration = PostHogConfiguration.fromMainBundle else {
-            return
-        }
-        transport = PostHogTransport(configuration: configuration)
-#endif
+        // No production analytics transport.
     }
 
     var isConfigured: Bool {
@@ -94,7 +84,8 @@ final class CommandReopenAnalytics {
                 // Existing installations cannot be distinguished reliably from
                 // a new install at the first analytics rollout.
                 "first_open_kind": .string("analytics_rollout")
-            ]
+            ],
+            flushImmediately: true
         )
         defaults.set(true, forKey: StorageKey.didCaptureFirstOpen)
     }
@@ -116,7 +107,12 @@ final class CommandReopenAnalytics {
         if let completionMethod {
             properties["completion_method"] = .string(completionMethod)
         }
-        capture(.onboarding, properties: properties, entitlementState: entitlementState)
+        capture(
+            .onboarding,
+            properties: properties,
+            entitlementState: entitlementState,
+            flushImmediately: stage == "started"
+        )
     }
 
     func captureReopenActiveDay(totalSuccessfulReopens: Int, entitlementState: String) {
@@ -219,7 +215,8 @@ final class CommandReopenAnalytics {
     private func capture(
         _ name: EventName,
         properties: [String: AnalyticsValue],
-        entitlementState: String = "unrestricted"
+        entitlementState: String = "unrestricted",
+        flushImmediately: Bool = false
     ) {
         if name != .appFirstOpened,
            !defaults.bool(forKey: StorageKey.didCaptureFirstOpen) {
@@ -242,6 +239,9 @@ final class CommandReopenAnalytics {
         ]
         commonProperties.merge(properties) { _, value in value }
         transport.capture(Event(name: name, properties: commonProperties), distinctID: installationID)
+        if flushImmediately {
+            transport.flush()
+        }
     }
 
     private var installationID: String {
@@ -287,75 +287,6 @@ final class CommandReopenAnalytics {
         return "macOS \(version.majorVersion).\(version.minorVersion)"
     }
 }
-
-#if APPSTORE
-private struct PostHogConfiguration {
-    let projectToken: String
-    let host: String
-
-    static var fromMainBundle: Self? {
-        guard let token = (Bundle.main.object(forInfoDictionaryKey: "CmdReopenPostHogProjectToken") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-              !token.isEmpty,
-              !token.hasPrefix("phc_your_") else {
-            return nil
-        }
-        let host = ((Bundle.main.object(forInfoDictionaryKey: "CmdReopenPostHogHost") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines)).flatMap { $0.isEmpty ? nil : $0 }
-            ?? "https://us.i.posthog.com"
-        return Self(projectToken: token, host: host)
-    }
-}
-
-@MainActor
-private final class PostHogTransport: CommandReopenAnalytics.Transport {
-    private enum Constants {
-        static let flushIntervalSeconds: TimeInterval = 15 * 60
-    }
-
-    private let sdk = PostHogSDK.shared
-
-    init(configuration: PostHogConfiguration) {
-        let config = PostHogConfig(projectToken: configuration.projectToken, host: configuration.host)
-        // Command Reopen captures only its explicit product events. Disabling
-        // automatic capture keeps the menu-bar idle state free of lifecycle,
-        // screen-view, and swizzling work.
-        config.preloadFeatureFlags = false
-        config.sendFeatureFlagEvent = false
-        config.setDefaultPersonProperties = false
-        config.personProfiles = .never
-        config.errorTrackingConfig.autoCapture = false
-        config.captureApplicationLifecycleEvents = false
-        config.captureScreenViews = false
-        config.enableSwizzling = false
-        config.flushIntervalSeconds = Constants.flushIntervalSeconds
-        config.logs.flushIntervalSeconds = Constants.flushIntervalSeconds
-        sdk.setup(config)
-    }
-
-    func capture(_ event: CommandReopenAnalytics.Event, distinctID: String) {
-        sdk.capture(
-            event.name.rawValue,
-            distinctId: distinctID,
-            properties: event.properties.reduce(into: [String: Any]()) { result, entry in
-                result[entry.key] = entry.value.postHogValue
-            }
-        )
-    }
-
-}
-
-private extension CommandReopenAnalytics.AnalyticsValue {
-    var postHogValue: Any {
-        switch self {
-        case .string(let value): value
-        case .integer(let value): value
-        case .boolean(let value): value
-        case .strings(let value): value
-        }
-    }
-}
-#endif
 
 extension AccessEntitlementState {
     var analyticsValue: String {

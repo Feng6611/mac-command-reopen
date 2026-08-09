@@ -17,6 +17,9 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let preferredLanguage = "cmdreopenPreferredLanguage"
+        /// Set once the trial-exit offer has been presented, whatever the user
+        /// chose. The offer is made once per machine; see `TrialExitOffer`.
+        static let hasSeenTrialExitOffer = "cmdreopenHasSeenTrialExitOffer"
         static let analyticsInstallationID = "cmdreopen.analytics.installationID.v1"
 #if DEBUG
         static let pendingOnboardingRelaunch = "cmdreopenPendingOnboardingRelaunch"
@@ -47,6 +50,7 @@ enum AppDefaults {
     static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
+    static let hasSeenTrialExitOffer = Defaults.Key<Bool>(RawKey.hasSeenTrialExitOffer, default: false)
 
     static func migrateLegacyKeys(in defaults: UserDefaults = .standard) {
         migrate(from: LegacyRawKey.featureEnabled, to: RawKey.featureEnabled, in: defaults)

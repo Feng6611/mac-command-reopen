@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.4.2 — 2026-08-09
+
+- Removed product analytics and the PostHog dependency from all distributions.
+- Updated the direct edition to use the Command Reopen bundle identifier and
+  the same non-commercial feature surface as the App Store edition.
+- Renamed the direct edition status to Community edition; it has no RevenueCat,
+  trial, purchase, or upgrade flow.
+- Added a one-time offer shown when the paywall is closed after the trial ended
+  without a purchase: another 14 days, a prefilled feedback email that earns a
+  discount code by reply, or a link to the free Community edition. Withheld
+  from anyone the app restored fewer than five windows for, and never shown
+  twice. The extension keeps the original trial start date, so the app can
+  still report what the trial produced.
+- Reworked the paywall's visual hierarchy: brand color is now limited to the
+  purchase button and the selected plan card, and the sheet takes the height
+  its content needs instead of hiding overflow under the buttons.
+
+## 1.4.1 — 2026-08-06
+
+- Extended the automatic free trial from two days to fourteen days. Existing
+  trials retain their original start date and use the new duration.
+- Fixed App Store analytics configuration that could silently drop product
+  events when the release bundle lacked its PostHog project token. First-open
+  and onboarding-start events now flush immediately.
+- Added an App Store build gate that rejects archives without the configured
+  analytics token and host.
+
 ## 2026-07-27
 
 - Added Simplified Chinese (`zh-Hans`) as a fourth translation and a new

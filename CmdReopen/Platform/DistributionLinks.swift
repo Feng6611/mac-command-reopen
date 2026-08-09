@@ -4,6 +4,10 @@ enum ExternalLinks {
     static let officialURL = "https://commandreopen.com"
     static let githubURL = "https://github.com/Feng6611/mac-command-reopen"
     static let githubDocsBaseURL = "https://github.com/Feng6611/mac-command-reopen/blob/main"
+    /// Where the free Community edition is downloaded. The releases page, not
+    /// the repository root: someone taking this route wants the app, not the
+    /// source, and the root asks them to find the download themselves.
+    static let communityEditionURL = "\(githubURL)/releases/latest"
     static let appStoreStandardEULAURL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     static let customTermsURL = "\(githubDocsBaseURL)/TERMS.md"
     static let privacyURL = "\(officialURL)/privacy/"

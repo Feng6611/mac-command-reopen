@@ -74,7 +74,8 @@ Yes. If you Cmd+Tab to an app that has no open windows, Command Reopen will crea
 
 ## Privacy
 
-Command Reopen collects no data. Everything runs locally on your Mac. See [PRIVACY.md](PRIVACY.md).
+Command Reopen keeps window handling and app-specific activity on your Mac and
+does not collect or transmit product analytics. See [PRIVACY.md](PRIVACY.md).
 
 ## RevenueCat development configuration
 

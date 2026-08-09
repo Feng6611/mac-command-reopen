@@ -13,6 +13,7 @@ struct ProAccessDebugRows: View {
     @ObservedObject private var accessModel = CommandAccessModel.shared
     let onPresentOnboarding: () -> Void
     let onPresentPaywall: () -> Void
+    let onPresentTrialExitOffer: () -> Void
 
     var body: some View {
         KikiSettingsDebugPreviewRow(
@@ -26,6 +27,7 @@ struct ProAccessDebugRows: View {
         KikiSettingsValueRow("Test flows", systemImage: "play.rectangle") {
             Button("Onboarding", action: onPresentOnboarding)
             Button("Paywall", action: onPresentPaywall)
+            Button("Retention offer", action: onPresentTrialExitOffer)
         }
     }
 

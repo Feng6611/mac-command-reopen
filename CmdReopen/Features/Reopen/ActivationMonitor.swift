@@ -308,8 +308,10 @@ final class ActivationMonitor: ObservableObject {
                     return
                 }
                 self.recordExpiredNudge(at: now)
+#if APPSTORE
                 self.presentExpiredPaywallNudge()
                 AppLogger.activation.info("Trial expired nudge: allowing one-time reopen and showing paywall.")
+#endif
             }
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
@@ -334,6 +336,7 @@ final class ActivationMonitor: ObservableObject {
         defaults.set(date, forKey: Self.lastExpiredNudgeDateKey)
     }
 
+#if APPSTORE
     private func presentExpiredPaywallNudge() {
         Task { @MainActor in
             SettingsWindowController.shared.show(
@@ -343,6 +346,7 @@ final class ActivationMonitor: ObservableObject {
             )
         }
     }
+#endif
 
     private func shouldSuppressRecentlyLaunchedReopen(for app: NSRunningApplication, now: Date) -> Bool {
         guard Self.shouldSuppressRecentLaunch(
@@ -427,10 +431,12 @@ final class ActivationMonitor: ObservableObject {
                 bundleURL: openedBundleURL
             )
             guard didRecord else { return }
+#if APPSTORE
             CommandReopenAnalytics.shared.captureReopenActiveDay(
                 totalSuccessfulReopens: reopenStatsStore.totalSuccessfulReopens,
                 entitlementState: AppAccessController.shared.entitlementState.analyticsValue
             )
+#endif
         }
 
         if let openedProcessIdentifier {

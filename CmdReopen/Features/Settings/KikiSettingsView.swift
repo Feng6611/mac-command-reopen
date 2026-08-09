@@ -67,11 +67,35 @@ struct SettingsView: View {
                 accessModel: accessModel,
                 context: .settings,
                 source: route.paywallSource,
+                // Closing the paywall after the trial ended is the only moment
+                // the app knows the user decided not to pay. `TrialExitOffer`
+                // resolves to nil in every other case, including a close that
+                // followed a purchase.
+                onFinish: {
+                    guard TrialExitOffer.resolve(accessModel: accessModel) != nil else { return }
+                    route.presentTrialExitOffer()
+                },
                 onPurchaseCompleted: {
                     _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
                 }
             )
         }
+        .sheet(isPresented: $route.isTrialExitOfferPresented) {
+            // Resolved again on presentation rather than carried over from the
+            // paywall's close: the sheet is asked for one run loop later, and
+            // anything that changed access state in between should cancel it.
+            if let offer = TrialExitOffer.resolve(accessModel: accessModel) {
+                TrialExitOfferSheet(accessModel: accessModel, offer: offer)
+            }
+        }
+#if DEBUG
+        .sheet(isPresented: $route.isTrialExitOfferDebugPreviewPresented) {
+            TrialExitOfferSheet(
+                accessModel: accessModel,
+                offer: .debugPreview
+            )
+        }
+#endif
 #endif
     }
 
@@ -151,6 +175,9 @@ struct SettingsView: View {
                     },
                     onPresentPaywall: {
                         route.presentPaywall()
+                    },
+                    onPresentTrialExitOffer: {
+                        route.presentTrialExitOfferDebugPreview()
                     }
                 )
             } header: {
@@ -231,8 +258,8 @@ struct SettingsView: View {
 #else
         return KikiAccessStatusPresentation(
             tone: .active,
-            title: language.string(localized: "Direct version"),
-            subtitle: language.string(localized: "All Command Reopen features are available."),
+            title: language.string(localized: "Community edition"),
+            subtitle: language.string(localized: "Free and fully featured for the community."),
             actionTitle: nil
         )
 #endif

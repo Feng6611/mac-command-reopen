@@ -1,7 +1,6 @@
 #if APPSTORE
 import KikiCommerceCore
 import KikiCommercePresentation
-import KikiPaywall
 import SwiftUI
 
 enum PaywallPresentationContext {
@@ -37,8 +36,7 @@ struct PaywallSheetView: View {
     @State private var purchaseAttempt: PurchaseAttempt?
 
     var body: some View {
-        // The user's own trial numbers, when there are enough of them to lead
-        // with. Resolved once per render and reused for subtitle and stats.
+        // The user's trial history changes the expired-state explanation.
         // Only while a trial is running or has just ended: the copy says "in
         // your trial", which would contradict a sheet offering to start one.
         let receipt = accessModel.status.hasTrialHistory
@@ -57,7 +55,7 @@ struct PaywallSheetView: View {
                 expiredSubtitle: receipt == nil
                     ? appLanguage.string(localized: "Upgrade to continue automatic window reopening.")
                     : appLanguage.string(localized: "Without Pro, Cmd+Tab leaves them minimized again.", comment: "Expired-trial paywall subtitle, naming what stopped working."),
-                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
+                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 14 days. No payment now — nothing auto-renews."),
                 features: [
                     appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab"),
                     appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"),
@@ -74,10 +72,8 @@ struct PaywallSheetView: View {
                 noActivePurchaseMessage: appLanguage.string(localized: "No active purchase found on this account."),
                 purchaseErrorMessage: appLanguage.string(localized: "The purchase couldn't be completed.")
             ),
-            stats: ownedAccessStats ?? trialStats(for: receipt),
             footerLinks: footerLinks,
             tint: DS.Colors.brandPrimary,
-            planPresentation: localizedPlanPresentation,
             onFinish: {
                 CommandReopenAnalytics.shared.capturePaywallAction(
                     sessionID: paywallSessionID,
@@ -120,39 +116,6 @@ struct PaywallSheetView: View {
             availablePlans: plans.filter(\.isAvailable).map(\.id),
             totalSuccessfulReopens: ReopenStatsStore.shared.totalSuccessfulReopens,
             entitlementState: accessModel.accessEntitlementState.analyticsValue
-        )
-    }
-
-    private func localizedPlanPresentation(
-        _ product: KikiAccessPlanProduct
-    ) -> KikiPaywallPlanPresentation {
-        let language = appLanguage
-        let title: String
-        let billingDetail: String
-        let badge: String?
-
-        switch product.plan.commercePlan {
-        case .yearly:
-            title = language.string("Yearly")
-            billingDetail = language.string("per year")
-            badge = nil
-        case .lifetime:
-            title = language.string("Lifetime")
-            billingDetail = language.string("once")
-            badge = language.string("Best Value")
-        default:
-            title = product.title
-            billingDetail = product.billingDetail
-            badge = product.badge
-        }
-
-        return KikiPaywallPlanPresentation(
-            id: product.id,
-            title: title,
-            displayPrice: product.displayPrice,
-            billingDetail: billingDetail,
-            badge: badge,
-            isAvailable: product.isAvailable
         )
     }
 
@@ -254,74 +217,8 @@ struct PaywallSheetView: View {
         }
     }
 
-    /// Fills the space the plan cards leave behind for an owner, with their own
-    /// figures rather than another pitch. `nil` when the user has not paid, so
-    /// the trial figures take the slot instead.
-    private var ownedAccessStats: [KikiAccessPaywallStat]? {
-        guard case .pro(let plan, _) = accessModel.status else {
-            return nil
-        }
-
-        var stats: [KikiAccessPaywallStat] = []
-        let restored = ReopenStatsStore.shared.totalSuccessfulReopens
-        if restored > 0 {
-            stats.append(
-                KikiAccessPaywallStat(
-                    id: "restored",
-                    value: restored.formatted(),
-                    label: appLanguage.string(localized: "Windows restored")
-                )
-            )
-        }
-        stats.append(
-            KikiAccessPaywallStat(id: "plan", value: localizedPlanTitle(for: plan), label: appLanguage.string(localized: "Your plan"))
-        )
-        return stats
-    }
-
-    /// The trial evidence, sized to outweigh the prices it argues against.
-    ///
-    /// The total leads because it is the argument; the app beside it is what
-    /// makes the total legible as the user's own rather than a statistic.
-    private func trialStats(for receipt: TrialReceipt?) -> [KikiAccessPaywallStat] {
-        guard let receipt else {
-            return []
-        }
-
-        var stats = [
-            KikiAccessPaywallStat(
-                id: "trialRestored",
-                value: receipt.formattedCount,
-                label: appLanguage.string(localized: "Restored in your trial",
-                    comment: "Caption under the trial reopen count on the paywall; one line only."
-                )
-            )
-        ]
-        if let leadApp = receipt.leadApp {
-            // The count is the value and the app name the caption, so a long
-            // name is clipped in the smaller type instead of shrinking the
-            // figure it belongs to.
-            stats.append(
-                KikiAccessPaywallStat(
-                    id: "trialLeadApp",
-                    value: leadApp.count.formatted(),
-                    label: leadApp.displayName
-                )
-            )
-        }
-        return stats
-    }
-
     private func format(_ date: Date) -> String {
         date.formatted(.dateTime.year().month(.abbreviated).day().locale(appLanguage.locale))
-    }
-
-    private func localizedPlanTitle(for plan: KikiAccessPlan) -> String {
-        switch plan.commercePlan {
-        case .yearly: appLanguage.string("Yearly")
-        case .lifetime: appLanguage.string("Lifetime")
-        default: plan.title
-        }
     }
 
     private var footerLinks: [KikiAccessPaywallLink] {

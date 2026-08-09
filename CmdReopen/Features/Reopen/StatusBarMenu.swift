@@ -83,6 +83,7 @@ final class StatusBarMenuController {
             SettingsOpener.shared.open()
         })
 
+#if APPSTORE
         if presentation.showsUpgradeItem {
             items.append(.action(title: AppLanguage.shared.string("Upgrade to Pro…")) {
                 SettingsOpener.shared.open(
@@ -92,6 +93,7 @@ final class StatusBarMenuController {
                 )
             })
         }
+#endif
         items.append(.separator)
 
         switch accessController.distributionChannel {

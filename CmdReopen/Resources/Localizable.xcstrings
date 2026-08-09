@@ -1,82 +1,88 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "%lld days left": {
-      "comment": "Trial time remaining in the About pane; plural-aware in the catalog.",
-      "localizations": {
-        "de": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Noch %lld Tag"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld days left" : {
+      "comment" : "Trial time remaining in the About pane; plural-aware in the catalog.",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Tag"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Noch %lld Tage"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Tage"
                 }
               }
             }
           }
         },
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld day left"
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day left"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld days left"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days left"
                 }
               }
             }
           }
         },
-        "fr": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Il reste %lld jour"
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il reste %lld jour"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Il reste %lld jours"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il reste %lld jours"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "残り %lld 日"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "残り %lld 日"
                 }
               }
             }
           }
         },
-        "zh-Hans": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "剩余 %lld 天"
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "剩余 %lld 天"
                 }
               }
             }
@@ -84,82 +90,82 @@
         }
       }
     },
-    "%lld uses left": {
-      "comment": "Trial usage remaining in the About pane; plural-aware in the catalog.",
-      "localizations": {
-        "de": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Noch %lld Nutzung"
+    "%lld uses left" : {
+      "comment" : "Trial usage remaining in the About pane; plural-aware in the catalog.",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Nutzung"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Noch %lld Nutzungen"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Nutzungen"
                 }
               }
             }
           }
         },
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld use left"
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld use left"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld uses left"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld uses left"
                 }
               }
             }
           }
         },
-        "fr": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Il reste %lld utilisation"
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il reste %lld utilisation"
                 }
               },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Il reste %lld utilisations"
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Il reste %lld utilisations"
                 }
               }
             }
           }
         },
-        "ja": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "残り %lld 回"
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "残り %lld 回"
                 }
               }
             }
           }
         },
-        "zh-Hans": {
-          "variations": {
-            "plural": {
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "剩余 %lld 次"
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "剩余 %lld 次"
                 }
               }
             }
@@ -167,3544 +173,3854 @@
         }
       }
     },
-    "%lldd": {
-      "comment": "Compact day count on the Active stat tile, e.g. '12d'. Use the locale's shortest natural day unit; it sits in a small tile beside a title.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld T"
+    "%lldd" : {
+      "comment" : "Compact day count on the Active stat tile, e.g. '12d'. Use the locale's shortest natural day unit; it sits in a small tile beside a title.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld T"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld j"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld j"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld日"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld日"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld 天"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天"
           }
         }
       }
     },
-    "About": {
-      "comment": "Menu item opening the system About panel.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Über"
+    "About" : {
+      "comment" : "Menu item opening the system About panel.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Über"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "À propos"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "À propos"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "このアプリについて"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアプリについて"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "关于"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于"
           }
         }
       }
     },
-    "Active": {
-      "comment": "Stat tile title: how many of the last 30 days had at least one reopen.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktiv"
+    "Active" : {
+      "comment" : "Stat tile title: how many of the last 30 days had at least one reopen.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiv"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Actif"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actif"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "稼働"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "稼働"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "活跃"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "活跃"
           }
         }
       }
     },
-    "Add": {
-      "comment": "Row label for the control that adds an app to the exclusion list.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Hinzufügen"
+    "Add" : {
+      "comment" : "Row label for the control that adds an app to the exclusion list.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hinzufügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ajouter"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajouter"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "追加"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "追加"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加"
           }
         }
       }
     },
-    "Added": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hinzugefügt"
+    "Added" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzugefügt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouté"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "追加済み"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加済み"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已添加"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已添加"
           }
         }
       }
     },
-    "All Command Reopen features are available.": {
-      "comment": "Subtitle in the About pane for the Direct (non-App-Store) build; all features are included.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alle Funktionen von Command Reopen sind verfügbar."
+    "All Command Reopen features are available." : {
+      "comment" : "Subtitle in the About pane for the Direct (non-App-Store) build; all features are included.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen von Command Reopen sind verfügbar."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toutes les fonctionnalités de Command Reopen sont disponibles."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctionnalités de Command Reopen sont disponibles."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen のすべての機能をご利用いただけます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen のすべての機能をご利用いただけます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen 的全部功能均已可用。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen 的全部功能均已可用。"
           }
         }
       }
     },
-    "All time": {
-      "comment": "Subtitle on the Top Apps section when the selected range has no data and the list falls back to every recorded reopen.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gesamt"
+    "All time" : {
+      "comment" : "Subtitle on the Top Apps section when the selected range has no data and the list falls back to every recorded reopen.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Depuis le début"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis le début"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "全期間"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全期間"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "全部时间"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部时间"
           }
         }
       }
     },
-    "App": {
-      "comment": "Series label for the app axis of the Top Apps chart; the noun 'app', not the button 'App Store'.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App"
+    "App" : {
+      "comment" : "Series label for the app axis of the Top Apps chart; the noun 'app', not the button 'App Store'.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
           }
         }
       }
     },
-    "App name or bundle ID": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App-Name oder Bundle-ID"
+    "App name or bundle ID" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Name oder Bundle-ID"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nom de l’app ou identifiant de bundle"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de l’app ou identifiant de bundle"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App名またはBundle ID"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App名またはBundle ID"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App 名称或 Bundle ID"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App 名称或 Bundle ID"
           }
         }
       }
     },
-    "Auto-renews annually": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verlängert sich automatisch jährlich"
+    "Auto-renews annually" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlängert sich automatisch jährlich"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Renouvellement automatique chaque année"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renouvellement automatique chaque année"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "毎年自動更新"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "毎年自動更新"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每年自动续期"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每年自动续期"
           }
         }
       }
     },
-    "Best Value": {
-      "comment": "Badge on the recommended paywall plan.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Beste Wahl"
+    "Best Value" : {
+      "comment" : "Badge on the recommended paywall plan.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beste Wahl"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Meilleur choix"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meilleur choix"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "おすすめ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "おすすめ"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最超值"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最超值"
           }
         }
       }
     },
-    "Checking purchases…": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käufe werden überprüft…"
+    "Checking purchases…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käufe werden überprüft…"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vérification des achats…"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification des achats…"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入を確認中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を確認中…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在检查购买项目…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在检查购买项目…"
           }
         }
       }
     },
-    "Click below, then press Cmd+Tab once — the window comes right back.": {
-      "comment": "Onboarding tutorial instruction, single line under the key-cap visual. Keep Cmd+Tab in Latin.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Klicken Sie unten und drücken Sie dann einmal Cmd+Tab – das Fenster kommt sofort zurück."
+    "Click below, then press Cmd+Tab once — the window comes right back." : {
+      "comment" : "Onboarding tutorial instruction, single line under the key-cap visual. Keep Cmd+Tab in Latin.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken Sie unten und drücken Sie dann einmal Cmd+Tab – das Fenster kommt sofort zurück."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cliquez ci-dessous, puis appuyez une fois sur Cmd+Tab — la fenêtre revient aussitôt."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez ci-dessous, puis appuyez une fois sur Cmd+Tab — la fenêtre revient aussitôt."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下のボタンをクリックし、Cmd+Tab を1回押すと、ウインドウはすぐに戻ってきます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下のボタンをクリックし、Cmd+Tab を1回押すと、ウインドウはすぐに戻ってきます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "点按下方按钮，然后按一次 Cmd+Tab，窗口就会回来。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点按下方按钮，然后按一次 Cmd+Tab，窗口就会回来。"
           }
         }
       }
     },
-    "Cmd+Tab": {
-      "comment": "Onboarding flow diagram, step 2 label. Keep the key names in Latin in every locale.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab"
+    "Cmd+Tab" : {
+      "comment" : "Onboarding flow diagram, step 2 label. Keep the key names in Latin in every locale.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab"
           }
         }
       }
     },
-    "Cmd+Tab now brings your windows back.": {
-      "comment": "Onboarding success step body. Keep Cmd+Tab in Latin.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab bringt Ihre Fenster jetzt zurück."
+    "Cmd+Tab now brings your windows back." : {
+      "comment" : "Onboarding success step body. Keep Cmd+Tab in Latin.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab bringt Ihre Fenster jetzt zurück."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab ramène désormais vos fenêtres."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab ramène désormais vos fenêtres."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "これからは Cmd+Tab でウインドウが戻ってきます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これからは Cmd+Tab でウインドウが戻ってきます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "现在按 Cmd+Tab 就能找回窗口。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现在按 Cmd+Tab 就能找回窗口。"
           }
         }
       }
     },
-    "Command Reopen Pro": {
-      "comment": "Product tier name — do not translate.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro"
+    "Command Reopen Pro" : {
+      "comment" : "Product tier name — do not translate.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro"
           }
         }
       }
     },
-    "Command Reopen Pro is active during the trial.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro ist während der Testphase aktiv."
+    "Command Reopen Pro is active during the trial." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro ist während der Testphase aktiv."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro est actif pendant l’essai."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro est actif pendant l’essai."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トライアル期間中は Command Reopen Pro が有効です。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トライアル期間中は Command Reopen Pro が有効です。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "试用期间可使用 Command Reopen Pro。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试用期间可使用 Command Reopen Pro。"
           }
         }
       }
     },
-    "Continue": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fortfahren"
+    "Command Reopen — what I was missing" : {
+      "comment" : "Subject line of the prefilled feedback email offered when a trial ends.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen – was mir gefehlt hat"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Continuer"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen — ce qui m’a manqué"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "続ける"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen — 足りないと感じた点"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "继续"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen — 我觉得还缺什么"
           }
         }
       }
     },
-    "Count": {
-      "comment": "Series label for the count axis of the reopen charts.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anzahl"
+    "Continue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortfahren"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "回数"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "次数"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续"
           }
         }
       }
     },
-    "Date": {
-      "comment": "Series label for the date axis of the trend chart.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Datum"
+    "Count" : {
+      "comment" : "Series label for the count axis of the reopen charts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日付"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回数"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日期"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次数"
           }
         }
       }
     },
-    "Day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag"
+    "Date" : {
+      "comment" : "Series label for the date axis of the trend chart.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jour"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日期"
           }
         }
       }
     },
-    "Didn’t come back? No worries — try again.": {
-      "comment": "Gentle retry hint shown if the user does not return with a single Cmd+Tab press during onboarding.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht zurückgekommen? Kein Problem – versuchen Sie es erneut."
+    "Day" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pas revenu ? Pas de souci — réessayez."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "戻ってこなかった？ 大丈夫、もう一度お試しください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "窗口没回来？再试一次就好。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日"
           }
         }
       }
     },
-    "Direct version": {
-      "comment": "'Direct' is the non-App-Store distribution channel; keep as a proper noun.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Direct-Version"
+    "Debug only. Live clears the Pro access override." : {
+
+    },
+    "Developer Testing" : {
+
+    },
+    "Didn’t come back? No worries — try again." : {
+      "comment" : "Gentle retry hint shown if the user does not return with a single Cmd+Tab press during onboarding.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht zurückgekommen? Kein Problem – versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas revenu ? Pas de souci — réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻ってこなかった？ 大丈夫、もう一度お試しください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口没回来？再试一次就好。"
+          }
+        }
+      }
+    },
+    "Direct version" : {
+      "comment" : "'Direct' is the non-App-Store distribution channel; keep as a proper noun.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct-Version"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Direct"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct版"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct 版本"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "Email" : {
+      "comment" : "About-pane row label for the support address.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メール"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邮箱"
+          }
+        }
+      }
+    },
+    "Enable Command Reopen" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen aktivieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer Command Reopen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen を有効にする"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用 Command Reopen"
+          }
+        }
+      }
+    },
+    "Exclude apps you don’t want restored" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps ausschließen, die nicht wiederhergestellt werden sollen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Version Direct"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclure les apps que vous ne voulez pas restaurer"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Direct版"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元したくないAppを除外"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Direct 版本"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排除不想被恢复的 App"
           }
         }
       }
     },
-    "Done": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fertig"
+    "Excluded Apps" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgeschlossene Apps"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terminé"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps exclues"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完了"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するApp"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完成"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排除的 App"
           }
         }
       }
     },
-    "Email": {
-      "comment": "About-pane row label for the support address.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "E-Mail"
+    "Excluded apps keep the standard Cmd+Tab behavior." : {
+      "comment" : "Footer under the exclusion list, explaining what excluding an app does.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Für ausgeschlossene Apps gilt weiterhin das normale Cmd+Tab-Verhalten."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "E-mail"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les apps exclues conservent le comportement standard de Cmd+Tab."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "メール"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "除外したアプリでは、Cmd+Tab は通常どおりの動作になります。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "邮箱"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "被排除的 App 保持 Cmd+Tab 的原有行为。"
           }
         }
       }
     },
-    "Enable Command Reopen": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen aktivieren"
+    "Fix Cmd+Tab for minimized and closed windows" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab für minimierte und geschlossene Fenster reparieren"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activer Command Reopen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réparer Cmd+Tab pour les fenêtres réduites et fermées"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen を有効にする"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化・閉じたウインドウも Cmd+Tab で復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "启用 Command Reopen"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 Cmd+Tab 找回最小化和已关闭的窗口"
           }
         }
       }
     },
-    "Exclude apps you don’t want restored": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apps ausschließen, die nicht wiederhergestellt werden sollen"
+    "General" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exclure les apps que vous ne voulez pas restaurer"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元したくないAppを除外"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一般"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "排除不想被恢复的 App"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通用"
           }
         }
       }
     },
-    "Excluded Apps": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ausgeschlossene Apps"
+    "Get on Mac App Store" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Mac App Store laden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apps exclues"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger dans le Mac App Store"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除外するApp"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac App Store で入手"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "排除的 App"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前往 Mac App Store 获取"
           }
         }
       }
     },
-    "Excluded apps keep the standard Cmd+Tab behavior.": {
-      "comment": "Footer under the exclusion list, explaining what excluding an app does.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Für ausgeschlossene Apps gilt weiterhin das normale Cmd+Tab-Verhalten."
+    "Give me 14 more days" : {
+      "comment" : "Primary button that extends the expired trial by another fourteen days.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch 14 Tage nutzen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Les apps exclues conservent le comportement standard de Cmd+Tab."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me donner 14 jours de plus"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "除外したアプリでは、Cmd+Tab は通常どおりの動作になります。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あと14日間使う"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "被排除的 App 保持 Cmd+Tab 的原有行为。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再给我 14 天"
           }
         }
       }
     },
-    "Fix Cmd+Tab for minimized and closed windows": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cmd+Tab für minimierte und geschlossene Fenster reparieren"
+    "It works!" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es funktioniert!"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réparer Cmd+Tab pour les fenêtres réduites et fermées"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ça fonctionne !"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化・閉じたウインドウも Cmd+Tab で復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "できました！"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "让 Cmd+Tab 找回最小化和已关闭的窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成功了！"
           }
         }
       }
     },
-    "General": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Allgemein"
+    "Keep it working" : {
+      "comment" : "Purchase button while the feature is still running on a trial.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Weiter nutzen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Général"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Continuer à l’utiliser"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一般"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使い続ける"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "通用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续使用"
           }
         }
       }
     },
-    "Get on Mac App Store": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Im Mac App Store laden"
+    "Language" : {
+      "comment" : "Settings row label for the app UI language picker.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Télécharger dans le Mac App Store"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langue"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac App Store で入手"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "言語"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "前往 Mac App Store 获取"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语言"
           }
         }
       }
     },
-    "It works!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Es funktioniert!"
+    "Last 12 months" : {
+      "comment" : "Subtitle stating the range the chart covers.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte 12 Monate"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ça fonctionne !"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12 derniers mois"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "できました！"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去 12 か月"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "成功了！"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近 12 个月"
           }
         }
       }
     },
-    "Keep it working": {
-      "comment": "Purchase button while the feature is still running on a trial.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Weiter nutzen"
+    "Last 12 weeks" : {
+      "comment" : "Subtitle stating the range the chart covers.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte 12 Wochen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Continuer à l’utiliser"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12 dernières semaines"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "使い続ける"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去 12 週"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "继续使用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近 12 周"
           }
         }
       }
     },
-    "Language": {
-      "comment": "Settings row label for the app UI language picker.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sprache"
+    "Last 30 days" : {
+      "comment" : "Subtitle stating the range the chart covers.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte 30 Tage"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Langue"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 derniers jours"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "言語"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去 30 日"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "语言"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近 30 天"
           }
         }
       }
     },
-    "Last 12 months": {
-      "comment": "Subtitle stating the range the chart covers.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letzte 12 Monate"
+    "Launch at Login" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Anmelden öffnen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12 derniers mois"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir à la session"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "過去 12 か月"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に開く"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近 12 个月"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录时打开"
           }
         }
       }
     },
-    "Last 12 weeks": {
-      "comment": "Subtitle stating the range the chart covers.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letzte 12 Wochen"
+    "Lifetime" : {
+      "comment" : "One-time purchase tier (opposite of the yearly subscription).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmalkauf"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "12 dernières semaines"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vie"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "過去 12 週"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切り"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近 12 周"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "买断"
           }
         }
       }
     },
-    "Last 30 days": {
-      "comment": "Subtitle stating the range the chart covers.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letzte 30 Tage"
+    "Loading purchase options…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaufoptionen werden geladen…"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 derniers jours"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des options d’achat…"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "過去 30 日"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入オプションを読み込み中…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最近 30 天"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在载入购买选项…"
           }
         }
       }
     },
-    "Launch at Login": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Beim Anmelden öffnen"
+    "Made by" : {
+      "comment" : "About-pane row label for the developer.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Entwickelt von"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ouvrir à la session"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Développé par"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ログイン時に開く"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "開発者"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "登录时打开"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开发者"
           }
         }
       }
     },
-    "Lifetime": {
-      "comment": "One-time purchase tier (opposite of the yearly subscription).",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einmalkauf"
+    "Minimize This Window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Fenster minimieren"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "À vie"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduire cette fenêtre"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "買い切り"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このウインドウを最小化"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "买断"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化此窗口"
           }
         }
       }
     },
-    "Loading purchase options…": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kaufoptionen werden geladen…"
+    "Minimized" : {
+      "comment" : "Onboarding flow diagram, step 1 label. Keep it to one or two words; three steps sit side by side.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimiert"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chargement des options d’achat…"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入オプションを読み込み中…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在载入购买选项…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化"
           }
         }
       }
     },
-    "Made by": {
-      "comment": "About-pane row label for the developer.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Entwickelt von"
+    "Month" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monat"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Développé par"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mois"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "開発者"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开发者"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月"
           }
         }
       }
     },
-    "Minimize This Window": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dieses Fenster minimieren"
+    "No Accessibility. No Screen Recording. Nothing to grant." : {
+      "comment" : "Onboarding success step hero card subtitle.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Bedienungshilfen. Keine Bildschirmaufnahme. Nichts zu erteilen."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réduire cette fenêtre"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d’Accessibilité. Pas d’enregistrement de l’écran. Rien à accorder."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このウインドウを最小化"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセシビリティも画面収録も不要。許可するものはありません。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化此窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不需要辅助功能，不需要屏幕录制，什么都不用授权。"
           }
         }
       }
     },
-    "Minimized": {
-      "comment": "Onboarding flow diagram, step 1 label. Keep it to one or two words; three steps sit side by side.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Minimiert"
+    "No active purchase found on this account." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für dieses Konto wurde kein aktiver Kauf gefunden."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réduite"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun achat actif n’a été trouvé sur ce compte."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアカウントには有効な購入が見つかりませんでした。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此账户下没有有效的购买项目。"
           }
         }
       }
     },
-    "Month": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monat"
+    "No card, no payment. If it still isn’t worth it in two weeks, that’s a real answer." : {
+      "comment" : "Subtitle of the trial extension offer, stating that the extension costs nothing.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Karte, keine Zahlung. Wenn es sich in zwei Wochen immer noch nicht lohnt, ist das eine ehrliche Antwort."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mois"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans carte ni paiement. Si dans deux semaines ça ne vaut toujours pas le coup, c’est une vraie réponse."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お支払いもカード登録も不要です。2週間後にやはり必要ないと感じたら、それも一つの答えです。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "月"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不用付款，也不用填卡。两周后要是还觉得不值，那就是答案。"
           }
         }
       }
     },
-    "No Accessibility. No Screen Recording. Nothing to grant.": {
-      "comment": "Onboarding success step hero card subtitle.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Bedienungshilfen. Keine Bildschirmaufnahme. Nichts zu erteilen."
+    "No excluded apps" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine ausgeschlossenen Apps"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pas d’Accessibilité. Pas d’enregistrement de l’écran. Rien à accorder."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune app exclue"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アクセシビリティも画面収録も不要。許可するものはありません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外しているAppはありません"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不需要辅助功能，不需要屏幕录制，什么都不用授权。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有排除的 App"
           }
         }
       }
     },
-    "No active purchase found on this account.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Für dieses Konto wurde kein aktiver Kauf gefunden."
+    "No internet connection. Connect and try again to load purchases." : {
+      "comment" : "Purchase error when the store cannot be reached.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Internetverbindung. Stellen Sie eine Verbindung her und laden Sie die Kaufoptionen erneut."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun achat actif n’a été trouvé sur ce compte."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune connexion Internet. Connectez-vous, puis réessayez de charger les achats."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このアカウントには有効な購入が見つかりませんでした。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インターネットに接続していません。接続してから購入オプションを再度読み込んでください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此账户下没有有效的购买项目。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有网络连接。请连接网络后重试以载入购买选项。"
           }
         }
       }
+    },
+    "No matching apps found." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Apps gefunden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune app correspondante trouvée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一致するAppが見つかりませんでした。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有找到匹配的 App。"
+          }
+        }
+      }
+    },
+    "No reopen activity yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Wiederherstellungen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune réouverture pour le moment"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元履歴はまだありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "还没有恢复记录"
+          }
+        }
+      }
+    },
+    "Not selected" : {
+      "comment" : "VoiceOver value for an unselected paywall plan card (Kiki_mackit KikiPaywall).",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht ausgewählt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non sélectionné"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未選択"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未选中"
+          }
+        }
+      }
+    },
+    "Onboarding" : {
+
+    },
+    "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it." : {
+      "comment" : "About-pane footer tying the zero-permission claim to the public source.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open Source unter MIT-Lizenz. Command Reopen benötigt keine Systemberechtigungen — und Sie müssen uns das nicht glauben, sondern können es im Quellcode nachprüfen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Open source sous licence MIT. Command Reopen ne demande aucune autorisation système — et vous pouvez le vérifier dans le code plutôt que nous croire sur parole."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "MIT ライセンスのオープンソースです。Command Reopen はシステム権限を一切必要としません。その点はソースコードでご確認いただけます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以 MIT 协议开源。Command Reopen 不需要任何系统权限——你可以在源代码里自己核实，不必只听我们说。"
+          }
+        }
+      }
+    },
+    "Pay once, use forever" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal zahlen, dauerhaft nutzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payez une fois, utilisez à vie"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一度の支払いで、ずっと使えます"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次买断，永久使用"
+          }
+        }
+      }
+    },
+    "Paywall" : {
+
     },
-    "No excluded apps": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine ausgeschlossenen Apps"
+    "Privacy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune app exclue"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confidentialité"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除外しているAppはありません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシー"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "没有排除的 App"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐私政策"
           }
         }
       }
     },
-    "No internet connection. Connect and try again to load purchases.": {
-      "comment": "Purchase error when the store cannot be reached.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Internetverbindung. Stellen Sie eine Verbindung her und laden Sie die Kaufoptionen erneut."
+    "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase." : {
+      "comment" : "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf abgeschlossen, aber der Pro-Zugriff wird noch synchronisiert. Bitte warten Sie einen Moment oder verwenden Sie „Kauf wiederherstellen“."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune connexion Internet. Connectez-vous, puis réessayez de charger les achats."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat effectué, mais l’accès Pro est encore en cours de synchronisation. Patientez un instant ou utilisez « Restaurer l’achat »."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "インターネットに接続していません。接続してから購入オプションを再度読み込んでください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入は完了しましたが、Proアクセスはまだ同期中です。しばらくお待ちいただくか、「購入を復元」をご利用ください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "没有网络连接。请连接网络后重试以载入购买选项。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买已完成，但 Pro 权限仍在同步。请稍候，或点按「恢复购买」。"
           }
         }
       }
     },
-    "No matching apps found.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine passenden Apps gefunden."
+    "Purchase options are unavailable right now. Try again later or restore an existing purchase." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaufoptionen sind derzeit nicht verfügbar. Versuchen Sie es später erneut oder stellen Sie einen bestehenden Kauf wieder her."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune app correspondante trouvée."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les options d’achat sont indisponibles pour le moment. Réessayez plus tard ou restaurez un achat existant."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一致するAppが見つかりませんでした。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入オプションは現在利用できません。後でもう一度お試しいただくか、既存の購入を復元してください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "没有找到匹配的 App。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂时无法获取购买选项。请稍后再试，或恢复已有的购买。"
           }
         }
       }
     },
-    "No reopen activity yet": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Noch keine Wiederherstellungen"
+    "Purchase restored." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf wurde wiederhergestellt."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune réouverture pour le moment"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat restauré."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元履歴はまだありません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を復元しました。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "还没有恢复记录"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买已恢复。"
           }
         }
       }
     },
-    "Not selected": {
-      "comment": "VoiceOver value for an unselected paywall plan card (Kiki_mackit KikiPaywall).",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht ausgewählt"
+    "Purchase successful. Pro unlocked." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf erfolgreich. Pro ist freigeschaltet."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Non sélectionné"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achat réussi. Pro est débloqué."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未選択"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入が完了しました。Proが有効になりました。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未选中"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买成功，Pro 已解锁。"
           }
         }
       }
     },
-    "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.": {
-      "comment": "About-pane footer tying the zero-permission claim to the public source.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Open Source unter MIT-Lizenz. Command Reopen benötigt keine Systemberechtigungen — und Sie müssen uns das nicht glauben, sondern können es im Quellcode nachprüfen."
+    "Purchases are turned off on this Mac. Check your Screen Time content and privacy restrictions." : {
+      "comment" : "Purchase error when StoreKit reports payments are not allowed; on macOS this is a Screen Time restriction. Use the platform's own name for that setting.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käufe sind auf diesem Mac deaktiviert. Prüfen Sie die Inhalts- und Datenschutzbeschränkungen in der Bildschirmzeit."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Open source sous licence MIT. Command Reopen ne demande aucune autorisation système — et vous pouvez le vérifier dans le code plutôt que nous croire sur parole."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les achats sont désactivés sur ce Mac. Vérifiez les restrictions de contenu et de confidentialité dans Temps d’écran."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "MIT ライセンスのオープンソースです。Command Reopen はシステム権限を一切必要としません。その点はソースコードでご確認いただけます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この Mac では購入が許可されていません。スクリーンタイムのコンテンツとプライバシーの制限を確認してください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "以 MIT 协议开源。Command Reopen 不需要任何系统权限——你可以在源代码里自己核实，不必只听我们说。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此 Mac 已关闭购买功能。请检查「屏幕使用时间」中的内容和隐私访问限制。"
           }
         }
       }
     },
-    "Pay once, use forever": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einmal zahlen, dauerhaft nutzen"
+    "Purchases aren’t available in this build. Please contact support." : {
+      "comment" : "Purchase error the user cannot fix: the app's commerce configuration is missing or rejected. Do not name the commerce vendor.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käufe sind in dieser Version nicht verfügbar. Bitte wenden Sie sich an den Support."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Payez une fois, utilisez à vie"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les achats ne sont pas disponibles dans cette version. Veuillez contacter l’assistance."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一度の支払いで、ずっと使えます"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このビルドでは購入できません。サポートにお問い合わせください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一次买断，永久使用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此版本无法进行购买。请联系支持。"
           }
         }
       }
     },
-    "Privacy": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Datenschutz"
+    "Purchases couldn't be restored." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käufe konnten nicht wiederhergestellt werden."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confidentialité"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les achats n’ont pas pu être restaurés."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プライバシー"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を復元できませんでした。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "隐私政策"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法恢复购买。"
           }
         }
       }
     },
-    "Purchase completed, but Pro access is still syncing. Please wait a moment or use Restore Purchase.": {
-      "comment": "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kauf abgeschlossen, aber der Pro-Zugriff wird noch synchronisiert. Bitte warten Sie einen Moment oder verwenden Sie „Kauf wiederherstellen“."
+    "Purchases unavailable" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käufe nicht verfügbar"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Achat effectué, mais l’accès Pro est encore en cours de synchronisation. Patientez un instant ou utilisez « Restaurer l’achat »."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achats indisponibles"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入は完了しましたが、Proアクセスはまだ同期中です。しばらくお待ちいただくか、「購入を復元」をご利用ください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入は利用できません"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "购买已完成，但 Pro 权限仍在同步。请稍候，或点按「恢复购买」。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法购买"
           }
         }
       }
     },
-    "Purchase options are unavailable right now. Try again later or restore an existing purchase.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kaufoptionen sind derzeit nicht verfügbar. Versuchen Sie es später erneut oder stellen Sie einen bestehenden Kauf wieder her."
+    "Quit %@" : {
+      "comment" : "Menu item resolved by Kiki_mackit KikiMenuBar via String(localized: \"Quit \\(appName)\", bundle: .main). %@ is the app display name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ beenden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les options d’achat sont indisponibles pour le moment. Réessayez plus tard ou restaurez un achat existant."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter %@"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入オプションは現在利用できません。後でもう一度お試しいただくか、既存の購入を復元してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ を終了"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂时无法获取购买选项。请稍后再试，或恢复已有的购买。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 %@"
           }
         }
       }
     },
-    "Purchase restored.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kauf wurde wiederhergestellt."
+    "Rate on App Store" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im App Store bewerten"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Achat restauré."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter sur l’App Store"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入を復元しました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store で評価する"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "购买已恢复。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 App Store 评分"
           }
         }
       }
     },
-    "Purchase successful. Pro unlocked.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kauf erfolgreich. Pro ist freigeschaltet."
+    "Remove %@" : {
+      "comment" : "Accessibility label; %@ is the app display name being removed from the exclusion list.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ entfernen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Achat réussi. Pro est débloqué."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer %@"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入が完了しました。Proが有効になりました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ を削除"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "购买成功，Pro 已解锁。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除 %@"
           }
         }
       }
     },
-    "Purchases are turned off on this Mac. Check your Screen Time content and privacy restrictions.": {
-      "comment": "Purchase error when StoreKit reports payments are not allowed; on macOS this is a Screen Time restriction. Use the platform's own name for that setting.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käufe sind auf diesem Mac deaktiviert. Prüfen Sie die Inhalts- und Datenschutzbeschränkungen in der Bildschirmzeit."
+    "Restore Purchase" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kauf wiederherstellen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les achats sont désactivés sur ce Mac. Vérifiez les restrictions de contenu et de confidentialité dans Temps d’écran."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer l’achat"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "この Mac では購入が許可されていません。スクリーンタイムのコンテンツとプライバシーの制限を確認してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此 Mac 已关闭购买功能。请检查「屏幕使用时间」中的内容和隐私访问限制。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复购买"
           }
         }
       }
     },
-    "Purchases aren’t available in this build. Please contact support.": {
-      "comment": "Purchase error the user cannot fix: the app's commerce configuration is missing or rejected. Do not name the commerce vendor.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käufe sind in dieser Version nicht verfügbar. Bitte wenden Sie sich an den Support."
+    "Restored" : {
+      "comment" : "Onboarding flow diagram, step 3 label — the window is back.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les achats ne sont pas disponibles dans cette version. Veuillez contacter l’assistance."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurée"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このビルドでは購入できません。サポートにお問い合わせください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "此版本无法进行购买。请联系支持。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已恢复"
           }
         }
       }
     },
-    "Purchases couldn't be restored.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käufe konnten nicht wiederhergestellt werden."
+    "Restored in your trial" : {
+      "comment" : "Caption under the trial reopen count on the paywall; one line only.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "In Ihrer Testphase wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les achats n’ont pas pu être restaurés."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restaurées pendant l’essai"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入を復元できませんでした。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "トライアル中に復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法恢复购买。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试用期内已恢复"
           }
         }
       }
     },
-    "Purchases unavailable": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käufe nicht verfügbar"
+    "Restores minimized and closed windows on Cmd+Tab" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellt minimierte und geschlossene Fenster per Cmd+Tab wieder her"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Achats indisponibles"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaure les fenêtres réduites et fermées avec Cmd+Tab"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入は利用できません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化・閉じたウインドウを Cmd+Tab で復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法购买"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 Cmd+Tab 时恢复最小化和已关闭的窗口"
           }
         }
       }
     },
-    "Quit %@": {
-      "comment": "Menu item resolved by Kiki_mackit KikiMenuBar via String(localized: \"Quit \\(appName)\", bundle: .main). %@ is the app display name.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ beenden"
+    "See it work" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So funktioniert es"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quitter %@"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voyez le résultat"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ を終了"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動きを確認しましょう"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "退出 %@"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试一下"
           }
         }
       }
     },
-    "Rate on App Store": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Im App Store bewerten"
+    "Selected" : {
+      "comment" : "VoiceOver value for a selected paywall plan card (Kiki_mackit KikiPaywall).",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgewählt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Noter sur l’App Store"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionné"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store で評価する"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択中"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 App Store 评分"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已选中"
           }
         }
       }
     },
-    "Remove %@": {
-      "comment": "Accessibility label; %@ is the app display name being removed from the exclusion list.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ entfernen"
+    "Settings…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen…"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retirer %@"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages…"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ を削除"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除 %@"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
           }
         }
       }
     },
-    "Restore Purchase": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kauf wiederherstellen"
+    "Source" : {
+      "comment" : "About-pane row label for the source repository.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Quellcode"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurer l’achat"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code source"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入を復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ソースコード"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "恢复购买"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "源代码"
           }
         }
       }
     },
-    "Restored": {
-      "comment": "Onboarding flow diagram, step 3 label — the window is back.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wiederhergestellt"
+    "Start free trial" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlose Testphase starten"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaurée"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrer l’essai gratuit"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルを開始"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已恢复"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始免费试用"
           }
         }
       }
     },
-    "Restored in your trial": {
-      "comment": "Caption under the trial reopen count on the paywall; one line only.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "In Ihrer Testphase wiederhergestellt"
+    "Start the free trial when you are ready." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starten Sie die kostenlose Testphase, wenn Sie bereit sind."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Restaurées pendant l’essai"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrez l’essai gratuit quand vous êtes prêt."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "トライアル中に復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備ができたら無料トライアルを開始してください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "试用期内已恢复"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "准备好了就开始免费试用。"
           }
         }
       }
     },
-    "Restores minimized and closed windows on Cmd+Tab": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stellt minimierte und geschlossene Fenster per Cmd+Tab wieder her"
+    "Start using Command Reopen to see trends" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwenden Sie Command Reopen, um Trends zu sehen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restaure les fenêtres réduites et fermées avec Cmd+Tab"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez Command Reopen pour voir des tendances"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化・閉じたウインドウを Cmd+Tab で復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen を使い始めるとトレンドが表示されます"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "按 Cmd+Tab 时恢复最小化和已关闭的窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始使用 Command Reopen 后即可查看趋势"
           }
         }
       }
     },
-    "See it work": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "So funktioniert es"
+    "Statistics" : {
+      "comment" : "Menu item opening the stats pane; the count rides in a trailing menu badge.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistik"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voyez le résultat"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistiques"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "動きを確認しましょう"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "統計"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "试一下"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "统计"
           }
         }
       }
     },
-    "Selected": {
-      "comment": "VoiceOver value for a selected paywall plan card (Kiki_mackit KikiPaywall).",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ausgewählt"
+    "Statistics — %@ restored" : {
+      "comment" : "Menu item opening the stats pane on macOS 13, where a menu badge is unavailable. %@ is the lifetime reopen count, already number-formatted.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistik — %lld wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sélectionné"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Statistiques — %lld restaurées"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選択中"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "統計 — %lld 件を復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已选中"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "统计 — 已恢复 %@ 次"
           }
         }
       }
     },
-    "Settings…": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einstellungen…"
+    "Stats" : {
+      "comment" : "Settings tab title; short form of Statistics.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistiken"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglages…"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistiques"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "設定…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "統計"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "设置…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "统计"
           }
         }
       }
     },
-    "Source": {
-      "comment": "About-pane row label for the source repository.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Quellcode"
+    "Status" : {
+      "comment" : "Status label in the About pane (Kiki access status).",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Code source"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "ソースコード"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ステータス"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "源代码"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "状态"
           }
         }
       }
     },
-    "Start free trial": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kostenlose Testphase starten"
+    "Support" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Démarrer l’essai gratuit"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assistance"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無料トライアルを開始"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サポート"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始免费试用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持"
           }
         }
       }
     },
-    "Start the free trial when you are ready.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Starten Sie die kostenlose Testphase, wenn Sie bereit sind."
+    "Take another 14 days" : {
+      "comment" : "Title of the card offered when the user closes the paywall after their trial ended.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch einmal 14 Tage"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Démarrez l’essai gratuit quand vous êtes prêt."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encore 14 jours"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "準備ができたら無料トライアルを開始してください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう14日間、無料で"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "准备好了就开始免费试用。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再免费用 14 天"
           }
         }
       }
     },
-    "Start using Command Reopen to see trends": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verwenden Sie Command Reopen, um Trends zu sehen"
+    "Tell me what’s missing" : {
+      "comment" : "Secondary button that opens an email to the developer about why the user did not upgrade.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagen, was fehlt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utilisez Command Reopen pour voir des tendances"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dire ce qui manque"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen を使い始めるとトレンドが表示されます"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "足りないところを伝える"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始使用 Command Reopen 后即可查看趋势"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "告诉我缺了什么"
           }
         }
       }
     },
-    "Statistics": {
-      "comment": "Menu item opening the stats pane; the count rides in a trailing menu badge.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Statistik"
+    "Terms" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzungsbedingungen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Statistiques"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conditions"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "統計"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用規約"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "统计"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用条款"
           }
         }
       }
     },
-    "Statistics — %@ restored": {
-      "comment": "Menu item opening the stats pane on macOS 13, where a menu badge is unavailable. %@ is the lifetime reopen count, already number-formatted.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Statistik — %lld wiederhergestellt"
+    "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase." : {
+      "comment" : "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der App Store hat diesen Kauf noch nicht vollständig synchronisiert. Bitte versuchen Sie es gleich erneut oder verwenden Sie „Kauf wiederherstellen“."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Statistiques — %lld restaurées"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’App Store n’a pas encore fini de synchroniser cet achat. Réessayez dans un instant ou utilisez « Restaurer l’achat »."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "統計 — %lld 件を復元"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store でこの購入の同期がまだ完了していません。しばらくしてからもう一度お試しいただくか、「購入を復元」をご利用ください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "统计 — 已恢复 %@ 次"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store 尚未同步完这笔购买。请稍后再试，或点按「恢复购买」。"
           }
         }
       }
     },
-    "Stats": {
-      "comment": "Settings tab title; short form of Statistics.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statistiken"
+    "The App Store isn’t offering this plan right now. Try again later." : {
+      "comment" : "Purchase error: the store returned no purchasable product for the selected plan.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der App Store bietet diesen Plan derzeit nicht an. Versuchen Sie es später erneut."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statistiques"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’App Store ne propose pas cette formule pour le moment. Réessayez plus tard."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "統計"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store は現在このプランを提供していません。しばらくしてからもう一度お試しください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "统计"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Store 暂时没有提供此方案。请稍后再试。"
           }
         }
       }
     },
-    "Status": {
-      "comment": "Status label in the About pane (Kiki access status).",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Status"
+    "The free trial couldn't be started." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die kostenlose Testphase konnte nicht gestartet werden."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statut"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’essai gratuit n’a pas pu être démarré."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ステータス"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルを開始できませんでした。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "状态"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法开始免费试用。"
           }
         }
       }
     },
-    "Support": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Support"
+    "The purchase couldn't be completed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kauf konnte nicht abgeschlossen werden."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Assistance"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’achat n’a pas pu être effectué."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サポート"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を完了できませんでした。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "支持"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法完成购买。"
           }
         }
       }
     },
-    "Terms": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nutzungsbedingungen"
+    "The purchase was cancelled." : {
+      "comment" : "Purchase error after the user backs out of the App Store sheet.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kauf wurde abgebrochen."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Conditions"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’achat a été annulé."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用規約"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入がキャンセルされました。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用条款"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买已取消。"
           }
         }
       }
     },
-    "The App Store did not finish syncing this purchase yet. Please try again in a moment or use Restore Purchase.": {
-      "comment": "Purchase-sync error; 'Restore Purchase' is a button title and must match its translation.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der App Store hat diesen Kauf noch nicht vollständig synchronisiert. Bitte versuchen Sie es gleich erneut oder verwenden Sie „Kauf wiederherstellen“."
+    "Today" : {
+      "comment" : "Stat tile title: reopens so far today.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L’App Store n’a pas encore fini de synchroniser cet achat. Réessayez dans un instant ou utilisez « Restaurer l’achat »."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aujourd’hui"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store でこの購入の同期がまだ完了していません。しばらくしてからもう一度お試しいただくか、「購入を復元」をご利用ください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store 尚未同步完这笔购买。请稍后再试，或点按「恢复购买」。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天"
           }
         }
       }
     },
-    "The App Store isn’t offering this plan right now. Try again later.": {
-      "comment": "Purchase error: the store returned no purchasable product for the selected plan.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der App Store bietet diesen Plan derzeit nicht an. Versuchen Sie es später erneut."
+    "Top Apps" : {
+      "comment" : "Section heading listing the apps most often reopened.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top-Apps"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L’App Store ne propose pas cette formule pour le moment. Réessayez plus tard."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top des apps"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store は現在このプランを提供していません。しばらくしてからもう一度お試しください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "よく使うApp"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store 暂时没有提供此方案。请稍后再试。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最常恢复的 App"
           }
         }
       }
     },
-    "The free trial couldn't be started.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die kostenlose Testphase konnte nicht gestartet werden."
+    "Trend" : {
+      "comment" : "Column header in the reopen-history table.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trend"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L’essai gratuit n’a pas pu être démarré."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendance"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無料トライアルを開始できませんでした。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トレンド"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法开始免费试用。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "趋势"
           }
         }
       }
     },
-    "The purchase couldn't be completed.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Kauf konnte nicht abgeschlossen werden."
+    "Trial ended" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testphase beendet"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L’achat n’a pas pu être effectué."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai terminé"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入を完了できませんでした。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トライアル終了"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法完成购买。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试用已结束"
           }
         }
       }
     },
-    "The purchase was cancelled.": {
-      "comment": "Purchase error after the user backs out of the App Store sheet.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Kauf wurde abgebrochen."
+    "Trial not started" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testphase nicht gestartet"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L’achat a été annulé."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai non démarré"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入がキャンセルされました。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トライアル未開始"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "购买已取消。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未开始试用"
           }
         }
       }
     },
-    "Today": {
-      "comment": "Stat tile title: reopens so far today.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heute"
+    "Try every Pro feature free for 14 days. No payment now — nothing auto-renews." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testen Sie alle Pro-Funktionen 14 Tage kostenlos. Keine Zahlung jetzt – nichts verlängert sich automatisch."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aujourd’hui"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayez gratuitement toutes les fonctionnalités Pro pendant 14 jours. Aucun paiement maintenant — rien ne se renouvelle automatiquement."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今日"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのPro機能を14日間無料でお試しいただけます。今すぐの支払いはなく、自動更新もありません。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用全部 Pro 功能 14 天。现在无需付款，也不会自动续期。"
           }
         }
       }
     },
-    "Top Apps": {
-      "comment": "Section heading listing the apps most often reopened.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Top-Apps"
+    "Turn it back on" : {
+      "comment" : "Purchase button after the trial ended, when the feature has already stopped.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wieder aktivieren"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Top des apps"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réactiver"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "よく使うApp"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "もう一度有効にする"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最常恢复的 App"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新开启"
           }
         }
       }
     },
-    "Trend": {
-      "comment": "Column header in the reopen-history table.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trend"
+    "Unavailable" : {
+      "comment" : "Kiki commerce readiness value — user cannot buy or restore right now.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht verfügbar"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tendance"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indisponible"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トレンド"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用不可"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "趋势"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不可用"
           }
         }
       }
     },
-    "Trial ended": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Testphase beendet"
+    "Upgrade" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgraden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Essai terminé"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à niveau"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トライアル終了"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップグレード"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "试用已结束"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升级"
           }
         }
       }
     },
-    "Trial not started": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Testphase nicht gestartet"
+    "Upgrade to Pro…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Pro upgraden…"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Essai non démarré"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer à Pro…"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "トライアル未開始"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro にアップグレード…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "未开始试用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升级到 Pro…"
           }
         }
       }
     },
-    "Try every Pro feature free for 2 days. No payment now — nothing auto-renews.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Testen Sie alle Pro-Funktionen 2 Tage kostenlos. Keine Zahlung jetzt – nichts verlängert sich automatisch."
+    "Upgrade to continue automatic window reopening." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgraden Sie, um Fenster weiterhin automatisch wiederherzustellen."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Essayez gratuitement toutes les fonctionnalités Pro pendant 2 jours. Aucun paiement maintenant — rien ne se renouvelle automatiquement."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passez à Pro pour continuer à rouvrir automatiquement les fenêtres."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "すべてのPro機能を2日間無料でお試しいただけます。今すぐの支払いはなく、自動更新もありません。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップグレードして、ウインドウの自動復元を続けましょう。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费试用全部 Pro 功能 2 天。现在无需付款，也不会自动续期。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "升级后可继续自动恢复窗口。"
           }
         }
       }
     },
-    "Turn it back on": {
-      "comment": "Purchase button after the trial ended, when the feature has already stopped.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Wieder aktivieren"
+    "Use the free Community edition" : {
+      "comment" : "Footer link to the free, non-commercial edition on GitHub.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlose Community-Edition verwenden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Réactiver"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser l’édition Community gratuite"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "もう一度有効にする"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料のCommunity版を使う"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重新开启"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改用免费的 Community 版"
           }
         }
       }
     },
-    "Unavailable": {
-      "comment": "Kiki commerce readiness value — user cannot buy or restore right now.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht verfügbar"
+    "Verifying your Command Reopen Pro access." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Command Reopen Pro-Zugriff wird überprüft."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Indisponible"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de votre accès Command Reopen Pro."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "利用不可"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro のアクセスを確認しています。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "不可用"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在验证你的 Command Reopen Pro 权限。"
           }
         }
       }
     },
-    "Upgrade": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgraden"
+    "View options" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen anzeigen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mettre à niveau"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les options"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アップグレード"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オプションを表示"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看选项"
           }
         }
       }
     },
-    "Upgrade to Pro…": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auf Pro upgraden…"
+    "View plans" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pläne anzeigen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Passer à Pro…"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voir les formules"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pro にアップグレード…"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プランを表示"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级到 Pro…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看方案"
           }
         }
       }
     },
-    "Upgrade to continue automatic window reopening.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgraden Sie, um Fenster weiterhin automatisch wiederherzustellen."
+    "We couldn't verify your purchase status. Try again when you're online." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Kaufstatus konnte nicht überprüft werden. Versuchen Sie es erneut, wenn Sie online sind."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Passez à Pro pour continuer à rouvrir automatiquement les fenêtres."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de vérifier votre statut d’achat. Réessayez lorsque vous êtes en ligne."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "アップグレードして、ウインドウの自動復元を続けましょう。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入状況を確認できませんでした。オンラインになってからもう一度お試しください。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "升级后可继续自动恢复窗口。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法验证你的购买状态。请在联网后重试。"
           }
         }
       }
     },
-    "Verifying your Command Reopen Pro access.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ihr Command Reopen Pro-Zugriff wird überprüft."
+    "Website" : {
+      "comment" : "About-pane row label for the product site.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Website"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vérification de votre accès Command Reopen Pro."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Site web"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Command Reopen Pro のアクセスを確認しています。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ウェブサイト"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在验证你的 Command Reopen Pro 权限。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网站"
           }
         }
       }
     },
-    "View options": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Optionen anzeigen"
+    "Week" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Woche"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voir les options"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semaine"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オプションを表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "查看选项"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周"
           }
         }
       }
     },
-    "View plans": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pläne anzeigen"
+    "Welcome" : {
+      "comment" : "Onboarding window title.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voir les formules"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bienvenue"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プランを表示"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ようこそ"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "查看方案"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "欢迎"
           }
         }
       }
     },
-    "We couldn't verify your purchase status. Try again when you're online.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ihr Kaufstatus konnte nicht überprüft werden. Versuchen Sie es erneut, wenn Sie online sind."
+    "What stopped me from upgrading:\n\n\nWhat I expected it to do:\n\n" : {
+      "comment" : "Prefilled body of the trial feedback email. Each line is a prompt the user answers.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was mich vom Upgrade abgehalten hat:\n\n\nWas ich erwartet hatte:\n\n"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de vérifier votre statut d’achat. Réessayez lorsque vous êtes en ligne."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce qui m’a empêché de passer à la version payante :\n\n\nCe que j’attendais :\n\n"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "購入状況を確認できませんでした。オンラインになってからもう一度お試しください。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップグレードしなかった理由：\n\n\n期待していた動作：\n\n"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "无法验证你的购买状态。请在联网后重试。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让我没有升级的原因：\n\n\n我原本以为它能做到：\n\n"
           }
         }
       }
     },
-    "Website": {
-      "comment": "About-pane row label for the product site.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Website"
+    "Windows restored" : {
+      "comment" : "Caption under the lifetime reopen count on the paywall; one line only.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fenster wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Site web"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Fenêtres restaurées"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "ウェブサイト"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "復元したウインドウ"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "网站"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已恢复窗口"
           }
         }
       }
     },
-    "Week": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Woche"
+    "Without Pro, Cmd+Tab leaves them minimized again." : {
+      "comment" : "Second sentence of the expired-trial paywall subtitle, naming what stopped working.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ohne Pro bleiben sie bei Cmd+Tab wieder minimiert."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Semaine"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sans Pro, Cmd+Tab les laisse à nouveau réduites."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "週"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro なしでは Cmd+Tab で最小化されたままになります。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "周"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有 Pro，Cmd+Tab 会让这些窗口继续留在最小化状态。"
           }
         }
       }
     },
-    "Welcome": {
-      "comment": "Onboarding window title.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Willkommen"
+    "Write back about what didn’t work and I’ll reply with a discount code." : {
+      "comment" : "Footnote explaining what the user gets for sending feedback.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib mir, was nicht funktioniert hat – du bekommst einen Rabattcode zurück."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bienvenue"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrivez-moi ce qui n’a pas marché, je vous réponds avec un code de réduction."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ようこそ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "うまくいかなかった点を書いて送っていただければ、割引コードを返信します。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "欢迎"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "写下哪里不好用，我会回信给你一个折扣码。"
           }
         }
       }
     },
-    "Windows restored": {
-      "comment": "Caption under the lifetime reopen count on the paywall; one line only.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Fenster wiederhergestellt"
+    "Yearly" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jährlich"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Fenêtres restaurées"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuel"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "復元したウインドウ"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年額プラン"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已恢复窗口"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年付"
           }
         }
       }
     },
-    "Without Pro, Cmd+Tab leaves them minimized again.": {
-      "comment": "Second sentence of the expired-trial paywall subtitle, naming what stopped working.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ohne Pro bleiben sie bei Cmd+Tab wieder minimiert."
+    "You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie minimieren ein Fenster, wechseln mit Cmd+Tab zurück – aber das Fenster ist weg. Command Reopen behebt das."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Sans Pro, Cmd+Tab les laisse à nouveau réduites."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous réduisez une fenêtre, revenez avec Cmd+Tab, mais la fenêtre a disparu. Command Reopen corrige cela."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pro なしでは Cmd+Tab で最小化されたままになります。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウを最小化して Cmd+Tab で戻ると、ウインドウが消えています。Command Reopen はこれを解決します。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "没有 Pro，Cmd+Tab 会让这些窗口继续留在最小化状态。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化一个窗口，再用 Cmd+Tab 切回来，窗口却不见了。Command Reopen 解决的就是这件事。"
           }
         }
       }
     },
-    "Yearly": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jährlich"
+    "Your Pro access ends on %@. Everything keeps working until then." : {
+      "comment" : "Paywall subtitle for a subscriber who turned off auto-renew.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang endet am %@. Bis dahin funktioniert alles weiter."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Annuel"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre accès Pro prend fin le %@. Tout continue de fonctionner jusque-là."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "年額プラン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro アクセスは %@ に終了します。それまではすべてご利用いただけます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "年付"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的 Pro 权限将于 %@ 到期。在此之前一切照常。"
           }
         }
       }
     },
-    "You minimize a window, Cmd+Tab back — but the window is gone. Command Reopen fixes that.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sie minimieren ein Fenster, wechseln mit Cmd+Tab zurück – aber das Fenster ist weg. Command Reopen behebt das."
+    "Your Pro access never expires. Thank you for buying it." : {
+      "comment" : "Paywall subtitle for a one-time purchase, which has no renewal date.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang läuft nie ab. Vielen Dank für Ihren Kauf."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vous réduisez une fenêtre, revenez avec Cmd+Tab, mais la fenêtre a disparu. Command Reopen corrige cela."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre accès Pro n’expire jamais. Merci pour votre achat."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウインドウを最小化して Cmd+Tab で戻ると、ウインドウが消えています。Command Reopen はこれを解決します。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro アクセスに期限はありません。ご購入ありがとうございます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最小化一个窗口，再用 Cmd+Tab 切回来，窗口却不见了。Command Reopen 解决的就是这件事。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的 Pro 权限永久有效。感谢购买。"
           }
         }
       }
     },
-    "Your Pro access ends on %@. Everything keeps working until then.": {
-      "comment": "Paywall subtitle for a subscriber who turned off auto-renew.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ihr Pro-Zugang endet am %@. Bis dahin funktioniert alles weiter."
+    "Your Pro access renews on %@." : {
+      "comment" : "Paywall subtitle for a subscriber whose plan auto-renews.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Pro-Zugang verlängert sich am %@."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Votre accès Pro prend fin le %@. Tout continue de fonctionner jusque-là."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre accès Pro se renouvelle le %@."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pro アクセスは %@ に終了します。それまではすべてご利用いただけます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pro アクセスは %@ に更新されます。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的 Pro 权限将于 %@ 到期。在此之前一切照常。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的 Pro 权限将于 %@ 续期。"
           }
         }
       }
     },
-    "Your Pro access never expires. Thank you for buying it.": {
-      "comment": "Paywall subtitle for a one-time purchase, which has no renewal date.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ihr Pro-Zugang läuft nie ab. Vielen Dank für Ihren Kauf."
+    "Your free trial is active." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre kostenlose Testphase ist aktiv."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Votre accès Pro n’expire jamais. Merci pour votre achat."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre essai gratuit est actif."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pro アクセスに期限はありません。ご購入ありがとうございます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルが有効です。"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的 Pro 权限永久有效。感谢购买。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用进行中。"
           }
         }
       }
     },
-    "Your Pro access renews on %@.": {
-      "comment": "Paywall subtitle for a subscriber whose plan auto-renews.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ihr Pro-Zugang verlängert sich am %@."
+    "Your plan" : {
+      "comment" : "Caption under the purchased plan name on the paywall; one line only.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Plan"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Votre accès Pro se renouvelle le %@."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre formule"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Pro アクセスは %@ に更新されます。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ご利用プラン"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的 Pro 权限将于 %@ 续期。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的方案"
           }
         }
       }
     },
-    "Your free trial is active.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ihre kostenlose Testphase ist aktiv."
+    "You’re all set" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Votre essai gratuit est actif."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout est prêt"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "無料トライアルが有効です。"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "準備完了"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免费试用进行中。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一切就绪"
           }
         }
       }
     },
-    "Your plan": {
-      "comment": "Caption under the purchased plan name on the paywall; one line only.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Ihr Plan"
+    "Zero permissions" : {
+      "comment" : "Onboarding success step hero card title — the product's key differentiator.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Berechtigungen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Votre formule"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zéro autorisation"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "ご利用プラン"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限は一切不要"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的方案"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "零权限"
           }
         }
       }
     },
-    "You’re all set": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alles bereit"
+    "Zero permissions — sandboxed, nothing to grant" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Berechtigungen – sandboxed, nichts freizugeben"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tout est prêt"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune autorisation — sandboxé, rien à accorder"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "準備完了"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "権限は不要 — サンドボックス化され、許可するものはありません"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一切就绪"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "零权限——沙盒运行，无需任何授权"
           }
         }
       }
     },
-    "Zero permissions": {
-      "comment": "Onboarding success step hero card title — the product's key differentiator.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Berechtigungen"
+    "automatically" : {
+      "comment" : "Onboarding flow diagram, caption under 'Restored'. Lowercase fragment, no period.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "automatisch"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zéro autorisation"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "automatiquement"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "権限は一切不要"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動的に"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "零权限"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动完成"
           }
         }
       }
     },
-    "Zero permissions — sandboxed, nothing to grant": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Berechtigungen – sandboxed, nichts freizugeben"
+    "once" : {
+      "comment" : "Billing-detail label paired with the lifetime price (e.g. '$10.99 / once').",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmalig"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune autorisation — sandboxé, rien à accorder"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une fois"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "権限は不要 — サンドボックス化され、許可するものはありません"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一括"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "零权限——沙盒运行，无需任何授权"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次性"
           }
         }
       }
     },
-    "automatically": {
-      "comment": "Onboarding flow diagram, caption under 'Restored'. Lowercase fragment, no period.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "automatisch"
+    "per year" : {
+      "comment" : "Billing-detail label paired with the yearly price (e.g. '$5.99 / per year').",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pro Jahr"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "automatiquement"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "par an"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自動的に"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年額"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自动完成"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每年"
           }
         }
       }
     },
-    "once": {
-      "comment": "Billing-detail label paired with the lifetime price (e.g. '$10.99 / once').",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einmalig"
+    "restored most often" : {
+      "comment" : "Label under the name of the app whose windows were restored most during the trial.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "am häufigsten wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Une fois"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "restaurée le plus souvent"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一括"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最も多く復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一次性"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复得最多"
           }
         }
       }
     },
-    "per year": {
-      "comment": "Billing-detail label paired with the yearly price (e.g. '$5.99 / per year').",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "pro Jahr"
+    "switch back" : {
+      "comment" : "Onboarding flow diagram, caption under 'Cmd+Tab'. Lowercase fragment, no period.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zurückwechseln"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "par an"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "revenir"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "年額"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切り替えて戻る"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每年"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切回来"
           }
         }
       }
     },
-    "switch back": {
-      "comment": "Onboarding flow diagram, caption under 'Cmd+Tab'. Lowercase fragment, no period.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "zurückwechseln"
+    "total reopens" : {
+      "comment" : "Number caption under the total reopen count.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederherstellungen insgesamt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "revenir"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réouvertures totales"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "切り替えて戻る"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計復元回数"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "切回来"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "累计恢复次数"
           }
         }
       }
     },
-    "total reopens": {
-      "comment": "Number caption under the total reopen count.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wiederherstellungen insgesamt"
+    "window hidden" : {
+      "comment" : "Onboarding flow diagram, caption under 'Minimized'. Lowercase fragment, no period.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster verschwunden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réouvertures totales"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fenêtre masquée"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "合計復元回数"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウが消える"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "累计恢复次数"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口不见了"
           }
         }
       }
     },
-    "window hidden": {
-      "comment": "Onboarding flow diagram, caption under 'Minimized'. Lowercase fragment, no period.",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fenster verschwunden"
+    "windows restored" : {
+      "comment" : "Label under the number of windows the app restored during the trial.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster wiederhergestellt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "fenêtre masquée"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fenêtres restaurées"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ウインドウが消える"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "件のウィンドウを復元"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "窗口不见了"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "个窗口已恢复"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

@@ -76,6 +76,13 @@ final class CommandAccessModel: ObservableObject {
         defaults[AppDefaults.trialStartDate]
     }
 
+    /// Whether this machine already took the one trial extension the app
+    /// offers. Read by `TrialExitOffer` to decide whether it may be made again.
+    var hasExtendedTrial: Bool { accessManager.hasExtendedTrial }
+
+    /// Whether the trial-exit offer has already been presented here.
+    var hasSeenTrialExitOffer: Bool { defaults[AppDefaults.hasSeenTrialExitOffer] }
+
     var accessEntitlementState: AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
             return .trial
@@ -125,6 +132,19 @@ final class CommandAccessModel: ObservableObject {
 
     func markExpiredPromptHandled() {
         shouldOpenProSettings = false
+    }
+
+    /// Grants the one trial extension offered when the user closes the paywall
+    /// after their trial ended. The original trial start date is preserved by
+    /// the access engine, so the app can still report what the trial produced.
+    func extendTrial(by duration: TimeInterval) {
+        accessManager.extendTrial(by: duration)
+    }
+
+    /// Records that the trial-exit offer was made, whatever the user chose.
+    func markTrialExitOfferShown() {
+        defaults[AppDefaults.hasSeenTrialExitOffer] = true
+        objectWillChange.send()
     }
 
 #if DEBUG

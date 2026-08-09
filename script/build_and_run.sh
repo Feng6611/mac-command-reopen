@@ -30,7 +30,7 @@ xcodebuild \
 SWIFT_ACTIVE_COMPILATION_CONDITIONS="DEBUG APPSTORE APPLE_SANDBOX" \
 TARGET_BUILD_DIR="$PRODUCTS_DIR" \
 INFOPLIST_PATH="$APP_NAME.app/Contents/Info.plist" \
-  "$ROOT_DIR/scripts/verify_revenuecat_api_key.sh"
+  "$ROOT_DIR/scripts/verify_appstore_configuration.sh"
 
 /usr/bin/codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 SIGNING_DETAILS="$(/usr/bin/codesign -dv --verbose=4 "$APP_BUNDLE" 2>&1)"
