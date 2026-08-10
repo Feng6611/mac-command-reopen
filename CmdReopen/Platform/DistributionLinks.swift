@@ -4,10 +4,10 @@ enum ExternalLinks {
     static let officialURL = "https://commandreopen.com"
     static let githubURL = "https://github.com/Feng6611/mac-command-reopen"
     static let githubDocsBaseURL = "https://github.com/Feng6611/mac-command-reopen/blob/main"
-    /// Where the free Community edition is downloaded. The releases page, not
-    /// the repository root: someone taking this route wants the app, not the
+    /// Where the free build is downloaded. The releases page, not the
+    /// repository root: someone taking this route wants the app, not the
     /// source, and the root asks them to find the download themselves.
-    static let communityEditionURL = "\(githubURL)/releases/latest"
+    static let freeBuildURL = "\(githubURL)/releases/latest"
     static let appStoreStandardEULAURL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
     static let customTermsURL = "\(githubDocsBaseURL)/TERMS.md"
     static let privacyURL = "\(officialURL)/privacy/"
@@ -21,6 +21,12 @@ enum ExternalLinks {
     }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
+    /// Where the feedback-reward rules live: what counts as real feedback,
+    /// how the 40% code arrives, and where to redeem it. On the product
+    /// domain, beside privacy — it is a commitment, not a notion page.
+    static let feedbackURL = "\(officialURL)/feedback/"
+    /// Value from `sale/brand/identity.md`, like the developer identity above.
+    static let xURL = "https://x.com/chen31641727"
 
     /// Values come from `sale/brand/identity.md`, which is the single source
     /// for the developer identity across every asset — a buyer checking who

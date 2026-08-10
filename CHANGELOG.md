@@ -7,12 +7,20 @@
   the same non-commercial feature surface as the App Store edition.
 - Renamed the direct edition status to Community edition; it has no RevenueCat,
   trial, purchase, or upgrade flow.
-- Added a one-time offer shown when the paywall is closed after the trial ended
-  without a purchase: another 14 days, a prefilled feedback email that earns a
-  discount code by reply, or a link to the free Community edition. Withheld
-  from anyone the app restored fewer than five windows for, and never shown
-  twice. The extension keeps the original trial start date, so the app can
-  still report what the trial produced.
+- Added a win-back offer shown when the paywall is closed after the trial ended
+  without a purchase: the lifetime unlock at 20% off, bought in place, with the
+  free GitHub build as the alternative. The discount runs for two days from the
+  first showing and can be reopened from Settings and About until it expires,
+  after which it does not return. Withheld from anyone the app restored fewer
+  than five windows for.
+- The free build's About status now reads "Free — full-featured, nothing
+  locked. Same app as the App Store version." It previously said "Community
+  edition", which named the distribution channel and implied a cut-down build.
+- Added a support card to the free build's About pane: the App Store version as
+  the primary action, Star on GitHub and Follow on X beside it, and an "I
+  already did" that removes the card for good.
+- Added a line under the About contact rows: real feedback gets a personal
+  reply, usually with a 40% discount code.
 - Reworked the paywall's visual hierarchy: brand color is now limited to the
   purchase button and the selected plan card, and the sheet takes the height
   its content needs instead of hiding overflow under the buttons.

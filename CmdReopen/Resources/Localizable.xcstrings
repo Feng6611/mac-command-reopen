@@ -202,6 +202,93 @@
         }
       }
     },
+    "20% off" : {
+      "comment" : "Badge on the win-back plan card naming the discount.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 % Rabatt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "−20 %"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20%オフ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "八折"
+          }
+        }
+      }
+    },
+    "20% off lifetime" : {
+      "comment" : "Title of the banner row that reopens the win-back offer.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 % Rabatt auf Lifetime"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vie, −20 %"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切り20%オフ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "买断八折"
+          }
+        }
+      }
+    },
+    "20% off, before you go" : {
+      "comment" : "Title of the win-back card shown when the paywall is closed after the trial ended.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 % Rabatt, bevor du gehst"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20 % de remise avant de partir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後に、20%オフを"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "临走前，八折带走"
+          }
+        }
+      }
+    },
     "About" : {
       "comment" : "Menu item opening the system About panel.",
       "localizations" : {
@@ -661,35 +748,6 @@
         }
       }
     },
-    "Command Reopen — what I was missing" : {
-      "comment" : "Subject line of the prefilled feedback email offered when a trial ends.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen – was mir gefehlt hat"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen — ce qui m’a manqué"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen — 足りないと感じた点"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen — 我觉得还缺什么"
-          }
-        }
-      }
-    },
     "Continue" : {
       "localizations" : {
         "de" : {
@@ -953,6 +1011,35 @@
         }
       }
     },
+    "Ends today" : {
+      "comment" : "Countdown on the win-back banner during the discount's final day.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endet heute"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se termine aujourd’hui"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本日まで"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天截止"
+          }
+        }
+      }
+    },
     "Exclude apps you don’t want restored" : {
       "localizations" : {
         "de" : {
@@ -1066,6 +1153,92 @@
         }
       }
     },
+    "Follow on X" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf X folgen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivre sur X"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xでフォロー"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 X 上关注"
+          }
+        }
+      }
+    },
+    "Free" : {
+      "comment" : "About status value for the free GitHub build.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费"
+          }
+        }
+      }
+    },
+    "Full-featured, nothing locked. Same app as the App Store version." : {
+      "comment" : "About status subtitle for the free GitHub build.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voller Funktionsumfang, nichts gesperrt. Dieselbe App wie im App Store."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctions, rien de verrouillé. La même app que sur l’App Store."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全機能が使え、ロックはありません。App Store版と同じアプリです。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能完整，没有任何锁。和 App Store 版是同一个 app。"
+          }
+        }
+      }
+    },
     "General" : {
       "localizations" : {
         "de" : {
@@ -1090,6 +1263,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通用"
+          }
+        }
+      }
+    },
+    "Get it on the App Store" : {
+      "comment" : "Primary button of the free build's support card.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im App Store holen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Télécharger sur l’App Store"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Storeで入手"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "去 App Store 购买"
+          }
+        }
+      }
+    },
+    "Get lifetime at 20% off" : {
+      "comment" : "Purchase button on the win-back card; buys the discounted lifetime unlock immediately.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime mit 20 % Rabatt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir à vie avec 20 % de remise"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切りを20%オフで"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "八折买断"
           }
         }
       }
@@ -1122,31 +1353,118 @@
         }
       }
     },
-    "Give me 14 more days" : {
-      "comment" : "Primary button that extends the expired trial by another fourteen days.",
+    "How it works" : {
+      "comment" : "Link to the feedback-reward rules page.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch 14 Tage nutzen"
+            "value" : "So funktioniert’s"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Me donner 14 jours de plus"
+            "value" : "Comment ça marche"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "あと14日間使う"
+            "value" : "詳しく"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "再给我 14 天"
+            "value" : "规则说明"
+          }
+        }
+      }
+    },
+    "I already did" : {
+      "comment" : "Dismisses the support card permanently; the user says they already supported the app.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hab ich schon"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’est déjà fait"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう済ませました"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我已经支持过了"
+          }
+        }
+      }
+    },
+    "If the price was the sticking point, here’s a smaller one. It ends today." : {
+      "comment" : "Subtitle of the win-back card during the discount window's final day.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn es am Preis lag: hier ein kleinerer. Er endet heute."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si c’était une question de prix, en voici un plus bas. Il se termine aujourd’hui."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "価格がネックだったなら、こちらを。本日で終了します。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果卡在价格上，这里有个更低的。今天截止。"
+          }
+        }
+      }
+    },
+    "If the price was the sticking point, here’s a smaller one. It holds for 2 days, then it’s gone." : {
+      "comment" : "Subtitle of the win-back card while more than a day of the discount window remains.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn es am Preis lag: hier ein kleinerer. Er gilt 2 Tage, dann ist er weg."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si c’était une question de prix, en voici un plus bas. Valable 2 jours, ensuite c’est fini."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "価格がネックだったなら、こちらを。2日間だけ有効です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果卡在价格上，这里有个更低的。只留 2 天。"
           }
         }
       }
@@ -1580,35 +1898,6 @@
         }
       }
     },
-    "No card, no payment. If it still isn’t worth it in two weeks, that’s a real answer." : {
-      "comment" : "Subtitle of the trial extension offer, stating that the extension costs nothing.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Karte, keine Zahlung. Wenn es sich in zwei Wochen immer noch nicht lohnt, ist das eine ehrliche Antwort."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans carte ni paiement. Si dans deux semaines ça ne vaut toujours pas le coup, c’est une vraie réponse."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お支払いもカード登録も不要です。2週間後にやはり必要ないと感じたら、それも一つの答えです。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不用付款，也不用填卡。两周后要是还觉得不值，那就是答案。"
-          }
-        }
-      }
-    },
     "No excluded apps" : {
       "localizations" : {
         "de" : {
@@ -1718,6 +2007,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "还没有恢复记录"
+          }
+        }
+      }
+    },
+    "No thanks — use the free GitHub build" : {
+      "comment" : "Footer link on the win-back card to the free build on GitHub.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein danke – kostenlosen GitHub-Build nutzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non merci — utiliser la version gratuite sur GitHub"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今回は見送り、無料のGitHub版を使う"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不用了，去用免费的 GitHub 版"
           }
         }
       }
@@ -2272,6 +2590,35 @@
         }
       }
     },
+    "Same app, paid the other way" : {
+      "comment" : "Title of the support card in the free build's About pane.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieselbe App, nur anders bezahlt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La même app, payée autrement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同じアプリ、別の支え方"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同一个 app，另一种付法"
+          }
+        }
+      }
+    },
     "See it work" : {
       "localizations" : {
         "de" : {
@@ -2358,6 +2705,35 @@
         }
       }
     },
+    "Something broken or missing? Real feedback gets a personal reply — usually with a 40% discount code." : {
+      "comment" : "About footer promising a reply and a discount code for real feedback.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas kaputt oder fehlt? Auf echtes Feedback antworte ich persönlich – meist mit einem 40-%-Rabattcode."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un bug, un manque ? Je réponds personnellement à tout retour utile — le plus souvent avec un code de −40 %."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不具合や足りない点があれば教えてください。実のあるご意見には私が直接返信します（多くの場合40%オフのコード付きで）。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "哪里坏了或者缺什么？认真的反馈我都会亲自回信，通常还会附一个六折码。"
+          }
+        }
+      }
+    },
     "Source" : {
       "comment" : "About-pane row label for the source repository.",
       "localizations" : {
@@ -2383,6 +2759,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "源代码"
+          }
+        }
+      }
+    },
+    "Star on GitHub" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf GitHub mit Stern versehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre une étoile sur GitHub"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubでスターを付ける"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "去 GitHub 点个 star"
           }
         }
       }
@@ -2615,64 +3019,6 @@
         }
       }
     },
-    "Take another 14 days" : {
-      "comment" : "Title of the card offered when the user closes the paywall after their trial ended.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch einmal 14 Tage"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encore 14 jours"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "もう14日間、無料で"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再免费用 14 天"
-          }
-        }
-      }
-    },
-    "Tell me what’s missing" : {
-      "comment" : "Secondary button that opens an email to the developer about why the user did not upgrade.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sagen, was fehlt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dire ce qui manque"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "足りないところを伝える"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "告诉我缺了什么"
-          }
-        }
-      }
-    },
     "Terms" : {
       "localizations" : {
         "de" : {
@@ -2841,6 +3187,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "购买已取消。"
+          }
+        }
+      }
+    },
+    "This free build has every feature and always will. The App Store version is identical — buying it funds the work, and you get automatic updates." : {
+      "comment" : "Body of the free build's support card, stating that the paid version unlocks nothing extra.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser kostenlose Build hat alle Funktionen und wird sie behalten. Die App-Store-Version ist identisch – sie zu kaufen finanziert die Arbeit, und du bekommst automatische Updates."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version gratuite a toutes les fonctions et les gardera. Celle de l’App Store est identique — l’acheter finance le travail, et vous avez les mises à jour automatiques."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この無料版はすべての機能を備えており、今後もそのままです。App Store版は中身も同じで、購入は開発への支援になります（自動アップデート付き）。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这个免费版功能齐全，以后也一样。App Store 版内容完全相同——买它是在为这份工作付钱，顺带拿到自动更新。"
           }
         }
       }
@@ -3159,35 +3534,6 @@
         }
       }
     },
-    "Use the free Community edition" : {
-      "comment" : "Footer link to the free, non-commercial edition on GitHub.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kostenlose Community-Edition verwenden"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utiliser l’édition Community gratuite"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料のCommunity版を使う"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "改用免费的 Community 版"
-          }
-        }
-      }
-    },
     "Verifying your Command Reopen Pro access." : {
       "localizations" : {
         "de" : {
@@ -3386,35 +3732,6 @@
         }
       }
     },
-    "What stopped me from upgrading:\n\n\nWhat I expected it to do:\n\n" : {
-      "comment" : "Prefilled body of the trial feedback email. Each line is a prompt the user answers.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Was mich vom Upgrade abgehalten hat:\n\n\nWas ich erwartet hatte:\n\n"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ce qui m’a empêché de passer à la version payante :\n\n\nCe que j’attendais :\n\n"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アップグレードしなかった理由：\n\n\n期待していた動作：\n\n"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "让我没有升级的原因：\n\n\n我原本以为它能做到：\n\n"
-          }
-        }
-      }
-    },
     "Windows restored" : {
       "comment" : "Caption under the lifetime reopen count on the paywall; one line only.",
       "extractionState" : "stale",
@@ -3470,35 +3787,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "没有 Pro，Cmd+Tab 会让这些窗口继续留在最小化状态。"
-          }
-        }
-      }
-    },
-    "Write back about what didn’t work and I’ll reply with a discount code." : {
-      "comment" : "Footnote explaining what the user gets for sending feedback.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schreib mir, was nicht funktioniert hat – du bekommst einen Rabattcode zurück."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Écrivez-moi ce qui n’a pas marché, je vous réponds avec un code de réduction."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "うまくいかなかった点を書いて送っていただければ、割引コードを返信します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "写下哪里不好用，我会回信给你一个折扣码。"
           }
         }
       }

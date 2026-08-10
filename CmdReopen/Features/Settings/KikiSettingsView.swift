@@ -1,7 +1,9 @@
+import AppKit
 import KikiSettings
 import SwiftUI
 #if APPSTORE
 import KikiCommerceCore
+import KikiPaywall
 #endif
 
 @MainActor
@@ -85,14 +87,15 @@ struct SettingsView: View {
             // paywall's close: the sheet is asked for one run loop later, and
             // anything that changed access state in between should cancel it.
             if let offer = TrialExitOffer.resolve(accessModel: accessModel) {
-                TrialExitOfferSheet(accessModel: accessModel, offer: offer)
+                TrialExitOfferView(accessModel: accessModel, offer: offer)
             }
         }
 #if DEBUG
         .sheet(isPresented: $route.isTrialExitOfferDebugPreviewPresented) {
-            TrialExitOfferSheet(
+            TrialExitOfferView(
                 accessModel: accessModel,
-                offer: .debugPreview
+                offer: .debugPreview,
+                marksOfferShown: false
             )
         }
 #endif
@@ -113,18 +116,13 @@ struct SettingsView: View {
             }
 
             Section {
-                KikiSettingsStatusRow(
-                    title: appLanguage.string("Status"),
-                    value: accessPresentation.title,
-                    systemImage: "info.circle",
-                    valueSystemImage: accessPresentation.tone == .neutral ? nil : accessPresentation.tone.systemImage,
-                    tone: accessPresentation.tone.settingsTone,
-                    tint: DS.Colors.brandPrimary,
-                    showsBadge: false,
-                    trailingSystemImage: accessAction == nil ? nil : "chevron.right",
-                    action: accessAction
-                )
+                aboutStatusRow
             }
+#if !APPSTORE
+            Section {
+                DirectSupportCardRow()
+            }
+#endif
 
             // Someone who opens About is checking who wrote this and whether
             // the permission claim holds. The rows are ordered as that check
@@ -156,6 +154,23 @@ struct SettingsView: View {
                 )
             } footer: {
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    // The feedback bounty rides under the contact rows rather
+                    // than getting a card of its own: it is a promise attached
+                    // to the channels above, not another ask competing with
+                    // them. "Usually" scopes the promise to feedback that
+                    // actually helps, while the reply itself stays guaranteed.
+                    HStack(spacing: DS.Spacing.xs) {
+                        KikiSettingsHelperText(
+                            appLanguage.string(localized: "Something broken or missing? Real feedback gets a personal reply — usually with a 40% discount code.", comment: "About footer promising a reply and a discount code for real feedback.")
+                        )
+                        Button(appLanguage.string(localized: "How it works", comment: "Link to the feedback-reward rules page.")) {
+                            if let url = URL(string: ExternalLinks.feedbackURL) {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.link)
+                        .font(.caption)
+                    }
                     KikiSettingsHelperText(
                         appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
                     )
@@ -190,6 +205,71 @@ struct SettingsView: View {
     }
 
     private var aboutMetadata: KikiAppMetadata { .bundle() }
+
+    @ViewBuilder
+    private var aboutStatusRow: some View {
+#if APPSTORE
+        if let offer = activeWinbackOffer {
+            KikiSettingsValueRow(
+                appLanguage.string("Status"),
+                systemImage: "info.circle"
+            ) {
+                HStack(spacing: DS.Spacing.sm) {
+                    Text(accessPresentation.title)
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
+
+                    Spacer(minLength: 0)
+
+                    Button {
+                        route.presentTrialExitOffer()
+                    } label: {
+                        KikiPaywallPill(
+                            text: winbackPillText(for: offer),
+                            tone: .accent,
+                            tint: DS.Colors.brandPrimary
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .help(appLanguage.string("Open the limited-time offer"))
+                }
+            }
+        } else {
+            standardAboutStatusRow
+        }
+#else
+        standardAboutStatusRow
+#endif
+    }
+
+    private var standardAboutStatusRow: some View {
+        KikiSettingsStatusRow(
+            title: appLanguage.string("Status"),
+            value: accessPresentation.title,
+            systemImage: "info.circle",
+            valueSystemImage: accessPresentation.tone == .neutral ? nil : accessPresentation.tone.systemImage,
+            tone: accessPresentation.tone.settingsTone,
+            tint: DS.Colors.brandPrimary,
+            showsBadge: false,
+            trailingSystemImage: accessAction == nil ? nil : "chevron.right",
+            action: accessAction
+        )
+    }
+
+#if APPSTORE
+    private var activeWinbackOffer: TrialExitOffer? {
+        guard accessModel.winbackOfferFirstShownAt != nil else { return nil }
+        return TrialExitOffer.resolve(accessModel: accessModel)
+    }
+
+    private func winbackPillText(for offer: TrialExitOffer) -> String {
+        let days = offer.daysRemaining()
+        let remaining = days == 1
+            ? appLanguage.string("1 day left")
+            : appLanguage.string("\(days) days left")
+        return appLanguage.string("20% off · \(remaining)")
+    }
+#endif
 
     private var accessAction: (@MainActor () -> Void)? {
         guard accessController.distributionChannel == .appStore else { return nil }
@@ -256,10 +336,16 @@ struct SettingsView: View {
             )
         }
 #else
+        // The status row answers the money question, not the channel question:
+        // this build costs nothing and withholds nothing. Channel names
+        // (Direct, Community edition) kept getting rewritten because they
+        // named the distribution in a row that should state the deal; where
+        // provenance is the question — README, Releases — it is "the GitHub
+        // build".
         return KikiAccessStatusPresentation(
             tone: .active,
-            title: language.string(localized: "Community edition"),
-            subtitle: language.string(localized: "Free and fully featured for the community."),
+            title: language.string(localized: "Free", comment: "About status value for the free GitHub build."),
+            subtitle: language.string(localized: "Full-featured, nothing locked. Same app as the App Store version.", comment: "About status subtitle for the free GitHub build."),
             actionTitle: nil
         )
 #endif
@@ -269,7 +355,7 @@ struct SettingsView: View {
     private func localizedPlanTitle(for plan: KikiAccessPlan) -> String {
         switch plan.commercePlan {
         case .yearly: appLanguage.string("Yearly")
-        case .lifetime: appLanguage.string("Lifetime")
+        case .lifetime, .winbackLifetime: appLanguage.string("Lifetime")
         default: plan.title
         }
     }
@@ -277,7 +363,7 @@ struct SettingsView: View {
     private func localizedPlanBillingDetail(for plan: KikiAccessPlan) -> String {
         switch plan.commercePlan {
         case .yearly: appLanguage.string("per year")
-        case .lifetime: appLanguage.string("once")
+        case .lifetime, .winbackLifetime: appLanguage.string("once")
         default: plan.billingDetail
         }
     }

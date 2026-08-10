@@ -73,6 +73,7 @@ struct PaywallSheetView: View {
                 purchaseErrorMessage: appLanguage.string(localized: "The purchase couldn't be completed.")
             ),
             footerLinks: footerLinks,
+            displayPlanIDs: RevenueCatConfiguration.visiblePaywallPlanIDs,
             tint: DS.Colors.brandPrimary,
             onFinish: {
                 CommandReopenAnalytics.shared.capturePaywallAction(

@@ -6,30 +6,34 @@
 import Foundation
 import KikiCommerceCore
 
-/// What Command Reopen offers someone who closes the paywall after their trial
-/// ended without buying.
+/// The win-back offer Command Reopen makes when someone closes the paywall
+/// after their trial ended without buying: the lifetime unlock at 20% off,
+/// purchasable on the spot, or the free GitHub build.
 ///
-/// Closing that sheet is the only moment the app knows for certain that the
-/// user decided not to pay, and it is the last one before they either forget
-/// the app or delete it. Rather than let them leave with nothing, the app makes
-/// one offer: more time, a way to say what was wrong, or the free Community
-/// edition.
+/// Closing that paywall is the only moment the app knows for certain that the
+/// user decided not to pay, and the last one before they either forget the app
+/// or delete it. The offer is a separate discounted SKU rather than a code:
+/// macOS has no in-app redemption sheet, and a code would send the user
+/// hunting for the App Store's redeem screen at the exact moment they are
+/// already leaving.
 ///
-/// The offer is deliberately scarce. It is made **once per machine**, and never
-/// to someone who already took the extension, because a trial that can always
-/// be renewed is not a trial — it is a free app with extra steps.
+/// The discount runs for **two days from its first presentation** and never
+/// returns. Inside that window the card can be reopened from the banners in
+/// Settings and About — someone who closed it deserves a way back while the
+/// price still holds. A discount that quietly came back later would teach
+/// users that the full price is never real.
 struct TrialExitOffer: Equatable {
-    /// How much more trial time the offer grants.
-    ///
-    /// The same fourteen days as the original trial. A shorter "last chance"
-    /// window would read as a haggle; the point of the offer is that the user
-    /// did not get to a decision, and the honest fix is to give them the same
-    /// run again.
-    static let extraTrialDuration: TimeInterval = 14 * 24 * 60 * 60
+    /// How long the discount holds after the user first sees it. Two days is
+    /// long enough to sleep on it, short enough that "it ends" is true.
+    static let discountWindow: TimeInterval = 2 * 24 * 60 * 60
 
-    /// The figures the card argues from. Never `nil` in a resolved offer — see
-    /// `resolve(...)` for why an offer without them is not made at all.
+    /// The figures the card argues from. Never `nil` in a resolved offer —
+    /// see `resolve(...)` for why an offer without them is not made at all.
     let receipt: TrialReceipt
+
+    /// When the discount stops. Drives the card's urgency line and the
+    /// banners' countdown.
+    let windowEndsAt: Date
 
 #if DEBUG
     /// Stable content for the Debug Settings preview. It lets development
@@ -43,47 +47,58 @@ struct TrialExitOffer: Equatable {
                 displayName: "Xcode",
                 count: 12
             )
-        )!
+        )!,
+        windowEndsAt: Date().addingTimeInterval(discountWindow)
     )
 #endif
 
-    /// Decides whether the offer may be made.
+    /// Decides whether the offer may be made or re-shown.
     ///
     /// - Parameters:
     ///   - status: current access state. Only an expired trial qualifies; a
     ///     running trial has not asked the user for a decision yet, and a
     ///     purchase has already got one.
-    ///   - hasExtendedTrial: whether an extension was already granted here.
-    ///   - hasBeenShown: whether the card was already presented here, whatever
-    ///     the user picked. Declining once is an answer.
-    ///   - receipt: what the app did during the trial. Required: without it the
-    ///     card has no argument, and a second free fortnight spent on someone
-    ///     who never adopted the feature buys neither a sale nor a signal.
+    ///   - firstShownAt: when the offer was first presented here, `nil` if
+    ///     never. Before the first show the offer is fresh; inside the window
+    ///     it may be re-presented; after it, it is gone for good.
+    ///   - now: the current moment, injectable for tests.
+    ///   - receipt: what the app did during the trial. Required: the card
+    ///     argues from the user's own figures, and a discount pitched at
+    ///     someone the app never helped is spam with a price on it.
     static func resolve(
         status: KikiAccessState,
-        hasExtendedTrial: Bool,
-        hasBeenShown: Bool,
+        firstShownAt: Date?,
+        now: Date = Date(),
         receipt: TrialReceipt?
     ) -> TrialExitOffer? {
-        guard status == .expired,
-              !hasExtendedTrial,
-              !hasBeenShown,
-              let receipt else {
+        guard status == .expired, let receipt else {
             return nil
         }
 
-        return TrialExitOffer(receipt: receipt)
+        let windowEndsAt = (firstShownAt ?? now).addingTimeInterval(discountWindow)
+        guard now < windowEndsAt else {
+            return nil
+        }
+
+        return TrialExitOffer(receipt: receipt, windowEndsAt: windowEndsAt)
+    }
+
+    /// Whole days left before the window closes, rounded up: a fresh offer
+    /// reports 2, and anything within the final day reports 1. Feeds the
+    /// countdown copy, which says "ends today" at 1.
+    func daysRemaining(now: Date = Date()) -> Int {
+        max(0, Int(ceil(windowEndsAt.timeIntervalSince(now) / 86_400)))
     }
 }
 
 @MainActor
 extension TrialExitOffer {
     /// Resolves the offer against live app state.
-    static func resolve(accessModel: CommandAccessModel) -> TrialExitOffer? {
+    static func resolve(accessModel: CommandAccessModel, now: Date = Date()) -> TrialExitOffer? {
         resolve(
             status: accessModel.status,
-            hasExtendedTrial: accessModel.hasExtendedTrial,
-            hasBeenShown: accessModel.hasSeenTrialExitOffer,
+            firstShownAt: accessModel.winbackOfferFirstShownAt,
+            now: now,
             receipt: TrialReceipt.make(trialStartedAt: accessModel.trialStartedAt)
         )
     }

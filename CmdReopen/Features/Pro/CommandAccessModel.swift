@@ -76,12 +76,9 @@ final class CommandAccessModel: ObservableObject {
         defaults[AppDefaults.trialStartDate]
     }
 
-    /// Whether this machine already took the one trial extension the app
-    /// offers. Read by `TrialExitOffer` to decide whether it may be made again.
-    var hasExtendedTrial: Bool { accessManager.hasExtendedTrial }
-
-    /// Whether the trial-exit offer has already been presented here.
-    var hasSeenTrialExitOffer: Bool { defaults[AppDefaults.hasSeenTrialExitOffer] }
+    /// When the win-back offer was first presented on this machine, or `nil`
+    /// if it never has been. The discount window is measured from this moment.
+    var winbackOfferFirstShownAt: Date? { defaults[AppDefaults.winbackOfferFirstShownAt] }
 
     var accessEntitlementState: AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
@@ -134,16 +131,12 @@ final class CommandAccessModel: ObservableObject {
         shouldOpenProSettings = false
     }
 
-    /// Grants the one trial extension offered when the user closes the paywall
-    /// after their trial ended. The original trial start date is preserved by
-    /// the access engine, so the app can still report what the trial produced.
-    func extendTrial(by duration: TimeInterval) {
-        accessManager.extendTrial(by: duration)
-    }
-
-    /// Records that the trial-exit offer was made, whatever the user chose.
-    func markTrialExitOfferShown() {
-        defaults[AppDefaults.hasSeenTrialExitOffer] = true
+    /// Starts the win-back window on the offer's first presentation. Later
+    /// presentations inside the window keep the original clock — the discount
+    /// expires two days after the user first saw it, not after the last look.
+    func markWinbackOfferShown(now: Date = Date()) {
+        guard defaults[AppDefaults.winbackOfferFirstShownAt] == nil else { return }
+        defaults[AppDefaults.winbackOfferFirstShownAt] = now
         objectWillChange.send()
     }
 
