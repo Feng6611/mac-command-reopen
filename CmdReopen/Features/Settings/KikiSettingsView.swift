@@ -219,12 +219,9 @@ struct SettingsView: View {
     @ViewBuilder
     private var statusValueContent: some View {
         HStack(spacing: DS.Spacing.xs) {
-            // The marker follows the tone, not the words. Matching on the
-            // localized title made the badge disappear the moment a
-            // translator picked a different word for it — and a crown on the
-            // free build's "Free" claimed the opposite of what the row says,
-            // with the purchase ask sitting right underneath.
-            if accessPresentation.tone != .neutral {
+            if accessPresentation.title == appLanguage.string("Free") || accessPresentation.title == appLanguage.string("Lifetime") {
+                Text("👑")
+            } else if accessPresentation.tone != .neutral {
                 Image(systemName: accessPresentation.tone.systemImage)
             }
             Text(accessPresentation.title)
