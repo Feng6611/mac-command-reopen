@@ -4,8 +4,8 @@
 //
 //  Design tokens and reusable components.
 //  Strategy: native-first — use Apple system colors, fonts, and controls.
-//  Only define what Apple doesn't provide: spacing scale, semantic
-//  color aliases, card modifier, and shared UI components.
+//  Only define what Apple doesn't provide: the spacing scale, the brand
+//  colour and its tints, and the few components used across features.
 //
 //  Rules (see DESIGN.md):
 //  1. Native-first — default to system components.
@@ -43,36 +43,25 @@ enum DS {
     enum Radius {
         static let control: CGFloat = 6
         static let card:    CGFloat = 10
-        static let modal:   CGFloat = 14
     }
 
     // MARK: Semantic Colors
 
     enum Colors {
-        static let cardBackground = Color(nsColor: .windowBackgroundColor)
-        static let cardBorder     = Color(nsColor: .separatorColor).opacity(0.4)
+        static let cardBorder = Color(nsColor: .separatorColor).opacity(0.4)
 
         static let brandPrimary = Color(red: 203/255, green: 48/255, blue: 224/255)
-        static let accentTint       = brandPrimary.opacity(0.12)
-        static let accentTintSubtle = brandPrimary.opacity(0.06)
-        static let proFill          = brandPrimary.opacity(0.88)
-
-        static let warningTint = Color.orange.opacity(0.12)
+        static let accentTint   = brandPrimary.opacity(0.12)
     }
 
     // MARK: Typography (only non-system fonts)
     // Prefer .headline / .body / .callout / .caption / .footnote for everything else.
 
     enum Typography {
-        static let displayHero    = Font.system(size: 36, weight: .bold, design: .rounded)
-        static let onboardingTitle = Font.system(size: 24, weight: .bold)
-        static let headlineMedium = Font.system(size: 20, weight: .semibold)
-        static let headlineSmall  = Font.system(size: 18, weight: .bold, design: .rounded)
-        static let metricValue    = Font.system(size: 16, weight: .semibold, design: .rounded)
-        static let bodyMedium     = Font.system(size: 13, weight: .medium)
-        static let captionMedium  = Font.system(size: 11, weight: .medium)
-        static let micro          = Font.system(size: 10)
-        static let microSemibold  = Font.system(size: 10, weight: .semibold)
+        static let displayHero   = Font.system(size: 36, weight: .bold, design: .rounded)
+        static let metricValue   = Font.system(size: 16, weight: .semibold, design: .rounded)
+        static let micro         = Font.system(size: 10)
+        static let microSemibold = Font.system(size: 10, weight: .semibold)
     }
 }
 
@@ -99,89 +88,6 @@ struct DSStatsGroupBoxStyle: GroupBoxStyle {
 
 extension GroupBoxStyle where Self == DSStatsGroupBoxStyle {
     static var dsStats: DSStatsGroupBoxStyle { DSStatsGroupBoxStyle() }
-}
-
-// MARK: - Card Modifier (for marketing surfaces: Paywall, Onboarding, Support)
-
-struct DSCardModifier: ViewModifier {
-    var borderColor: Color = DS.Colors.cardBorder
-    var radius: CGFloat = DS.Radius.card
-
-    func body(content: Content) -> some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(DS.Colors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .strokeBorder(borderColor, lineWidth: 0.5)
-            )
-            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-    }
-}
-
-extension View {
-    func dsCard(borderColor: Color = DS.Colors.cardBorder, radius: CGFloat = DS.Radius.card) -> some View {
-        modifier(DSCardModifier(borderColor: borderColor, radius: radius))
-    }
-}
-
-// MARK: - Icon Badge
-
-struct DSIconBadge: View {
-    let systemName: String
-    var iconColor: Color = .accentColor
-    var backgroundColor: Color = DS.Colors.accentTint
-    var size: CGFloat = 44
-    var iconSize: CGFloat = 19
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(backgroundColor)
-                .frame(width: size, height: size)
-            Image(systemName: systemName)
-                .font(.system(size: iconSize))
-                .foregroundStyle(iconColor)
-        }
-    }
-}
-
-// MARK: - Status Pill
-
-enum PillTone {
-    case accent, warning, neutral
-}
-
-struct StatusPill: View {
-    let text: String
-    var tone: PillTone = .accent
-
-    var body: some View {
-        Text(text)
-            .font(DS.Typography.microSemibold)
-            .foregroundColor(foregroundColor)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 3)
-            .background(Capsule().fill(fillColor))
-    }
-
-    private var foregroundColor: Color {
-        switch tone {
-        case .accent:  return .white
-        case .warning: return .orange
-        case .neutral: return .secondary
-        }
-    }
-
-    private var fillColor: Color {
-        switch tone {
-        case .accent:  return DS.Colors.proFill
-        case .warning: return DS.Colors.warningTint
-        case .neutral: return Color(nsColor: .controlBackgroundColor)
-        }
-    }
 }
 
 // MARK: - Section Header
@@ -272,30 +178,5 @@ struct EmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.control, style: .continuous))
-    }
-}
-
-// MARK: - Dot Separator
-
-struct DSDotSeparator: View {
-    var body: some View {
-        Circle()
-            .fill(Color.secondary.opacity(0.4))
-            .frame(width: 3, height: 3)
-    }
-}
-
-// MARK: - onChange compatibility shim (macOS 13+)
-
-struct OnChangeCompat<V: Equatable>: ViewModifier {
-    let value: V
-    let action: () -> Void
-
-    func body(content: Content) -> some View {
-        if #available(macOS 14.0, *) {
-            content.onChange(of: value) { action() }
-        } else {
-            content.onChange(of: value) { _ in action() }
-        }
     }
 }

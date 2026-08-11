@@ -175,10 +175,6 @@ final class ReopenStatsStore: ObservableObject {
         }
     }
 
-    var maxAppCount: Int {
-        snapshot.perAppCounts.values.max() ?? 0
-    }
-
     func dailyStats(last days: Int = 30) -> [(date: Date, count: Int)] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())

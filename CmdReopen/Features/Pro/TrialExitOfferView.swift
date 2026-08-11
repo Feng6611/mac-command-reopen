@@ -229,7 +229,7 @@ struct WinbackOfferRow: View {
 
                     Spacer(minLength: 0)
 
-                    Text(countdown(for: offer))
+                    Text(offer.countdownText())
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
@@ -251,13 +251,4 @@ struct WinbackOfferRow: View {
         return TrialExitOffer.resolve(accessModel: accessModel)
     }
 
-    private func countdown(for offer: TrialExitOffer) -> String {
-        let days = offer.daysRemaining()
-        if days > 1 {
-            return appLanguage.string(localized: "\(days) days left",
-                comment: "Trial time remaining in the About pane; plural-aware in the catalog.")
-        }
-        return appLanguage.string(localized: "Ends today",
-            comment: "Countdown on the win-back banner during the discount's final day.")
-    }
 }

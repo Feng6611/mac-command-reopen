@@ -93,6 +93,24 @@ struct TrialExitOffer: Equatable {
 
 @MainActor
 extension TrialExitOffer {
+    /// How much of the window is left, in the words every surface uses.
+    ///
+    /// Three surfaces render this countdown and each used to phrase it for
+    /// itself, which is how the final day came to read "Ends today" on one
+    /// banner and "1 day left" on another for the same offer at the same
+    /// moment. Whole days only: the point is that the price is temporary,
+    /// not that the user should watch a clock.
+    func countdownText(now: Date = Date()) -> String {
+        let language = AppLanguage.shared
+        let days = daysRemaining(now: now)
+        guard days > 1 else {
+            return language.string(localized: "Ends today",
+                comment: "Countdown on the win-back banner during the discount's final day.")
+        }
+        return language.string(localized: "\(days) days left",
+            comment: "Trial time remaining in the About pane; plural-aware in the catalog.")
+    }
+
     /// Resolves the offer against live app state.
     static func resolve(accessModel: CommandAccessModel, now: Date = Date()) -> TrialExitOffer? {
 #if DEBUG

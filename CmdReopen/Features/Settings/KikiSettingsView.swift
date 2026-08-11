@@ -3,7 +3,6 @@ import KikiSettings
 import SwiftUI
 #if APPSTORE
 import KikiCommerceCore
-import KikiPaywall
 #endif
 
 @MainActor
@@ -116,7 +115,15 @@ struct SettingsView: View {
             }
 
             Section {
-                aboutStatusRow
+                standardAboutStatusRow
+#if APPSTORE
+                // The same banner General shows, rather than a second design
+                // for the same state: one offer, one way it looks, wherever
+                // the user meets it.
+                WinbackOfferRow(accessModel: accessModel) {
+                    route.presentTrialExitOffer()
+                }
+#endif
             }
 #if !APPSTORE
             Section {
@@ -196,42 +203,6 @@ struct SettingsView: View {
 
     private var aboutMetadata: KikiAppMetadata { .bundle() }
 
-    @ViewBuilder
-    private var aboutStatusRow: some View {
-#if APPSTORE
-        if let offer = activeWinbackOffer {
-            KikiSettingsValueRow(
-                appLanguage.string("Status"),
-                systemImage: "info.circle"
-            ) {
-                HStack(spacing: DS.Spacing.sm) {
-                    Text(accessPresentation.title)
-                        .lineLimit(1)
-                        .foregroundStyle(.secondary)
-
-                    Spacer(minLength: 0)
-
-                    Button {
-                        route.presentTrialExitOffer()
-                    } label: {
-                        KikiPaywallPill(
-                            text: winbackPillText(for: offer),
-                            tone: .accent,
-                            tint: DS.Colors.brandPrimary
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .help(appLanguage.string("Open the limited-time offer"))
-                }
-            }
-        } else {
-            standardAboutStatusRow
-        }
-#else
-        standardAboutStatusRow
-#endif
-    }
-
     private var standardAboutStatusRow: some View {
         KikiSettingsValueRow(appLanguage.string("Status"), systemImage: "info.circle") {
             if let accessAction {
@@ -266,21 +237,6 @@ struct SettingsView: View {
             }
         }
     }
-
-#if APPSTORE
-    private var activeWinbackOffer: TrialExitOffer? {
-        guard accessModel.winbackOfferFirstShownAt != nil else { return nil }
-        return TrialExitOffer.resolve(accessModel: accessModel)
-    }
-
-    private func winbackPillText(for offer: TrialExitOffer) -> String {
-        let days = offer.daysRemaining()
-        let remaining = days == 1
-            ? appLanguage.string("1 day left")
-            : appLanguage.string("\(days) days left")
-        return appLanguage.string("20% off · \(remaining)")
-    }
-#endif
 
     private var accessAction: (@MainActor () -> Void)? {
         guard accessController.distributionChannel == .appStore else { return nil }
