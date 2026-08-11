@@ -122,31 +122,38 @@ struct SettingsView: View {
             Section {
                 DirectSupportCardRow()
             }
+#else
+            // Each edition puts its one ask in the same slot, directly under
+            // the status it follows from: the free build asks for a purchase,
+            // the paid build asks for feedback. Below the contact section it
+            // would sit after that section's footer, and a footer reads as the
+            // end of the pane rather than a divider before more content.
+            Section {
+                FeedbackOfferCardRow()
+            }
 #endif
 
-            // Someone who opens About is checking who wrote this and whether
-            // the permission claim holds. The rows are ordered as that check
-            // runs: who, where they publish, how to reach them, and the source
-            // that makes the claim verifiable rather than a promise.
+            // The left side identifies the destination; only the right-side
+            // value and action icon are interactive.
             Section {
-                KikiSettingsLinkRow(
+                SettingsTrailingLinkRow(
                     title: appLanguage.string("Made by"),
                     value: ExternalLinks.developerName,
                     urlString: ExternalLinks.developerURL,
                     systemImage: "person"
                 )
-                KikiSettingsLinkRow(
+                SettingsTrailingLinkRow(
                     title: appLanguage.string("Website"),
                     value: ExternalLinks.websiteDisplayName,
                     urlString: ExternalLinks.officialURL,
                     systemImage: "globe"
                 )
-                KikiSettingsCopyRow(
+                SettingsTrailingCopyRow(
                     title: appLanguage.string("Email"),
                     value: ExternalLinks.contactEmailAddress,
                     systemImage: "envelope"
                 )
-                KikiSettingsLinkRow(
+                SettingsTrailingLinkRow(
                     title: appLanguage.string("Source"),
                     value: ExternalLinks.repositoryDisplayName,
                     urlString: ExternalLinks.githubURL,
@@ -154,23 +161,6 @@ struct SettingsView: View {
                 )
             } footer: {
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                    // The feedback bounty rides under the contact rows rather
-                    // than getting a card of its own: it is a promise attached
-                    // to the channels above, not another ask competing with
-                    // them. "Usually" scopes the promise to feedback that
-                    // actually helps, while the reply itself stays guaranteed.
-                    HStack(spacing: DS.Spacing.xs) {
-                        KikiSettingsHelperText(
-                            appLanguage.string(localized: "Something broken or missing? Real feedback gets a personal reply — usually with a 40% discount code.", comment: "About footer promising a reply and a discount code for real feedback.")
-                        )
-                        Button(appLanguage.string(localized: "How it works", comment: "Link to the feedback-reward rules page.")) {
-                            if let url = URL(string: ExternalLinks.feedbackURL) {
-                                NSWorkspace.shared.open(url)
-                            }
-                        }
-                        .buttonStyle(.link)
-                        .font(.caption)
-                    }
                     KikiSettingsHelperText(
                         appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
                     )
@@ -243,17 +233,38 @@ struct SettingsView: View {
     }
 
     private var standardAboutStatusRow: some View {
-        KikiSettingsStatusRow(
-            title: appLanguage.string("Status"),
-            value: accessPresentation.title,
-            systemImage: "info.circle",
-            valueSystemImage: accessPresentation.tone == .neutral ? nil : accessPresentation.tone.systemImage,
-            tone: accessPresentation.tone.settingsTone,
-            tint: DS.Colors.brandPrimary,
-            showsBadge: false,
-            trailingSystemImage: accessAction == nil ? nil : "chevron.right",
-            action: accessAction
-        )
+        KikiSettingsValueRow(appLanguage.string("Status"), systemImage: "info.circle") {
+            if let accessAction {
+                Button(action: accessAction) {
+                    statusValueContent
+                }
+                .buttonStyle(.plain)
+            } else {
+                statusValueContent
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var statusValueContent: some View {
+        HStack(spacing: DS.Spacing.xs) {
+            // The marker follows the tone, not the words. Matching on the
+            // localized title made the badge disappear the moment a
+            // translator picked a different word for it — and a crown on the
+            // free build's "Free" claimed the opposite of what the row says,
+            // with the purchase ask sitting right underneath.
+            if accessPresentation.tone != .neutral {
+                Image(systemName: accessPresentation.tone.systemImage)
+            }
+            Text(accessPresentation.title)
+                .lineLimit(1)
+                .foregroundStyle(accessPresentation.tone == .neutral ? .secondary : DS.Colors.brandPrimary)
+            if accessAction != nil {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
     }
 
 #if APPSTORE
@@ -368,4 +379,56 @@ struct SettingsView: View {
         }
     }
 #endif
+}
+
+private struct SettingsTrailingLinkRow: View {
+    let title: String
+    let value: String
+    let urlString: String
+    let systemImage: String
+
+    var body: some View {
+        KikiSettingsValueRow(title, systemImage: systemImage) {
+            Button {
+                KikiSettingsActions.openURL(urlString)
+            } label: {
+                HStack(spacing: DS.Spacing.xs) {
+                    Text(value)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+}
+
+private struct SettingsTrailingCopyRow: View {
+    let title: String
+    let value: String
+    let systemImage: String
+
+    var body: some View {
+        KikiSettingsValueRow(title, systemImage: systemImage) {
+            Button {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(value, forType: .string)
+            } label: {
+                HStack(spacing: DS.Spacing.xs) {
+                    Text(value)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    Image(systemName: "doc.on.doc")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
 }

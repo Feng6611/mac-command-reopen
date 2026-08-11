@@ -95,7 +95,23 @@ struct TrialExitOffer: Equatable {
 extension TrialExitOffer {
     /// Resolves the offer against live app state.
     static func resolve(accessModel: CommandAccessModel, now: Date = Date()) -> TrialExitOffer? {
-        resolve(
+#if DEBUG
+        // Debug Settings can hold the window open on its own. What is under
+        // test there is the banners and their countdown, and reaching those
+        // for real needs a two-day-old expired trial with five restores
+        // inside it — so the gates that guard *whether* to make the offer are
+        // stood in for, while the window arithmetic stays the real one.
+        if accessModel.isWinbackDebugForced, let firstShownAt = accessModel.winbackOfferFirstShownAt {
+            return resolve(
+                status: .expired,
+                firstShownAt: firstShownAt,
+                now: now,
+                receipt: debugPreview.receipt
+            )
+        }
+#endif
+
+        return resolve(
             status: accessModel.status,
             firstShownAt: accessModel.winbackOfferFirstShownAt,
             now: now,

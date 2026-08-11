@@ -21,13 +21,8 @@ enum ExternalLinks {
     }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
-    /// Where the feedback-reward rules live: what counts as real feedback,
-    /// how the 40% code arrives, and where to redeem it. On the product
-    /// domain, beside privacy — it is a commitment, not a notion page.
-    static let feedbackURL = "\(officialURL)/feedback/"
-    /// Value from `sale/brand/identity.md`, like the developer identity above.
-    static let xURL = "https://x.com/chen31641727"
-
+    /// Feedback form for App Store users requesting a lifetime discount code.
+    static let feedbackURL = "https://forms.gle/5MfTRHnmxivjqnrr5"
     /// Values come from `sale/brand/identity.md`, which is the single source
     /// for the developer identity across every asset — a buyer checking who
     /// wrote this should meet the same name here, on GitHub and on the site.

@@ -88,12 +88,18 @@ struct TrialExitOfferView: View {
                 .keyboardShortcut(.defaultAction)
             }
         } footer: {
-            Button(appLanguage.string(localized: "No thanks — use the free GitHub build",
-                comment: "Footer link on the win-back card to the free build on GitHub.")) {
+            // The way out leads to the free build, stated as an alternative
+            // rather than advertised as a free copy: naming the price here
+            // would undercut the offer directly above it for every user still
+            // deciding. The card's close button remains the plain dismissal,
+            // so this link is a route rather than the only exit.
+            Button(appLanguage.string(localized: "Other ways to use it",
+                comment: "Footer link on the win-back card leading to the free build on GitHub.")) {
                 openFreeBuild()
             }
-            .buttonStyle(.link)
+            .buttonStyle(.plain)
             .font(.caption)
+            .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity)
         }
         .onAppear {
@@ -146,21 +152,34 @@ struct TrialExitOfferView: View {
     }
 
     /// The deal, as one pre-selected card: the discounted price beside the
-    /// struck-through full price. Both prices come from the store when the
-    /// offering has loaded, so currencies always match.
+    /// struck-through full price.
+    ///
+    /// The comparison is shown only when both products came from the store.
+    /// A fallback price is a build-time US dollar string, so pairing one with
+    /// a loaded price printed a strike-through in the user's currency beside
+    /// a discount in another — "¥48.00 $8.79", which reads as a bug and
+    /// misstates the saving. Without both, the card shows the price it can
+    /// actually charge and drops the comparison.
     private var winbackPlanCard: KikiPaywallPlan {
-        let fullPrice = accessModel.planProduct(for: .lifetime).displayPrice
+        let fullProduct = accessModel.planProduct(for: .lifetime)
+        let comparablePrices = fullProduct.isAvailable && winbackProduct.isAvailable
 
         return KikiPaywallPlan(
             id: winbackProduct.id,
             title: appLanguage.string("Lifetime"),
             displayPrice: winbackProduct.displayPrice,
-            originalPrice: fullPrice,
+            originalPrice: comparablePrices ? fullProduct.displayPrice : nil,
             billingDetail: appLanguage.string("once"),
             badge: appLanguage.string(localized: "20% off",
                 comment: "Badge on the win-back plan card naming the discount."),
             isAvailable: winbackProduct.isAvailable
         )
+    }
+
+    private func openFreeBuild() {
+        dismiss()
+        guard let url = URL(string: ExternalLinks.freeBuildURL) else { return }
+        urlOpener.open(url)
     }
 
     private func purchase() {
@@ -182,11 +201,6 @@ struct TrialExitOfferView: View {
         }
     }
 
-    private func openFreeBuild() {
-        dismiss()
-        guard let url = URL(string: ExternalLinks.freeBuildURL) else { return }
-        urlOpener.open(url)
-    }
 }
 
 /// The way back to the win-back card while its window holds.

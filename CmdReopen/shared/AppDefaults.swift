@@ -24,6 +24,9 @@ enum AppDefaults {
         static let analyticsInstallationID = "cmdreopen.analytics.installationID.v1"
 #if DEBUG
         static let pendingOnboardingRelaunch = "cmdreopenPendingOnboardingRelaunch"
+        /// Set by Debug Settings to hold the win-back window open without an
+        /// expired trial behind it. Read only from DEBUG builds.
+        static let winbackDebugForced = "cmdreopenWinbackDebugForced"
 #endif
     }
 
@@ -52,6 +55,9 @@ enum AppDefaults {
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
     static let winbackOfferFirstShownAt = Defaults.Key<Date?>(RawKey.winbackOfferFirstShownAt, default: nil)
+#if DEBUG
+    static let winbackDebugForced = Defaults.Key<Bool>(RawKey.winbackDebugForced, default: false)
+#endif
 
     static func migrateLegacyKeys(in defaults: UserDefaults = .standard) {
         migrate(from: LegacyRawKey.featureEnabled, to: RawKey.featureEnabled, in: defaults)

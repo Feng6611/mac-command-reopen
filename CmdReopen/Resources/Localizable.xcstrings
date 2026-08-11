@@ -1,12 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
-    "%lld" : {
-
-    },
+    "" : {},
+    "%lld" : {},
     "%lld days left" : {
       "comment" : "Trial time remaining in the About pane; plural-aware in the catalog.",
       "localizations" : {
@@ -862,12 +858,8 @@
         }
       }
     },
-    "Debug only. Live clears the Pro access override." : {
-
-    },
-    "Developer Testing" : {
-
-    },
+    "Debug only. Live clears the Pro access override." : {},
+    "Developer Testing" : {},
     "Didn’t come back? No worries — try again." : {
       "comment" : "Gentle retry hint shown if the user does not return with a single Cmd+Tab press during onboarding.",
       "localizations" : {
@@ -1125,6 +1117,35 @@
         }
       }
     },
+    "Feedback" : {
+      "comment" : "About row title for the feedback-reward offer.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィードバック"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反馈"
+          }
+        }
+      }
+    },
     "Fix Cmd+Tab for minimized and closed windows" : {
       "localizations" : {
         "de" : {
@@ -1149,34 +1170,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "让 Cmd+Tab 找回最小化和已关闭的窗口"
-          }
-        }
-      }
-    },
-    "Follow on X" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf X folgen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suivre sur X"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xでフォロー"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 X 上关注"
           }
         }
       }
@@ -1349,64 +1342,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前往 Mac App Store 获取"
-          }
-        }
-      }
-    },
-    "How it works" : {
-      "comment" : "Link to the feedback-reward rules page.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "So funktioniert’s"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comment ça marche"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳しく"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "规则说明"
-          }
-        }
-      }
-    },
-    "I already did" : {
-      "comment" : "Dismisses the support card permanently; the user says they already supported the app.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hab ich schon"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "C’est déjà fait"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "もう済ませました"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "我已经支持过了"
           }
         }
       }
@@ -2011,35 +1946,6 @@
         }
       }
     },
-    "No thanks — use the free GitHub build" : {
-      "comment" : "Footer link on the win-back card to the free build on GitHub.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nein danke – kostenlosen GitHub-Build nutzen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non merci — utiliser la version gratuite sur GitHub"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今回は見送り、無料のGitHub版を使う"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不用了，去用免费的 GitHub 版"
-          }
-        }
-      }
-    },
     "Not selected" : {
       "comment" : "VoiceOver value for an unselected paywall plan card (Kiki_mackit KikiPaywall).",
       "extractionState" : "stale",
@@ -2070,9 +1976,7 @@
         }
       }
     },
-    "Onboarding" : {
-
-    },
+    "Onboarding" : {},
     "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it." : {
       "comment" : "About-pane footer tying the zero-permission claim to the public source.",
       "localizations" : {
@@ -2098,6 +2002,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以 MIT 协议开源。Command Reopen 不需要任何系统权限——你可以在源代码里自己核实，不必只听我们说。"
+          }
+        }
+      }
+    },
+    "Open the form" : {
+      "comment" : "Button on the feedback offer card; opens the feedback form in a browser.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formular öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le formulaire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォームを開く"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开表单"
+          }
+        }
+      }
+    },
+    "Other ways to use it" : {
+      "comment" : "Footer link on the win-back card leading to the free build on GitHub.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Möglichkeiten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres options"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほかの選択肢"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他使用方式"
           }
         }
       }
@@ -2130,9 +2092,7 @@
         }
       }
     },
-    "Paywall" : {
-
-    },
+    "Paywall" : {},
     "Privacy" : {
       "localizations" : {
         "de" : {
@@ -2705,31 +2665,31 @@
         }
       }
     },
-    "Something broken or missing? Real feedback gets a personal reply — usually with a 40% discount code." : {
-      "comment" : "About footer promising a reply and a discount code for real feedback.",
+    "Share feedback, get a discount code" : {
+      "comment" : "Title of the App Store feedback offer card in About.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Etwas kaputt oder fehlt? Auf echtes Feedback antworte ich persönlich – meist mit einem 40-%-Rabattcode."
+            "value" : "Feedback geben, Rabattcode erhalten"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un bug, un manque ? Je réponds personnellement à tout retour utile — le plus souvent avec un code de −40 %."
+            "value" : "Donnez votre avis, recevez un code de réduction"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不具合や足りない点があれば教えてください。実のあるご意見には私が直接返信します（多くの場合40%オフのコード付きで）。"
+            "value" : "フィードバックで割引コードを進呈"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "哪里坏了或者缺什么？认真的反馈我都会亲自回信，通常还会附一个六折码。"
+            "value" : "提反馈，拿优惠码"
           }
         }
       }
@@ -2764,11 +2724,12 @@
       }
     },
     "Star on GitHub" : {
+      "comment" : "Secondary support action in the free build's support card.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auf GitHub mit Stern versehen"
+            "value" : "Auf GitHub mit Stern markieren"
           }
         },
         "fr" : {
@@ -2780,13 +2741,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHubでスターを付ける"
+            "value" : "GitHubでスターする"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "去 GitHub 点个 star"
+            "value" : "在 GitHub 点 Star"
           }
         }
       }
@@ -3015,6 +2976,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "支持"
+          }
+        }
+      }
+    },
+    "Tell us what works and what doesn't — a report we can act on earns a lifetime discount code." : {
+      "comment" : "Body of the App Store feedback offer card in About.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagen Sie uns, was funktioniert und was nicht — für einen Hinweis, mit dem wir etwas anfangen können, gibt es einen Rabattcode für die Lifetime-Version."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dites-nous ce qui fonctionne et ce qui ne va pas : un retour exploitable vous vaut un code de réduction sur la licence à vie."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "うまくいっている点も、いっていない点もお聞かせください。改善につながるご報告には、買い切り版の割引コードをお送りします。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好用不好用都欢迎说。只要是我们能着手改的问题，就送一个买断版优惠码。"
           }
         }
       }

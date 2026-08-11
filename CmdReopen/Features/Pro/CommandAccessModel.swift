@@ -148,6 +148,32 @@ final class CommandAccessModel: ObservableObject {
     func clearDebugProAccessOverride() {
         accessManager.clearDebugProAccessOverride()
     }
+
+    /// Whether Debug Settings is holding the win-back window open.
+    ///
+    /// The window normally opens only after an expired trial with real usage
+    /// behind it, so the banners it drives are otherwise unreachable without
+    /// aging a trial by two days and restoring five windows inside it.
+    var isWinbackDebugForced: Bool { defaults[AppDefaults.winbackDebugForced] }
+
+    /// Places the win-back window's start so the offer reports `daysRemaining`
+    /// days left, or closes the window when `daysRemaining` is `nil`.
+    func setWinbackDebugWindow(daysRemaining: Int?) {
+        guard let daysRemaining else {
+            defaults[AppDefaults.winbackDebugForced] = false
+            defaults[AppDefaults.winbackOfferFirstShownAt] = nil
+            objectWillChange.send()
+            return
+        }
+
+        // `daysRemaining` rounds up, so land mid-day inside the target day
+        // rather than on its boundary, where rounding could report either.
+        let remaining = TimeInterval(daysRemaining) * 86_400 - 43_200
+        defaults[AppDefaults.winbackDebugForced] = true
+        defaults[AppDefaults.winbackOfferFirstShownAt] =
+            Date().addingTimeInterval(remaining - TrialExitOffer.discountWindow)
+        objectWillChange.send()
+    }
 #endif
 
     private func bindAccessState() {
