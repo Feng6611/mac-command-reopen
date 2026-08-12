@@ -43,9 +43,22 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
         distributionChannel == .appStore && entitlementState.showsUpgradeEntry
     }
 
+    /// Whether this launch should present onboarding.
+    ///
+    /// Both editions show it: the tutorial explains the one interaction the
+    /// product is, and the free build needs that explanation more than the
+    /// paid one — nothing visibly happens when it is installed. Only the way
+    /// "first launch" is known differs. The App Store build asks the commerce
+    /// state, which knows whether a trial has ever been opened; the free build
+    /// has no commerce state and reads the completion flag onboarding itself
+    /// writes.
     var shouldShowOnboarding: Bool {
-        distributionChannel == .appStore
-            && (resolvedCommerceStateSource?.isFirstLaunch ?? false)
+        switch distributionChannel {
+        case .appStore:
+            resolvedCommerceStateSource?.isFirstLaunch ?? false
+        case .direct:
+            !UserDefaults.standard.bool(forKey: AppDefaults.RawKey.hasSeenOnboarding)
+        }
     }
 
     init(

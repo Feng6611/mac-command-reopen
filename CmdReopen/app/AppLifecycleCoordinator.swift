@@ -39,17 +39,16 @@ final class AppLifecycleCoordinator {
     }
 
     func applicationWillFinishLaunching() {
-#if APPSTORE
+        // Onboarding runs the Cmd+Tab tutorial, which needs a real app to tab
+        // to and from, so a launch that will present it starts as .regular.
+        // Every other launch is the steady state: menu bar only.
 #if DEBUG
         isRelaunchedForOnboarding = OnboardingLaunchRequest.consume()
-        let shouldStartRegular = isRelaunchedForOnboarding || CommandAccessModel.shared.isFirstLaunch
+        let shouldStartRegular = isRelaunchedForOnboarding || accessController.shouldShowOnboarding
 #else
-        let shouldStartRegular = CommandAccessModel.shared.isFirstLaunch
+        let shouldStartRegular = accessController.shouldShowOnboarding
 #endif
         NSApp.setActivationPolicy(shouldStartRegular ? .regular : .accessory)
-#else
-        NSApp.setActivationPolicy(.accessory)
-#endif
     }
 
     func applicationDidFinishLaunching() {
@@ -78,9 +77,14 @@ final class AppLifecycleCoordinator {
 #endif
 
 #if APPSTORE
+        // The App Store build waits for the first commerce result before
+        // presenting: onboarding's copy and its trial depend on it.
         scheduleInitialCommerceRefresh()
 #else
         hasCompletedInitialCommerceRefresh = true
+        if accessController.shouldShowOnboarding {
+            OnboardingWindowController.shared.showIfNeeded(accessController: accessController)
+        }
 #endif
     }
 
@@ -151,14 +155,14 @@ final class AppLifecycleCoordinator {
 #if DEBUG
         if isRelaunchedForOnboarding {
             isRelaunchedForOnboarding = false
-            OnboardingWindowController.shared.showAfterDebugRelaunch(proStatusManager: .shared)
+            OnboardingWindowController.shared.showAfterDebugRelaunch()
             return
         }
 #endif
 
         if CommandAccessModel.shared.readiness.allowsAutomaticPresentation,
            accessController.shouldShowOnboarding {
-            OnboardingWindowController.shared.showIfNeeded(proStatusManager: .shared)
+            OnboardingWindowController.shared.showIfNeeded(accessController: accessController)
             return
         }
 #endif

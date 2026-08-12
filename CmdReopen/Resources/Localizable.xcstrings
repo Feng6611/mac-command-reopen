@@ -1,35 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here." : {
-      "comment" : "Footer explaining automatic Cmd+Tab ordering after the foreground app loses its last visible window.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn das letzte Fenster geschlossen oder minimiert wird, kommt die vorherige App nach vorn, damit ein Cmd+Tab hierher zurückführt."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Après la fermeture ou la réduction de la dernière fenêtre, l’app précédente passe au premier plan afin qu’un seul Cmd+Tab vous ramène ici."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最後のウインドウを閉じるか最小化すると前のアプリを前面にし、Cmd+Tab 1回でここに戻れるようにします。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭或最小化最后一个窗口后，将上一个 App 切到前台，让你按一次 Cmd+Tab 就能返回。"
-          }
-        }
-      }
-    },
     "" : {},
     "%lld" : {},
     "%lld days left" : {
@@ -429,6 +400,35 @@
         }
       }
     },
+    "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here." : {
+      "comment" : "Footer explaining automatic Cmd+Tab ordering after the foreground app loses its last visible window.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn das letzte Fenster geschlossen oder minimiert wird, kommt die vorherige App nach vorn, damit ein Cmd+Tab hierher zurückführt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après la fermeture ou la réduction de la dernière fenêtre, l’app précédente passe au premier plan afin qu’un seul Cmd+Tab vous ramène ici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後のウインドウを閉じるか最小化すると前のアプリを前面にし、Cmd+Tab 1回でここに戻れるようにします。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭或最小化最后一个窗口后，将上一个 App 切到前台，让你按一次 Cmd+Tab 就能返回。"
+          }
+        }
+      }
+    },
     "All Command Reopen features are available." : {
       "comment" : "Subtitle in the About pane for the Direct (non-App-Store) build; all features are included.",
       "localizations" : {
@@ -773,6 +773,64 @@
         }
       }
     },
+    "Command Reopen is running, and it will be there after every restart." : {
+      "comment" : "Subtitle of the final onboarding step in the free build.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen läuft — und ist auch nach jedem Neustart wieder da."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen tourne, et il sera là après chaque redémarrage."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen が動いています。再起動しても、そのまま使えます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen 已经在运行，重启之后也会自己回来。"
+          }
+        }
+      }
+    },
+    "Command Reopen only restores windows while it is running." : {
+      "comment" : "Explains why the final onboarding step turns on launch at login.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen stellt Fenster nur wieder her, solange es läuft."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen ne restaure les fenêtres que lorsqu'il est en cours d'exécution."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen は動いている間だけウインドウを復元します。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "只有在运行时，Command Reopen 才能帮你还原窗口。"
+          }
+        }
+      }
+    },
     "Continue" : {
       "localizations" : {
         "de" : {
@@ -1056,6 +1114,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天截止"
+          }
+        }
+      }
+    },
+    "Every feature, no limits, for as long as you want it. The Mac App Store version is the same app — buying it is how the work gets paid for." : {
+      "comment" : "Body of the free build's note on the final onboarding step.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen, ohne Einschränkung, so lange Sie möchten. Die Version aus dem Mac App Store ist dieselbe App — sie zu kaufen ist die Art, diese Arbeit zu bezahlen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctions, sans limite, aussi longtemps que vous voulez. La version du Mac App Store est la même app : l'acheter, c'est financer ce travail."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能はすべて入っていて、制限も期限もありません。Mac App Store 版はまったく同じアプリで、買っていただくことがこの開発を支える方法です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能全都在，不限时也不设限。Mac App Store 上是同一个 App，买它就是在为这些开发买单。"
           }
         }
       }
@@ -1460,6 +1547,35 @@
         }
       }
     },
+    "Keep app next in Cmd+Tab" : {
+      "comment" : "Settings toggle that keeps an app second in Cmd+Tab after its last visible window disappears.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App als Nächstes in Cmd+Tab behalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder l’app suivante dans Cmd+Tab"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab の次の位置に App を保持"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 App 保持在 Cmd+Tab 下一位"
+          }
+        }
+      }
+    },
     "Keep it working" : {
       "comment" : "Purchase button while the feature is still running on a trial.",
       "localizations" : {
@@ -1601,35 +1717,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近 30 天"
-          }
-        }
-      }
-    },
-    "Keep app next in Cmd+Tab" : {
-      "comment" : "Settings toggle that keeps an app second in Cmd+Tab after its last visible window disappears.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App als Nächstes in Cmd+Tab behalten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Garder l’app suivante dans Cmd+Tab"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cmd+Tab の次の位置に App を保持"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "让 App 保持在 Cmd+Tab 下一位"
           }
         }
       }
@@ -3267,6 +3354,35 @@
         }
       }
     },
+    "This is the free community build" : {
+      "comment" : "Heading of the free build's note on the final onboarding step.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist die kostenlose Community-Version"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceci est la version communautaire gratuite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "これは無料のコミュニティ版です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你装的是免费的社区版"
+          }
+        }
+      }
+    },
     "Today" : {
       "comment" : "Stat tile title: reopens so far today.",
       "localizations" : {
@@ -3981,30 +4097,31 @@
         }
       }
     },
-    "Your free trial is active." : {
+    "Your free trial is active — 14 days, and nothing is charged until you pick a plan." : {
+      "comment" : "Subtitle of the final onboarding step in the App Store build.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre kostenlose Testphase ist aktiv."
+            "value" : "Ihre Testphase läuft — 14 Tage, und es wird nichts berechnet, bevor Sie sich für einen Tarif entscheiden."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre essai gratuit est actif."
+            "value" : "Votre essai gratuit a commencé : 14 jours, et rien ne vous sera facturé avant que vous choisissiez une formule."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料トライアルが有効です。"
+            "value" : "無料トライアルが始まりました。14 日間、プランを選ぶまで料金はかかりません。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免费试用进行中。"
+            "value" : "试用已经开始，14 天。在你选定方案之前不会产生任何费用。"
           }
         }
       }

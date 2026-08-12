@@ -5,14 +5,15 @@
 //  Created by CHEN on 2026/3/28.
 //
 
-#if APPSTORE
 import AppKit
 import Combine
 import ConfettiSwiftUI
-import KikiCommerceCore
 import KikiOnboarding
 import SwiftUI
 import os
+#if APPSTORE
+import KikiCommerceCore
+#endif
 
 // MARK: - Flow
 
@@ -262,15 +263,22 @@ private struct SuccessStepView: View {
     }
 }
 
+/// The last step, and the only one that changes anything about the machine.
+///
+/// It answers "what happens now": the app keeps running across restarts, and
+/// — for the free build — what it costs and how it gets funded. This is the
+/// last moment the user is looking at a window; after Continue the app has no
+/// Dock icon and lives in the menu bar.
 private struct FinishStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
+    @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     let navigation: KikiOnboardingNavigation
 
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
             title: AppLanguage.shared.string("You’re all set"),
-            bodyText: AppLanguage.shared.string("Your free trial is active."),
+            bodyText: bodyText,
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(
                 title: AppLanguage.shared.string("Continue"),
@@ -283,9 +291,92 @@ private struct FinishStepView: View {
             background: .plain,
             contentAlignment: .centered
         ) {
-            EmptyView()
+            VStack(spacing: DS.Spacing.lg) {
+                launchAtLoginCard
+#if !APPSTORE
+                communityBuildNote
+#endif
+            }
+            .padding(.top, DS.Spacing.lg)
+        }
+        .onAppear {
+            // Checked on arrival rather than after the fact: this app only
+            // works while it is running, so a Mac that reboots without it
+            // looks like an app that stopped working rather than one that was
+            // never asked to start. The toggle is on screen and reversible in
+            // the same breath, which is what separates a sensible default
+            // from a decision made behind the user's back.
+            if !launchAtLoginManager.isEnabled {
+                launchAtLoginManager.setEnabled(true)
+            }
         }
     }
+
+    private var bodyText: String {
+#if APPSTORE
+        appLanguage.string(localized: "Your free trial is active — 14 days, and nothing is charged until you pick a plan.",
+            comment: "Subtitle of the final onboarding step in the App Store build.")
+#else
+        appLanguage.string(localized: "Command Reopen is running, and it will be there after every restart.",
+            comment: "Subtitle of the final onboarding step in the free build.")
+#endif
+    }
+
+    private var launchAtLoginCard: some View {
+        Toggle(isOn: launchAtLoginManager.binding) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(appLanguage.string("Launch at Login"))
+                    .font(.callout.weight(.medium))
+                Text(appLanguage.string(localized: "Command Reopen only restores windows while it is running.",
+                    comment: "Explains why the final onboarding step turns on launch at login."))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .toggleStyle(.switch)
+        .tint(DS.Colors.brandPrimary)
+        .padding(DS.Spacing.lg)
+        .frame(maxWidth: .infinity)
+        .background(
+            .thinMaterial,
+            in: RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
+                .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
+        )
+    }
+
+#if !APPSTORE
+    /// What the user actually installed, said once, at the only moment they
+    /// are certain to read it. Stated as a fact and a way to help rather than
+    /// as a limitation: nothing here is locked, so an upsell would be a lie.
+    private var communityBuildNote: some View {
+        VStack(spacing: DS.Spacing.xs) {
+            Text(appLanguage.string(localized: "This is the free community build",
+                comment: "Heading of the free build's note on the final onboarding step."))
+                .font(.callout.weight(.medium))
+
+            Text(appLanguage.string(localized: "Every feature, no limits, for as long as you want it. The Mac App Store version is the same app — buying it is how the work gets paid for.",
+                comment: "Body of the free build's note on the final onboarding step."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(appLanguage.string("Get on Mac App Store")) {
+                if let url = URL(string: AppStoreLinks.productURL) {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.plain)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(DS.Colors.brandPrimary)
+            .padding(.top, DS.Spacing.xxs)
+        }
+        .frame(maxWidth: .infinity)
+    }
+#endif
 }
 
 // MARK: - Product Content
@@ -467,9 +558,9 @@ final class OnboardingWindowController {
         coordinator?.isVisible == true
     }
 
-    func showIfNeeded(proStatusManager: CommandAccessModel) {
-        guard proStatusManager.isFirstLaunch else { return }
-        present(proStatusManager: proStatusManager)
+    func showIfNeeded(accessController: AppAccessController) {
+        guard accessController.shouldShowOnboarding else { return }
+        present()
     }
 
 #if DEBUG
@@ -479,12 +570,12 @@ final class OnboardingWindowController {
         relaunchForOnboarding()
     }
 
-    func showAfterDebugRelaunch(proStatusManager: CommandAccessModel) {
-        present(proStatusManager: proStatusManager)
+    func showAfterDebugRelaunch() {
+        present()
     }
 #endif
 
-    private func present(proStatusManager: CommandAccessModel) {
+    private func present() {
         if let existingCoordinator = coordinator, existingCoordinator.isVisible {
             NSApplication.shared.activate(ignoringOtherApps: true)
             existingCoordinator.window?.makeKeyAndOrderFront(nil)
@@ -497,11 +588,13 @@ final class OnboardingWindowController {
         analyticsSessionStartedAt = Date()
         didCaptureDemoStarted = false
         didCaptureDemoSucceeded = false
+#if APPSTORE
         CommandReopenAnalytics.shared.captureOnboarding(
             stage: "started",
             sessionID: sessionID,
-            entitlementState: proStatusManager.accessEntitlementState.analyticsValue
+            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
         )
+#endif
 
         ActivationMonitor.shared.setOnboardingSessionActive(true)
         prepareRegularOnboardingSession()
@@ -780,42 +873,56 @@ final class OnboardingWindowController {
     private func captureDemoStartedIfNeeded() {
         guard !didCaptureDemoStarted, let analyticsSessionID else { return }
         didCaptureDemoStarted = true
+#if APPSTORE
         CommandReopenAnalytics.shared.captureOnboarding(
             stage: "demo_started",
             sessionID: analyticsSessionID,
-            entitlementState: CommandAccessModel.shared.accessEntitlementState.analyticsValue
+            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
         )
+#endif
     }
 
     private func captureDemoSucceededIfNeeded() {
         guard !didCaptureDemoSucceeded, let analyticsSessionID else { return }
         didCaptureDemoSucceeded = true
+#if APPSTORE
         CommandReopenAnalytics.shared.captureOnboarding(
             stage: "demo_succeeded",
             sessionID: analyticsSessionID,
-            entitlementState: CommandAccessModel.shared.accessEntitlementState.analyticsValue
+            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
         )
+#endif
     }
 
     private func captureOnboardingCompletion() {
+#if APPSTORE
         guard let analyticsSessionID else { return }
-        let accessModel = CommandAccessModel.shared
         let durationMilliseconds = analyticsSessionStartedAt.map {
             max(0, Int(Date().timeIntervalSince($0) * 1_000))
         }
+
+        // The free build has no plan to name, so it reports the one thing
+        // that is true of every one of its finishers rather than borrowing a
+        // commerce vocabulary that does not apply to it.
         let completionMethod: String
-        switch accessModel.status {
+#if APPSTORE
+        switch CommandAccessModel.shared.status {
         case .trial(_): completionMethod = "local_trial"
         case .pro(let plan, _): completionMethod = plan.commercePlan == .yearly ? "yearly_purchase" : "lifetime_purchase"
         case .notStarted, .expired: completionMethod = "without_trial"
         }
+#else
+        completionMethod = "community_build"
+#endif
+
         CommandReopenAnalytics.shared.captureOnboarding(
             stage: "completed",
             sessionID: analyticsSessionID,
             durationMilliseconds: durationMilliseconds,
             completionMethod: completionMethod,
-            entitlementState: accessModel.accessEntitlementState.analyticsValue
+            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
         )
+#endif
     }
 
     private func restoreActivationPolicyIfNeeded() {
@@ -915,4 +1022,3 @@ final class OnboardingWindowController {
         return !ActivationMonitor.isIgnoredBundleID(bundleID)
     }
 }
-#endif

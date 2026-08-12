@@ -119,6 +119,7 @@
 			files = (
 				56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000182F4400010099C190 /* KikiSettings in Frameworks */,
+				8D3000192F4400010099C190 /* KikiOnboarding in Frameworks */,
 				8D30001B2F4400010099C190 /* KikiWindow in Frameworks */,
 				8D30001C2F4400010099C190 /* KikiDesign in Frameworks */,
 				9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */,
@@ -956,7 +957,6 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
-					OnboardingView.swift,
 					CommandAccessModel.swift,
 					CommandReopenAnalytics.swift,
 					PaywallView.swift,
@@ -1023,7 +1023,6 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
-					OnboardingView.swift,
 					CommandAccessModel.swift,
 					CommandReopenAnalytics.swift,
 					PaywallView.swift,
@@ -1092,7 +1091,6 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
-					OnboardingView.swift,
 					CommandAccessModel.swift,
 					CommandReopenAnalytics.swift,
 					PaywallView.swift,
