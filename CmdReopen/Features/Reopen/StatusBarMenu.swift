@@ -8,7 +8,11 @@
 import AppKit
 import Combine
 import KikiMenuBar
+import SwiftUI
 import os
+#if APPSTORE
+import KikiCommerceCore
+#endif
 
 @MainActor
 final class StatusBarMenuController {
@@ -84,14 +88,20 @@ final class StatusBarMenuController {
         })
 
 #if APPSTORE
+        // Hidden outright once the user owns Pro — `showsUpgradeEntry` is
+        // false for a Pro entitlement, so no purchased user is asked again.
         if presentation.showsUpgradeItem {
-            items.append(.action(title: AppLanguage.shared.string("Upgrade to Pro…")) {
-                SettingsOpener.shared.open(
-                    initialTab: .about,
-                    presentsPaywall: true,
-                    paywallSource: .statusBar
-                )
-            })
+            items.append(.action(
+                title: AppLanguage.shared.string("Upgrade to Pro…"),
+                badgeText: upgradeBadgeText(),
+                action: {
+                    SettingsOpener.shared.open(
+                        initialTab: .about,
+                        presentsPaywall: true,
+                        paywallSource: .statusBar
+                    )
+                }
+            ))
         }
 #endif
         items.append(.separator)
@@ -102,9 +112,18 @@ final class StatusBarMenuController {
                 self?.model.openURL(AppStoreLinks.reviewURL)
             })
         case .direct:
-            items.append(.action(title: AppLanguage.shared.string("Get on Mac App Store")) { [weak self] in
-                self?.model.openURL(AppStoreLinks.productURL)
-            })
+            // The only ask the free build makes here, and the only item in
+            // this menu carrying a symbol — in a list of plain rows one icon
+            // is what draws the eye, and the brand tint keeps it from reading
+            // as just another system glyph.
+            items.append(.action(
+                title: AppLanguage.shared.string("Get on Mac App Store"),
+                systemImage: "heart.fill",
+                imageTint: NSColor(DS.Colors.brandPrimary),
+                action: { [weak self] in
+                    self?.model.openURL(AppStoreLinks.productURL)
+                }
+            ))
         }
 
         items.append(.about(title: AppLanguage.shared.string("About")) { [weak self] in
@@ -127,6 +146,38 @@ final class StatusBarMenuController {
 
         return items
     }
+
+#if APPSTORE
+    /// What the upgrade item carries beside its title, or `nil` for none.
+    ///
+    /// The badge is the only thing in this menu that changes with access
+    /// state, so it says the one thing worth interrupting for: how long the
+    /// trial has left, or that the price is currently lower. An expired trial
+    /// with no live discount gets nothing — "0 days left" is a scold, and the
+    /// item's own title already states what it does.
+    private func upgradeBadgeText() -> String? {
+        let accessModel = CommandAccessModel.shared
+
+        if accessModel.activeWinbackOffer != nil {
+            return AppLanguage.shared.string(localized: "20% off",
+                comment: "Badge on the win-back plan card naming the discount.")
+        }
+
+        switch accessModel.status {
+        case .trial(.time(let daysRemaining, _)):
+            return daysRemaining > 1
+                ? AppLanguage.shared.string(localized: "\(daysRemaining) days left",
+                    comment: "Trial time remaining in the About pane; plural-aware in the catalog.")
+                : AppLanguage.shared.string(localized: "Ends today",
+                    comment: "Countdown on the win-back banner during the discount's final day.")
+        case .trial(.usage(_, let used, let limit)):
+            return AppLanguage.shared.string(localized: "\(max(0, limit - used)) uses left",
+                comment: "Trial usage remaining in the About pane; plural-aware in the catalog.")
+        case .notStarted, .expired, .pro:
+            return nil
+        }
+    }
+#endif
 
     private func toggleFeatureEnabled() {
         guard let activationMonitor else {

@@ -195,7 +195,7 @@ struct SettingsView: View {
             } header: {
                 Text(appLanguage.string("Developer Testing"))
             } footer: {
-                KikiSettingsHelperText(appLanguage.string("Debug only. Live clears the Pro access override."))
+                KikiSettingsHelperText(appLanguage.string("Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies."))
             }
 #endif
         }

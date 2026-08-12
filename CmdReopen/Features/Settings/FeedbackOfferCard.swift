@@ -4,6 +4,7 @@
 //
 
 #if APPSTORE
+import KikiCommerceCore
 import KikiSettings
 import SwiftUI
 
@@ -17,8 +18,18 @@ import SwiftUI
 /// a paragraph explaining it would out-weigh the rows it sits above.
 struct FeedbackOfferCardRow: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
+    @ObservedObject private var accessModel = CommandAccessModel.shared
 
     var body: some View {
+        // Nothing to offer someone who already owns Pro, and an offer they
+        // cannot take reads as a pane that has not noticed they paid. Their
+        // feedback is still welcome through the Email row above.
+        if !accessModel.status.isPro {
+            card
+        }
+    }
+
+    private var card: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "text.bubble.fill")
@@ -30,14 +41,14 @@ struct FeedbackOfferCardRow: View {
                             .fill(DS.Colors.accentTint)
                     )
 
-                Text(appLanguage.string(localized: "Share feedback, get a discount code",
+                Text(appLanguage.string(localized: "Share how you use Command Reopen, get Pro",
                     comment: "Title of the App Store feedback offer card in About."))
                     .font(.headline)
 
                 Spacer(minLength: 0)
             }
 
-            Text(appLanguage.string(localized: "Tell us what works and what doesn't — a report we can act on earns a lifetime discount code.",
+            Text(appLanguage.string(localized: "Tell us how it fits your day. An account we can act on earns the lifetime unlock.",
                 comment: "Body of the App Store feedback offer card in About."))
                 .font(.caption)
                 .foregroundStyle(.secondary)

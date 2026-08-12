@@ -21,8 +21,11 @@ enum ExternalLinks {
     }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
-    /// Feedback form for App Store users requesting a lifetime discount code.
-    static let feedbackURL = "https://forms.gle/5MfTRHnmxivjqnrr5"
+    /// Where App Store users write up how they use the app to earn the
+    /// lifetime unlock. Kept as a constant because About links to it from
+    /// every shipped build: if the page moves, this is the single line to
+    /// change, and a stale value here is a dead end inside the app.
+    static let feedbackURL = "https://www.notion.so/flowww/12ba8193c4c7807594b5c836af520f13?v=3b9a8193c4c7800b8189000cc24d166e"
     /// Values come from `sale/brand/identity.md`, which is the single source
     /// for the developer identity across every asset — a buyer checking who
     /// wrote this should meet the same name here, on GitHub and on the site.

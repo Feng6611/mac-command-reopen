@@ -80,6 +80,18 @@ final class CommandAccessModel: ObservableObject {
     /// if it never has been. The discount window is measured from this moment.
     var winbackOfferFirstShownAt: Date? { defaults[AppDefaults.winbackOfferFirstShownAt] }
 
+    /// The win-back offer if its window is open, `nil` otherwise.
+    ///
+    /// Every surface that mentions the discount asks this same question — the
+    /// menu bar, the About banner, Debug Settings — and each had begun
+    /// answering it for itself. The window must have been opened by the card,
+    /// never resolved fresh: a countdown for a clock that never started would
+    /// advertise the discount before the paywall was ever declined.
+    var activeWinbackOffer: TrialExitOffer? {
+        guard winbackOfferFirstShownAt != nil else { return nil }
+        return TrialExitOffer.resolve(accessModel: self)
+    }
+
     var accessEntitlementState: AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
             return .trial

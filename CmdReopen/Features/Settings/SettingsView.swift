@@ -36,16 +36,6 @@ struct SettingsTabContent: View {
 
     var body: some View {
         KikiSettingsPane {
-#if APPSTORE
-            // The route back to the win-back card, only while its two-day
-            // window holds. General is the pane people open to fix things,
-            // which is where a lapsed trial user most likely lands.
-            Section {
-                WinbackOfferRow(accessModel: accessModel) {
-                    SettingsNavigationModel.shared.presentTrialExitOffer()
-                }
-            }
-#endif
             Section {
                 Picker(selection: $appLanguage.selected) {
                     ForEach(SupportedLanguage.allCases) { language in

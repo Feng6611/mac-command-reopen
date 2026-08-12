@@ -858,7 +858,6 @@
         }
       }
     },
-    "Debug only. Live clears the Pro access override." : {},
     "Developer Testing" : {},
     "Didn’t come back? No worries — try again." : {
       "comment" : "Gentle retry hint shown if the user does not return with a single Cmd+Tab press during onboarding.",
@@ -2665,31 +2664,31 @@
         }
       }
     },
-    "Share feedback, get a discount code" : {
+    "Share how you use Command Reopen, get Pro" : {
       "comment" : "Title of the App Store feedback offer card in About.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Feedback geben, Rabattcode erhalten"
+            "value" : "Erzählen Sie uns, wie Sie es nutzen — und erhalten Sie Pro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Donnez votre avis, recevez un code de réduction"
+            "value" : "Racontez-nous votre usage, recevez Pro"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フィードバックで割引コードを進呈"
+            "value" : "使い方を教えてください。Pro を差し上げます"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "提反馈，拿优惠码"
+            "value" : "分享 Command Reopen 使用体验送会员"
           }
         }
       }
@@ -2980,31 +2979,31 @@
         }
       }
     },
-    "Tell us what works and what doesn't — a report we can act on earns a lifetime discount code." : {
+    "Tell us how it fits your day. An account we can act on earns the lifetime unlock." : {
       "comment" : "Body of the App Store feedback offer card in About.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sagen Sie uns, was funktioniert und was nicht — für einen Hinweis, mit dem wir etwas anfangen können, gibt es einen Rabattcode für die Lifetime-Version."
+            "value" : "Beschreiben Sie, wo es in Ihren Arbeitstag passt. Für eine Schilderung, mit der wir etwas anfangen können, gibt es die Lifetime-Freischaltung."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dites-nous ce qui fonctionne et ce qui ne va pas : un retour exploitable vous vaut un code de réduction sur la licence à vie."
+            "value" : "Décrivez comment il s'insère dans votre journée. Un témoignage exploitable vous vaut la licence à vie."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "うまくいっている点も、いっていない点もお聞かせください。改善につながるご報告には、買い切り版の割引コードをお送りします。"
+            "value" : "普段どんな場面で使っているかをお書きください。改善につながる内容には、買い切り版をお贈りします。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "好用不好用都欢迎说。只要是我们能着手改的问题，就送一个买断版优惠码。"
+            "value" : "说说它在你日常里怎么用。写得上我们能着手改的，就送买断版。"
           }
         }
       }

@@ -217,7 +217,7 @@ struct WinbackOfferRow: View {
     let onOpen: () -> Void
 
     var body: some View {
-        if let offer = activeOffer {
+        if let offer = accessModel.activeWinbackOffer {
             Button(action: onOpen) {
                 HStack(spacing: DS.Spacing.sm) {
                     Image(systemName: "tag.fill")
@@ -243,12 +243,5 @@ struct WinbackOfferRow: View {
         }
     }
 
-    /// The row exists only inside a window that has already been opened by
-    /// the card itself. Resolving fresh would show a countdown for a clock
-    /// that has not started.
-    private var activeOffer: TrialExitOffer? {
-        guard accessModel.winbackOfferFirstShownAt != nil else { return nil }
-        return TrialExitOffer.resolve(accessModel: accessModel)
-    }
 
 }

@@ -114,17 +114,21 @@ extension TrialExitOffer {
     /// Resolves the offer against live app state.
     static func resolve(accessModel: CommandAccessModel, now: Date = Date()) -> TrialExitOffer? {
 #if DEBUG
-        // Debug Settings can hold the window open on its own. What is under
-        // test there is the banners and their countdown, and reaching those
-        // for real needs a two-day-old expired trial with five restores
-        // inside it — so the gates that guard *whether* to make the offer are
-        // stood in for, while the window arithmetic stays the real one.
+        // Debug Settings can open the window without waiting two days for it.
+        //
+        // It stands in for the usage history only — a picker cannot fabricate
+        // five restores spread across a trial. The access state stays the
+        // real one, so the win-back row in Debug Settings does nothing until
+        // Pro access is also set to Expired. Substituting the state as well
+        // made the banners appear for a Pro user, which is precisely the
+        // mismatch between the debug panel and the app it is meant to mirror.
         if accessModel.isWinbackDebugForced, let firstShownAt = accessModel.winbackOfferFirstShownAt {
             return resolve(
-                status: .expired,
+                status: accessModel.status,
                 firstShownAt: firstShownAt,
                 now: now,
-                receipt: debugPreview.receipt
+                receipt: TrialReceipt.make(trialStartedAt: accessModel.trialStartedAt)
+                    ?? debugPreview.receipt
             )
         }
 #endif
