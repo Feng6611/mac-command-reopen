@@ -516,6 +516,35 @@
         }
       }
     },
+    "App Exposé" : {
+      "comment" : "Label for the ⌃↓ shortcut. Use Apple's own name for App Exposé in this locale.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Exposé"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Exposé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Exposé"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "程序窗口"
+          }
+        }
+      }
+    },
     "App name or bundle ID" : {
       "localizations" : {
         "de" : {
@@ -540,6 +569,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App 名称或 Bundle ID"
+          }
+        }
+      }
+    },
+    "Apps" : {
+      "comment" : "Section of the Mac shortcuts sheet covering app-level shortcuts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
           }
         }
       }
@@ -654,6 +712,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点按下方按钮，然后按一次 Cmd+Tab，窗口就会回来。"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "comment" : "Accessibility label for the sheet's close button.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
+    "Close the window" : {
+      "comment" : "Label for the ⌘W shortcut.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster schließen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer la fenêtre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウを閉じる"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭窗口"
           }
         }
       }
@@ -1461,6 +1577,35 @@
         }
       }
     },
+    "Hide the app" : {
+      "comment" : "Label for the ⌘H shortcut.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App ausblenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer l'app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App を隠す"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏 App"
+          }
+        }
+      }
+    },
     "If the price was the sticking point, here’s a smaller one. It ends today." : {
       "comment" : "Subtitle of the win-back card during the discount window's final day.",
       "localizations" : {
@@ -1806,6 +1951,35 @@
         }
       }
     },
+    "Mac window shortcuts" : {
+      "comment" : "Title of the sheet listing the macOS window shortcuts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac-Fenster-Kurzbefehle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Raccourcis de fenêtres du Mac"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac のウインドウ操作"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac 窗口快捷键"
+          }
+        }
+      }
+    },
     "Made by" : {
       "comment" : "About-pane row label for the developer.",
       "localizations" : {
@@ -1863,6 +2037,35 @@
         }
       }
     },
+    "Minimize the window" : {
+      "comment" : "Label for the ⌘M shortcut.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster im Dock ablegen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placer la fenêtre dans le Dock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウをしまう"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化窗口"
+          }
+        }
+      }
+    },
     "Minimized" : {
       "comment" : "Onboarding flow diagram, step 1 label. Keep it to one or two words; three steps sit side by side.",
       "localizations" : {
@@ -1892,6 +2095,35 @@
         }
       }
     },
+    "Mission Control" : {
+      "comment" : "Label for the ⌃↑ shortcut. Use Apple's own name for Mission Control in this locale.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mission Control"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mission Control"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mission Control"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调度中心"
+          }
+        }
+      }
+    },
     "Month" : {
       "localizations" : {
         "de" : {
@@ -1916,6 +2148,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "月"
+          }
+        }
+      }
+    },
+    "Nine of them, and where this app fits" : {
+      "comment" : "Subtitle of the Settings row that opens the Mac shortcuts sheet.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neun Stück — und wo diese App hineinpasst"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuf raccourcis, et la place de cette app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9 つと、このアプリの居場所"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "九个，以及这个 App 补在哪"
           }
         }
       }
@@ -2522,6 +2783,35 @@
         }
       }
     },
+    "Quit the app" : {
+      "comment" : "Label for the ⌘Q shortcut.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App beenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter l'app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App を終了"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 App"
+          }
+        }
+      }
+    },
     "Rate on App Store" : {
       "localizations" : {
         "de" : {
@@ -2867,6 +3157,35 @@
         }
       }
     },
+    "Spaces" : {
+      "comment" : "Section of the Mac shortcuts sheet covering Mission Control and Spaces.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spaces"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spaces"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作スペース"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "桌面空间"
+          }
+        }
+      }
+    },
     "Star on GitHub" : {
       "comment" : "Secondary support action in the free build's support card.",
       "localizations" : {
@@ -3124,6 +3443,93 @@
         }
       }
     },
+    "Switch Spaces" : {
+      "comment" : "Label for the ⌃← / ⌃→ shortcut. Use Apple's own term for Spaces in this locale.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischen Spaces wechseln"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer de Space"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "操作スペースを切り替える"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换桌面空间"
+          }
+        }
+      }
+    },
+    "Switch apps" : {
+      "comment" : "Label for the ⌘⇥ shortcut.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App wechseln"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer d'app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App を切り替える"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换 App"
+          }
+        }
+      }
+    },
+    "Switch windows within an app — ⌘ and the key above Tab" : {
+      "comment" : "Label for the shortcut that cycles windows of the frontmost app; its key differs by keyboard layout.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster einer App wechseln — ⌘ und die Taste über der Tabulatortaste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer de fenêtre dans une app — ⌘ et la touche au-dessus de Tab"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同じ App のウインドウを切り替える — ⌘ と Tab の上のキー"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在同一个 App 里切窗口 — ⌘ 加 Tab 上面那个键"
+          }
+        }
+      }
+    },
     "Tell us how it fits your day. An account we can act on earns the lifetime unlock." : {
       "comment" : "Body of the App Store feedback offer card in About.",
       "localizations" : {
@@ -3239,6 +3645,35 @@
         }
       }
     },
+    "The app comes back. The window stays in the Dock." : {
+      "comment" : "What macOS does after minimizing a window and switching back to the app.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die App kommt zurück. Das Fenster bleibt im Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'app revient. La fenêtre reste dans le Dock."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App は戻るが、ウインドウは Dock に入ったまま。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App 切回来了，窗口还在 Dock 里。"
+          }
+        }
+      }
+    },
     "The free trial couldn't be started." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3321,6 +3756,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "购买已取消。"
+          }
+        }
+      }
+    },
+    "The window comes back with it." : {
+      "comment" : "What this app does after minimizing a window and switching back to the app.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster kommt mit zurück."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La fenêtre revient avec elle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウも一緒に戻る。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口跟着一起回来。"
           }
         }
       }
@@ -3895,6 +4359,35 @@
         }
       }
     },
+    "Windows" : {
+      "comment" : "Section of the Mac shortcuts sheet covering window-level shortcuts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口"
+          }
+        }
+      }
+    },
     "Windows restored" : {
       "comment" : "Caption under the lifetime reopen count on the paywall; one line only.",
       "extractionState" : "stale",
@@ -4382,6 +4875,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切回来"
+          }
+        }
+      }
+    },
+    "then" : {
+      "comment" : "Joins two shortcuts pressed one after the other, as in “⌘M then ⌘⇥”.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dann"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "puis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "のあと"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "之后按"
           }
         }
       }

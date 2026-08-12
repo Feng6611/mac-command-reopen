@@ -25,6 +25,7 @@ struct SettingsTabContent: View {
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
+    @State private var isShowingMacShortcuts = false
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
@@ -77,6 +78,35 @@ struct SettingsTabContent: View {
                 addApplicationAction: addLookupResult
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
+
+            // Not called Help or Tutorial: both words say "you don't know how
+            // to use this", and the sheet's argument is the opposite — that
+            // the user already has the language and this app fills one line
+            // of it. It is also where every "could it also…" gets answered.
+            Section {
+                Button {
+                    isShowingMacShortcuts = true
+                } label: {
+                    HStack(spacing: DS.Spacing.sm) {
+                        Image(systemName: "command")
+                            .foregroundStyle(.secondary)
+                        Text("Mac window shortcuts")
+                        Spacer(minLength: 0)
+                        Text("Nine of them, and where this app fits")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .sheet(isPresented: $isShowingMacShortcuts) {
+            MacShortcutsSheet()
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()

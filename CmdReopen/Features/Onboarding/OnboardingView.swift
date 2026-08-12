@@ -840,12 +840,17 @@ final class OnboardingWindowController {
             }
         }
 
+        // General, not About. Someone who has just been shown how the app
+        // works lands on the pane that continues that — the settings it just
+        // turned on, and the shortcuts sheet that places what they learned
+        // inside the rest of the system. About is credits, status and price,
+        // which is a strange thing to hand someone thirty seconds in.
         DispatchQueue.main.async {
             SettingsWindowController.shared.show(
                 activationMonitor: .shared,
                 reopenStatsStore: .shared,
                 accessController: .shared,
-                initialTab: .about
+                initialTab: .general
             )
         }
     }
