@@ -97,8 +97,7 @@ final class StatusBarMenuController {
                 action: {
                     SettingsOpener.shared.open(
                         initialTab: .about,
-                        presentsPaywall: true,
-                        paywallSource: .statusBar
+                        presentsPaywall: true
                     )
                 }
             ))

@@ -542,10 +542,6 @@ final class OnboardingWindowController {
     private var observers: [NSObjectProtocol] = []
     private var minimizeReturnSession = OnboardingMinimizeReturnSession()
     private let tryMinimizeModel = OnboardingTryMinimizeModel()
-    private var analyticsSessionID: String?
-    private var analyticsSessionStartedAt: Date?
-    private var didCaptureDemoStarted = false
-    private var didCaptureDemoSucceeded = false
     private var activationConfirmationTask: Task<Void, Never>?
     private var returnTimeoutWorkItem: DispatchWorkItem?
     private let returnTimeout: TimeInterval = 10
@@ -582,19 +578,6 @@ final class OnboardingWindowController {
             return
         }
         coordinator = nil
-
-        let sessionID = UUID().uuidString.lowercased()
-        analyticsSessionID = sessionID
-        analyticsSessionStartedAt = Date()
-        didCaptureDemoStarted = false
-        didCaptureDemoSucceeded = false
-#if APPSTORE
-        CommandReopenAnalytics.shared.captureOnboarding(
-            stage: "started",
-            sessionID: sessionID,
-            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
-        )
-#endif
 
         ActivationMonitor.shared.setOnboardingSessionActive(true)
         prepareRegularOnboardingSession()
@@ -636,7 +619,6 @@ final class OnboardingWindowController {
         }
 
         tryMinimizeModel.clearRetryHint()
-        captureDemoStartedIfNeeded()
         guard let target = returnTargetOrFinder() else {
             tryMinimizeModel.showRetryHint()
             AppLogger.lifecycle.error("Onboarding activation hand-off has no eligible return target.")
@@ -780,7 +762,6 @@ final class OnboardingWindowController {
         }
         window.makeKeyAndOrderFront(nil)
         coordinator.advance()
-        captureDemoSucceededIfNeeded()
         AppLogger.lifecycle.notice("Onboarding minimize tutorial completed after app activation.")
     }
 
@@ -845,7 +826,6 @@ final class OnboardingWindowController {
     }
 
     private func handleFinished() {
-        captureOnboardingCompletion()
         ActivationMonitor.shared.setOnboardingSessionActive(false)
         restoreActivationPolicyIfNeeded()
         coordinator = nil
@@ -868,61 +848,6 @@ final class OnboardingWindowController {
                 initialTab: .about
             )
         }
-    }
-
-    private func captureDemoStartedIfNeeded() {
-        guard !didCaptureDemoStarted, let analyticsSessionID else { return }
-        didCaptureDemoStarted = true
-#if APPSTORE
-        CommandReopenAnalytics.shared.captureOnboarding(
-            stage: "demo_started",
-            sessionID: analyticsSessionID,
-            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
-        )
-#endif
-    }
-
-    private func captureDemoSucceededIfNeeded() {
-        guard !didCaptureDemoSucceeded, let analyticsSessionID else { return }
-        didCaptureDemoSucceeded = true
-#if APPSTORE
-        CommandReopenAnalytics.shared.captureOnboarding(
-            stage: "demo_succeeded",
-            sessionID: analyticsSessionID,
-            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
-        )
-#endif
-    }
-
-    private func captureOnboardingCompletion() {
-#if APPSTORE
-        guard let analyticsSessionID else { return }
-        let durationMilliseconds = analyticsSessionStartedAt.map {
-            max(0, Int(Date().timeIntervalSince($0) * 1_000))
-        }
-
-        // The free build has no plan to name, so it reports the one thing
-        // that is true of every one of its finishers rather than borrowing a
-        // commerce vocabulary that does not apply to it.
-        let completionMethod: String
-#if APPSTORE
-        switch CommandAccessModel.shared.status {
-        case .trial(_): completionMethod = "local_trial"
-        case .pro(let plan, _): completionMethod = plan.commercePlan == .yearly ? "yearly_purchase" : "lifetime_purchase"
-        case .notStarted, .expired: completionMethod = "without_trial"
-        }
-#else
-        completionMethod = "community_build"
-#endif
-
-        CommandReopenAnalytics.shared.captureOnboarding(
-            stage: "completed",
-            sessionID: analyticsSessionID,
-            durationMilliseconds: durationMilliseconds,
-            completionMethod: completionMethod,
-            entitlementState: AppAccessController.shared.entitlementState.analyticsValue
-        )
-#endif
     }
 
     private func restoreActivationPolicyIfNeeded() {

@@ -556,8 +556,7 @@ final class ActivationMonitor: ObservableObject {
         Task { @MainActor in
             SettingsWindowController.shared.show(
                 initialTab: .about,
-                presentsPaywall: true,
-                paywallSource: .expiredReopenNudge
+                presentsPaywall: true
             )
         }
     }
@@ -639,20 +638,11 @@ final class ActivationMonitor: ObservableObject {
         }
 
         let recordedBundleID = openedBundleID ?? requestedBundleID
-        Task { @MainActor [reopenStatsStore] in
-            let didRecord = reopenStatsStore.recordSuccessfulReopen(
-                bundleID: recordedBundleID,
-                localizedName: localizedName,
-                bundleURL: openedBundleURL
-            )
-            guard didRecord else { return }
-#if APPSTORE
-            CommandReopenAnalytics.shared.captureReopenActiveDay(
-                totalSuccessfulReopens: reopenStatsStore.totalSuccessfulReopens,
-                entitlementState: AppAccessController.shared.entitlementState.analyticsValue
-            )
-#endif
-        }
+        _ = reopenStatsStore.recordSuccessfulReopen(
+            bundleID: recordedBundleID,
+            localizedName: localizedName,
+            bundleURL: openedBundleURL
+        )
 
         if let openedProcessIdentifier {
             AppLogger.activation.debug("Re-opened \(recordedBundleID), pid \(openedProcessIdentifier)")

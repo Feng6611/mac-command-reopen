@@ -67,7 +67,6 @@ struct SettingsView: View {
             PaywallSheetView(
                 accessModel: accessModel,
                 context: .settings,
-                source: route.paywallSource,
                 // Closing the paywall after the trial ended is the only moment
                 // the app knows the user decided not to pay. `TrialExitOffer`
                 // resolves to nil in every other case, including a close that

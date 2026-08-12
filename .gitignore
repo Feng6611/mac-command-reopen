@@ -35,6 +35,4 @@ docs/*
 !docs/DESIGN.md
 !docs/DecisionLog.md
 !docs/IssueLog.md
-!docs/PostHogAnalytics.md
 Config/LocalSecrets.xcconfig
-Config/PostHogLocal.xcconfig

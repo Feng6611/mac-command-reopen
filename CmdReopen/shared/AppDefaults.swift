@@ -22,7 +22,6 @@ enum AppDefaults {
         /// runs a fixed time from this moment and never reopens; see
         /// `TrialExitOffer`.
         static let winbackOfferFirstShownAt = "cmdreopenWinbackOfferFirstShownAt"
-        static let analyticsInstallationID = "cmdreopen.analytics.installationID.v1"
 #if DEBUG
         static let pendingOnboardingRelaunch = "cmdreopenPendingOnboardingRelaunch"
         /// Set by Debug Settings to hold the win-back window open without an

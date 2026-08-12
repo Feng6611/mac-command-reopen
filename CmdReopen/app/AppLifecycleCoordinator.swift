@@ -137,8 +137,7 @@ final class AppLifecycleCoordinator {
                         reopenStatsStore: .shared,
                         accessController: self.accessController,
                         initialTab: .about,
-                        presentsPaywall: true,
-                        paywallSource: .trialExpiredLaunch
+                        presentsPaywall: true
                     )
                 }
 
@@ -174,8 +173,7 @@ final class AppLifecycleCoordinator {
                     reopenStatsStore: .shared,
                     accessController: accessController,
                     initialTab: .about,
-                    presentsPaywall: true,
-                    paywallSource: .trialExpiredLaunch
+                    presentsPaywall: true
                 )
             }
 

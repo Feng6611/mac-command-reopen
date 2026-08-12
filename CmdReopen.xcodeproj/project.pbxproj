@@ -958,7 +958,6 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
 					CommandAccessModel.swift,
-					CommandReopenAnalytics.swift,
 					PaywallView.swift,
 					ProCommerceStateSource.swift,
 					ProModels.swift,
@@ -1024,7 +1023,6 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
 					CommandAccessModel.swift,
-					CommandReopenAnalytics.swift,
 					PaywallView.swift,
 					ProCommerceStateSource.swift,
 					ProModels.swift,
@@ -1092,7 +1090,6 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				EXCLUDED_SOURCE_FILE_NAMES = (
 					CommandAccessModel.swift,
-					CommandReopenAnalytics.swift,
 					PaywallView.swift,
 					ProCommerceStateSource.swift,
 					ProModels.swift,
