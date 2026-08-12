@@ -14,4 +14,11 @@ extension ActivationMonitor {
             set: { self.isFeatureEnabled = $0 }
         )
     }
+
+    var automaticSwitcherReorderingBinding: Binding<Bool> {
+        Binding(
+            get: { self.isAutomaticSwitcherReorderingEnabled },
+            set: { self.isAutomaticSwitcherReorderingEnabled = $0 }
+        )
+    }
 }

@@ -11,6 +11,39 @@ import Defaults
 import Foundation
 import os
 
+struct ForegroundWindowObservationState: Equatable {
+    private(set) var hasObservedVisibleWindow = false
+    private(set) var consecutiveMissingSamples = 0
+
+    mutating func observe(
+        hasVisibleWindow: Bool,
+        requiredMissingSamples: Int
+    ) -> Bool {
+        if hasVisibleWindow {
+            hasObservedVisibleWindow = true
+            consecutiveMissingSamples = 0
+            return false
+        }
+
+        guard hasObservedVisibleWindow else {
+            return false
+        }
+
+        consecutiveMissingSamples += 1
+        guard consecutiveMissingSamples >= max(1, requiredMissingSamples) else {
+            return false
+        }
+
+        reset()
+        return true
+    }
+
+    mutating func reset() {
+        hasObservedVisibleWindow = false
+        consecutiveMissingSamples = 0
+    }
+}
+
 /// Monitors app activation and sends a reopen request when the user switches to an app
 /// via Command+Tab (or other non-mouse activation), unless the app was recently launched.
 final class ActivationMonitor: ObservableObject {
@@ -20,6 +53,8 @@ final class ActivationMonitor: ObservableObject {
         static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
         static let rapidReturnSuppressionInterval: TimeInterval = 2.0
+        static let foregroundWindowPollingInterval: TimeInterval = 0.15
+        static let requiredMissingWindowSamples = 2
     }
 
     static let ignoredBundleIDs: Set<String> = [
@@ -50,6 +85,17 @@ final class ActivationMonitor: ObservableObject {
         }
     }
 
+    @Published var isAutomaticSwitcherReorderingEnabled: Bool {
+        didSet {
+            guard isAutomaticSwitcherReorderingEnabled != oldValue else { return }
+            defaults[AppDefaults.automaticSwitcherReordering] = isAutomaticSwitcherReorderingEnabled
+            updateForegroundWindowPollingState()
+            AppLogger.activation.notice(
+                "Automatic Cmd+Tab reordering toggled to \(self.isAutomaticSwitcherReorderingEnabled ? "ON" : "OFF")"
+            )
+        }
+    }
+
     @Published private(set) var userExcludedBundleIDs: Set<String> {
         didSet {
             guard userExcludedBundleIDs != oldValue else { return }
@@ -73,6 +119,11 @@ final class ActivationMonitor: ObservableObject {
     private let accessController: FeatureAvailabilityProviding
     private let windowInfoProvider: WindowInfoListing
     private var activationObserver: NSObjectProtocol?
+    private var foregroundWindowTimer: Timer?
+    private var latestForegroundApplication: NSRunningApplication?
+    private var monitoredForegroundApplication: NSRunningApplication?
+    private var foregroundReturnTarget: NSRunningApplication?
+    private var foregroundWindowObservation = ForegroundWindowObservationState()
     private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
     private var lastActivationDates: [String: Date] = [:]
@@ -93,6 +144,7 @@ final class ActivationMonitor: ObservableObject {
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
         let storedValue = defaults[AppDefaults.featureEnabled]
+        let storedAutomaticSwitcherReordering = defaults[AppDefaults.automaticSwitcherReordering]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
         let hasStoredExcludedBundles = defaults.object(forKey: AppDefaults.RawKey.excludedBundleIDs) != nil
         let hasMigratedDefaultExcludedBundles = defaults[AppDefaults.defaultExcludedBundlesMigrated]
@@ -112,7 +164,10 @@ final class ActivationMonitor: ObservableObject {
         }
 
         _isFeatureEnabled = Published(initialValue: storedValue)
+        _isAutomaticSwitcherReorderingEnabled = Published(initialValue: storedAutomaticSwitcherReordering)
         _userExcludedBundleIDs = Published(initialValue: initialExcluded)
+        latestForegroundApplication = workspace.frontmostApplication
+        configureForegroundObservation(for: workspace.frontmostApplication)
         updateObservationState()
         AppLogger.activation.debug("ActivationMonitor ready. Feature enabled: \(storedValue)")
     }
@@ -145,6 +200,7 @@ final class ActivationMonitor: ObservableObject {
         if isActive {
             cancelPendingReopenEvaluation()
         }
+        updateForegroundWindowPollingState()
         AppLogger.activation.debug(
             "External reopen requests \(isActive ? "suppressed" : "restored") for onboarding."
         )
@@ -153,6 +209,7 @@ final class ActivationMonitor: ObservableObject {
     private func updateObservationState() {
         if isFeatureEnabled {
             startObservingIfNeeded()
+            updateForegroundWindowPollingState()
         } else {
             stopObserving()
         }
@@ -185,6 +242,7 @@ final class ActivationMonitor: ObservableObject {
         }
         self.selfTriggeredSuppressUntil.removeAll()
         cancelPendingReopenEvaluation()
+        stopForegroundWindowPolling()
     }
 
     private static let lastExpiredNudgeDateKey = "lastExpiredPaywallNudgeDate"
@@ -204,6 +262,7 @@ final class ActivationMonitor: ObservableObject {
             AppLogger.activation.debug("Ignoring activation of Command Reopen itself.")
             return
         }
+        recordForegroundActivation(app)
         if NSEvent.pressedMouseButtons != 0 {
             AppLogger.activation.debug("Ignoring activation triggered by mouse interaction.")
             return
@@ -212,7 +271,6 @@ final class ActivationMonitor: ObservableObject {
             AppLogger.activation.error("Activation without bundle identifier.")
             return
         }
-
         let now = Date()
         let previousBundleID = lastFrontmostBundleID
         let previousBundleLastActivation = previousBundleID.flatMap { lastActivationDates[$0] }
@@ -264,6 +322,163 @@ final class ActivationMonitor: ObservableObject {
 
     deinit {
         stopObserving()
+    }
+
+    private func recordForegroundActivation(_ app: NSRunningApplication) {
+        guard Self.isEligibleForegroundApplication(app) else { return }
+
+        let previousApplication = latestForegroundApplication
+        latestForegroundApplication = app
+
+        // Re-activating the same process (for example after closing Settings)
+        // must not erase the return target learned when this app first became
+        // frontmost.
+        if monitoredForegroundApplication?.processIdentifier == app.processIdentifier {
+            return
+        }
+
+        guard !userExcludedBundleIDs.contains(app.bundleIdentifier ?? "") else {
+            monitoredForegroundApplication = nil
+            foregroundReturnTarget = nil
+            foregroundWindowObservation.reset()
+            return
+        }
+
+        monitoredForegroundApplication = app
+        foregroundReturnTarget = Self.isEligibleReturnTarget(previousApplication, excluding: app)
+            ? previousApplication
+            : Self.finderApplication(excluding: app)
+        foregroundWindowObservation.reset()
+    }
+
+    private func configureForegroundObservation(for application: NSRunningApplication?) {
+        guard let application, Self.isEligibleForegroundApplication(application) else {
+            monitoredForegroundApplication = nil
+            foregroundReturnTarget = nil
+            return
+        }
+        monitoredForegroundApplication = userExcludedBundleIDs.contains(application.bundleIdentifier ?? "")
+            ? nil
+            : application
+        foregroundReturnTarget = nil
+        foregroundWindowObservation.reset()
+    }
+
+    private func updateForegroundWindowPollingState() {
+        guard isFeatureEnabled,
+              isAutomaticSwitcherReorderingEnabled,
+              !isReopenSuppressedForOnboarding else {
+            stopForegroundWindowPolling()
+            return
+        }
+        startForegroundWindowPollingIfNeeded()
+    }
+
+    private func startForegroundWindowPollingIfNeeded() {
+        guard foregroundWindowTimer == nil else { return }
+        let timer = Timer(timeInterval: Constants.foregroundWindowPollingInterval, repeats: true) { [weak self] _ in
+            self?.evaluateForegroundWindowDisappearance()
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        foregroundWindowTimer = timer
+    }
+
+    private func stopForegroundWindowPolling() {
+        foregroundWindowTimer?.invalidate()
+        foregroundWindowTimer = nil
+        foregroundWindowObservation.reset()
+    }
+
+    private func evaluateForegroundWindowDisappearance() {
+        guard accessController.isCoreFeatureAvailable,
+              let source = monitoredForegroundApplication,
+              !userExcludedBundleIDs.contains(source.bundleIdentifier ?? ""),
+              let frontmost = workspace.frontmostApplication,
+              frontmost.processIdentifier == source.processIdentifier,
+              let windowInfoList = windowInfoProvider.onScreenWindowInfo() else {
+            foregroundWindowObservation.reset()
+            return
+        }
+
+        guard let returnTarget = resolvedForegroundReturnTarget(
+            for: source,
+            windowInfoList: windowInfoList
+        ) else {
+            foregroundWindowObservation.reset()
+            return
+        }
+
+        let hasVisibleWindow = WindowInspector.hasVisibleWindow(
+            ownerPID: source.processIdentifier,
+            windowInfoList: windowInfoList
+        )
+        guard foregroundWindowObservation.observe(
+            hasVisibleWindow: hasVisibleWindow,
+            requiredMissingSamples: Constants.requiredMissingWindowSamples
+        ) else {
+            return
+        }
+
+        AppLogger.activation.notice(
+            "Last visible window disappeared for \(source.bundleIdentifier ?? "unknown"); handing off foreground activation."
+        )
+        requestActivation(of: returnTarget, from: source)
+    }
+
+    private func resolvedForegroundReturnTarget(
+        for source: NSRunningApplication,
+        windowInfoList: [[String: Any]]
+    ) -> NSRunningApplication? {
+        if let foregroundReturnTarget,
+           Self.isEligibleReturnTarget(foregroundReturnTarget, excluding: source),
+           WindowInspector.hasVisibleWindow(
+               ownerPID: foregroundReturnTarget.processIdentifier,
+               windowInfoList: windowInfoList
+           ) {
+            return foregroundReturnTarget
+        }
+        return Self.finderApplication(excluding: source)
+    }
+
+    private func requestActivation(
+        of target: NSRunningApplication,
+        from source: NSRunningApplication
+    ) {
+        if #available(macOS 14.0, *), target.activate(from: source, options: []) {
+            return
+        }
+        _ = target.activate(options: [.activateIgnoringOtherApps])
+    }
+
+    private static func finderApplication(excluding source: NSRunningApplication) -> NSRunningApplication? {
+        NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.finder")
+            .first(where: { isEligibleReturnTarget($0, excluding: source) })
+    }
+
+    private static func isEligibleForegroundApplication(_ app: NSRunningApplication) -> Bool {
+        guard !app.isTerminated,
+              app.activationPolicy == .regular,
+              let bundleID = app.bundleIdentifier,
+              bundleID != Bundle.main.bundleIdentifier,
+              !isIgnoredBundleID(bundleID) else {
+            return false
+        }
+        return !HelperProcessFilter.isHelperLike(
+            bundleID: bundleID,
+            bundleURL: app.bundleURL,
+            localizedName: app.localizedName
+        )
+    }
+
+    private static func isEligibleReturnTarget(
+        _ app: NSRunningApplication?,
+        excluding source: NSRunningApplication
+    ) -> Bool {
+        guard let app,
+              app.processIdentifier != source.processIdentifier else {
+            return false
+        }
+        return isEligibleForegroundApplication(app)
     }
 
     private func scheduleReopenEvaluation(

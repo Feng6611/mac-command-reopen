@@ -51,11 +51,20 @@ struct SettingsTabContent: View {
             Section {
                 Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                     .disabled(isFeatureLocked)
+                Toggle(
+                    "Keep app next in Cmd+Tab",
+                    isOn: activationMonitor.automaticSwitcherReorderingBinding
+                )
+                .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
                 Toggle("Launch at Login", isOn: launchAtLoginManager.binding)
                     .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
                         guard isEnabled else { return }
                         _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
                     }
+            } footer: {
+                Text("After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             ExcludedAppsSection(

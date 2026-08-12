@@ -1,6 +1,35 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here." : {
+      "comment" : "Footer explaining automatic Cmd+Tab ordering after the foreground app loses its last visible window.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn das letzte Fenster geschlossen oder minimiert wird, kommt die vorherige App nach vorn, damit ein Cmd+Tab hierher zurückführt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après la fermeture ou la réduction de la dernière fenêtre, l’app précédente passe au premier plan afin qu’un seul Cmd+Tab vous ramène ici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後のウインドウを閉じるか最小化すると前のアプリを前面にし、Cmd+Tab 1回でここに戻れるようにします。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭或最小化最后一个窗口后，将上一个 App 切到前台，让你按一次 Cmd+Tab 就能返回。"
+          }
+        }
+      }
+    },
     "" : {},
     "%lld" : {},
     "%lld days left" : {
@@ -1572,6 +1601,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近 30 天"
+          }
+        }
+      }
+    },
+    "Keep app next in Cmd+Tab" : {
+      "comment" : "Settings toggle that keeps an app second in Cmd+Tab after its last visible window disappears.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App als Nächstes in Cmd+Tab behalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder l’app suivante dans Cmd+Tab"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab の次の位置に App を保持"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 App 保持在 Cmd+Tab 下一位"
           }
         }
       }

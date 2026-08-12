@@ -11,6 +11,7 @@ import Foundation
 enum AppDefaults {
     enum RawKey {
         static let featureEnabled = "cmdreopenAutoHelpEnabled"
+        static let automaticSwitcherReordering = "cmdreopenAutomaticSwitcherReordering"
         static let excludedBundleIDs = "cmdreopenExcludedBundleIDs"
         static let defaultExcludedBundlesMigrated = "cmdreopenDefaultExcludedBundlesMigrated"
         static let universalControlExcludedMigrated = "cmdreopenUniversalControlExcludedMigrated"
@@ -49,6 +50,7 @@ enum AppDefaults {
     }
 
     static let featureEnabled = Defaults.Key<Bool>(RawKey.featureEnabled, default: true)
+    static let automaticSwitcherReordering = Defaults.Key<Bool>(RawKey.automaticSwitcherReordering, default: true)
     static let excludedBundleIDs = Defaults.Key<[String]>(RawKey.excludedBundleIDs, default: [])
     static let defaultExcludedBundlesMigrated = Defaults.Key<Bool>(RawKey.defaultExcludedBundlesMigrated, default: false)
     static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
