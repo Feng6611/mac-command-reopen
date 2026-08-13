@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- General keeps its three switches in one card and moves each explanation
+  under the switch it belongs to. A section footer can only explain the last
+  row of its group, so the Cmd+Tab sentence had been reading as an explanation
+  of Launch at Login. Language leaves the top card — it is set once, and it
+  was standing ahead of the app's own switches — and joins Mac window
+  shortcuts in a closing group of rows that are read rather than operated.
+- The upgrade item in the menu bar carries a plain `hourglass` rather than
+  `hourglass.circle.fill`. A filled circle symbol tinted with a single palette
+  colour renders as a solid disc at menu size: the glyph inside is knocked out,
+  so the icon said nothing and looked like a bullet.
+- Purchase status is checked when Settings opens, not only at launch and on a
+  five-minute activation throttle. The About row states that status, and both
+  scheduled checks happen away from it, so a launch check that failed or hung
+  left the row reading "checking purchases" with nothing on its way.
+- The legacy paid-app lookup (`AppTransaction.shared`) is bounded by the same
+  timeout as the RevenueCat requests. It runs first in the entitlement
+  refresh and was the one unbounded await in that path — on a copy with no
+  receipt it took seconds, and could hold the whole refresh indefinitely.
+
 - Settings opens tall enough for the General pane again. The window was taking
   Kiki's default height because the app sized only the AppKit window and left
   the SwiftUI shell — which is what the window actually settles at — on its

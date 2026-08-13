@@ -87,6 +87,11 @@ final class SettingsWindowController {
         }
 
         coordinator.prepare()
+
+        // The About pane states purchase status; asking for it when the window
+        // opens is what keeps that row from showing the result of a check that
+        // ran minutes ago, or never finished.
+        Task { await AppLifecycleCoordinator.shared.refreshCommerceStateForSettings() }
     }
 
     func show(

@@ -37,37 +37,32 @@ struct SettingsTabContent: View {
 
     var body: some View {
         KikiSettingsPane {
-            Section {
-                Picker(selection: $appLanguage.selected) {
-                    ForEach(SupportedLanguage.allCases) { language in
-                        // Native-language labels so users can always find their own language,
-                        // regardless of the current UI language.
-                        Text(verbatim: language.displayName).tag(language)
-                    }
-                } label: {
-                    Text("Language")
-                }
-            }
-
+            // All three switches in one card. Splitting them by topic bought
+            // each explanation the right neighbour and cost the pane two more
+            // group boundaries, in a pane that already has too many; the
+            // explanations belong to their own rows instead.
             Section {
                 Toggle("Enable Command Reopen", isOn: activationMonitor.featureToggleBinding)
                     .disabled(isFeatureLocked)
-                Toggle(
+
+                switchRow(
                     "Keep app next in Cmd+Tab",
+                    caption: "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here.",
                     isOn: activationMonitor.automaticSwitcherReorderingBinding
                 )
                 .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
+
                 // The binding reports a registration that macOS is holding for
                 // approval; without it the switch slides back on its own.
-                Toggle("Launch at Login", isOn: launchAtLoginManager.binding)
-                    .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
-                        guard isEnabled else { return }
-                        _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
-                    }
-            } footer: {
-                Text("After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                switchRow(
+                    "Launch at Login",
+                    caption: "Command Reopen only restores windows while it is running.",
+                    isOn: launchAtLoginManager.binding
+                )
+                .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
+                    guard isEnabled else { return }
+                    _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
+                }
             }
 
             ExcludedAppsSection(
@@ -105,6 +100,16 @@ struct SettingsTabContent: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+
+                Picker(selection: $appLanguage.selected) {
+                    ForEach(SupportedLanguage.allCases) { language in
+                        // Native-language labels so users can always find their own language,
+                        // regardless of the current UI language.
+                        Text(verbatim: language.displayName).tag(language)
+                    }
+                } label: {
+                    Text("Language")
+                }
             }
         }
         .onChange(of: appLanguage.selected) { _ in
@@ -120,6 +125,29 @@ struct SettingsTabContent: View {
         }
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in
             refreshApplicationCatalog()
+        }
+    }
+
+    /// A switch that carries its own explanation.
+    ///
+    /// A section footer sits under the last row of its group, so one card with
+    /// three switches can only explain its last one. The alternative — a group
+    /// per switch — reads as three unrelated settings and adds two more card
+    /// edges to a pane that is already busy. System Settings puts the same
+    /// kind of line under the label it belongs to.
+    private func switchRow(
+        _ title: LocalizedStringKey,
+        caption: LocalizedStringKey,
+        isOn: Binding<Bool>
+    ) -> some View {
+        Toggle(isOn: isOn) {
+            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
+                Text(title)
+                Text(caption)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

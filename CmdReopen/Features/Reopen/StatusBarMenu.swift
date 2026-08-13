@@ -94,7 +94,7 @@ final class StatusBarMenuController {
             items.append(.action(
                 title: AppLanguage.shared.string("Upgrade to Pro…"),
                 badgeText: upgradeBadgeText(),
-                systemImage: "hourglass.circle.fill",
+                systemImage: "hourglass",
                 imageTint: NSColor(
                     red: 203 / 255,
                     green: 48 / 255,

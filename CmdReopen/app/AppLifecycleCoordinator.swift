@@ -203,6 +203,30 @@ final class AppLifecycleCoordinator {
 #endif
     }
 
+    /// Checks purchases at the moment the user can see the answer.
+    ///
+    /// The two scheduled checks — one at launch, one throttled to five minutes
+    /// on activation — both happen away from the pane that displays the
+    /// result. A launch check that failed, or that is still waiting on
+    /// StoreKit, therefore left the About row reading "checking purchases"
+    /// with nothing on its way to replace it. Opening Settings is the one
+    /// moment the answer is being read, so it is worth asking again; the
+    /// throttle is waived only while no check has ever resolved.
+    func refreshCommerceStateForSettings() async {
+        await refreshCommerceStateIfNeeded(
+            force: !hasResolvedCommerceReadiness,
+            reason: "settingsOpened"
+        )
+    }
+
+    private var hasResolvedCommerceReadiness: Bool {
+#if APPSTORE
+        CommandAccessModel.shared.readiness.hasResolvedInitialRefresh
+#else
+        true
+#endif
+    }
+
     private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {
         if isRefreshingCommerce {
             AppLogger.lifecycle.debug("Skipping commerce refresh for \(reason) because another refresh is already running.")
