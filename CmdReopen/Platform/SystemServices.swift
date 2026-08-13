@@ -59,5 +59,8 @@ struct SharedApplicationPresenter: ApplicationPresenting {
 protocol LaunchAtLoginManaging: AnyObject {
     var isEnabled: Bool { get }
 
-    func setEnabled(_ enabled: Bool)
+    /// Returns what macOS actually did, which `isEnabled` alone cannot say:
+    /// a registration awaiting the user's approval reads as "not enabled".
+    @discardableResult
+    func setEnabled(_ enabled: Bool) -> LaunchAtLoginOutcome
 }

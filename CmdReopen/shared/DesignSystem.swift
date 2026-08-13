@@ -33,9 +33,25 @@ enum DS {
 
     // MARK: Window Dimensions
 
+    /// Settings geometry lives here because two Kiki call sites have to agree
+    /// on it: `KikiSettingsWindowController` sizes the AppKit window, and
+    /// `KikiSettingsCoordinatorView` sizes the SwiftUI content — and the
+    /// SwiftUI ideal is what the window actually settles at. Passing one and
+    /// not the other is how this pane ended up at Kiki's generic default.
     enum Window {
-        static let settingsWidth:  CGFloat = 540
-        static let settingsHeight: CGFloat = 560
+        /// Kiki fixes menu-bar utility Settings at 500 (min == ideal == max).
+        /// Passing anything else here only produces a window whose minimum
+        /// contradicts its maximum.
+        static let settingsWidth: CGFloat = 500
+
+        /// The pane may be resized down without collapsing the tab chrome;
+        /// longer General/About content then scrolls inside the native pane.
+        static let settingsMinimumHeight: CGFloat = 520
+
+        /// Compact enough to stay a utility window. General intentionally
+        /// scrolls once the exclusion list grows instead of making every tab
+        /// inherit a tall document-like window.
+        static let settingsHeight: CGFloat = 620
     }
 
     // MARK: Corner Radius (semantic)

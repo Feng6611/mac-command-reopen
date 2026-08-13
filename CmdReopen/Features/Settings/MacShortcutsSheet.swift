@@ -5,6 +5,18 @@
 
 import SwiftUI
 
+/// Reports the height the list wants, so the sheet is as tall as what it holds
+/// instead of a number someone guessed. Measured inside the scroll view, where
+/// the content is laid out at its natural height whatever the sheet resolves
+/// to, so the value cannot feed back into the frame that consumes it.
+private struct MacShortcutsContentHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 /// The window language macOS already speaks, with the one place this app fills
 /// in marked inside it.
 ///
@@ -15,8 +27,19 @@ import SwiftUI
 /// is also the answer to every "could it also do windows layouts / split view
 /// / custom shortcuts" that will ever arrive.
 struct MacShortcutsSheet: View {
+    /// Narrower than the 500pt Settings window it drops out of, so the parent
+    /// still reads as the window this belongs to.
+    private static let width: CGFloat = 440
+
+    /// Floor and ceiling for the measured content. The ceiling keeps the sheet
+    /// clear of the Settings window's bottom edge — a sheet as tall as its
+    /// parent reads as a second window in the wrong place. Past it the list
+    /// scrolls, which is what the longer locales need.
+    private static let minimumContentHeight: CGFloat = 320
+    private static let maximumContentHeight: CGFloat = 480
+
     @ObservedObject private var appLanguage = AppLanguage.shared
-    @Environment(\.dismiss) private var dismiss
+    @State private var contentHeight: CGFloat = MacShortcutsSheet.maximumContentHeight
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,14 +48,14 @@ struct MacShortcutsSheet: View {
             Divider()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: DS.Spacing.xl) {
+                VStack(alignment: .leading, spacing: DS.Spacing.lg) {
                     section(
                         title: appLanguage.string(localized: "Apps",
                             comment: "Section of the Mac shortcuts sheet covering app-level shortcuts."),
                         shortcuts: Self.appShortcuts
                     )
 
-                    VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                         section(
                             title: appLanguage.string(localized: "Windows",
                                 comment: "Section of the Mac shortcuts sheet covering window-level shortcuts."),
@@ -51,51 +74,79 @@ struct MacShortcutsSheet: View {
                         shortcuts: Self.spaceShortcuts
                     )
                 }
-                .padding(DS.Spacing.xl)
+                .padding(DS.Spacing.lg)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.preference(
+                            key: MacShortcutsContentHeightKey.self,
+                            value: proxy.size.height
+                        )
+                    }
+                )
             }
+            .frame(height: resolvedContentHeight)
+
         }
-        .frame(width: 460, height: 560)
+        .frame(width: Self.width)
+        .onPreferenceChange(MacShortcutsContentHeightKey.self) { height in
+            guard height > 0 else { return }
+            contentHeight = height
+        }
+    }
+
+    private var resolvedContentHeight: CGFloat {
+        min(max(contentHeight, Self.minimumContentHeight), Self.maximumContentHeight)
     }
 
     private var header: some View {
-        HStack {
-            Text(appLanguage.string(localized: "Mac window shortcuts",
-                comment: "Title of the sheet listing the macOS window shortcuts."))
-                .font(.headline)
-
-            Spacer(minLength: 0)
-
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.caption.weight(.semibold))
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel(appLanguage.string("Close"))
-        }
-        .padding(.horizontal, DS.Spacing.xl)
-        .padding(.vertical, DS.Spacing.lg)
+        Text(appLanguage.string(localized: "Mac window shortcuts",
+            comment: "Title of the sheet listing the macOS window shortcuts."))
+            .font(.headline)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, DS.Spacing.xl)
+            .padding(.trailing, 36)
+            .padding(.vertical, DS.Spacing.lg)
     }
 
     private func section(title: String, shortcuts: [MacShortcut]) -> some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            VStack(spacing: DS.Spacing.xs) {
+            VStack(spacing: DS.Spacing.xxs) {
                 ForEach(shortcuts) { shortcut in
-                    HStack(spacing: DS.Spacing.md) {
-                        keyCaps(for: shortcut)
-                        Text(shortcut.label(appLanguage))
-                            .font(.callout)
-                        Spacer(minLength: 0)
-                    }
+                    row(for: shortcut)
                 }
             }
         }
+    }
+
+    /// Label left, keys against the trailing edge — the arrangement System
+    /// Settings uses for its own shortcut lists. A leading key column has to be
+    /// wide enough for the widest combination, which leaves an empty gutter
+    /// beside every row whose key is not printable and forces the long labels
+    /// to wrap inside what is left of the row.
+    private func row(for shortcut: MacShortcut) -> some View {
+        HStack(alignment: .center, spacing: DS.Spacing.md) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(shortcut.label(appLanguage))
+                    .font(.callout)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let detail = shortcut.detail?(appLanguage) {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Spacer(minLength: DS.Spacing.md)
+
+            keyCaps(for: shortcut)
+        }
+        .frame(minHeight: 26)
     }
 
     /// The one thing this app does, phrased as a before and after rather than
@@ -127,7 +178,7 @@ struct MacShortcutsSheet: View {
                 isApp: true
             )
         }
-        .padding(DS.Spacing.lg)
+        .padding(DS.Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
@@ -145,7 +196,7 @@ struct MacShortcutsSheet: View {
             Text(verbatim: source)
                 .font(.caption.weight(.medium))
                 .foregroundStyle(isApp ? DS.Colors.brandPrimary : .secondary)
-                .frame(width: 108, alignment: .leading)
+                .frame(width: 96, alignment: .leading)
             Text(result)
                 .font(.caption)
                 .foregroundStyle(isApp ? .primary : .secondary)
@@ -173,18 +224,20 @@ struct MacShortcutsSheet: View {
                     )
             }
         }
-        .frame(width: 96, alignment: .leading)
+        .fixedSize()
     }
 }
 
 /// One row of the sheet.
 ///
 /// `glyphs` are the key faces to draw. A shortcut whose key moves with the
-/// keyboard layout carries none — see `windowShortcuts`.
+/// keyboard layout carries none and names its key in `detail` instead — see
+/// `windowShortcuts`.
 struct MacShortcut: Identifiable {
     let id: String
     let glyphs: [String]
     let label: (AppLanguage) -> String
+    var detail: ((AppLanguage) -> String)?
 }
 
 extension MacShortcutsSheet {
@@ -203,12 +256,20 @@ extension MacShortcutsSheet {
     static let windowShortcuts: [MacShortcut] = [
         // Drawn without key faces on purpose: the key below Escape is ` on a
         // US layout, ^ on a German one and @ on a French one, so a printed
-        // glyph would be wrong for a good share of users. The label carries
-        // the meaning, which is the part that does not move.
-        MacShortcut(id: "switchWindows", glyphs: []) {
-            $0.string(localized: "Switch windows within an app — ⌘ and the key above Tab",
-                comment: "Label for the shortcut that cycles windows of the frontmost app; its key differs by keyboard layout.")
-        },
+        // glyph would be wrong for a good share of users. The detail line
+        // carries the meaning, which is the part that does not move.
+        MacShortcut(
+            id: "switchWindows",
+            glyphs: [],
+            label: {
+                $0.string(localized: "Switch windows within an app",
+                    comment: "Label for the shortcut that cycles windows of the frontmost app.")
+            },
+            detail: {
+                $0.string(localized: "⌘ and the key above Tab",
+                    comment: "Names the keys for the window-cycling shortcut, whose second key differs by keyboard layout. Keep ⌘ verbatim.")
+            }
+        ),
         MacShortcut(id: "closeWindow", glyphs: ["⌘", "W"]) {
             $0.string(localized: "Close the window", comment: "Label for the ⌘W shortcut.")
         },

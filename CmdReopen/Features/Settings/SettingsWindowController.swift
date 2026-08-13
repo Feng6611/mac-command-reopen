@@ -8,11 +8,16 @@ final class SettingsNavigationModel: ObservableObject {
     static let shared = SettingsNavigationModel()
     @Published var isPaywallSheetPresented = false
     @Published var isTrialExitOfferPresented = false
+    @Published var isMacShortcutsPresented = false
 #if DEBUG
     @Published var isTrialExitOfferDebugPreviewPresented = false
 #endif
     func presentPaywall() {
         isPaywallSheetPresented = true
+    }
+
+    func presentMacShortcuts() {
+        isMacShortcutsPresented = true
     }
 
     /// Presents the trial-exit offer after the paywall has finished closing.
@@ -45,7 +50,15 @@ final class SettingsWindowController {
         initialTab: SettingsTab.general,
         windowController: KikiSettingsWindowController(
             frameAutosaveName: "CommandReopen.SettingsWindow",
+            idealContentSize: CGSize(
+                width: DS.Window.settingsWidth,
+                height: DS.Window.settingsHeight
+            ),
             minimumContentSize: CGSize(
+                width: DS.Window.settingsWidth,
+                height: DS.Window.settingsMinimumHeight
+            ),
+            maximumContentSize: CGSize(
                 width: DS.Window.settingsWidth,
                 height: DS.Window.settingsHeight
             )

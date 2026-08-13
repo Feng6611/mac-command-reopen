@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+- Settings opens tall enough for the General pane again. The window was taking
+  Kiki's default height because the app sized only the AppKit window and left
+  the SwiftUI shell — which is what the window actually settles at — on its
+  defaults, and passed a width minimum that contradicted the Kit's fixed width.
+  Both sides now come from `DS.Window`: 500 wide, opening at 700 with a 620
+  floor.
+- Reworked the Mac window shortcuts sheet: labels read left with the keys
+  against the trailing edge, as in System Settings, instead of a fixed key
+  column that left an empty gutter beside the one shortcut whose key moves with
+  the keyboard layout. The sheet takes the height its content needs and stays
+  clear of the window's bottom edge instead of a fixed 460×560 that ran past
+  it, and closes with Done or Esc rather than a close glyph holding focus.
+- Launch at Login now says when macOS is holding the login item for approval,
+  and offers to open Login Items. Registration awaiting approval reads as "off"
+  through `SMAppService`, so the switch used to slide back in silence — on the
+  last onboarding step, directly under the promise that the app will be there
+  after every restart.
+
 ## 1.4.2 — 2026-08-09
 
 - Removed product analytics and the PostHog dependency from all distributions.

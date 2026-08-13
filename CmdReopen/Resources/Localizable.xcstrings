@@ -487,6 +487,35 @@
         }
       }
     },
+    "Allow Command Reopen to launch at login" : {
+      "comment" : "Alert title shown when macOS holds the login item until the user approves it.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen beim Anmelden öffnen zulassen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser Command Reopen à s’ouvrir à la session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に Command Reopen を開くことを許可"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许 Command Reopen 在登录时打开"
+          }
+        }
+      }
+    },
     "App" : {
       "comment" : "Series label for the app axis of the Top Apps chart; the noun 'app', not the button 'App Store'.",
       "localizations" : {
@@ -885,6 +914,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试用期间可使用 Command Reopen Pro。"
+          }
+        }
+      }
+    },
+    "Command Reopen could not be added to Login Items" : {
+      "comment" : "Alert title shown when registering the login item failed outright.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen konnte nicht zu den Anmeldeobjekten hinzugefügt werden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’ajouter Command Reopen aux éléments d’ouverture"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen をログイン項目に追加できませんでした"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法把 Command Reopen 添加到登录项"
           }
         }
       }
@@ -2351,6 +2409,35 @@
         }
       }
     },
+    "Not Now" : {
+      "comment" : "Alert button that dismisses the login item prompt without opening System Settings.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt nicht"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "後で"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以后再说"
+          }
+        }
+      }
+    },
     "Not selected" : {
       "comment" : "VoiceOver value for an unselected paywall plan card (Kiki_mackit KikiPaywall).",
       "extractionState" : "stale",
@@ -2382,6 +2469,35 @@
       }
     },
     "Onboarding" : {},
+    "Open Login Items" : {
+      "comment" : "Alert button that opens System Settings at the Login Items pane.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldeobjekte öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les éléments d’ouverture"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン項目を開く"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开登录项"
+          }
+        }
+      }
+    },
     "Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it." : {
       "comment" : "About-pane footer tying the zero-permission claim to the public source.",
       "localizations" : {
@@ -3501,31 +3617,31 @@
         }
       }
     },
-    "Switch windows within an app — ⌘ and the key above Tab" : {
-      "comment" : "Label for the shortcut that cycles windows of the frontmost app; its key differs by keyboard layout.",
+    "Switch windows within an app" : {
+      "comment" : "Label for the shortcut that cycles windows of the frontmost app.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fenster einer App wechseln — ⌘ und die Taste über der Tabulatortaste"
+            "value" : "Fenster einer App wechseln"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Changer de fenêtre dans une app — ⌘ et la touche au-dessus de Tab"
+            "value" : "Changer de fenêtre dans une app"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "同じ App のウインドウを切り替える — ⌘ と Tab の上のキー"
+            "value" : "同じ App のウインドウを切り替える"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在同一个 App 里切窗口 — ⌘ 加 Tab 上面那个键"
+            "value" : "在同一个 App 里切换窗口"
           }
         }
       }
@@ -4763,6 +4879,64 @@
         }
       }
     },
+    "macOS holds new login items until you allow them. Open Login Items and switch Command Reopen on." : {
+      "comment" : "Alert body shown when macOS holds the login item until the user approves it.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS lässt neue Anmeldeobjekte erst nach Ihrer Freigabe zu. Öffnen Sie die Anmeldeobjekte und aktivieren Sie Command Reopen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS suspend les nouveaux éléments d’ouverture jusqu’à ce que vous les autorisiez. Ouvrez les éléments d’ouverture et activez Command Reopen."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいログイン項目は、許可するまで macOS が保留します。「ログイン項目」を開いて Command Reopen をオンにしてください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新的登录项要你允许之后 macOS 才会启用。打开「登录项」，把 Command Reopen 开启。"
+          }
+        }
+      }
+    },
+    "macOS turned the request down. You can add Command Reopen yourself in Login Items." : {
+      "comment" : "Alert body shown when registering the login item failed and macOS gave no reason.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS hat die Anfrage abgelehnt. Sie können Command Reopen in den Anmeldeobjekten selbst hinzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS a refusé la demande. Vous pouvez ajouter Command Reopen vous-même dans les éléments d’ouverture."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS が要求を拒否しました。「ログイン項目」で手動で Command Reopen を追加できます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS 拒绝了这次请求。你可以在「登录项」里自己把 Command Reopen 加进去。"
+          }
+        }
+      }
+    },
     "once" : {
       "comment" : "Billing-detail label paired with the lifetime price (e.g. '$10.99 / once').",
       "localizations" : {
@@ -4991,6 +5165,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "个窗口已恢复"
+          }
+        }
+      }
+    },
+    "⌘ and the key above Tab" : {
+      "comment" : "Names the keys for the window-cycling shortcut, whose second key differs by keyboard layout. Keep ⌘ verbatim.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ und die Taste über der Tabulatortaste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ et la touche au-dessus de Tab"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ と Tab の上のキー"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ 加 Tab 上面那个键"
           }
         }
       }

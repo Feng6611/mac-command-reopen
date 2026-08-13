@@ -1,4 +1,5 @@
 import AppKit
+import KikiDesign
 import KikiSettings
 import SwiftUI
 #if APPSTORE
@@ -51,7 +52,16 @@ struct SettingsView: View {
 #endif
 
     var body: some View {
-        KikiSettingsCoordinatorView(coordinator: SettingsWindowController.shared.coordinator) { tab in
+        // Sized here as well as on the window controller: the SwiftUI ideal is
+        // what the Settings window settles at, so the AppKit side alone leaves
+        // the pane at Kiki's generic default height.
+        KikiSettingsCoordinatorView(
+            coordinator: SettingsWindowController.shared.coordinator,
+            width: DS.Window.settingsWidth,
+            height: DS.Window.settingsHeight,
+            minimumWidth: DS.Window.settingsWidth,
+            minimumHeight: DS.Window.settingsMinimumHeight
+        ) { tab in
             switch tab {
             case .general:
                 SettingsTabContent()
@@ -62,6 +72,9 @@ struct SettingsView: View {
             }
         }
         .id(appLanguage.selected)
+        .kikiCardSheet(isPresented: $route.isMacShortcutsPresented) {
+            MacShortcutsSheet()
+        }
 #if APPSTORE
         .sheet(isPresented: $route.isPaywallSheetPresented) {
             PaywallSheetView(

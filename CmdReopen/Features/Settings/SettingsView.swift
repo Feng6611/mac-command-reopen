@@ -16,6 +16,7 @@ struct SettingsTabContent: View {
     @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
     @EnvironmentObject private var appLanguage: AppLanguage
+    @ObservedObject private var route = SettingsNavigationModel.shared
 #if APPSTORE
     @ObservedObject private var accessModel = CommandAccessModel.shared
 #endif
@@ -25,7 +26,6 @@ struct SettingsTabContent: View {
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     @State private var appLookupQuery = ""
     @State private var applicationCatalog: [ExcludedApplicationInfo] = []
-    @State private var isShowingMacShortcuts = false
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
@@ -57,6 +57,8 @@ struct SettingsTabContent: View {
                     isOn: activationMonitor.automaticSwitcherReorderingBinding
                 )
                 .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
+                // The binding reports a registration that macOS is holding for
+                // approval; without it the switch slides back on its own.
                 Toggle("Launch at Login", isOn: launchAtLoginManager.binding)
                     .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
                         guard isEnabled else { return }
@@ -85,7 +87,7 @@ struct SettingsTabContent: View {
             // of it. It is also where every "could it also…" gets answered.
             Section {
                 Button {
-                    isShowingMacShortcuts = true
+                    route.presentMacShortcuts()
                 } label: {
                     HStack(spacing: DS.Spacing.sm) {
                         Image(systemName: "command")
@@ -104,9 +106,6 @@ struct SettingsTabContent: View {
                 }
                 .buttonStyle(.plain)
             }
-        }
-        .sheet(isPresented: $isShowingMacShortcuts) {
-            MacShortcutsSheet()
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()

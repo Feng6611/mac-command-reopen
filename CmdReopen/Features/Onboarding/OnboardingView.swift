@@ -306,8 +306,13 @@ private struct FinishStepView: View {
             // never asked to start. The toggle is on screen and reversible in
             // the same breath, which is what separates a sensible default
             // from a decision made behind the user's back.
+            //
+            // When macOS holds the registration for approval, the prompt comes
+            // up here rather than later: this step says the app will be there
+            // after every restart, and a switch that quietly stayed off makes
+            // that sentence untrue on the one screen the user is reading it.
             if !launchAtLoginManager.isEnabled {
-                launchAtLoginManager.setEnabled(true)
+                LaunchAtLoginApproval.present(for: launchAtLoginManager.setEnabled(true))
             }
         }
     }

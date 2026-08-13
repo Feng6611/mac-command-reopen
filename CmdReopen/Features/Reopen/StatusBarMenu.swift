@@ -94,6 +94,13 @@ final class StatusBarMenuController {
             items.append(.action(
                 title: AppLanguage.shared.string("Upgrade to Pro…"),
                 badgeText: upgradeBadgeText(),
+                systemImage: "hourglass.circle.fill",
+                imageTint: NSColor(
+                    red: 203 / 255,
+                    green: 48 / 255,
+                    blue: 224 / 255,
+                    alpha: 1
+                ),
                 action: {
                     SettingsOpener.shared.open(
                         initialTab: .about,
@@ -204,6 +211,7 @@ final class StatusBarMenuModel: ObservableObject {
     private let applicationPresenter: ApplicationPresenting
     private let reviewPromptRequester: (ReviewPromptTrigger) -> Void
     private let totalReopensProvider: () -> Int
+    private let launchAtLoginOutcomePresenter: (LaunchAtLoginOutcome) -> Void
 
     /// Carries the running total on the item that leads to the full breakdown,
     /// rather than as a line of its own: a number nobody can act on takes the
@@ -241,7 +249,8 @@ final class StatusBarMenuModel: ObservableObject {
         urlOpener: URLOpening? = nil,
         applicationPresenter: ApplicationPresenting? = nil,
         reviewPromptRequester: @escaping (ReviewPromptTrigger) -> Void,
-        totalReopensProvider: (() -> Int)? = nil
+        totalReopensProvider: (() -> Int)? = nil,
+        launchAtLoginOutcomePresenter: ((LaunchAtLoginOutcome) -> Void)? = nil
     ) {
         let resolvedLaunchManager = launchManager ?? LaunchAtLoginManager()
         let resolvedTotalReopensProvider = totalReopensProvider ?? {
@@ -252,6 +261,8 @@ final class StatusBarMenuModel: ObservableObject {
         self.applicationPresenter = applicationPresenter ?? SharedApplicationPresenter()
         self.reviewPromptRequester = reviewPromptRequester
         self.totalReopensProvider = resolvedTotalReopensProvider
+        self.launchAtLoginOutcomePresenter = launchAtLoginOutcomePresenter
+            ?? { LaunchAtLoginApproval.present(for: $0) }
         self.launchAtLoginEnabled = resolvedLaunchManager.isEnabled
         self.totalReopens = resolvedTotalReopensProvider()
     }
@@ -263,11 +274,15 @@ final class StatusBarMenuModel: ObservableObject {
 
     func setLaunchAtLogin(_ isEnabled: Bool) {
         let wasEnabled = launchAtLoginEnabled
-        launchManager.setEnabled(isEnabled)
+        let outcome = launchManager.setEnabled(isEnabled)
         launchAtLoginEnabled = launchManager.isEnabled
         if !wasEnabled, launchAtLoginEnabled {
             reviewPromptRequester(.launchAtLoginEnabled)
         }
+        // The menu closes the moment the item is clicked, so a login item left
+        // waiting for approval would otherwise show as a check mark that never
+        // appears, with nowhere for the explanation to go.
+        launchAtLoginOutcomePresenter(outcome)
     }
 
     func showAbout(distributionChannel: DistributionChannel) {
