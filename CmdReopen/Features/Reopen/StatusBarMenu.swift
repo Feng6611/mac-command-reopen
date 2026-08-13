@@ -91,16 +91,14 @@ final class StatusBarMenuController {
         // Hidden outright once the user owns Pro — `showsUpgradeEntry` is
         // false for a Pro entitlement, so no purchased user is asked again.
         if presentation.showsUpgradeItem {
+            // No leading icon: AppKit reserves the image column per menu, so one
+            // icon indents every other item, and a menu is otherwise iconless
+            // here. The countdown rides the trailing system badge, which is the
+            // native way to mark the one item carrying news — and, unlike
+            // tinted title text, it keeps inverting correctly on hover.
             items.append(.action(
                 title: AppLanguage.shared.string("Upgrade to Pro…"),
                 badgeText: upgradeBadgeText(),
-                systemImage: "hourglass",
-                imageTint: NSColor(
-                    red: 203 / 255,
-                    green: 48 / 255,
-                    blue: 224 / 255,
-                    alpha: 1
-                ),
                 action: {
                     SettingsOpener.shared.open(
                         initialTab: .about,

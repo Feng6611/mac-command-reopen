@@ -72,7 +72,7 @@ struct SettingsView: View {
             }
         }
         .id(appLanguage.selected)
-        .kikiCardSheet(isPresented: $route.isMacShortcutsPresented) {
+        .sheet(isPresented: $route.isMacShortcutsPresented) {
             MacShortcutsSheet()
         }
 #if APPSTORE

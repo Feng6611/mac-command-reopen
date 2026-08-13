@@ -3,19 +3,8 @@
 //  CmdReopen
 //
 
+import KikiDesign
 import SwiftUI
-
-/// Reports the height the list wants, so the sheet is as tall as what it holds
-/// instead of a number someone guessed. Measured inside the scroll view, where
-/// the content is laid out at its natural height whatever the sheet resolves
-/// to, so the value cannot feed back into the frame that consumes it.
-private struct MacShortcutsContentHeightKey: PreferenceKey {
-    static let defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
-    }
-}
 
 /// The window language macOS already speaks, with the one place this app fills
 /// in marked inside it.
@@ -26,86 +15,72 @@ private struct MacShortcutsContentHeightKey: PreferenceKey {
 /// own that the app occupies one line of a language they already have — which
 /// is also the answer to every "could it also do windows layouts / split view
 /// / custom shortcuts" that will ever arrive.
+///
+/// Presented in the same card the paywall uses — `KikiSheetShell` — so the two
+/// sheets in this app share one size behaviour and one way out. The list is
+/// the shell's scrolling content; the close control is the shell's.
 struct MacShortcutsSheet: View {
-    /// Narrower than the 500pt Settings window it drops out of, so the parent
+    /// Narrower than the 500pt Settings window it sits over, so the parent
     /// still reads as the window this belongs to.
-    private static let width: CGFloat = 440
+    private static let width: CGFloat = 460
 
-    /// Floor and ceiling for the measured content. The ceiling keeps the sheet
-    /// clear of the Settings window's bottom edge — a sheet as tall as its
-    /// parent reads as a second window in the wrong place. Past it the list
-    /// scrolls, which is what the longer locales need.
-    private static let minimumContentHeight: CGFloat = 320
-    private static let maximumContentHeight: CGFloat = 480
+    /// The shell measures the list and clamps it here. The ceiling keeps the
+    /// card clear of the window's edges; past it the list scrolls, which the
+    /// longer locales need.
+    private static let minimumHeight: CGFloat = 360
+    private static let maximumHeight: CGFloat = 560
 
     @ObservedObject private var appLanguage = AppLanguage.shared
-    @State private var contentHeight: CGFloat = MacShortcutsSheet.maximumContentHeight
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
+        KikiSheetShell(
+            width: Self.width,
+            minimumHeight: Self.minimumHeight,
+            idealHeight: Self.maximumHeight,
+            maximumHeight: Self.maximumHeight,
+            showsCloseButton: true,
+            onClose: { dismiss() }
+        ) {
+            VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+                header
 
-            Divider()
+                section(
+                    title: appLanguage.string(localized: "Apps",
+                        comment: "Section of the Mac shortcuts sheet covering app-level shortcuts."),
+                    shortcuts: Self.appShortcuts
+                )
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: DS.Spacing.lg) {
+                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                     section(
-                        title: appLanguage.string(localized: "Apps",
-                            comment: "Section of the Mac shortcuts sheet covering app-level shortcuts."),
-                        shortcuts: Self.appShortcuts
+                        title: appLanguage.string(localized: "Windows",
+                            comment: "Section of the Mac shortcuts sheet covering window-level shortcuts."),
+                        shortcuts: Self.windowShortcuts
                     )
-
-                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        section(
-                            title: appLanguage.string(localized: "Windows",
-                                comment: "Section of the Mac shortcuts sheet covering window-level shortcuts."),
-                            shortcuts: Self.windowShortcuts
-                        )
-                        // Directly under ⌘M, the shortcut it annotates. At the
-                        // bottom of the sheet it would read as this app's
-                        // feature list; here it reads as a footnote to one line
-                        // of the system's own language.
-                        gapNote
-                    }
-
-                    section(
-                        title: appLanguage.string(localized: "Spaces",
-                            comment: "Section of the Mac shortcuts sheet covering Mission Control and Spaces."),
-                        shortcuts: Self.spaceShortcuts
-                    )
+                    // Directly under ⌘M, the shortcut it annotates. At the
+                    // bottom of the sheet it would read as this app's feature
+                    // list; here it reads as a footnote to one line of the
+                    // system's own language.
+                    gapNote
                 }
-                .padding(DS.Spacing.lg)
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.preference(
-                            key: MacShortcutsContentHeightKey.self,
-                            value: proxy.size.height
-                        )
-                    }
+
+                section(
+                    title: appLanguage.string(localized: "Spaces",
+                        comment: "Section of the Mac shortcuts sheet covering Mission Control and Spaces."),
+                    shortcuts: Self.spaceShortcuts
                 )
             }
-            .frame(height: resolvedContentHeight)
-
+            .padding(DS.Spacing.xl)
         }
-        .frame(width: Self.width)
-        .onPreferenceChange(MacShortcutsContentHeightKey.self) { height in
-            guard height > 0 else { return }
-            contentHeight = height
-        }
-    }
-
-    private var resolvedContentHeight: CGFloat {
-        min(max(contentHeight, Self.minimumContentHeight), Self.maximumContentHeight)
     }
 
     private var header: some View {
         Text(appLanguage.string(localized: "Mac window shortcuts",
             comment: "Title of the sheet listing the macOS window shortcuts."))
-            .font(.headline)
+            .font(.title3.weight(.semibold))
+            // Clear of the shell's close button in the top-trailing corner.
+            .padding(.trailing, DS.Spacing.xxl)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, DS.Spacing.xl)
-            .padding(.trailing, 36)
-            .padding(.vertical, DS.Spacing.lg)
     }
 
     private func section(title: String, shortcuts: [MacShortcut]) -> some View {

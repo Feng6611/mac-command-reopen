@@ -2,16 +2,17 @@
 
 ## Unreleased
 
-- General keeps its three switches in one card and moves each explanation
-  under the switch it belongs to. A section footer can only explain the last
-  row of its group, so the Cmd+Tab sentence had been reading as an explanation
-  of Launch at Login. Language leaves the top card — it is set once, and it
-  was standing ahead of the app's own switches — and joins Mac window
-  shortcuts in a closing group of rows that are read rather than operated.
-- The upgrade item in the menu bar carries a plain `hourglass` rather than
-  `hourglass.circle.fill`. A filled circle symbol tinted with a single palette
-  colour renders as a solid disc at menu size: the glyph inside is knocked out,
-  so the icon said nothing and looked like a bullet.
+- General is two cards: one for everything the pane operates — the three
+  switches, Mac window shortcuts and Language — and one for the exclusion list.
+  Every row carries a leading symbol so the labels share a column and read as a
+  list, and the per-row explanations are gone, the way System Settings does not
+  caption its own toggles. The earlier split into a group per topic only added
+  card edges to a pane that was already busy.
+- The menu bar's upgrade item drops its leading icon. AppKit reserves the image
+  column per menu, so one icon indented every other item in an otherwise
+  icon-less menu; the trailing "N days left" badge is the native way to mark
+  the one item carrying news, and unlike tinted title text it keeps inverting
+  on hover.
 - Purchase status is checked when Settings opens, not only at launch and on a
   five-minute activation throttle. The About row states that status, and both
   scheduled checks happen away from it, so a launch check that failed or hung
@@ -25,14 +26,15 @@
   Kiki's default height because the app sized only the AppKit window and left
   the SwiftUI shell — which is what the window actually settles at — on its
   defaults, and passed a width minimum that contradicted the Kit's fixed width.
-  Both sides now come from `DS.Window`: 500 wide, opening at 700 with a 620
+  Both sides now come from `DS.Window`: 500 wide, opening at 620 with a 520
   floor.
 - Reworked the Mac window shortcuts sheet: labels read left with the keys
   against the trailing edge, as in System Settings, instead of a fixed key
   column that left an empty gutter beside the one shortcut whose key moves with
-  the keyboard layout. The sheet takes the height its content needs and stays
-  clear of the window's bottom edge instead of a fixed 460×560 that ran past
-  it, and closes with Done or Esc rather than a close glyph holding focus.
+  the keyboard layout. It is presented on the shared `KikiSheetShell` — the
+  same card the paywall uses — so it takes the height its content needs, stays
+  clear of the window's edges, and closes with the shell's corner control or
+  Esc.
 - Launch at Login now says when macOS is holding the login item for approval,
   and offers to open Login Items. Registration awaiting approval reads as "off"
   through `SMAppService`, so the switch used to slide back in silence — on the
