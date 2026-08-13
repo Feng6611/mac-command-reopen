@@ -9,6 +9,7 @@ import KikiCommerceCore
 @MainActor
 enum SettingsTab: Int, CaseIterable, Hashable {
     case general
+    case multiWindow
     case statistics
     case about
 
@@ -19,6 +20,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     func title(for distributionChannel: DistributionChannel, language: AppLanguage) -> String {
         switch self {
         case .general: language.string("General")
+        case .multiWindow: language.string("Multi-Window")
         case .statistics: language.string("Stats")
         case .about: language.string("About")
         }
@@ -27,6 +29,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     func icon(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: "gearshape"
+        case .multiWindow: "macwindow.on.rectangle"
         case .statistics: "chart.bar.xaxis"
         case .about: "info.circle"
         }
@@ -65,6 +68,8 @@ struct SettingsView: View {
             switch tab {
             case .general:
                 SettingsTabContent()
+            case .multiWindow:
+                MultiWindowRestoreSettingsView()
             case .statistics:
                 ReopenStatsView()
             case .about:
@@ -72,8 +77,17 @@ struct SettingsView: View {
             }
         }
         .id(appLanguage.selected)
-        .kikiCardSheet(isPresented: $route.isMacShortcutsPresented) {
-            MacShortcutsSheet()
+        .sheet(isPresented: $route.isMacShortcutsPresented) {
+            KikiSheetShell(
+                width: 440,
+                minimumHeight: 320,
+                idealHeight: 480,
+                maximumHeight: 540,
+                showsCloseButton: true,
+                onClose: { route.isMacShortcutsPresented = false }
+            ) {
+                MacShortcutsSheet()
+            }
         }
 #if APPSTORE
         .sheet(isPresented: $route.isPaywallSheetPresented) {

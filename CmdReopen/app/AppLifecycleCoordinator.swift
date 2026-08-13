@@ -55,6 +55,11 @@ final class AppLifecycleCoordinator {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
+#if DEBUG
+        if runAppleEventWindowRestoreProbeIfRequested() {
+            return
+        }
+#endif
         statusBarController.install(
             activationMonitor: .shared,
             accessController: accessController
@@ -104,6 +109,24 @@ final class AppLifecycleCoordinator {
     }
 
 #if DEBUG
+    private func runAppleEventWindowRestoreProbeIfRequested() -> Bool {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let flagIndex = arguments.firstIndex(of: "--probe-apple-event-window-restore"),
+              arguments.indices.contains(flagIndex + 1) else {
+            return false
+        }
+
+        let bundleIdentifier = arguments[flagIndex + 1]
+        let result = AppleEventWindowRestorer(isEnabled: { $0 == bundleIdentifier }).restoreMinimizedWindows(
+            bundleIdentifier: bundleIdentifier
+        )
+        print("APPLE_EVENT_WINDOW_RESTORE_PROBE bundle=\(bundleIdentifier) result=\(String(describing: result))")
+        DispatchQueue.main.async {
+            NSApp.terminate(nil)
+        }
+        return true
+    }
+
     private var shouldAutoShowSettingsForDebugLaunch: Bool {
         let environment = ProcessInfo.processInfo.environment
         return environment["OS_ACTIVITY_DT_MODE"] == "1" || environment["OS_ACTIVITY_DT_MODE"] == "YES"

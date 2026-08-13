@@ -118,6 +118,7 @@ final class ActivationMonitor: ObservableObject {
     private let reopenStatsStore: ReopenStatsStore
     private let accessController: FeatureAvailabilityProviding
     private let windowInfoProvider: WindowInfoListing
+    private let appleEventWindowRestorer: AppleEventWindowRestoring
     private var activationObserver: NSObjectProtocol?
     private var foregroundWindowTimer: Timer?
     private var latestForegroundApplication: NSRunningApplication?
@@ -135,7 +136,8 @@ final class ActivationMonitor: ObservableObject {
          defaults: UserDefaults = .standard,
          reopenStatsStore: ReopenStatsStore? = nil,
          accessController: FeatureAvailabilityProviding? = nil,
-         windowInfoProvider: WindowInfoListing = CoreGraphicsWindowInfoProvider()) {
+         windowInfoProvider: WindowInfoListing = CoreGraphicsWindowInfoProvider(),
+         appleEventWindowRestorer: AppleEventWindowRestoring = AppleEventWindowRestorer()) {
         AppDefaults.migrateLegacyKeys(in: defaults)
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
@@ -143,6 +145,7 @@ final class ActivationMonitor: ObservableObject {
         self.reopenStatsStore = reopenStatsStore ?? .shared
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
+        self.appleEventWindowRestorer = appleEventWindowRestorer
         let storedValue = defaults[AppDefaults.featureEnabled]
         let storedAutomaticSwitcherReordering = defaults[AppDefaults.automaticSwitcherReordering]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
@@ -604,6 +607,27 @@ final class ActivationMonitor: ObservableObject {
         }
         lastReopenDates[bundleID] = now
 
+        let automationResult = appleEventWindowRestorer.restoreMinimizedWindows(
+            bundleIdentifier: bundleID
+        )
+        switch WindowRestoreRouting.action(for: automationResult) {
+        case .recordAutomationSuccess(let windowCount):
+            let runningApplication = workspace.runningApplications.first {
+                $0.bundleIdentifier == bundleID
+            }
+            _ = reopenStatsStore.recordSuccessfulReopen(
+                bundleID: bundleID,
+                localizedName: runningApplication?.localizedName,
+                bundleURL: runningApplication?.bundleURL
+            )
+            AppLogger.activation.notice(
+                "Restored \(windowCount) minimized window(s) for \(bundleID) through Apple Events."
+            )
+            return
+        case .useNativeReopen:
+            logAutomationFallback(result: automationResult, bundleIdentifier: bundleID)
+        }
+
         // Ignore one immediate echo activation caused by our own reopen request.
         selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
 
@@ -620,6 +644,34 @@ final class ActivationMonitor: ObservableObject {
                 openedProcessIdentifier: openedApp?.processIdentifier,
                 error: error,
                 openedBundleURL: openedApp?.bundleURL
+            )
+        }
+    }
+
+    private func logAutomationFallback(
+        result: AppleEventWindowRestoreResult,
+        bundleIdentifier: String
+    ) {
+        switch result {
+        case .restored:
+            break
+        case .disabled:
+            break
+        case .noMinimizedWindows:
+            AppLogger.activation.debug(
+                "Apple Events found no minimized windows for \(bundleIdentifier); using native reopen."
+            )
+        case .unsupported(let capability):
+            AppLogger.activation.debug(
+                "Apple Events capability \(String(describing: capability)) for \(bundleIdentifier); using native reopen."
+            )
+        case .permissionDenied(let errorNumber):
+            AppLogger.activation.info(
+                "Apple Events denied for \(bundleIdentifier) (\(errorNumber)); using native reopen."
+            )
+        case .failed(let errorNumber, let message):
+            AppLogger.activation.error(
+                "Apple Events failed for \(bundleIdentifier) (\(errorNumber)): \(message, privacy: .public). Using native reopen."
             )
         }
     }

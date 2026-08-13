@@ -89,3 +89,32 @@ failure looked identical.
 With Command Reopen switched off in System Settings › Login Items, turn the
 Settings toggle on and confirm the alert appears and lands on the Login Items
 pane; confirm the same from the menu bar item with no window open.
+
+## I-003 — Apple Event success does not imply arbitrary MAS automation
+
+- Date: 2026-08-13
+- Status: Open release boundary
+
+### Symptom
+
+Safari, Chrome, or Terminal can restore windows in a non-sandboxed test, which
+can look like proof that the same implementation is ready for the Mac App
+Store. This branch subsequently proved a named-target MAS Sandbox build too,
+but that still does not prove App Review acceptance.
+
+### Cause
+
+Automation/TCC consent and App Sandbox authorization are independent. The MAS
+target is sandboxed, and target apps do not generally publish the fine-grained
+scripting access groups needed by `com.apple.security.scripting-targets`.
+Named `com.apple.security.temporary-exception.apple-events` entries can make a
+local allowlist experiment possible, but they are not arbitrary-app access and
+remain subject to App Review justification.
+
+### Resolution boundary
+
+Validate Direct and MAS artifacts separately. For MAS, inspect the final
+signature, probe every named target, file a Feedback Assistant issue, and add
+App Store Connect usage information before considering submission. If that
+release path is rejected or unjustifiable, retain the adapters as a Direct-only
+enhancement and compile the MAS target onto the existing native fallback.
