@@ -52,6 +52,7 @@ struct ReopenStatsView: View {
     /// so their copy has to be resolved here rather than by `Text`'s
     /// environment locale.
     @ObservedObject private var appLanguage = AppLanguage.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var timeRange: StatTimeRange = .day
     @State private var heroTarget: Double = 0
@@ -86,8 +87,13 @@ struct ReopenStatsView: View {
             guard !appeared else { return }
             appeared = true
             _ = reopenStatsStore.requestReviewIfEligible(for: .statsOpened)
-            withAnimation(.easeOut(duration: 0.8).delay(0.15)) {
-                heroTarget = Double(reopenStatsStore.totalSuccessfulReopens)
+            let total = Double(reopenStatsStore.totalSuccessfulReopens)
+            if reduceMotion {
+                heroTarget = total
+            } else {
+                withAnimation(.easeOut(duration: 0.8).delay(0.15)) {
+                    heroTarget = total
+                }
             }
         }
     }
@@ -130,7 +136,7 @@ struct ReopenStatsView: View {
                 }
                 .opacity(appeared ? 1 : 0)
                 .offset(x: appeared ? 0 : 12)
-                .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.5).delay(0.3), value: appeared)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -176,7 +182,7 @@ struct ReopenStatsView: View {
         .groupBoxStyle(.dsStats)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
-        .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.5).delay(0.2), value: appeared)
     }
 
     // MARK: - Top Apps
@@ -233,7 +239,7 @@ struct ReopenStatsView: View {
         .groupBoxStyle(.dsStats)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
-        .animation(.easeOut(duration: 0.5).delay(0.35), value: appeared)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.5).delay(0.35), value: appeared)
     }
 
     private var timeRangeSubtitle: String {
@@ -260,7 +266,7 @@ private struct ChartsTrendView: View {
                     x: .value(appLanguage.string("Date"), item.date, unit: calendarUnit),
                     y: .value(appLanguage.string("Count"), item.count)
                 )
-                .foregroundStyle(item.count > 0 ? Color.accentColor : Color.secondary.opacity(0.18))
+                .foregroundStyle(item.count > 0 ? DS.Colors.brandPrimary : Color.secondary.opacity(0.18))
                 .cornerRadius(3)
             }
         }
@@ -329,7 +335,9 @@ private struct ChartsTopAppsView: View {
         .chartXAxis(.hidden)
     }
 
-    private static let barColors: [Color] = [.purple, .blue, .teal, .orange, .pink, .indigo]
+    // The most-restored app leads in the brand colour; the rest stay multi-hue
+    // so the bars remain tellable apart. Shared with the fallback view below.
+    private static let barColors: [Color] = [DS.Colors.brandPrimary, .blue, .teal, .orange, .pink, .indigo]
 
     private func topAppColor(at index: Int) -> Color {
         Self.barColors[index % Self.barColors.count]
@@ -351,7 +359,7 @@ private struct FallbackTrendView: View {
                 VStack(spacing: 4) {
                     Spacer(minLength: 0)
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
-                        .fill(Color.accentColor.opacity(item.count > 0 ? 1 : 0.15))
+                        .fill(DS.Colors.brandPrimary.opacity(item.count > 0 ? 1 : 0.15))
                         .frame(height: barHeight(for: item.count))
                 }
             }
@@ -440,7 +448,7 @@ private struct FallbackTopAppsView: View {
         return max(4, CGFloat(count) / CGFloat(maxCount) * totalWidth)
     }
 
-    private static let barColors: [Color] = [.purple, .blue, .teal, .orange, .pink, .indigo]
+    private static let barColors: [Color] = [DS.Colors.brandPrimary, .blue, .teal, .orange, .pink, .indigo]
 
     private func fallbackTopAppColor(at index: Int) -> Color {
         Self.barColors[index % Self.barColors.count]
