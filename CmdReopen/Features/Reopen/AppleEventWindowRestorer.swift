@@ -104,23 +104,33 @@ protocol AppleEventAutomationAuthorizing: AnyObject {
 }
 
 final class SystemAppleEventAutomationAuthorizer: AppleEventAutomationAuthorizing {
+    typealias ProcessIdentifierProvider = (String) async -> pid_t?
+    typealias PermissionChecker = (pid_t) async -> OSStatus
+
+    private let processIdentifierProvider: ProcessIdentifierProvider
+    private let permissionChecker: PermissionChecker
+
+    convenience init() {
+        self.init(
+            processIdentifierProvider: Self.resolveProcessIdentifier,
+            permissionChecker: Self.determinePermission
+        )
+    }
+
+    init(
+        processIdentifierProvider: @escaping ProcessIdentifierProvider,
+        permissionChecker: @escaping PermissionChecker
+    ) {
+        self.processIdentifierProvider = processIdentifierProvider
+        self.permissionChecker = permissionChecker
+    }
+
     func requestAuthorization(bundleIdentifier: String) async -> AppleEventAutomationAuthorizationResult {
-        guard let processIdentifier = NSRunningApplication.runningApplications(
-            withBundleIdentifier: bundleIdentifier
-        ).first?.processIdentifier else {
+        guard let processIdentifier = await processIdentifierProvider(bundleIdentifier) else {
             return .targetNotRunning
         }
 
-        let status: OSStatus = await Task.detached(priority: .userInitiated) {
-            let descriptor = NSAppleEventDescriptor(processIdentifier: processIdentifier)
-            guard let address = descriptor.aeDesc else { return OSStatus(paramErr) }
-            return AEDeterminePermissionToAutomateTarget(
-                address,
-                AEEventClass(typeWildCard),
-                AEEventID(typeWildCard),
-                true
-            )
-        }.value
+        let status = await permissionChecker(processIdentifier)
 
         switch status {
         case noErr:
@@ -132,6 +142,49 @@ final class SystemAppleEventAutomationAuthorizer: AppleEventAutomationAuthorizin
         default:
             return .failed(errorNumber: Int(status))
         }
+    }
+
+    /// Automation permission is addressed to a live process. If the app is not
+    /// running yet, launch it without activation so enabling the toggle does not
+    /// make the user leave Settings and open the target by hand.
+    private static func resolveProcessIdentifier(bundleIdentifier: String) async -> pid_t? {
+        if let runningApplication = NSRunningApplication.runningApplications(
+            withBundleIdentifier: bundleIdentifier
+        ).first {
+            return runningApplication.processIdentifier
+        }
+
+        guard let applicationURL = NSWorkspace.shared.urlForApplication(
+            withBundleIdentifier: bundleIdentifier
+        ) else {
+            return nil
+        }
+
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = false
+        configuration.addsToRecentItems = false
+
+        return await withCheckedContinuation { continuation in
+            NSWorkspace.shared.openApplication(
+                at: applicationURL,
+                configuration: configuration
+            ) { application, _ in
+                continuation.resume(returning: application?.processIdentifier)
+            }
+        }
+    }
+
+    private static func determinePermission(processIdentifier: pid_t) async -> OSStatus {
+        await Task.detached(priority: .userInitiated) {
+            let descriptor = NSAppleEventDescriptor(processIdentifier: processIdentifier)
+            guard let address = descriptor.aeDesc else { return OSStatus(paramErr) }
+            return AEDeterminePermissionToAutomateTarget(
+                address,
+                AEEventClass(typeWildCard),
+                AEEventID(typeWildCard),
+                true
+            )
+        }.value
     }
 }
 

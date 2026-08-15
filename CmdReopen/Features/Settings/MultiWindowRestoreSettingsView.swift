@@ -107,7 +107,7 @@ struct MultiWindowRestoreSettingsView: View {
         case .authorizationDenied:
             return appLanguage.string("Access was denied. Allow Command Reopen in Automation settings, then try again.")
         case .targetNotRunning:
-            return appLanguage.string("Open this app first, then enable it again.")
+            return appLanguage.string("Could not open this app to request Automation access.")
         case .failed(let errorNumber):
             return appLanguage.string("Authorization failed (error \(errorNumber)).")
         case .enabled:
