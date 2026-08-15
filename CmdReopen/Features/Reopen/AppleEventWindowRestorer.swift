@@ -104,33 +104,14 @@ protocol AppleEventAutomationAuthorizing: AnyObject {
 }
 
 final class SystemAppleEventAutomationAuthorizer: AppleEventAutomationAuthorizing {
-    typealias ProcessIdentifierProvider = (String) async -> pid_t?
-    typealias PermissionChecker = (pid_t) async -> OSStatus
-
-    private let processIdentifierProvider: ProcessIdentifierProvider
-    private let permissionChecker: PermissionChecker
-
-    convenience init() {
-        self.init(
-            processIdentifierProvider: Self.resolveProcessIdentifier,
-            permissionChecker: Self.determinePermission
-        )
-    }
-
-    init(
-        processIdentifierProvider: @escaping ProcessIdentifierProvider,
-        permissionChecker: @escaping PermissionChecker
-    ) {
-        self.processIdentifierProvider = processIdentifierProvider
-        self.permissionChecker = permissionChecker
-    }
-
     func requestAuthorization(bundleIdentifier: String) async -> AppleEventAutomationAuthorizationResult {
-        guard let processIdentifier = await processIdentifierProvider(bundleIdentifier) else {
+        guard let processIdentifier = await Self.resolveProcessIdentifier(
+            bundleIdentifier: bundleIdentifier
+        ) else {
             return .targetNotRunning
         }
 
-        let status = await permissionChecker(processIdentifier)
+        let status = await Self.determinePermission(processIdentifier: processIdentifier)
 
         switch status {
         case noErr:
