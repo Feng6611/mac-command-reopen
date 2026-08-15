@@ -15,6 +15,7 @@ struct CmdReopenApp: App {
     @StateObject private var accessController = AppAccessController.shared
     @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
     @StateObject private var appLanguage = AppLanguage.shared
+    @StateObject private var multiWindowRestoreSettings = AppleEventWindowRestoreSettings.shared
 
     var body: some Scene {
         Settings {
@@ -24,6 +25,7 @@ struct CmdReopenApp: App {
                 .environmentObject(accessController)
                 .environmentObject(settingsNavigationModel)
                 .environmentObject(appLanguage)
+                .environmentObject(multiWindowRestoreSettings)
                 .environment(\.locale, appLanguage.locale)
         }
     }

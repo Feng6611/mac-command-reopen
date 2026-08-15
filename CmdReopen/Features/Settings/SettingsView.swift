@@ -42,6 +42,17 @@ struct SettingsTabContent: View {
             // column and read as a list rather than a stack of loose controls;
             // the switches carry no per-row prose, the way System Settings
             // doesn't caption its own toggles.
+
+            // A disabled toggle with no reason is a dead end: when the trial
+            // has ended the controls below dim, so this row is the one place
+            // that names why and offers the way out. Absent in the free build,
+            // where the feature never locks.
+            if isFeatureLocked {
+                Section {
+                    lockedBanner
+                }
+            }
+
             Section {
                 KikiSettingsToggleRow(
                     appLanguage.string("Enable Command Reopen"),
@@ -128,6 +139,41 @@ struct SettingsTabContent: View {
         .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in
             refreshApplicationCatalog()
         }
+    }
+
+    /// Reuses the About pane's expired-state wording so the two surfaces name
+    /// the same thing the same way. The whole row is the upgrade affordance —
+    /// the paywall sheet lives on the App Store build, the only build that can
+    /// reach a locked state.
+    private var lockedBanner: some View {
+        Button {
+            route.presentPaywall()
+        } label: {
+            HStack(spacing: DS.Spacing.sm) {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .foregroundStyle(DS.Colors.brandPrimary)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(appLanguage.string("Trial ended"))
+                        .font(.callout.weight(.medium))
+                    Text(appLanguage.string("Upgrade to continue automatic window reopening."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: DS.Spacing.sm)
+
+                Text(appLanguage.string("Upgrade"))
+                    .font(.callout.weight(.medium))
+                    .foregroundStyle(DS.Colors.brandPrimary)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func addLookupResult(_ result: ExcludedApplicationInfo) {

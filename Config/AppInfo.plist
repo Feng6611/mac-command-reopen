@@ -34,5 +34,7 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Command Reopen uses automation to restore minimized windows in compatible apps when you switch back to them.</string>
 </dict>
 </plist>

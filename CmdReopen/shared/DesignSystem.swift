@@ -145,7 +145,9 @@ struct MetricTile: View {
     let title: String
     let value: String
     let systemImage: String
-    var tint: Color = .accentColor
+    // Brand tint by default so an un-tinted tile joins the app's accent rather
+    // than the system's. Call sites that want a per-metric hue still pass one.
+    var tint: Color = DS.Colors.brandPrimary
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.xs) {

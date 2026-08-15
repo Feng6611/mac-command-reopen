@@ -186,6 +186,7 @@ private struct TryMinimizeStepView: View {
 
 private struct SuccessStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let navigation: KikiOnboardingNavigation
 
     @State private var showsWedge = false
@@ -253,6 +254,13 @@ private struct SuccessStepView: View {
         }
         .onAppear {
             NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+            // Reduce Motion turns the celebration off, not the payoff: the
+            // wedge appears at once with no spring, and the confetti — pure
+            // decoration — is skipped entirely.
+            guard !reduceMotion else {
+                showsWedge = true
+                return
+            }
             withAnimation(.spring(response: 0.45, dampingFraction: 0.8).delay(0.15)) {
                 showsWedge = true
             }

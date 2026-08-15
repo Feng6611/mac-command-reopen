@@ -182,3 +182,76 @@ card permanently.
 Neither card is extracted into Kiki yet. The two are close in shape but not
 identical, and the workspace rule is to prove a component in two real apps
 before lifting it.
+
+## D-006 — Probe app-owned Apple Event adapters without replacing native reopen
+
+- Date: 2026-08-13
+- Status: Experimental
+
+### Context
+
+The existing `NSWorkspace.openApplication` route can restore one minimized
+window or create a closed window, but it cannot ask every compatible app to
+deminiaturize all of its windows. Safari, Chrome, Terminal, Preview, and iTerm2
+expose minimized-window properties in their AppleScript dictionaries.
+Runtime MAS tests proved Safari, Chrome, Terminal, Preview, iTerm2, and Ghostty.
+Arc declares a writable property but its handler fails; Xcode 26.3 declares a
+writable property but times out even while enumerating windows; Finder and VS
+Code do not expose the required primitive; and the installed Dia version cannot
+validate Dia's newer focus-only scripting API.
+
+App Sandbox is a separate boundary. Automation consent does not grant a
+sandboxed app permission to send arbitrary Apple Events. The MAS experiment
+therefore names only known bundle IDs with a temporary Apple Events exception;
+Direct uses the ordinary Hardened Runtime Automation entitlement.
+
+### Decision
+
+Keep the adapter registry, per-app preference and authorization state,
+permission-denial cache, and native fallback inside Command Reopen's reopen
+feature. This is direct product behavior and recovery policy, not a repeated
+Kiki app-shell mechanism.
+
+Standard reopen remains enabled by default. The enhanced multi-window route is
+off by default and appears in its own Settings tab. Enabling one app first asks
+macOS for Automation consent for that running target; only an approved target
+is persisted. A denied, failed, or not-running target stays disabled.
+
+Attempt an adapter only after CoreGraphics reports no visible window. Count a
+positive restore as the successful reopen. For no minimized windows,
+unsupported/focus-only dictionaries, permission denial, or script failure,
+preserve the existing native reopen path. Cache a permission denial for the
+process lifetime so later activations do not aggressively retry it.
+
+Do not describe the MAS route as universal: a local signed build can prove a
+listed target works, while App Review acceptance of temporary exceptions
+remains a separate release decision.
+
+### Verification
+
+Unit tests cover the allowlist, property-name adapters, fallback routing, and
+denial cache. The MAS artifact must build with App Sandbox, have its final
+entitlements inspected, and be probed independently from Direct.
+
+The Apple Development-signed MAS Debug artifact was inspected with `codesign`
+and contained App Sandbox, Automation, and named temporary exceptions for only
+the proven adapters. Its runtime matrix is:
+
+| App | MAS Sandbox result |
+| --- | --- |
+| Safari | Restored one minimized window (`miniaturized`) |
+| Chrome | Restored one window; a second run restored two and returned `windowCount: 2` |
+| Terminal | Restored one minimized window; two-window fixture creation was unreliable |
+| Preview | Restored one minimized document window |
+| Arc | Declares `minimized`, but the handler returned AppleScript `-10000`; focus/native fallback |
+| iTerm2 3.6.6 | Restored one minimized window (`miniaturized`) |
+| Ghostty 1.3.1 | Restored the minimized test window through `activate window`; Ghostty exposes no minimized property |
+| Xcode 26.3 | Declares writable `miniaturized`, but host and MAS probes timed out (`-1712`); excluded from Settings and the MAS exception list |
+| Finder | Exposes `collapsed`, not a Dock-minimized primitive; native fallback |
+| VS Code | No scripting dictionary; native fallback |
+| Dia 1.0.2 | No scripting dictionary in the installed version; focus/native fallback marker |
+
+Each adapter event has a three-second timeout. Permission denial is cached by
+bundle ID for the process lifetime. A Debug-only
+`--probe-apple-event-window-restore <bundle-id>` launch argument prints the
+result from the signed artifact and exits.
