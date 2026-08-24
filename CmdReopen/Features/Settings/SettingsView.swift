@@ -37,12 +37,6 @@ struct SettingsTabContent: View {
 
     var body: some View {
         KikiSettingsPane {
-            // One card for everything the pane operates, one for the exclusion
-            // list. Every row carries a leading symbol so the labels share a
-            // column and read as a list rather than a stack of loose controls;
-            // the switches carry no per-row prose, the way System Settings
-            // doesn't caption its own toggles.
-
             // A disabled toggle with no reason is a dead end: when the trial
             // has ended the controls below dim, so this row is the one place
             // that names why and offers the way out. Absent in the free build,
@@ -54,19 +48,15 @@ struct SettingsTabContent: View {
             }
 
             Section {
-                KikiSettingsToggleRow(
-                    appLanguage.string("Enable Command Reopen"),
-                    isOn: activationMonitor.featureToggleBinding,
-                    systemImage: "macwindow.on.rectangle"
+                KikiSettingsMenuPickerRow(
+                    appLanguage.string("Language"),
+                    selection: $appLanguage.selected,
+                    options: SupportedLanguage.allCases,
+                    systemImage: "globe",
+                    // Native-language labels so users can always find their own
+                    // language regardless of the current UI language.
+                    optionTitle: { $0.displayName }
                 )
-                .disabled(isFeatureLocked)
-
-                KikiSettingsToggleRow(
-                    appLanguage.string("Keep app next in Cmd+Tab"),
-                    isOn: activationMonitor.automaticSwitcherReorderingBinding,
-                    systemImage: "command"
-                )
-                .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
 
                 // The binding reports a registration that macOS is holding for
                 // approval; without it the switch slides back on its own.
@@ -79,11 +69,20 @@ struct SettingsTabContent: View {
                     guard isEnabled else { return }
                     _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
                 }
+            }
 
-                // Not called Help or Tutorial: both words say "you don't know
-                // how to use this", and the sheet's argument is the opposite —
-                // the user already has the language and this app fills one line
-                // of it. It is also where every "could it also…" is answered.
+            ExcludedAppsSection(
+                bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
+                isDisabled: isFeatureLocked,
+                removeAction: removeExcludedBundleID,
+                query: $appLookupQuery,
+                searchResults: appLookupResults,
+                excludedBundleIDs: activationMonitor.userExcludedBundleIDs,
+                addApplicationAction: addLookupResult
+            )
+            .opacity(isFeatureLocked ? 0.5 : 1)
+
+            Section {
                 Button {
                     route.presentMacShortcuts()
                 } label: {
@@ -102,28 +101,7 @@ struct SettingsTabContent: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-
-                KikiSettingsMenuPickerRow(
-                    appLanguage.string("Language"),
-                    selection: $appLanguage.selected,
-                    options: SupportedLanguage.allCases,
-                    systemImage: "globe",
-                    // Native-language labels so users can always find their own
-                    // language regardless of the current UI language.
-                    optionTitle: { $0.displayName }
-                )
             }
-
-            ExcludedAppsSection(
-                bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
-                isDisabled: isFeatureLocked,
-                removeAction: removeExcludedBundleID,
-                query: $appLookupQuery,
-                searchResults: appLookupResults,
-                excludedBundleIDs: activationMonitor.userExcludedBundleIDs,
-                addApplicationAction: addLookupResult
-            )
-            .opacity(isFeatureLocked ? 0.5 : 1)
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()

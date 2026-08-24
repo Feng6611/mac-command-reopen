@@ -255,3 +255,41 @@ Each adapter event has a three-second timeout. Permission denial is cached by
 bundle ID for the process lifetime. A Debug-only
 `--probe-apple-event-window-restore <bundle-id>` launch argument prints the
 result from the signed artifact and exits.
+
+## D-007 — One custom review introduction, then StoreKit owns later displays
+
+- Date: 2026-08-15
+- Status: Accepted with App Review risk
+
+### Context
+
+Command Reopen already chooses intentional review moments from successful
+product use, but StoreKit may suppress every request and exposes no completion
+result. The product wants one branded introduction before later eligible
+requests return to the system prompt.
+
+Apple's App Review Guideline 5.6.1 says custom review prompts may be rejected.
+This is therefore a deliberate submission risk, not a new Kiki default.
+
+### Decision
+
+- Keep the existing MAS-only eligibility, one-request-per-launch behavior,
+  successful-reopen threshold, and rolling annual cap.
+- On the first eligible request, persist only that the custom prompt was shown.
+  Never record or infer that the user submitted a review.
+- The custom prompt offers `Review on App Store` and `Not Now`. It does not ask
+  for a star rating, filter users by sentiment, reward a review, or change
+  access. The primary action opens the App Store's `action=write-review` URL.
+- Later eligible requests call StoreKit directly; Apple decides whether to
+  display its system prompt.
+- Put the product-neutral window, layout, and visible action reporting in
+  `KikiReview`. Keep timing, copy, storage keys, distribution policy, StoreKit,
+  and the App Store URL in Command Reopen.
+
+### Verification
+
+Kiki package tests cover configuration and construction. Command Reopen tests
+cover first-custom/later-system routing, persistence, product thresholds, the
+per-launch guard, and the rolling annual cap. Release review notes must call
+out the one-time custom prompt, and the team must be ready to remove it if App
+Review rejects the flow.

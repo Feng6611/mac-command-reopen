@@ -290,7 +290,8 @@ final class ActivationMonitor: ObservableObject {
         if HelperProcessFilter.isHelperLike(
             bundleID: bundleID,
             bundleURL: app.bundleURL,
-            localizedName: app.localizedName
+            localizedName: app.localizedName,
+            activationPolicy: app.activationPolicy
         ) {
             AppLogger.activation.debug("Ignoring activation for helper-like process \(bundleID).")
             return
@@ -469,7 +470,8 @@ final class ActivationMonitor: ObservableObject {
         return !HelperProcessFilter.isHelperLike(
             bundleID: bundleID,
             bundleURL: app.bundleURL,
-            localizedName: app.localizedName
+            localizedName: app.localizedName,
+            activationPolicy: app.activationPolicy
         )
     }
 
@@ -618,7 +620,8 @@ final class ActivationMonitor: ObservableObject {
             _ = reopenStatsStore.recordSuccessfulReopen(
                 bundleID: bundleID,
                 localizedName: runningApplication?.localizedName,
-                bundleURL: runningApplication?.bundleURL
+                bundleURL: runningApplication?.bundleURL,
+                activationPolicy: runningApplication?.activationPolicy
             )
             AppLogger.activation.notice(
                 "Restored \(windowCount) minimized window(s) for \(bundleID) through Apple Events."
@@ -643,7 +646,8 @@ final class ActivationMonitor: ObservableObject {
                 localizedName: openedApp?.localizedName,
                 openedProcessIdentifier: openedApp?.processIdentifier,
                 error: error,
-                openedBundleURL: openedApp?.bundleURL
+                openedBundleURL: openedApp?.bundleURL,
+                openedActivationPolicy: openedApp?.activationPolicy
             )
         }
     }
@@ -682,7 +686,8 @@ final class ActivationMonitor: ObservableObject {
         localizedName: String?,
         openedProcessIdentifier: pid_t?,
         error: Error?,
-        openedBundleURL: URL? = nil
+        openedBundleURL: URL? = nil,
+        openedActivationPolicy: NSApplication.ActivationPolicy? = nil
     ) {
         if let error {
             AppLogger.activation.error("Failed to re-open \(requestedBundleID): \(error.localizedDescription)")
@@ -693,7 +698,8 @@ final class ActivationMonitor: ObservableObject {
         _ = reopenStatsStore.recordSuccessfulReopen(
             bundleID: recordedBundleID,
             localizedName: localizedName,
-            bundleURL: openedBundleURL
+            bundleURL: openedBundleURL,
+            activationPolicy: openedActivationPolicy
         )
 
         if let openedProcessIdentifier {

@@ -9,7 +9,7 @@ import KikiCommerceCore
 @MainActor
 enum SettingsTab: Int, CaseIterable, Hashable {
     case general
-    case multiWindow
+    case advanced
     case statistics
     case about
 
@@ -20,7 +20,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     func title(for distributionChannel: DistributionChannel, language: AppLanguage) -> String {
         switch self {
         case .general: language.string("General")
-        case .multiWindow: language.string("Multi-Window")
+        case .advanced: language.string("Advanced")
         case .statistics: language.string("Stats")
         case .about: language.string("About")
         }
@@ -29,7 +29,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     func icon(for distributionChannel: DistributionChannel) -> String {
         switch self {
         case .general: "gearshape"
-        case .multiWindow: "macwindow.on.rectangle"
+        case .advanced: "slider.horizontal.3"
         case .statistics: "chart.bar.xaxis"
         case .about: "info.circle"
         }
@@ -68,8 +68,8 @@ struct SettingsView: View {
             switch tab {
             case .general:
                 SettingsTabContent()
-            case .multiWindow:
-                MultiWindowRestoreSettingsView()
+            case .advanced:
+                AdvancedSettingsView()
             case .statistics:
                 ReopenStatsView()
             case .about:
@@ -207,6 +207,9 @@ struct SettingsView: View {
                     },
                     onPresentTrialExitOffer: {
                         route.presentTrialExitOfferDebugPreview()
+                    },
+                    onPresentReviewPrompt: {
+                        ReopenStatsStore.shared.presentCustomReviewPromptPreview()
                     }
                 )
             } header: {

@@ -1321,6 +1321,35 @@
         }
       }
     },
+    "Enjoying Command Reopen?" : {
+      "comment" : "Headline for Command Reopen's one-time custom review prompt.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gefällt dir Command Reopen?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous appréciez Command Reopen ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen を気に入っていただけましたか？"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "喜欢 Command Reopen 吗？"
+          }
+        }
+      }
+    },
     "Exclude apps you don’t want restored" : {
       "localizations" : {
         "de" : {
@@ -1660,6 +1689,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隐藏 App"
+          }
+        }
+      }
+    },
+    "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it." : {
+      "comment" : "Body copy for Command Reopen's one-time custom review prompt.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Command Reopen Cmd+Tab für dich verbessert hat, hilft eine kurze App-Store-Bewertung mehr Menschen, die App zu entdecken."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si Command Reopen a amélioré votre utilisation de Cmd+Tab, un avis rapide sur l’App Store aidera davantage de personnes à le découvrir."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen で Cmd+Tab が使いやすくなったなら、App Store での短いレビューが、より多くの人に見つけてもらう助けになります。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果 Command Reopen 让 Cmd+Tab 更好用了，花一点时间在 App Store 留下评价，可以帮助更多人发现它。"
           }
         }
       }
@@ -2981,6 +3039,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除 %@"
+          }
+        }
+      }
+    },
+    "Review Command Reopen" : {
+      "comment" : "Window title for Command Reopen's one-time custom review prompt.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen bewerten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter Command Reopen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen を評価"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "评价 Command Reopen"
           }
         }
       }

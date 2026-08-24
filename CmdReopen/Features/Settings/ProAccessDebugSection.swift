@@ -14,6 +14,7 @@ struct ProAccessDebugRows: View {
     let onPresentOnboarding: () -> Void
     let onPresentPaywall: () -> Void
     let onPresentTrialExitOffer: () -> Void
+    let onPresentReviewPrompt: () -> Void
 
     var body: some View {
         KikiSettingsDebugPreviewRow(
@@ -28,6 +29,7 @@ struct ProAccessDebugRows: View {
             Button("Onboarding", action: onPresentOnboarding)
             Button("Paywall", action: onPresentPaywall)
             Button("Retention offer", action: onPresentTrialExitOffer)
+            Button("Review prompt", action: onPresentReviewPrompt)
         }
 
         // Presenting the retention card from "Test flows" deliberately does

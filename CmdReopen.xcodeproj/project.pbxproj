@@ -27,6 +27,8 @@
 		8D30001A2F4400010099C190 /* KikiPaywall in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000B2F4400010099C190 /* KikiPaywall */; };
 		8D30001B2F4400010099C190 /* KikiWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000C2F4400010099C190 /* KikiWindow */; };
 		8D30001C2F4400010099C190 /* KikiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000D2F4400010099C190 /* KikiDesign */; };
+		8D30001D2F4400010099C190 /* KikiReview in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000F2F4400010099C190 /* KikiReview */; };
+		8D30001E2F4400010099C190 /* KikiReview in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000F2F4400010099C190 /* KikiReview */; };
 		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
@@ -92,6 +94,7 @@
 				8D3000152F4400010099C190 /* KikiPaywall in Frameworks */,
 				8D3000162F4400010099C190 /* KikiWindow in Frameworks */,
 				8D3000172F4400010099C190 /* KikiDesign in Frameworks */,
+				8D30001D2F4400010099C190 /* KikiReview in Frameworks */,
 				9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010062F3401010099C190 /* Defaults in Frameworks */,
 			);
@@ -122,6 +125,7 @@
 				8D3000192F4400010099C190 /* KikiOnboarding in Frameworks */,
 				8D30001B2F4400010099C190 /* KikiWindow in Frameworks */,
 				8D30001C2F4400010099C190 /* KikiDesign in Frameworks */,
+				8D30001E2F4400010099C190 /* KikiReview in Frameworks */,
 				9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */,
 				9C2010072F3401010099C190 /* Defaults in Frameworks */,
 			);
@@ -188,6 +192,7 @@
 				8D3000092F4400010099C190 /* KikiSettings */,
 				8D30000C2F4400010099C190 /* KikiWindow */,
 				8D30000D2F4400010099C190 /* KikiDesign */,
+				8D30000F2F4400010099C190 /* KikiReview */,
 				8D30000E2F4400010099C190 /* KikiMenuBar */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
@@ -267,6 +272,7 @@
 				8D30000B2F4400010099C190 /* KikiPaywall */,
 				8D30000C2F4400010099C190 /* KikiWindow */,
 				8D30000D2F4400010099C190 /* KikiDesign */,
+				8D30000F2F4400010099C190 /* KikiReview */,
 				8D30000E2F4400010099C190 /* KikiMenuBar */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
@@ -1233,6 +1239,7 @@
 		8D30000C2F4400010099C190 /* KikiWindow */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiWindow; };
 		8D30000D2F4400010099C190 /* KikiDesign */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiDesign; };
 		8D30000E2F4400010099C190 /* KikiMenuBar */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiMenuBar; };
+		8D30000F2F4400010099C190 /* KikiReview */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiReview; };
 		9C2010042F3400010099C190 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;

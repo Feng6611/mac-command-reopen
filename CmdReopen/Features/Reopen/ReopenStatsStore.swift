@@ -5,13 +5,21 @@
 //  Created by CHEN on 2026/3/28.
 //
 
+import AppKit
 import Combine
 import Foundation
+import KikiReview
 import StoreKit
+import SwiftUI
 
 protocol AppReviewPrompting {
     @MainActor
-    func requestReview()
+    func present(_ presentation: AppReviewPromptPresentation)
+}
+
+enum AppReviewPromptPresentation: Equatable {
+    case custom
+    case system
 }
 
 enum ReviewPromptTrigger: Equatable {
@@ -27,9 +35,42 @@ enum ReviewPromptTrigger: Equatable {
     }
 }
 
-struct StoreKitAppReviewPrompter: AppReviewPrompting {
-    func requestReview() {
-        SKStoreReviewController.requestReview()
+@MainActor
+final class StoreKitAppReviewPrompter: AppReviewPrompting {
+    private let customPromptController = KikiReviewPromptController()
+
+    func present(_ presentation: AppReviewPromptPresentation) {
+        switch presentation {
+        case .custom:
+            presentCustomPrompt()
+        case .system:
+            SKStoreReviewController.requestReview()
+        }
+    }
+
+    private func presentCustomPrompt() {
+        let language = AppLanguage.shared
+        customPromptController.show(
+            configuration: KikiReviewPromptConfiguration(
+                windowTitle: language.string(localized: "Review Command Reopen",
+                    comment: "Window title for Command Reopen's one-time custom review prompt."),
+                title: language.string(localized: "Enjoying Command Reopen?",
+                    comment: "Headline for Command Reopen's one-time custom review prompt."),
+                message: language.string(localized: "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it.",
+                    comment: "Body copy for Command Reopen's one-time custom review prompt."),
+                primaryActionTitle: language.string(localized: "Rate on App Store",
+                    comment: "Primary action in Command Reopen's one-time custom review prompt."),
+                secondaryActionTitle: language.string(localized: "Not Now",
+                    comment: "Dismiss action in Command Reopen's one-time custom review prompt.")
+            ),
+            tint: DS.Colors.brandPrimary
+        ) { action in
+            guard action == .review,
+                  let url = URL(string: AppStoreLinks.reviewURL) else {
+                return
+            }
+            NSWorkspace.shared.open(url)
+        }
     }
 }
 
@@ -79,6 +120,7 @@ final class ReopenStatsStore: ObservableObject {
         static let rollingWindow: TimeInterval = 365 * 24 * 60 * 60
         static let requestTimestampsKey = "cmdreopenReviewPromptRequestTimestamps"
         static let migratedHistoryKey = "cmdreopenReviewPromptMigratedHistory"
+        static let customPromptShownKey = "cmdreopenCustomReviewPromptShown"
 
         // Previous builds stored milestones rather than dates. Retain these
         // keys only to migrate their request count into the rolling cap.
@@ -267,14 +309,20 @@ final class ReopenStatsStore: ObservableObject {
     }
 
     @discardableResult
-    func recordSuccessfulReopen(bundleID: String, localizedName: String?, bundleURL: URL? = nil) -> Bool {
+    func recordSuccessfulReopen(
+        bundleID: String,
+        localizedName: String?,
+        bundleURL: URL? = nil,
+        activationPolicy: NSApplication.ActivationPolicy? = nil
+    ) -> Bool {
         guard let normalizedBundleID = Self.normalize(bundleID) else {
             return false
         }
         guard !HelperProcessFilter.isHelperLike(
             bundleID: normalizedBundleID,
             bundleURL: bundleURL,
-            localizedName: localizedName
+            localizedName: localizedName,
+            activationPolicy: activationPolicy
         ) else {
             return false
         }
@@ -325,9 +373,27 @@ final class ReopenStatsStore: ObservableObject {
         requestTimestamps.append(now.timeIntervalSince1970)
         defaults.set(requestTimestamps, forKey: ReviewPrompt.requestTimestampsKey)
         hasRequestedReviewThisLaunch = true
-        appReviewPrompter.requestReview()
+        let presentation: AppReviewPromptPresentation
+        if defaults.bool(forKey: ReviewPrompt.customPromptShownKey) {
+            presentation = .system
+        } else {
+            // Persist at presentation time. Kiki reports which visible action
+            // was chosen, but neither the app nor StoreKit can prove that a
+            // person submitted a review.
+            defaults.set(true, forKey: ReviewPrompt.customPromptShownKey)
+            presentation = .custom
+        }
+        appReviewPrompter.present(presentation)
         return true
     }
+
+#if DEBUG
+    /// Exercises the production Kiki surface without consuming the one-time
+    /// custom-prompt flag or an annual review-request slot.
+    func presentCustomReviewPromptPreview() {
+        appReviewPrompter.present(.custom)
+    }
+#endif
 
     func reset() {
         pendingPersistenceTask?.cancel()

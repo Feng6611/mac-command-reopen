@@ -212,12 +212,16 @@ final class AppleEventWindowRestoreSettings: ObservableObject {
             return .disabled
         }
 
+        // The toggle is the user's preference, not a live permission probe.
+        // Persist it immediately so Settings never appears stuck while macOS
+        // launches the target app or waits for an Automation decision.
+        enabledBundleIdentifiers.insert(bundleIdentifier)
+        persist()
+
         let authorization = await authorizer.requestAuthorization(bundleIdentifier: bundleIdentifier)
         let result: AppleEventWindowRestoreSettingResult
         switch authorization {
         case .authorized:
-            enabledBundleIdentifiers.insert(bundleIdentifier)
-            persist()
             result = .enabled
         case .denied:
             result = .authorizationDenied
