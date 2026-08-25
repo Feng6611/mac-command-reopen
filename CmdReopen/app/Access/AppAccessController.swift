@@ -31,6 +31,27 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
         didResolveCommerceStateSource
     }
 
+    /// App-facing readiness policy. Keeping these answers here prevents the
+    /// lifecycle coordinator from reaching through the access seam to the
+    /// App Store-specific model.
+    var hasResolvedInitialCommerceRefresh: Bool {
+        switch distributionChannel {
+        case .appStore:
+            return commerceStateSource?.hasResolvedInitialRefresh ?? false
+        case .direct:
+            return true
+        }
+    }
+
+    var allowsAutomaticAccessPresentation: Bool {
+        switch distributionChannel {
+        case .appStore:
+            return commerceStateSource?.allowsAutomaticPresentation ?? false
+        case .direct:
+            return true
+        }
+    }
+
     var isCoreFeatureAvailable: Bool {
         entitlementState.isCoreFeatureAvailable
     }

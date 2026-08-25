@@ -31,6 +31,14 @@ final class ProCommerceStateSource: CommerceStateSource {
         proStatusManager.shouldOpenProSettings
     }
 
+    var hasResolvedInitialRefresh: Bool {
+        proStatusManager.readiness.hasResolvedInitialRefresh
+    }
+
+    var allowsAutomaticPresentation: Bool {
+        proStatusManager.readiness.allowsAutomaticPresentation
+    }
+
     var entitlementStatePublisher: AnyPublisher<AccessEntitlementState, Never> {
         Publishers.CombineLatest(
             proStatusManager.accessManager.$status,

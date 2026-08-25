@@ -111,7 +111,8 @@ struct SettingsView: View {
             TrialExitOfferView(
                 accessModel: accessModel,
                 offer: .debugPreview,
-                marksOfferShown: false
+                marksOfferShown: false,
+                rendersAvailableProductForPreview: true
             )
         }
 #endif
@@ -145,15 +146,6 @@ struct SettingsView: View {
 #if !APPSTORE
             Section {
                 DirectSupportCardRow()
-            }
-#else
-            // Each edition puts its one ask in the same slot, directly under
-            // the status it follows from: the free build asks for a purchase,
-            // the paid build asks for feedback. Below the contact section it
-            // would sit after that section's footer, and a footer reads as the
-            // end of the pane rather than a divider before more content.
-            Section {
-                FeedbackOfferCardRow()
             }
 #endif
 

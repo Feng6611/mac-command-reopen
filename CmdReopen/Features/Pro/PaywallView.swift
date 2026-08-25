@@ -1,6 +1,7 @@
 #if APPSTORE
 import KikiCommerceCore
 import KikiCommercePresentation
+import KikiPaywall
 import SwiftUI
 
 enum PaywallPresentationContext {
@@ -61,6 +62,7 @@ struct PaywallSheetView: View {
             ),
             footerLinks: footerLinks,
             displayPlanIDs: RevenueCatConfiguration.visiblePaywallPlanIDs,
+            planPresentation: localizedPlanPresentation(for:),
             tint: DS.Colors.brandPrimary,
             onFinish: {
                 let didCompletePurchase = accessModel.accessManager.commerceFeedback == .purchaseSucceeded
@@ -108,6 +110,40 @@ struct PaywallSheetView: View {
 
     private func format(_ date: Date) -> String {
         date.formatted(.dateTime.year().month(.abbreviated).day().locale(appLanguage.locale))
+    }
+
+    /// The access manager retains its commerce configuration for the whole
+    /// process. Resolve plan-card copy in this observed view so changing the
+    /// language in Settings immediately updates an already-open paywall.
+    private func localizedPlanPresentation(for product: KikiAccessPlanProduct) -> KikiPaywallPlanPresentation {
+        let plan = product.plan.commercePlan
+        let title: String
+        let billingDetail: String
+        let badge: String?
+
+        switch plan {
+        case .yearly:
+            title = appLanguage.string(localized: "Yearly")
+            billingDetail = appLanguage.string(localized: "per year")
+            badge = nil
+        case .lifetime, .winbackLifetime:
+            title = appLanguage.string(localized: "Lifetime")
+            billingDetail = appLanguage.string(localized: "once")
+            badge = plan == .lifetime ? appLanguage.string(localized: "Best Value") : nil
+        default:
+            title = product.title
+            billingDetail = product.billingDetail
+            badge = product.badge
+        }
+
+        return KikiPaywallPlanPresentation(
+            id: product.id,
+            title: title,
+            displayPrice: product.displayPrice,
+            billingDetail: billingDetail,
+            badge: badge,
+            isAvailable: product.isAvailable
+        )
     }
 
     private var footerLinks: [KikiAccessPaywallLink] {

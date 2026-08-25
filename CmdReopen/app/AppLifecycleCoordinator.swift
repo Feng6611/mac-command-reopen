@@ -182,7 +182,7 @@ final class AppLifecycleCoordinator {
         }
 #endif
 
-        if CommandAccessModel.shared.readiness.allowsAutomaticPresentation,
+        if accessController.allowsAutomaticAccessPresentation,
            accessController.shouldShowOnboarding {
             OnboardingWindowController.shared.showIfNeeded(accessController: accessController)
             return
@@ -243,11 +243,7 @@ final class AppLifecycleCoordinator {
     }
 
     private var hasResolvedCommerceReadiness: Bool {
-#if APPSTORE
-        CommandAccessModel.shared.readiness.hasResolvedInitialRefresh
-#else
-        true
-#endif
+        accessController.hasResolvedInitialCommerceRefresh
     }
 
     private func refreshCommerceStateIfNeeded(force: Bool, reason: String) async {

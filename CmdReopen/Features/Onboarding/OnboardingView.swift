@@ -403,7 +403,7 @@ private struct OnboardingFlowDiagram: View {
             flowStep(
                 icon: "minus.circle",
                 label: appLanguage.string("Minimized"),
-                sublabel: appLanguage.string("window hidden"),
+                sublabel: appLanguage.string("stays in Dock"),
                 tint: .orange
             )
 

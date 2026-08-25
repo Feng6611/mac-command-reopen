@@ -206,10 +206,12 @@ private struct ExcludedAppsSection: View {
     let excludedBundleIDs: Set<String>
     let addApplicationAction: (ExcludedApplicationInfo) -> Void
 
+    @ObservedObject private var appLanguage = AppLanguage.shared
+
     var body: some View {
         Section {
             if bundleIDs.isEmpty {
-                Text("No excluded apps")
+                Text(appLanguage.string("No excluded apps"))
                     .foregroundColor(.secondary)
             } else {
                 ForEach(bundleIDs, id: \.self) { bundleID in
@@ -221,7 +223,7 @@ private struct ExcludedAppsSection: View {
                 }
             }
 
-            LabeledContent("Add") {
+            LabeledContent(appLanguage.string("Add App")) {
                 ApplicationSearchControl(
                     query: $query,
                     results: searchResults,
@@ -231,9 +233,9 @@ private struct ExcludedAppsSection: View {
                 )
             }
         } header: {
-            Text("Excluded Apps")
+            Text(appLanguage.string("Excluded Apps"))
         } footer: {
-            Text("Excluded apps keep the standard Cmd+Tab behavior.")
+            Text(appLanguage.string("Excluded apps keep the standard Cmd+Tab behavior."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -275,21 +277,23 @@ private struct ApplicationSearchControl: View {
     let isDisabled: Bool
     let addAction: (ExcludedApplicationInfo) -> Void
 
+    @ObservedObject private var appLanguage = AppLanguage.shared
+
     private var trimmedQuery: String {
         query.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            TextField("", text: $query, prompt: Text("App name or bundle ID"))
+            TextField("", text: $query, prompt: Text(appLanguage.string("Search App name or bundle ID…")))
                 .textFieldStyle(.roundedBorder)
                 .disabled(isDisabled)
-                .accessibilityLabel("App name or bundle ID")
+                .accessibilityLabel(appLanguage.string("Search App name or bundle ID…"))
                 .onSubmit(addFirstAvailableResult)
 
             if !trimmedQuery.isEmpty {
                 if results.isEmpty {
-                    Text("No matching apps found.")
+                    Text(appLanguage.string("No matching apps found."))
                         .kikiSettingDescription()
                 } else {
                     VStack(alignment: .leading, spacing: DS.Spacing.xs) {
@@ -321,13 +325,15 @@ private struct ApplicationSearchResultRow: View {
     let isDisabled: Bool
     let addAction: (ExcludedApplicationInfo) -> Void
 
+    @ObservedObject private var appLanguage = AppLanguage.shared
+
     var body: some View {
         HStack(spacing: DS.Spacing.sm) {
             ApplicationInfoLabel(applicationInfo: applicationInfo)
 
             Spacer(minLength: DS.Spacing.sm)
 
-            Button(isAlreadyExcluded ? "Added" : "Add") {
+            Button(isAlreadyExcluded ? appLanguage.string("Added") : appLanguage.string("Add")) {
                 addAction(applicationInfo)
             }
             .disabled(isAlreadyExcluded || isDisabled)

@@ -17,16 +17,16 @@ struct AdvancedSettingsView: View {
         KikiSettingsPane {
             Section {
                 KikiSettingsToggleRow(
-                    appLanguage.string("Return to Previous App"),
+                    appLanguage.string("Return Focus to Previous App"),
                     isOn: activationMonitor.automaticSwitcherReorderingBinding,
                     systemImage: "arrow.uturn.backward"
                 )
                 .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
             } header: {
-                Text(appLanguage.string("After the Last Window Disappears"))
+                Text(appLanguage.string("When No Windows Remain"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("Closing or minimizing an app’s last window leaves it frontmost with nothing on screen. Command Reopen hands focus back — one Cmd+Tab still returns you.")
+                    appLanguage.string("When you close or minimize an app’s last window, automatically hand focus back to the previous app so Cmd+Tab can bring it right back.")
                 )
             }
 
@@ -35,21 +35,21 @@ struct AdvancedSettingsView: View {
                     appRow(app)
                 }
             } header: {
-                Text(appLanguage.string("Restore All Minimized Windows"))
+                Text(appLanguage.string("Restore All Windows at Once"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("Cmd+Tab back to an app and macOS leaves your minimized windows in the Dock. Turn one on to bring all of its windows back automatically.")
+                    appLanguage.string("Standard reopen brings back the main window. Enable an app below to restore every minimized window in your Dock at once using macOS Automation.")
                 )
             }
 
             Section {
-                Button(appLanguage.string("Open Automation Settings")) {
+                Button(appLanguage.string("Open Automation Settings…")) {
                     guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") else { return }
                     NSWorkspace.shared.open(url)
                 }
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("macOS has no direct way to reopen another app’s minimized windows, so Command Reopen uses Automation to control each app you enable. Access is requested only for apps you turn on.")
+                    appLanguage.string("If an app stops restoring, check macOS System Settings > Privacy & Security > Automation.")
                 )
             }
         }

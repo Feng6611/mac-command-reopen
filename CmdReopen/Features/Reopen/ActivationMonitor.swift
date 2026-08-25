@@ -233,6 +233,10 @@ final class ActivationMonitor: ObservableObject {
                 return
             }
             self.handleActivation(for: app)
+            // Window inspection is polling-based because other apps do not
+            // publish close/minimize notifications. Keep that cost only while
+            // the observed app is actually frontmost.
+            self.updateForegroundWindowPollingState()
         }
         AppLogger.activation.debug("Started observing activation notifications.")
     }
@@ -371,7 +375,11 @@ final class ActivationMonitor: ObservableObject {
     private func updateForegroundWindowPollingState() {
         guard isFeatureEnabled,
               isAutomaticSwitcherReorderingEnabled,
-              !isReopenSuppressedForOnboarding else {
+              !isReopenSuppressedForOnboarding,
+              let source = monitoredForegroundApplication,
+              !userExcludedBundleIDs.contains(source.bundleIdentifier ?? ""),
+              let frontmost = workspace.frontmostApplication,
+              frontmost.processIdentifier == source.processIdentifier else {
             stopForegroundWindowPolling()
             return
         }

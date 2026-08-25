@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ProAccessDebugRows: View {
     @ObservedObject private var accessModel = CommandAccessModel.shared
+    @ObservedObject private var appLanguage = AppLanguage.shared
     let onPresentOnboarding: () -> Void
     let onPresentPaywall: () -> Void
     let onPresentTrialExitOffer: () -> Void
@@ -18,18 +19,18 @@ struct ProAccessDebugRows: View {
 
     var body: some View {
         KikiSettingsDebugPreviewRow(
-            "Pro access",
+            appLanguage.string(localized: "Pro access"),
             selection: debugMode,
             options: KikiAccessDebugMode.allCases,
             isOverrideActive: accessModel.debugProAccessOverride != nil,
-            optionTitle: \.displayName
+            optionTitle: localizedDebugModeTitle(for:)
         )
 
-        KikiSettingsValueRow("Test flows", systemImage: "play.rectangle") {
-            Button("Onboarding", action: onPresentOnboarding)
-            Button("Paywall", action: onPresentPaywall)
-            Button("Retention offer", action: onPresentTrialExitOffer)
-            Button("Review prompt", action: onPresentReviewPrompt)
+        KikiSettingsValueRow(appLanguage.string(localized: "Test flows"), systemImage: "play.rectangle") {
+            Button(appLanguage.string(localized: "Onboarding"), action: onPresentOnboarding)
+            Button(appLanguage.string(localized: "Paywall"), action: onPresentPaywall)
+            Button(appLanguage.string(localized: "Retention offer"), action: onPresentTrialExitOffer)
+            Button(appLanguage.string(localized: "Review prompt"), action: onPresentReviewPrompt)
         }
 
         // Presenting the retention card from "Test flows" deliberately does
@@ -38,11 +39,11 @@ struct ProAccessDebugRows: View {
         // directly, at a chosen point inside it. Pro access must be Expired
         // for anything to show — that is the production gate, and the row
         // does not pretend otherwise.
-        KikiSettingsValueRow("Win-back window", systemImage: "tag") {
+        KikiSettingsValueRow(appLanguage.string(localized: "Win-back window"), systemImage: "tag") {
             Picker("", selection: winbackWindow) {
-                Text("Closed").tag(nil as Int?)
-                Text("2 days left").tag(2 as Int?)
-                Text("Ends today").tag(1 as Int?)
+                Text(appLanguage.string(localized: "Closed")).tag(nil as Int?)
+                Text(appLanguage.string(localized: "2 days left")).tag(2 as Int?)
+                Text(appLanguage.string(localized: "Ends today")).tag(1 as Int?)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -88,6 +89,16 @@ struct ProAccessDebugRows: View {
                 }
             }
         )
+    }
+
+    private func localizedDebugModeTitle(for mode: KikiAccessDebugMode) -> String {
+        switch mode {
+        case .live: appLanguage.string(localized: "Live")
+        case .notPro: appLanguage.string(localized: "Not Pro")
+        case .trial: appLanguage.string(localized: "Trial")
+        case .expired: appLanguage.string(localized: "Expired")
+        case .pro: appLanguage.string(localized: "Pro")
+        }
     }
 }
 #endif

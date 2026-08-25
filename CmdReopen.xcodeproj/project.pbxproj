@@ -12,6 +12,9 @@
 		7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
+		747A0FC8303DDD92002F75DA /* KikiMenuBar in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000E2F4400010099C190 /* KikiMenuBar */; };
+		747A0FC9303DDD92002F75DA /* KikiPaywall in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000B2F4400010099C190 /* KikiPaywall */; };
+		747A0FCA303DDD92002F75DA /* KikiMenuBar in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000E2F4400010099C190 /* KikiMenuBar */; };
 		8D3000012F4400010099C190 /* KikiCommerceCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000032F4400010099C190 /* KikiCommerceCore */; };
 		8D3000022F4400010099C190 /* KikiCommerceCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000032F4400010099C190 /* KikiCommerceCore */; };
 		8D3000102F4400010099C190 /* KikiRevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000062F4400010099C190 /* KikiRevenueCat */; };
@@ -24,7 +27,6 @@
 		8D3000172F4400010099C190 /* KikiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000D2F4400010099C190 /* KikiDesign */; };
 		8D3000182F4400010099C190 /* KikiSettings in Frameworks */ = {isa = PBXBuildFile; productRef = 8D3000092F4400010099C190 /* KikiSettings */; };
 		8D3000192F4400010099C190 /* KikiOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000A2F4400010099C190 /* KikiOnboarding */; };
-		8D30001A2F4400010099C190 /* KikiPaywall in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000B2F4400010099C190 /* KikiPaywall */; };
 		8D30001B2F4400010099C190 /* KikiWindow in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000C2F4400010099C190 /* KikiWindow */; };
 		8D30001C2F4400010099C190 /* KikiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000D2F4400010099C190 /* KikiDesign */; };
 		8D30001D2F4400010099C190 /* KikiReview in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000F2F4400010099C190 /* KikiReview */; };
@@ -85,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				747A0FC8303DDD92002F75DA /* KikiMenuBar in Frameworks */,
 				56759C132FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000012F4400010099C190 /* KikiCommerceCore in Frameworks */,
 				8D3000102F4400010099C190 /* KikiRevenueCat in Frameworks */,
@@ -127,7 +130,9 @@
 				8D30001C2F4400010099C190 /* KikiDesign in Frameworks */,
 				8D30001E2F4400010099C190 /* KikiReview in Frameworks */,
 				9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */,
+				747A0FC9303DDD92002F75DA /* KikiPaywall in Frameworks */,
 				9C2010072F3401010099C190 /* Defaults in Frameworks */,
+				747A0FCA303DDD92002F75DA /* KikiMenuBar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,7 +180,7 @@
 				748FCE172EB5027A0099C190 /* Sources */,
 				748FCE182EB5027A0099C190 /* Frameworks */,
 				748FCE192EB5027A0099C190 /* Resources */,
-				8D4100012FAA30010099C190 /* Verify RevenueCat API Key */,
+				8D4100012FAA30010099C190 /* Verify App Store Service Configuration */,
 			);
 			buildRules = (
 			);
@@ -592,7 +597,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 35;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -622,7 +627,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -646,7 +651,7 @@
 				CODE_SIGN_ENTITLEMENTS = CmdReopen/Resources/CmdReopen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 35;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -676,7 +681,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -848,7 +853,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 33;
+				CURRENT_PROJECT_VERSION = 35;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -878,7 +883,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -986,7 +991,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1051,7 +1056,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1118,7 +1123,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.4.2;
+				MARKETING_VERSION = 1.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1197,7 +1202,9 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Kiki_mackit;
 		};
+/* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
 		9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/LaunchAtLogin-Modern";
@@ -1227,19 +1234,59 @@
 /* Begin XCSwiftPackageProductDependency section */
 		8D3000032F4400010099C190 /* KikiCommerceCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */;
+			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "../KikiCommerceKit" */;
 			productName = KikiCommerceCore;
 		};
-		8D3000062F4400010099C190 /* KikiRevenueCat */ = {isa = XCSwiftPackageProductDependency; package = 8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */; productName = KikiRevenueCat; };
-		8D3000072F4400010099C190 /* KikiCommercePresentation */ = {isa = XCSwiftPackageProductDependency; package = 8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */; productName = KikiCommercePresentation; };
-		8D3000082F4400010099C190 /* KikiCommerceTesting */ = {isa = XCSwiftPackageProductDependency; package = 8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */; productName = KikiCommerceTesting; };
-		8D3000092F4400010099C190 /* KikiSettings */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiSettings; };
-		8D30000A2F4400010099C190 /* KikiOnboarding */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiOnboarding; };
-		8D30000B2F4400010099C190 /* KikiPaywall */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiPaywall; };
-		8D30000C2F4400010099C190 /* KikiWindow */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiWindow; };
-		8D30000D2F4400010099C190 /* KikiDesign */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiDesign; };
-		8D30000E2F4400010099C190 /* KikiMenuBar */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiMenuBar; };
-		8D30000F2F4400010099C190 /* KikiReview */ = {isa = XCSwiftPackageProductDependency; package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */; productName = KikiReview; };
+		8D3000062F4400010099C190 /* KikiRevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "../KikiCommerceKit" */;
+			productName = KikiRevenueCat;
+		};
+		8D3000072F4400010099C190 /* KikiCommercePresentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "../KikiCommerceKit" */;
+			productName = KikiCommercePresentation;
+		};
+		8D3000082F4400010099C190 /* KikiCommerceTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000042F4400010099C190 /* XCLocalSwiftPackageReference "../KikiCommerceKit" */;
+			productName = KikiCommerceTesting;
+		};
+		8D3000092F4400010099C190 /* KikiSettings */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiSettings;
+		};
+		8D30000A2F4400010099C190 /* KikiOnboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiOnboarding;
+		};
+		8D30000B2F4400010099C190 /* KikiPaywall */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiPaywall;
+		};
+		8D30000C2F4400010099C190 /* KikiWindow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiWindow;
+		};
+		8D30000D2F4400010099C190 /* KikiDesign */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiDesign;
+		};
+		8D30000E2F4400010099C190 /* KikiMenuBar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiMenuBar;
+		};
+		8D30000F2F4400010099C190 /* KikiReview */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiReview;
+		};
 		9C2010042F3400010099C190 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;

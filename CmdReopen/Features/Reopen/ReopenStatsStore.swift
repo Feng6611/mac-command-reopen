@@ -56,7 +56,7 @@ final class StoreKitAppReviewPrompter: AppReviewPrompting {
                     comment: "Window title for Command Reopen's one-time custom review prompt."),
                 title: language.string(localized: "Enjoying Command Reopen?",
                     comment: "Headline for Command Reopen's one-time custom review prompt."),
-                message: language.string(localized: "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it.",
+                message: language.string(localized: "If it’s made Cmd+Tab feel better, a quick App Store review helps more people find it.",
                     comment: "Body copy for Command Reopen's one-time custom review prompt."),
                 primaryActionTitle: language.string(localized: "Rate on App Store",
                     comment: "Primary action in Command Reopen's one-time custom review prompt."),

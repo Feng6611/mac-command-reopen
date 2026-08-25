@@ -38,6 +38,13 @@ protocol CommerceStateSource: AnyObject {
     var entitlementState: AccessEntitlementState { get }
     var isFirstLaunch: Bool { get }
     var shouldOpenProSettings: Bool { get }
+    /// Whether the first entitlement refresh produced a usable answer. The
+    /// lifecycle needs this presentation decision, but must not know which
+    /// commerce implementation supplied it.
+    var hasResolvedInitialRefresh: Bool { get }
+    /// Whether it is safe to automatically present onboarding or an upgrade
+    /// surface. A degraded provider should leave that decision to the user.
+    var allowsAutomaticPresentation: Bool { get }
     var entitlementStatePublisher: AnyPublisher<AccessEntitlementState, Never> { get }
     var proSettingsPromptPublisher: AnyPublisher<Bool, Never> { get }
 

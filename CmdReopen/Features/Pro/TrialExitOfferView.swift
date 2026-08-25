@@ -25,6 +25,10 @@ struct TrialExitOfferView: View {
     /// Debug previews render the production card without starting the real
     /// user's discount clock.
     var marksOfferShown = true
+    /// Lets the DEBUG-only review-screenshot preview show the intended
+    /// purchasable treatment while the discounted StoreKit SKU is still being
+    /// prepared in App Store Connect. It never changes release behavior.
+    var rendersAvailableProductForPreview = false
     var urlOpener: any URLOpening = WorkspaceURLOpener()
 
     @State private var isPurchasing = false
@@ -75,7 +79,7 @@ struct TrialExitOfferView: View {
 
                 Button(action: purchase) {
                     KikiPaywallActionLabel(
-                        title: appLanguage.string(localized: "Get lifetime at 20% off",
+                        title: appLanguage.string(localized: "Unlock Lifetime with 20% Off",
                             comment: "Purchase button on the win-back card; buys the discounted lifetime unlock immediately."),
                         isLoading: isPurchasing,
                         tint: DS.Colors.brandPrimary
@@ -84,7 +88,7 @@ struct TrialExitOfferView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .tint(DS.Colors.brandPrimary)
-                .disabled(isPurchasing || !winbackProduct.isAvailable)
+                .disabled(isPurchasing || !isWinbackProductAvailable)
                 .keyboardShortcut(.defaultAction)
             }
         } footer: {
@@ -116,10 +120,10 @@ struct TrialExitOfferView: View {
     /// price is temporary, not that the user should panic.
     private var subtitle: String {
         if offer.daysRemaining() > 1 {
-            return appLanguage.string(localized: "If the price was the sticking point, here’s a smaller one. It holds for 2 days, then it’s gone.",
+            return appLanguage.string(localized: "If the price was the sticking point, here’s a smaller one. Valid for 48 hours.",
                 comment: "Subtitle of the win-back card while more than a day of the discount window remains.")
         }
-        return appLanguage.string(localized: "If the price was the sticking point, here’s a smaller one. It ends today.",
+        return appLanguage.string(localized: "If the price was the sticking point, here’s a smaller one. Ends today.",
             comment: "Subtitle of the win-back card during the discount window's final day.")
     }
 
@@ -129,7 +133,7 @@ struct TrialExitOfferView: View {
         var stats = [
             KikiPaywallStatConfig(
                 value: offer.receipt.formattedCount,
-                label: appLanguage.string(localized: "windows restored",
+                label: appLanguage.string(localized: "windows restored in trial",
                     comment: "Label under the number of windows the app restored during the trial.")
             )
         ]
@@ -138,7 +142,7 @@ struct TrialExitOfferView: View {
             stats.append(
                 KikiPaywallStatConfig(
                     value: leadApp.displayName,
-                    label: appLanguage.string(localized: "restored most often",
+                    label: appLanguage.string(localized: "most restored app",
                         comment: "Label under the name of the app whose windows were restored most during the trial.")
                 )
             )
@@ -149,6 +153,10 @@ struct TrialExitOfferView: View {
 
     private var winbackProduct: KikiAccessPlanProduct {
         accessModel.planProduct(for: .winbackLifetime)
+    }
+
+    private var isWinbackProductAvailable: Bool {
+        winbackProduct.isAvailable || rendersAvailableProductForPreview
     }
 
     /// The deal, as one pre-selected card: the discounted price beside the
@@ -162,7 +170,7 @@ struct TrialExitOfferView: View {
     /// actually charge and drops the comparison.
     private var winbackPlanCard: KikiPaywallPlan {
         let fullProduct = accessModel.planProduct(for: .lifetime)
-        let comparablePrices = fullProduct.isAvailable && winbackProduct.isAvailable
+        let comparablePrices = fullProduct.isAvailable && isWinbackProductAvailable
 
         return KikiPaywallPlan(
             id: winbackProduct.id,
@@ -172,7 +180,7 @@ struct TrialExitOfferView: View {
             billingDetail: appLanguage.string("once"),
             badge: appLanguage.string(localized: "20% off",
                 comment: "Badge on the win-back plan card naming the discount."),
-            isAvailable: winbackProduct.isAvailable
+            isAvailable: isWinbackProductAvailable
         )
     }
 
