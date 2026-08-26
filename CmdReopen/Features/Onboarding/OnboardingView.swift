@@ -231,7 +231,7 @@ private struct SuccessStepView: View {
                 Text(appLanguage.string("Zero permissions"))
                     .font(.title2.bold())
 
-                Text(appLanguage.string("No Accessibility. No Screen Recording. Nothing to grant."))
+                Text(appLanguage.string("Core restore needs no Accessibility or Screen Recording."))
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

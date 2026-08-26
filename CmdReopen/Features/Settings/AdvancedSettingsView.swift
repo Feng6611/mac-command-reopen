@@ -1,102 +1,87 @@
+#if DIRECT
 import AppKit
-import KikiDesign
+import KikiAuthorization
+#endif
 import KikiSettings
 import SwiftUI
 
 struct AdvancedSettingsView: View {
-    @EnvironmentObject private var activationMonitor: ActivationMonitor
     @EnvironmentObject private var accessController: AppAccessController
-    @EnvironmentObject private var settings: AppleEventWindowRestoreSettings
     @EnvironmentObject private var appLanguage: AppLanguage
+#if DIRECT
+    @EnvironmentObject private var settings: AdvancedWindowRestoreSettings
+    @State private var isAccessibilityAuthorized = false
+#endif
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
     }
 
     var body: some View {
+#if DIRECT
         KikiSettingsPane {
             Section {
+                KikiAuthorizationStatusRow(
+                    title: appLanguage.string("Accessibility"),
+                    isAuthorized: isAccessibilityAuthorized,
+                    authorizedValue: appLanguage.string("Allowed"),
+                    unauthorizedValue: appLanguage.string("Needed"),
+                    action: openAccessibilitySetup
+                )
+            } header: {
+                Text(appLanguage.string("Accessibility"))
+            } footer: {
+                KikiSettingsHelperText(
+                    appLanguage.string("Advanced window restoration can control other apps’ windows only after you grant Accessibility access. Core Command Reopen needs no permission.")
+                )
+            }
+
+            Section {
                 KikiSettingsToggleRow(
-                    appLanguage.string("Return Focus to Previous App"),
-                    isOn: activationMonitor.automaticSwitcherReorderingBinding,
-                    systemImage: "arrow.uturn.backward"
+                    appLanguage.string("Use Advanced Window Restore"),
+                    isOn: $settings.isAdvancedModeEnabled,
+                    systemImage: "accessibility"
                 )
-                .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
-            } header: {
-                Text(appLanguage.string("When No Windows Remain"))
-            } footer: {
-                KikiSettingsHelperText(
-                    appLanguage.string("When you close or minimize an app’s last window, automatically hand focus back to the previous app so Cmd+Tab can bring it right back.")
-                )
-            }
+                .disabled(isFeatureLocked || !isAccessibilityAuthorized)
 
-            Section {
-                ForEach(AppleEventWindowRestoreRegistry.supportedApps) { app in
-                    appRow(app)
-                }
-            } header: {
-                Text(appLanguage.string("Restore All Windows at Once"))
-            } footer: {
-                KikiSettingsHelperText(
-                    appLanguage.string("Standard reopen brings back the main window. Enable an app below to restore every minimized window in your Dock at once using macOS Automation.")
+                KikiSettingsToggleRow(
+                    appLanguage.string("Restore All Minimized Windows"),
+                    isOn: $settings.restoresAllWindows,
+                    systemImage: "macwindow.on.rectangle"
                 )
-            }
-
-            Section {
-                Button(appLanguage.string("Open Automation Settings…")) {
-                    guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation") else { return }
-                    NSWorkspace.shared.open(url)
-                }
+                .disabled(isFeatureLocked || !settings.isAdvancedModeEnabled || !isAccessibilityAuthorized)
+            } header: {
+                Text(appLanguage.string("Advanced Mode"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("If an app stops restoring, check macOS System Settings > Privacy & Security > Automation.")
+                    appLanguage.string("When enabled, Command Reopen uses Accessibility to raise a window. Restore All also brings back every minimized window. Clicking a confirmed Dock app icon cycles that app’s eligible windows.")
                 )
             }
         }
-    }
-
-    @ViewBuilder
-    private func appRow(_ app: AppleEventWindowRestoreApp) -> some View {
-        let isInstalled = applicationURL(for: app) != nil
-        HStack(spacing: DS.Spacing.md) {
-            appIcon(for: app)
-            Text(app.name)
-                .foregroundStyle(isInstalled ? .primary : .secondary)
-            Spacer()
-            Toggle("", isOn: toggleBinding(for: app))
-                .labelsHidden()
-                .disabled(!isInstalled || isFeatureLocked)
+        .onAppear(perform: refreshAccessibilityAuthorization)
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)) { _ in
+            refreshAccessibilityAuthorization()
         }
-        .padding(.vertical, 2)
+
+#else
+        EmptyView()
+#endif
     }
 
-    private func toggleBinding(for app: AppleEventWindowRestoreApp) -> Binding<Bool> {
-        Binding(
-            get: { settings.isEnabled(bundleIdentifier: app.bundleIdentifier) },
-            set: { newValue in
-                Task { @MainActor in
-                    _ = await settings.setEnabled(newValue, bundleIdentifier: app.bundleIdentifier)
-                }
-            }
+#if DIRECT
+    private func openAccessibilitySetup() {
+        _ = KikiAuthorizationPanel.accessibility.requestSystemPrompt()
+        refreshAccessibilityAuthorization()
+        guard !isAccessibilityAuthorized else { return }
+        KikiAuthorizationAssistant.shared.present(
+            panel: .accessibility,
+            instruction: "Turn on Command Reopen in Accessibility to use its optional advanced window restore mode."
         )
     }
 
-    @ViewBuilder
-    private func appIcon(for app: AppleEventWindowRestoreApp) -> some View {
-        if let url = applicationURL(for: app) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                .resizable()
-                .frame(width: 24, height: 24)
-        } else {
-            Image(systemName: "app.dashed")
-                .font(.system(size: 20))
-                .foregroundStyle(.secondary)
-                .frame(width: 24, height: 24)
-        }
+    private func refreshAccessibilityAuthorization() {
+        isAccessibilityAuthorized = KikiAuthorizationPanel.accessibility.isAuthorized
     }
-
-    private func applicationURL(for app: AppleEventWindowRestoreApp) -> URL? {
-        NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.bundleIdentifier)
-    }
+#endif
 
 }

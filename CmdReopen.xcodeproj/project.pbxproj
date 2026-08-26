@@ -36,6 +36,7 @@
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010062F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 		9C2010072F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
+		A1C0A00130D1A0010099C190 /* KikiAuthorization in Frameworks */ = {isa = PBXBuildFile; productRef = A1C0A00230D1A0010099C190 /* KikiAuthorization */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C0A00130D1A0010099C190 /* KikiAuthorization in Frameworks */,
 				56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000182F4400010099C190 /* KikiSettings in Frameworks */,
 				8D3000192F4400010099C190 /* KikiOnboarding in Frameworks */,
@@ -279,6 +281,7 @@
 				8D30000D2F4400010099C190 /* KikiDesign */,
 				8D30000F2F4400010099C190 /* KikiReview */,
 				8D30000E2F4400010099C190 /* KikiMenuBar */,
+				A1C0A00230D1A0010099C190 /* KikiAuthorization */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
 				CF5000022F5900010099C190 /* ConfettiSwiftUI */,
@@ -1296,6 +1299,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		A1C0A00230D1A0010099C190 /* KikiAuthorization */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D3000052F4400010099C190 /* XCLocalSwiftPackageReference "../Kiki_mackit" */;
+			productName = KikiAuthorization;
 		};
 		CF5000022F5900010099C190 /* ConfettiSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

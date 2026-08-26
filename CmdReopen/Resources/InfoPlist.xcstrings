@@ -23,18 +23,6 @@
         }
       }
     },
-    "NSAppleEventsUsageDescription" : {
-      "comment" : "Privacy - AppleEvents Sending Usage Description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Command Reopen uses automation to restore minimized windows in compatible apps when you switch back to them."
-          }
-        }
-      }
-    },
     "NSHumanReadableCopyright" : {
       "comment" : "Copyright (human-readable)",
       "localizations" : {

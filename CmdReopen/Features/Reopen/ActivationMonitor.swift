@@ -118,7 +118,8 @@ final class ActivationMonitor: ObservableObject {
     private let reopenStatsStore: ReopenStatsStore
     private let accessController: FeatureAvailabilityProviding
     private let windowInfoProvider: WindowInfoListing
-    private let appleEventWindowRestorer: AppleEventWindowRestoring
+    private let accessibilityWindowRestorer: AccessibilityWindowRestoring
+    private let advancedWindowRestoreSettings: AdvancedWindowRestoreSettings
     private var activationObserver: NSObjectProtocol?
     private var foregroundWindowTimer: Timer?
     private var latestForegroundApplication: NSRunningApplication?
@@ -130,6 +131,7 @@ final class ActivationMonitor: ObservableObject {
     private var lastActivationDates: [String: Date] = [:]
     private var lastFrontmostBundleID: String?
     private var pendingReopenEvaluation: DispatchWorkItem?
+    private var pendingDockClickIntent: DockClickActivationIntent?
 
     init(notificationCenter: NotificationCenter? = nil,
          workspace: NSWorkspace = .shared,
@@ -137,7 +139,8 @@ final class ActivationMonitor: ObservableObject {
          reopenStatsStore: ReopenStatsStore? = nil,
          accessController: FeatureAvailabilityProviding? = nil,
          windowInfoProvider: WindowInfoListing = CoreGraphicsWindowInfoProvider(),
-         appleEventWindowRestorer: AppleEventWindowRestoring = AppleEventWindowRestorer()) {
+         accessibilityWindowRestorer: AccessibilityWindowRestoring = WindowRestorerFactory.makeDefault(),
+         advancedWindowRestoreSettings: AdvancedWindowRestoreSettings = .shared) {
         AppDefaults.migrateLegacyKeys(in: defaults)
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
@@ -145,7 +148,8 @@ final class ActivationMonitor: ObservableObject {
         self.reopenStatsStore = reopenStatsStore ?? .shared
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
-        self.appleEventWindowRestorer = appleEventWindowRestorer
+        self.accessibilityWindowRestorer = accessibilityWindowRestorer
+        self.advancedWindowRestoreSettings = advancedWindowRestoreSettings
         let storedValue = defaults[AppDefaults.featureEnabled]
         let storedAutomaticSwitcherReordering = defaults[AppDefaults.automaticSwitcherReordering]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
@@ -267,6 +271,10 @@ final class ActivationMonitor: ObservableObject {
         }
         guard app.bundleIdentifier != Bundle.main.bundleIdentifier else {
             AppLogger.activation.debug("Ignoring activation of Command Reopen itself.")
+            return
+        }
+        if consumePendingDockClickIntent(for: app) {
+            AppLogger.activation.debug("Confirmed Dock click owns the activation for \(app.bundleIdentifier ?? "unknown").")
             return
         }
         recordForegroundActivation(app)
@@ -617,11 +625,9 @@ final class ActivationMonitor: ObservableObject {
         }
         lastReopenDates[bundleID] = now
 
-        let automationResult = appleEventWindowRestorer.restoreMinimizedWindows(
-            bundleIdentifier: bundleID
-        )
-        switch WindowRestoreRouting.action(for: automationResult) {
-        case .recordAutomationSuccess(let windowCount):
+        let accessibilityResult = advancedWindowRestoreResult(for: bundleID)
+        switch accessibilityResult {
+        case .restored(let windowCount):
             let runningApplication = workspace.runningApplications.first {
                 $0.bundleIdentifier == bundleID
             }
@@ -632,11 +638,13 @@ final class ActivationMonitor: ObservableObject {
                 activationPolicy: runningApplication?.activationPolicy
             )
             AppLogger.activation.notice(
-                "Restored \(windowCount) minimized window(s) for \(bundleID) through Apple Events."
+                "Restored \(windowCount) window(s) for \(bundleID) through Accessibility."
             )
             return
-        case .useNativeReopen:
-            logAutomationFallback(result: automationResult, bundleIdentifier: bundleID)
+        case .unavailable, .failed:
+            if advancedWindowRestoreSettings.isAdvancedModeEnabled {
+                AppLogger.activation.info("Accessibility restore unavailable for \(bundleID); using native reopen.")
+            }
         }
 
         // Ignore one immediate echo activation caused by our own reopen request.
@@ -660,32 +668,65 @@ final class ActivationMonitor: ObservableObject {
         }
     }
 
-    private func logAutomationFallback(
-        result: AppleEventWindowRestoreResult,
-        bundleIdentifier: String
-    ) {
-        switch result {
-        case .restored:
-            break
-        case .disabled:
-            break
-        case .noMinimizedWindows:
-            AppLogger.activation.debug(
-                "Apple Events found no minimized windows for \(bundleIdentifier); using native reopen."
-            )
-        case .unsupported(let capability):
-            AppLogger.activation.debug(
-                "Apple Events capability \(String(describing: capability)) for \(bundleIdentifier); using native reopen."
-            )
-        case .permissionDenied(let errorNumber):
-            AppLogger.activation.info(
-                "Apple Events denied for \(bundleIdentifier) (\(errorNumber)); using native reopen."
-            )
-        case .failed(let errorNumber, let message):
-            AppLogger.activation.error(
-                "Apple Events failed for \(bundleIdentifier) (\(errorNumber)): \(message, privacy: .public). Using native reopen."
-            )
+    private func advancedWindowRestoreResult(for bundleIdentifier: String) -> AccessibilityWindowRestoreResult {
+#if DIRECT
+        guard let mode = AdvancedWindowRestorePolicy.mode(
+            isAdvancedModeEnabled: advancedWindowRestoreSettings.isAdvancedModeEnabled,
+            restoresAllWindows: advancedWindowRestoreSettings.restoresAllWindows
+        ) else { return .unavailable }
+        return accessibilityWindowRestorer.restoreWindows(
+            bundleIdentifier: bundleIdentifier,
+            mode: mode
+        )
+#else
+        return .unavailable
+#endif
+    }
+
+    /// A global monitor passes only confirmed Dock AX hits here. Other mouse
+    /// activations retain the normal activation path and never toggle windows.
+    func cycleWindowsForConfirmedDockClick(bundleIdentifier: String) {
+#if DIRECT
+        guard isFeatureEnabled,
+              accessController.isCoreFeatureAvailable,
+              advancedWindowRestoreSettings.isAdvancedModeEnabled,
+              !userExcludedBundleIDs.contains(bundleIdentifier),
+              !Self.isIgnoredBundleID(bundleIdentifier),
+              bundleIdentifier != Bundle.main.bundleIdentifier else {
+            return
         }
+        let action = accessibilityWindowRestorer.cycleWindows(bundleIdentifier: bundleIdentifier)
+        guard action != .none else { return }
+        AppLogger.activation.notice("Dock AX click \(action == .restoreAll ? "restored" : "minimized") all eligible windows for \(bundleIdentifier).")
+#endif
+    }
+
+    func registerPendingDockClick(
+        bundleIdentifier: String,
+        processIdentifier: pid_t,
+        at date: Date
+    ) {
+#if DIRECT
+        pendingDockClickIntent = DockClickActivationIntent(
+            bundleIdentifier: bundleIdentifier,
+            processIdentifier: processIdentifier,
+            expiresAt: date.addingTimeInterval(1)
+        )
+#endif
+    }
+
+    private func consumePendingDockClickIntent(for application: NSRunningApplication) -> Bool {
+#if DIRECT
+        guard let intent = pendingDockClickIntent else { return false }
+        defer { pendingDockClickIntent = nil }
+        return intent.matches(
+            bundleIdentifier: application.bundleIdentifier,
+            processIdentifier: application.processIdentifier,
+            now: Date()
+        )
+#else
+        return false
+#endif
     }
 
     func handleReopenCompletion(

@@ -90,31 +90,23 @@ With Command Reopen switched off in System Settings › Login Items, turn the
 Settings toggle on and confirm the alert appears and lands on the Login Items
 pane; confirm the same from the menu bar item with no window open.
 
-## I-003 — Apple Event success does not imply arbitrary MAS automation
+## I-003 — Accessibility/Dock behavior needs real-system release smoke
 
-- Date: 2026-08-13
-- Status: Open release boundary
+- Date: 2026-08-25
+- Status: Open manual verification boundary; supersedes Apple Events risk
 
-### Symptom
+### Risk
 
-Safari, Chrome, or Terminal can restore windows in a non-sandboxed test, which
-can look like proof that the same implementation is ready for the Mac App
-Store. This branch subsequently proved a named-target MAS Sandbox build too,
-but that still does not prove App Review acceptance.
-
-### Cause
-
-Automation/TCC consent and App Sandbox authorization are independent. The MAS
-target is sandboxed, and target apps do not generally publish the fine-grained
-scripting access groups needed by `com.apple.security.scripting-targets`.
-Named `com.apple.security.temporary-exception.apple-events` entries can make a
-local allowlist experiment possible, but they are not arbitrary-app access and
-remain subject to App Review justification.
+Accessibility is TCC-controlled and the Dock hierarchy is system-owned. A
+unit-tested hit-test and a successful build cannot prove that a specific macOS
+release exposes every third-party window as mutable AX, nor that the user's Dock
+click produces the expected activation ordering.
 
 ### Resolution boundary
 
-Validate Direct and MAS artifacts separately. For MAS, inspect the final
-signature, probe every named target, file a Feedback Assistant issue, and add
-App Store Connect usage information before considering submission. If that
-release path is rejected or unjustifiable, retain the adapters as a Direct-only
-enhancement and compile the MAS target onto the existing native fallback.
+Keep the feature Direct-only, opt-in, and safely native-fallbacked. Before a
+Direct release, grant Accessibility on a clean account and verify focused
+restore, Restore All, failed AX fallback, and a Dock click for a multi-window
+app. Revoke permission and confirm normal Cmd+Tab continues without prompts.
+For MAS, inspect final entitlements and dependency linkage to ensure the
+advanced UI and Apple Events exceptions do not ship.

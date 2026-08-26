@@ -71,6 +71,21 @@ struct SettingsTabContent: View {
                 }
             }
 
+            Section {
+                KikiSettingsToggleRow(
+                    appLanguage.string("Return Focus to Previous App"),
+                    isOn: activationMonitor.automaticSwitcherReorderingBinding,
+                    systemImage: "arrow.uturn.backward"
+                )
+                .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
+            } header: {
+                Text(appLanguage.string("When No Windows Remain"))
+            } footer: {
+                KikiSettingsHelperText(
+                    appLanguage.string("When you close or minimize an app’s last window, automatically hand focus back to the previous app so Cmd+Tab can bring it right back.")
+                )
+            }
+
             ExcludedAppsSection(
                 bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
                 isDisabled: isFeatureLocked,

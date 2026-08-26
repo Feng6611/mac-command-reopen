@@ -35,7 +35,11 @@ Command Reopen may receive purchase status information needed to determine wheth
 
 ## Permissions
 
-Command Reopen does not require Accessibility, Screen Recording, Contacts, Location, or other sensitive macOS permissions.
+Command Reopen's core Cmd+Tab behavior does not require Accessibility, Screen
+Recording, Contacts, Location, or other sensitive macOS permissions. The
+optional Direct-build Advanced Window Restore mode asks for Accessibility only
+when the user opens its Settings control and enables it; no permission is
+needed for the standard native fallback.
 
 ## Third Parties
 

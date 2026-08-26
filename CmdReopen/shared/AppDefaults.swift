@@ -18,7 +18,8 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let preferredLanguage = "cmdreopenPreferredLanguage"
-        static let appleEventWindowRestoreEnabledBundleIDs = "cmdreopenAppleEventWindowRestoreEnabledBundleIDs"
+        static let advancedWindowRestoreEnabled = "cmdreopenAdvancedWindowRestoreEnabled"
+        static let advancedWindowRestoreAllWindows = "cmdreopenAdvancedWindowRestoreAllWindows"
         /// When the win-back offer was first presented. The 20%-off window
         /// runs a fixed time from this moment and never reopens; see
         /// `TrialExitOffer`.
@@ -56,7 +57,8 @@ enum AppDefaults {
     static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
-    static let appleEventWindowRestoreEnabledBundleIDs = Defaults.Key<[String]>(RawKey.appleEventWindowRestoreEnabledBundleIDs, default: [])
+    static let advancedWindowRestoreEnabled = Defaults.Key<Bool>(RawKey.advancedWindowRestoreEnabled, default: false)
+    static let advancedWindowRestoreAllWindows = Defaults.Key<Bool>(RawKey.advancedWindowRestoreAllWindows, default: false)
     static let winbackOfferFirstShownAt = Defaults.Key<Date?>(RawKey.winbackOfferFirstShownAt, default: nil)
 #if DEBUG
     static let winbackDebugForced = Defaults.Key<Bool>(RawKey.winbackDebugForced, default: false)

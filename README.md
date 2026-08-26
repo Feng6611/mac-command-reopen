@@ -64,6 +64,10 @@ macOS treats minimized windows as intentionally "put away." Cmd+Tab switches the
 
 No special permissions for the core app behavior. It uses `NSWorkspace` APIs available to sandboxed apps and needs no Accessibility or Screen Recording permission for Cmd+Tab reopen.
 
+The optional Direct-build Advanced Window Restore mode uses Accessibility to
+raise a window or restore all minimized windows. It is off by default, shown
+separately in Settings, and always falls back to native reopen when unavailable.
+
 **Does it change the Cmd+Tab interface?**
 
 No. The native Cmd+Tab switcher stays exactly the same. Command Reopen works invisibly behind it — you won't notice any visual difference.

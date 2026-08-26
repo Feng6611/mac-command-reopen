@@ -183,78 +183,46 @@ Neither card is extracted into Kiki yet. The two are close in shape but not
 identical, and the workspace rule is to prove a component in two real apps
 before lifting it.
 
-## D-006 — Probe app-owned Apple Event adapters without replacing native reopen
+## D-006 — Direct-only Accessibility advanced restore replaces Apple Events
 
-- Date: 2026-08-13
-- Status: Experimental
+- Date: 2026-08-25
+- Status: Accepted; supersedes the 2026-08-13 Apple Events experiment
 
 ### Context
 
-The existing `NSWorkspace.openApplication` route can restore one minimized
-window or create a closed window, but it cannot ask every compatible app to
-deminiaturize all of its windows. Safari, Chrome, Terminal, Preview, and iTerm2
-expose minimized-window properties in their AppleScript dictionaries.
-Runtime MAS tests proved Safari, Chrome, Terminal, Preview, iTerm2, and Ghostty.
-Arc declares a writable property but its handler fails; Xcode 26.3 declares a
-writable property but times out even while enumerating windows; Finder and VS
-Code do not expose the required primitive; and the installed Dia version cannot
-validate Dia's newer focus-only scripting API.
-
-App Sandbox is a separate boundary. Automation consent does not grant a
-sandboxed app permission to send arbitrary Apple Events. The MAS experiment
-therefore names only known bundle IDs with a temporary Apple Events exception;
-Direct uses the ordinary Hardened Runtime Automation entitlement.
+Apple Events required target-specific scripting dictionaries, Automation
+consent, and Mac App Store temporary exceptions. That produced an app allowlist
+instead of a reliable window capability, while the product's primary path has
+always required no permission.
 
 ### Decision
 
-Keep the adapter registry, per-app preference and authorization state,
-permission-denial cache, and native fallback inside Command Reopen's reopen
-feature. This is direct product behavior and recovery policy, not a repeated
-Kiki app-shell mechanism.
+The App Store target compiles only the native `NSWorkspace` reopen path. The
+Direct target exposes a separate Advanced tab, where the user explicitly grants
+Accessibility and enables Advanced Window Restore. KikiAuthorization supplies
+only the status row and permission helper; Command Reopen owns the persisted
+mode, recovery policy, window behavior, and copy.
 
-Standard reopen remains enabled by default. The enhanced multi-window route is
-off by default and appears in its own Settings tab. Enabling one app first asks
-macOS for Automation consent for that running target; only an approved target
-is persisted. A denied, failed, or not-running target stays disabled.
+After the ordinary CoreGraphics visibility check finds no visible window, an
+enabled Direct mode uses AX to unminimize, focus, make main, and raise a window.
+Its optional Restore All setting applies that operation to every minimized
+window. Any missing permission, AX failure, or unavailable target returns to
+the same native reopen fallback.
 
-Attempt an adapter only after CoreGraphics reports no visible window. Count a
-positive restore as the successful reopen. For no minimized windows,
-unsupported/focus-only dictionaries, permission denial, or script failure,
-preserve the existing native reopen path. Cache a permission denial for the
-process lifetime so later activations do not aggressively retry it.
-
-Do not describe the MAS route as universal: a local signed build can prove a
-listed target works, while App Review acceptance of temporary exceptions
-remains a separate release decision.
+Dock cycling is deliberately narrower than generic mouse activation: a global
+click must AX-hit an `AXDockItem`, resolve an app bundle URL, and then match that
+same process's workspace activation within one second. Each accepted click
+re-reads the target's current AX windows and trust state; if all eligible
+windows are minimized it restores them, otherwise it minimizes them. There is
+no retained per-app cycle state to become stale after a PID or window-set
+change.
 
 ### Verification
 
-Unit tests cover the allowlist, property-name adapters, fallback routing, and
-denial cache. The MAS artifact must build with App Sandbox, have its final
-entitlements inspected, and be probed independently from Direct.
-
-The Apple Development-signed MAS Debug artifact was inspected with `codesign`
-and contained App Sandbox, Automation, and named temporary exceptions for only
-the proven adapters. Its runtime matrix is:
-
-| App | MAS Sandbox result |
-| --- | --- |
-| Safari | Restored one minimized window (`miniaturized`) |
-| Chrome | Restored one window; a second run restored two and returned `windowCount: 2` |
-| Terminal | Restored one minimized window; two-window fixture creation was unreliable |
-| Preview | Restored one minimized document window |
-| Arc | Declares `minimized`, but the handler returned AppleScript `-10000`; focus/native fallback |
-| iTerm2 3.6.6 | Restored one minimized window (`miniaturized`) |
-| Ghostty 1.3.1 | Restored the minimized test window through `activate window`; Ghostty exposes no minimized property |
-| Xcode 26.3 | Declares writable `miniaturized`, but host and MAS probes timed out (`-1712`); excluded from Settings and the MAS exception list |
-| Finder | Exposes `collapsed`, not a Dock-minimized primitive; native fallback |
-| VS Code | No scripting dictionary; native fallback |
-| Dia 1.0.2 | No scripting dictionary in the installed version; focus/native fallback marker |
-
-Each adapter event has a three-second timeout. Permission denial is cached by
-bundle ID for the process lifetime. A Debug-only
-`--probe-apple-event-window-restore <bundle-id>` launch argument prints the
-result from the signed artifact and exits.
+Behavior tests cover opt-in policy, focused versus all-window scope, Dock cycle
+planning, Dock-role filtering, and click-to-activation PID correlation. Build
+both distributions and inspect the MAS artifact's empty app entitlement plist;
+manual Direct smoke still needs a real Accessibility grant and Dock click.
 
 ## D-007 — One custom review introduction, then StoreKit owns later displays
 

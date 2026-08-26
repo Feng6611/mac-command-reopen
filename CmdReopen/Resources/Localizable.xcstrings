@@ -523,6 +523,93 @@
         }
       }
     },
+    "Advanced Mode" : {
+      "comment" : "Section header for the Direct build's optional AX behavior.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterter Modus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode avancé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度なモード"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高级模式"
+          }
+        }
+      }
+    },
+    "Allowed" : {
+      "comment" : "Accessibility authorization status when granted.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已允许"
+          }
+        }
+      }
+    },
+    "Needed" : {
+      "comment" : "Accessibility authorization status when not granted.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "必要"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要授权"
+          }
+        }
+      }
+    },
     "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here." : {
       "comment" : "Footer explaining automatic Cmd+Tab ordering after the foreground app loses its last visible window.",
       "extractionState" : "stale",
@@ -2031,31 +2118,31 @@
         }
       }
     },
-    "If an app stops restoring, check macOS System Settings > Privacy & Security > Automation." : {
-      "comment" : "Helper text guiding user to system privacy settings for automation.",
+    "Advanced window restoration can control other apps’ windows only after you grant Accessibility access. Core Command Reopen needs no permission." : {
+      "comment" : "Direct Advanced pane helper explaining the optional Accessibility permission.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Falls die Wiederherstellung fehlschlägt, überprüfen Sie die Berechtigung unter Systemeinstellungen > Datenschutz & Sicherheit > Automation."
+            "value" : "Die erweiterte Fensterwiederherstellung kann andere App-Fenster erst nach deiner Bedienungshilfen-Freigabe steuern. Die Kernfunktion benötigt keine Berechtigung."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si une app ne se restaure plus, vérifiez ses autorisations dans Réglages Système > Confidentialité et sécurité > Automatisation."
+            "value" : "La restauration avancée peut contrôler les fenêtres d’autres apps uniquement après l’autorisation Accessibilité. La fonction principale ne nécessite aucune autorisation."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "復元が動作しない場合は、macOS の「システム設定」>「プライバシーとセキュリティ」>「オートメーション」をご確認ください。"
+            "value" : "高度なウインドウ復元でほかの App を操作するには、アクセシビリティの許可が必要です。基本機能には権限は不要です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "若部分 App 恢复失效，请前往 macOS「系统设置」>「隐私与安全性」>「自动化」中检查授权。"
+            "value" : "高级窗口恢复仅在你授予辅助功能权限后才可控制其他 App 的窗口。核心功能无需任何权限。"
           }
         }
       }
@@ -2582,31 +2669,31 @@
         }
       }
     },
-    "macOS has no direct way to reopen another app’s minimized windows, so Command Reopen uses Automation to control each app you enable. Access is requested only for apps you turn on." : {
-      "extractionState" : "stale",
+    "Use Advanced Window Restore" : {
+      "comment" : "Toggle enabling the Direct build's optional Accessibility window behavior.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwendet die macOS-Automation. Die Berechtigung wird nur für aktivierte Apps angefordert."
+            "value" : "Erweiterte Fensterwiederherstellung verwenden"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilise l'automatisation macOS. L'accès est demandé uniquement pour les apps activées."
+            "value" : "Utiliser la restauration avancée des fenêtres"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS の「オートメーション」を使用します。権限は有効にした App でのみ要求されます。"
+            "value" : "高度なウインドウ復元を使用"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "通过 macOS“自动化”控制对应 App，仅在开启时请求对应权限。"
+            "value" : "使用高级窗口恢复"
           }
         }
       }
@@ -2899,31 +2986,31 @@
         }
       }
     },
-    "No Accessibility. No Screen Recording. Nothing to grant." : {
+    "Core restore needs no Accessibility or Screen Recording." : {
       "comment" : "Onboarding success step hero card subtitle.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Bedienungshilfen. Keine Bildschirmaufnahme. Reiner Sandbox-Betrieb."
+            "value" : "Die Kernwiederherstellung benötigt weder Bedienungshilfen noch Bildschirmaufnahme."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pas d’Accessibilité. Pas d’enregistrement d’écran. Sandboxé."
+            "value" : "La restauration principale ne nécessite ni Accessibilité ni enregistrement d’écran."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アクセシビリティも画面収録も不要。完全サンドボックス動作。"
+            "value" : "基本の復元にはアクセシビリティも画面収録も不要です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无需辅助功能，无需屏幕录制，纯沙盒运行。"
+            "value" : "核心恢复无需辅助功能或屏幕录制权限。"
           }
         }
       }
@@ -3215,31 +3302,31 @@
         }
       }
     },
-    "Open Automation Settings…" : {
-      "comment" : "Button opening system automation settings.",
+    "Accessibility" : {
+      "comment" : "macOS Accessibility permission title.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Automationseinstellungen in Systemeinstellungen öffnen …"
+            "value" : "Bedienungshilfen"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrir les réglages d’automatisation…"
+            "value" : "Accessibilité"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「システム設定」でオートメーション権限を管理…"
+            "value" : "アクセシビリティ"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在“系统设置”中管理自动化权限…"
+            "value" : "辅助功能"
           }
         }
       }
@@ -3875,31 +3962,31 @@
         }
       }
     },
-    "Restore All Windows at Once" : {
-      "comment" : "Section header for multi-window restoration via Apple Events.",
+    "Restore All Minimized Windows" : {
+      "comment" : "Toggle restoring every minimized AX window in Direct advanced mode.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Fenster auf einmal wiederherstellen"
+            "value" : "Alle minimierten Fenster wiederherstellen"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Restaurer toutes les fenêtres en une fois"
+            "value" : "Restaurer toutes les fenêtres réduites"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべてのウインドウをまとめて復元"
+            "value" : "最小化したすべてのウインドウを復元"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一次性恢复全部窗口"
+            "value" : "恢复所有最小化窗口"
           }
         }
       }
@@ -4427,31 +4514,31 @@
         }
       }
     },
-    "Standard reopen brings back the main window. Enable an app below to restore every minimized window in your Dock at once using macOS Automation." : {
-      "comment" : "Helper text explaining multi-window restoration feature.",
+    "When enabled, Command Reopen uses Accessibility to raise a window. Restore All also brings back every minimized window. Clicking a confirmed Dock app icon cycles that app’s eligible windows." : {
+      "comment" : "Direct Advanced pane helper describing AX focus, restore-all, and Dock cycling.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standardmäßig wird nur das Hauptfenster wiederhergestellt. Aktivieren Sie eine App, um alle minimierten Fenster im Dock über macOS-Automation auf einmal zu öffnen."
+            "value" : "Wenn aktiviert, hebt Command Reopen ein Fenster per Bedienungshilfen hervor. „Alle wiederherstellen“ bringt alle minimierten Fenster zurück. Ein bestätigter Klick auf das Dock-Symbol wechselt zwischen Minimieren und Wiederherstellen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La réouverture standard restaure la fenêtre principale. Activez une app pour restaurer d’un coup toutes les fenêtres réduites dans le Dock via l’automatisation macOS."
+            "value" : "Une fois activé, Command Reopen utilise Accessibilité pour relever une fenêtre. « Tout restaurer » ramène toutes les fenêtres réduites. Un clic confirmé sur l’icône du Dock alterne réduction et restauration."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "標準では主ウインドウのみ復元します。オンにすると、macOS の「オートメーション」を使用して Dock にあるすべての最小化ウインドウを一度に復元します。"
+            "value" : "有効にすると、アクセシビリティでウインドウを前面に出します。「すべて復元」では最小化した全ウインドウを戻し、Dock アイコンの確認済みクリックで最小化と復元を切り替えます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "默认仅唤起主窗口。开启以下 App 后，切回时将通过 macOS“自动化”权限一次性还原 Dock 中的全部多个最小化窗口。"
+            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”还会恢复所有最小化窗口。确认点击 Dock App 图标后，可在最小化与展开之间循环。"
           }
         }
       }

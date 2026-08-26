@@ -13,8 +13,10 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     case statistics
     case about
 
-    static func visibleTabs(showProTab: Bool) -> [SettingsTab] {
-        allCases
+    static func visibleTabs(showProTab: Bool, distributionChannel: DistributionChannel = .current) -> [SettingsTab] {
+        allCases.filter { tab in
+            tab != .advanced || distributionChannel == .direct
+        }
     }
 
     func title(for distributionChannel: DistributionChannel, language: AppLanguage) -> String {
@@ -36,7 +38,7 @@ enum SettingsTab: Int, CaseIterable, Hashable {
     }
 
     static func kikiTabs(language: AppLanguage) -> [KikiSettingsTabSpec<SettingsTab>] {
-        allCases.map { tab in
+        visibleTabs(showProTab: true).map { tab in
             KikiSettingsTabSpec(
                 tab,
                 title: tab.title(for: .current, language: language),
