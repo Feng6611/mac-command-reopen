@@ -67,18 +67,16 @@ final class AppLifecycleCoordinator {
                     && ActivationMonitor.shared.isFeatureEnabled
                     && self.accessController.isCoreFeatureAvailable
             },
-            onDockAppIntent: { bundleIdentifier, processIdentifier, date in
+            onDockAppIntent: { bundleIdentifier, processIdentifier, date, targetWasFrontmost in
                 ActivationMonitor.shared.registerPendingDockClick(
                     bundleIdentifier: bundleIdentifier,
                     processIdentifier: processIdentifier,
-                    at: date
+                    at: date,
+                    targetWasFrontmost: targetWasFrontmost
                 )
             },
-            onDockAppClick: { bundleIdentifier, action in
-                ActivationMonitor.shared.cycleWindowsForConfirmedDockClick(
-                    bundleIdentifier: bundleIdentifier,
-                    action: action
-                )
+            onDockAppClick: { intent in
+                ActivationMonitor.shared.cycleWindowsForConfirmedDockClick(intent)
             }
         )
 #endif

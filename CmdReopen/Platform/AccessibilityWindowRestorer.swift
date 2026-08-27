@@ -31,11 +31,16 @@ enum DockWindowCycleAction: Equatable {
 }
 
 enum DockWindowCyclePlanner {
-    /// Dock clicks are a true toggle: any eligible visible window means put the
-    /// application's windows away; otherwise restore the entire minimized set.
-    static func action(forMinimizedStates minimizedStates: [Bool]) -> DockWindowCycleAction {
+    /// Preserve native Dock activation for background apps that already expose
+    /// a visible window. Window cycling begins only after the app is frontmost,
+    /// or when a background app has no visible window to activate.
+    static func action(
+        forMinimizedStates minimizedStates: [Bool],
+        targetWasFrontmost: Bool
+    ) -> DockWindowCycleAction {
         guard !minimizedStates.isEmpty else { return .none }
-        return minimizedStates.allSatisfy { $0 } ? .restoreAll : .minimizeAll
+        if minimizedStates.allSatisfy({ $0 }) { return .restoreAll }
+        return targetWasFrontmost ? .minimizeAll : .none
     }
 
     static func didComplete(
@@ -58,6 +63,22 @@ enum DockWindowCyclePlanner {
 
     static func shouldActivateApplication(for action: DockWindowCycleAction) -> Bool {
         action == .restoreAll
+    }
+}
+
+enum DockClickExecutionTiming {
+    static func delay(
+        for action: DockWindowCycleAction,
+        targetWasFrontmost: Bool
+    ) -> TimeInterval {
+        switch action {
+        case .restoreAll, .none:
+            return 0.15
+        case .minimizeAll:
+            // Foreground minimize is responsive. Retain a defensive longer
+            // delay if a future policy ever permits minimize during activation.
+            return targetWasFrontmost ? 0.15 : 0.75
+        }
     }
 }
 
@@ -92,10 +113,75 @@ struct DockClickActivationIntent: Equatable {
     let bundleIdentifier: String
     let processIdentifier: pid_t
     let action: DockWindowCycleAction
+    let targetWasFrontmost: Bool
     let expiresAt: Date
 
     func matches(bundleIdentifier: String?, processIdentifier: pid_t, now: Date) -> Bool {
         now <= expiresAt && self.bundleIdentifier == bundleIdentifier && self.processIdentifier == processIdentifier
+    }
+}
+
+final class DockClickIntentCoordinator {
+    static let shared = DockClickIntentCoordinator()
+
+    private let lock = NSLock()
+    private var pendingIntent: DockClickActivationIntent?
+
+    func register(_ intent: DockClickActivationIntent) {
+        lock.lock()
+        pendingIntent = intent
+        lock.unlock()
+    }
+
+    func intent(
+        matchingBundleIdentifier bundleIdentifier: String?,
+        processIdentifier: pid_t,
+        now: Date
+    ) -> DockClickActivationIntent? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let intent = pendingIntent else { return nil }
+        guard intent.matches(
+            bundleIdentifier: bundleIdentifier,
+            processIdentifier: processIdentifier,
+            now: now
+        ) else {
+            pendingIntent = nil
+            return nil
+        }
+        return intent
+    }
+
+    func isCurrent(_ intent: DockClickActivationIntent, now: Date) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let pendingIntent else { return false }
+        guard now <= pendingIntent.expiresAt else {
+            self.pendingIntent = nil
+            return false
+        }
+        return pendingIntent == intent
+    }
+
+    func consume(_ intent: DockClickActivationIntent, now: Date) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let pendingIntent,
+              now <= pendingIntent.expiresAt,
+              pendingIntent == intent else {
+            if (self.pendingIntent?.expiresAt ?? .distantFuture) < now {
+                self.pendingIntent = nil
+            }
+            return false
+        }
+        self.pendingIntent = nil
+        return true
+    }
+
+    func clear() {
+        lock.lock()
+        pendingIntent = nil
+        lock.unlock()
     }
 }
 
@@ -115,13 +201,25 @@ enum AccessibilityWindowFocusPlanner {
     }
 }
 
+enum AccessibilityWindowCandidatePlanner {
+    static func minimized<Element>(
+        from elements: [Element],
+        state: (Element) -> Bool?
+    ) -> [Element] {
+        elements.filter { state($0) == true }
+    }
+}
+
 protocol AccessibilityWindowRestoring: AnyObject {
     func restoreWindows(
         bundleIdentifier: String,
         mode: AccessibilityWindowRestoreMode
     ) -> AccessibilityWindowRestoreResult
 
-    func plannedCycleAction(bundleIdentifier: String) -> DockWindowCycleAction
+    func plannedCycleAction(
+        bundleIdentifier: String,
+        targetWasFrontmost: Bool
+    ) -> DockWindowCycleAction
 
     func cycleWindows(
         bundleIdentifier: String,
@@ -142,14 +240,18 @@ final class AccessibilityWindowRestorer: AccessibilityWindowRestoring {
         guard !windows.isEmpty else { return .failed }
 
         let targets: [AXUIElement]
+        let minimizedWindows = AccessibilityWindowCandidatePlanner.minimized(
+            from: windows,
+            state: minimizedState(_:)
+        )
         switch mode {
         case .focusedWindow:
             targets = preferredWindow(
-                from: windows,
+                from: minimizedWindows,
                 processIdentifier: application.processIdentifier
             ).map { [$0] } ?? []
         case .allMinimizedWindows:
-            targets = windows.filter(isMinimized(_:))
+            targets = minimizedWindows
         }
         guard !targets.isEmpty else { return .failed }
 
@@ -161,12 +263,18 @@ final class AccessibilityWindowRestorer: AccessibilityWindowRestoring {
         return restoredCount > 0 ? .restored(windowCount: restoredCount) : .failed
     }
 
-    func plannedCycleAction(bundleIdentifier: String) -> DockWindowCycleAction {
+    func plannedCycleAction(
+        bundleIdentifier: String,
+        targetWasFrontmost: Bool
+    ) -> DockWindowCycleAction {
         guard AXIsProcessTrusted(), let application = runningApplication(for: bundleIdentifier) else {
             return .none
         }
         let minimizedStates = windows(for: application.processIdentifier).compactMap(minimizedState(_:))
-        return DockWindowCyclePlanner.action(forMinimizedStates: minimizedStates)
+        return DockWindowCyclePlanner.action(
+            forMinimizedStates: minimizedStates,
+            targetWasFrontmost: targetWasFrontmost
+        )
     }
 
     func cycleWindows(
@@ -182,7 +290,6 @@ final class AccessibilityWindowRestorer: AccessibilityWindowRestoring {
         // settled, refresh only the AX elements and never re-plan from their
         // already-mutated minimized state.
         let windows = windows(for: application.processIdentifier).filter { minimizedState($0) != nil }
-        guard action != .none else { return .none }
 
         let shouldMinimize = action == .minimizeAll
         if DockWindowCyclePlanner.shouldActivateApplication(for: action) {
@@ -239,10 +346,6 @@ final class AccessibilityWindowRestorer: AccessibilityWindowRestoring {
         return (value as? NSNumber)?.boolValue
     }
 
-    private func isMinimized(_ window: AXUIElement) -> Bool {
-        minimizedState(window) == true
-    }
-
     /// Prefer the window macOS already considers focused, then main, then the
     /// stable AX list order. This avoids making an arbitrary background window
     /// primary when an application exposes more than one minimized document.
@@ -295,7 +398,10 @@ final class NativeFallbackWindowRestorer: AccessibilityWindowRestoring {
         .unavailable
     }
 
-    func plannedCycleAction(bundleIdentifier: String) -> DockWindowCycleAction {
+    func plannedCycleAction(
+        bundleIdentifier: String,
+        targetWasFrontmost: Bool
+    ) -> DockWindowCycleAction {
         .none
     }
 
@@ -372,23 +478,19 @@ final class DockAccessibilityHitTester {
 final class DockClickMonitor {
     static let shared = DockClickMonitor()
 
-    /// A click on an already-frontmost app does not need to wait for a
-    /// workspace activation animation. Keep that toggle responsive.
-    private static let frontmostSettleDelay: TimeInterval = 0.15
-    /// `didActivateApplication` is delivered before the Dock has always
-    /// finished bringing a TextEdit-style multi-window app forward. Mutating
-    /// AX too early lets the Dock re-show one window after our minimize write.
-    private static let activationSettleDelay: TimeInterval = 0.75
-
     private var monitor: Any?
     private var activationObserver: NSObjectProtocol?
-    private var pendingIntent: DockClickActivationIntent?
     private let hitTester = DockAccessibilityHitTester()
+    private let intentCoordinator: DockClickIntentCoordinator
+
+    init(intentCoordinator: DockClickIntentCoordinator = .shared) {
+        self.intentCoordinator = intentCoordinator
+    }
 
     func start(
         isEnabled: @escaping () -> Bool,
-        onDockAppIntent: @escaping (String, pid_t, Date) -> DockWindowCycleAction,
-        onDockAppClick: @escaping (String, DockWindowCycleAction) -> Void
+        onDockAppIntent: @escaping (String, pid_t, Date, Bool) -> DockClickActivationIntent?,
+        onDockAppClick: @escaping (DockClickActivationIntent) -> Void
     ) {
         guard monitor == nil else { return }
         monitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown]) { [weak self] event in
@@ -406,24 +508,26 @@ final class DockClickMonitor {
                 return
             }
             let now = Date()
-            let action = onDockAppIntent(bundleIdentifier, application.processIdentifier, now)
-            guard action != .none else { return }
-            self.pendingIntent = DockClickActivationIntent(
-                bundleIdentifier: bundleIdentifier,
-                processIdentifier: application.processIdentifier,
-                action: action,
-                expiresAt: now.addingTimeInterval(1)
-            )
-            if NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier,
-               let intent = self.pendingIntent {
-                DispatchQueue.main.asyncAfter(deadline: .now() + Self.frontmostSettleDelay) { [weak self] in
+            let targetWasFrontmost = NSWorkspace.shared.frontmostApplication?.processIdentifier
+                == application.processIdentifier
+            guard let intent = onDockAppIntent(
+                bundleIdentifier,
+                application.processIdentifier,
+                now,
+                targetWasFrontmost
+            ) else { return }
+            if targetWasFrontmost {
+                let delay = DockClickExecutionTiming.delay(
+                    for: intent.action,
+                    targetWasFrontmost: true
+                )
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                     guard let self,
                           AXIsProcessTrusted(),
-                          self.pendingIntent == intent else {
+                          self.intentCoordinator.isCurrent(intent, now: Date()) else {
                         return
                     }
-                    self.pendingIntent = nil
-                    onDockAppClick(intent.bundleIdentifier, intent.action)
+                    onDockAppClick(intent)
                 }
             }
         }
@@ -434,21 +538,20 @@ final class DockClickMonitor {
         ) { [weak self] notification in
             guard let self,
                   let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
-                  let intent = self.pendingIntent else {
+                  let intent = self.intentCoordinator.intent(
+                    matchingBundleIdentifier: application.bundleIdentifier,
+                    processIdentifier: application.processIdentifier,
+                    now: Date()
+                  ) else {
                 return
             }
-            defer { self.pendingIntent = nil }
-            guard AXIsProcessTrusted(), intent.matches(
-                bundleIdentifier: application.bundleIdentifier,
-                processIdentifier: application.processIdentifier,
-                now: Date()
-            ) else {
-                return
-            }
-            // Let the Dock finish its native activation before mutating AX
-            // state, or it can immediately bring a just-minimized window back.
-            DispatchQueue.main.asyncAfter(deadline: .now() + Self.activationSettleDelay) {
-                onDockAppClick(intent.bundleIdentifier, intent.action)
+            guard AXIsProcessTrusted() else { return }
+            let delay = DockClickExecutionTiming.delay(
+                for: intent.action,
+                targetWasFrontmost: intent.targetWasFrontmost
+            )
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                onDockAppClick(intent)
             }
         }
     }
@@ -462,7 +565,7 @@ final class DockClickMonitor {
             NSWorkspace.shared.notificationCenter.removeObserver(activationObserver)
             self.activationObserver = nil
         }
-        pendingIntent = nil
+        intentCoordinator.clear()
     }
 }
 #endif

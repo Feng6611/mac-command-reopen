@@ -79,10 +79,10 @@ struct SettingsTabContent: View {
                 )
                 .disabled(isFeatureLocked || !activationMonitor.isFeatureEnabled)
             } header: {
-                Text(appLanguage.string("When No Windows Remain"))
+                Text(appLanguage.string("Reopen"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("When you close or minimize an app’s last window, automatically hand focus back to the previous app so Cmd+Tab can bring it right back.")
+                    appLanguage.string("When you close or minimize an app’s last window, focus returns so Cmd+Tab brings it right back.")
                 )
             }
 
@@ -97,26 +97,25 @@ struct SettingsTabContent: View {
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
 
-            Section {
-                Button {
-                    route.presentMacShortcuts()
-                } label: {
-                    KikiSettingsValueRow(
-                        appLanguage.string("Mac window shortcuts"),
-                        systemImage: "keyboard"
-                    ) {
-                        Text("Nine of them, and where this app fits")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                    .contentShape(Rectangle())
+        }
+        // A reference guide, not a setting: a lightweight footer link on the
+        // window background instead of a full-weight card row inside the Form.
+        .safeAreaInset(edge: .bottom) {
+            Button {
+                route.presentMacShortcuts()
+            } label: {
+                HStack(spacing: DS.Spacing.xxs) {
+                    Text(appLanguage.string("Mac window shortcuts"))
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
                 }
-                .buttonStyle(.plain)
+                .font(.callout)
+                .foregroundStyle(DS.Colors.brandPrimary)
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, DS.Spacing.sm)
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()
@@ -238,15 +237,13 @@ private struct ExcludedAppsSection: View {
                 }
             }
 
-            LabeledContent(appLanguage.string("Add App")) {
-                ApplicationSearchControl(
-                    query: $query,
-                    results: searchResults,
-                    excludedBundleIDs: excludedBundleIDs,
-                    isDisabled: isDisabled,
-                    addAction: addApplicationAction
-                )
-            }
+            ApplicationSearchControl(
+                query: $query,
+                results: searchResults,
+                excludedBundleIDs: excludedBundleIDs,
+                isDisabled: isDisabled,
+                addAction: addApplicationAction
+            )
         } header: {
             Text(appLanguage.string("Excluded Apps"))
         } footer: {
@@ -302,6 +299,8 @@ private struct ApplicationSearchControl: View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             TextField("", text: $query, prompt: Text(appLanguage.string("Search App name or bundle ID…")))
                 .textFieldStyle(.roundedBorder)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
                 .disabled(isDisabled)
                 .accessibilityLabel(appLanguage.string("Search App name or bundle ID…"))
                 .onSubmit(addFirstAvailableResult)
@@ -324,6 +323,7 @@ private struct ApplicationSearchControl: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func addFirstAvailableResult() {

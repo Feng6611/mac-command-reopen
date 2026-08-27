@@ -61,7 +61,7 @@ struct AdvancedSettingsView: View {
                 Text(appLanguage.string("Advanced Mode"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling alternates between minimizing and restoring an app’s windows.")
+                    appLanguage.string("When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling minimizes a frontmost app, restores all minimized windows, and leaves background app activation native.")
                 )
             }
         }

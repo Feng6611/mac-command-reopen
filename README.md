@@ -67,7 +67,9 @@ No special permissions for the core app behavior. It uses `NSWorkspace` APIs ava
 The optional Direct-build Advanced Window Restore mode uses Accessibility to
 raise a window or restore all minimized windows. It is off by default, shown
 separately in Settings, and always falls back to native reopen when unavailable.
-Dock-click window cycling has its own default-off switch inside Advanced Mode.
+Dock-click window cycling has its own default-off switch inside Advanced Mode:
+background apps activate normally, while clicking a frontmost app minimizes
+its windows and clicking an all-minimized app restores them.
 
 **Does it change the Cmd+Tab interface?**
 

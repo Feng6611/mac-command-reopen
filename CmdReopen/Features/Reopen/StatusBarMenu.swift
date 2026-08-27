@@ -5,7 +5,6 @@
 //  Created by Codex on 2026/4/26.
 //
 
-import AppKit
 import Combine
 import KikiMenuBar
 import SwiftUI
@@ -116,14 +115,8 @@ final class StatusBarMenuController {
                 self?.model.openURL(AppStoreLinks.reviewURL)
             })
         case .direct:
-            // The only ask the free build makes here, and the only item in
-            // this menu carrying a symbol — in a list of plain rows one icon
-            // is what draws the eye, and the brand tint keeps it from reading
-            // as just another system glyph.
             items.append(.action(
                 title: AppLanguage.shared.string("Get on Mac App Store"),
-                systemImage: "heart.fill",
-                imageTint: NSColor(DS.Colors.brandPrimary),
                 action: { [weak self] in
                     self?.model.openURL(AppStoreLinks.productURL)
                 }

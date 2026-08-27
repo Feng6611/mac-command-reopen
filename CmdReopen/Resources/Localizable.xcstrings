@@ -379,6 +379,35 @@
         }
       }
     },
+    "Accessibility" : {
+      "comment" : "macOS Accessibility permission title.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibilité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセシビリティ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辅助功能"
+          }
+        }
+      }
+    },
     "Active" : {
       "comment" : "Stat tile title: how many of the last 30 days had at least one reopen.",
       "localizations" : {
@@ -439,6 +468,7 @@
     },
     "Add App" : {
       "comment" : "Form row label for adding an excluded app.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -552,60 +582,31 @@
         }
       }
     },
-    "Allowed" : {
-      "comment" : "Accessibility authorization status when granted.",
+    "Advanced window restoration can control other apps’ windows only after you grant Accessibility access. Core Command Reopen needs no permission." : {
+      "comment" : "Direct Advanced pane helper explaining the optional Accessibility permission.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erlaubt"
+            "value" : "Die erweiterte Fensterwiederherstellung kann andere App-Fenster erst nach deiner Bedienungshilfen-Freigabe steuern. Die Kernfunktion benötigt keine Berechtigung."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorisé"
+            "value" : "La restauration avancée peut contrôler les fenêtres d’autres apps uniquement après l’autorisation Accessibilité. La fonction principale ne nécessite aucune autorisation."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "許可済み"
+            "value" : "高度なウインドウ復元でほかの App を操作するには、アクセシビリティの許可が必要です。基本機能には権限は不要です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已允许"
-          }
-        }
-      }
-    },
-    "Needed" : {
-      "comment" : "Accessibility authorization status when not granted.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erforderlich"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requis"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "必要"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "需要授权"
+            "value" : "高级窗口恢复仅在你授予辅助功能权限后才可控制其他 App 的窗口。核心功能无需任何权限。"
           }
         }
       }
@@ -724,6 +725,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "允许 Command Reopen 在登录时打开"
+          }
+        }
+      }
+    },
+    "Allowed" : {
+      "comment" : "Accessibility authorization status when granted.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaubt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已允许"
           }
         }
       }
@@ -1393,6 +1423,35 @@
         }
       }
     },
+    "Core restore needs no Accessibility or Screen Recording." : {
+      "comment" : "Onboarding success step hero card subtitle.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kernwiederherstellung benötigt weder Bedienungshilfen noch Bildschirmaufnahme."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La restauration principale ne nécessite ni Accessibilité ni enregistrement d’écran."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "基本の復元にはアクセシビリティも画面収録も不要です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "核心恢复无需辅助功能或屏幕录制权限。"
+          }
+        }
+      }
+    },
     "Count" : {
       "comment" : "Series label for the count axis of the reopen charts.",
       "localizations" : {
@@ -1418,6 +1477,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次数"
+          }
+        }
+      }
+    },
+    "Cycle Windows from Dock Click" : {
+      "comment" : "Toggle enabling Direct AX window cycling for confirmed Dock app clicks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster per Dock-Klick umschalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterner les fenêtres via le Dock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dockクリックでウインドウを切り替える"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击 Dock 循环窗口"
           }
         }
       }
@@ -2118,35 +2206,6 @@
         }
       }
     },
-    "Advanced window restoration can control other apps’ windows only after you grant Accessibility access. Core Command Reopen needs no permission." : {
-      "comment" : "Direct Advanced pane helper explaining the optional Accessibility permission.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die erweiterte Fensterwiederherstellung kann andere App-Fenster erst nach deiner Bedienungshilfen-Freigabe steuern. Die Kernfunktion benötigt keine Berechtigung."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La restauration avancée peut contrôler les fenêtres d’autres apps uniquement après l’autorisation Accessibilité. La fonction principale ne nécessite aucune autorisation."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高度なウインドウ復元でほかの App を操作するには、アクセシビリティの許可が必要です。基本機能には権限は不要です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高级窗口恢复仅在你授予辅助功能权限后才可控制其他 App 的窗口。核心功能无需任何权限。"
-          }
-        }
-      }
-    },
     "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it." : {
       "comment" : "Body copy for Command Reopen's one-time custom review prompt.",
       "extractionState" : "stale",
@@ -2669,35 +2728,6 @@
         }
       }
     },
-    "Use Advanced Window Restore" : {
-      "comment" : "Toggle enabling the Direct build's optional Accessibility window behavior.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erweiterte Fensterwiederherstellung verwenden"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utiliser la restauration avancée des fenêtres"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高度なウインドウ復元を使用"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用高级窗口恢复"
-          }
-        }
-      }
-    },
     "macOS holds new login items until you allow them. Open Login Items and switch Command Reopen on." : {
       "comment" : "Alert body shown when macOS holds login item.",
       "localizations" : {
@@ -2957,8 +2987,38 @@
         }
       }
     },
+    "Needed" : {
+      "comment" : "Accessibility authorization status when not granted.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "必要"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要授权"
+          }
+        }
+      }
+    },
     "Nine of them, and where this app fits" : {
       "comment" : "Subtitle on the General-pane row opening the Mac window shortcuts sheet.",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2982,35 +3042,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mac 常用窗口与切换快捷键"
-          }
-        }
-      }
-    },
-    "Core restore needs no Accessibility or Screen Recording." : {
-      "comment" : "Onboarding success step hero card subtitle.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Kernwiederherstellung benötigt weder Bedienungshilfen noch Bildschirmaufnahme."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La restauration principale ne nécessite ni Accessibilité ni enregistrement d’écran."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "基本の復元にはアクセシビリティも画面収録も不要です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "核心恢复无需辅助功能或屏幕录制权限。"
           }
         }
       }
@@ -3298,35 +3329,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一次性付费"
-          }
-        }
-      }
-    },
-    "Accessibility" : {
-      "comment" : "macOS Accessibility permission title.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bedienungshilfen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accessibilité"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アクセシビリティ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "辅助功能"
           }
         }
       }
@@ -3962,31 +3964,31 @@
         }
       }
     },
-    "Cycle Windows from Dock Click" : {
-      "comment" : "Toggle enabling Direct AX window cycling for confirmed Dock app clicks.",
+    "Reopen" : {
+      "comment" : "Section header for the reopen behavior group.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fenster per Dock-Klick umschalten"
+            "value" : "Erneut öffnen"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alterner les fenêtres via le Dock"
+            "value" : "Réouverture"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dockクリックでウインドウを切り替える"
+            "value" : "再オープン"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "点击 Dock 循环窗口"
+            "value" : "重新打开"
           }
         }
       }
@@ -4539,35 +4541,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "桌面空间"
-          }
-        }
-      }
-    },
-    "When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling alternates between minimizing and restoring an app’s windows." : {
-      "comment" : "Direct Advanced pane helper describing AX focus, restore-all, and Dock cycling.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn aktiviert, hebt Command Reopen ein Fenster per Bedienungshilfen hervor. „Alle wiederherstellen“ bringt alle minimierten Fenster zurück. Der Dock-Klick-Zyklus wechselt zwischen dem Minimieren und Wiederherstellen der Fenster einer App."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Une fois activé, Command Reopen utilise Accessibilité pour relever une fenêtre. « Tout restaurer » ramène toutes les fenêtres réduites. Le cycle par clic sur le Dock alterne la réduction et la restauration des fenêtres d’une app."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効にすると、アクセシビリティでウインドウを前面に出します。「すべて復元」では最小化した全ウインドウを戻します。Dockクリックの切り替えでは、Appのウインドウを最小化または復元します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；Dock 点击循环可在最小化与展开 App 窗口之间切换。"
           }
         }
       }
@@ -5779,6 +5752,35 @@
         }
       }
     },
+    "Use Advanced Window Restore" : {
+      "comment" : "Toggle enabling the Direct build's optional Accessibility window behavior.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erweiterte Fensterwiederherstellung verwenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser la restauration avancée des fenêtres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高度なウインドウ復元を使用"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用高级窗口恢复"
+          }
+        }
+      }
+    },
     "Verifying your Command Reopen Pro access." : {
       "localizations" : {
         "de" : {
@@ -5977,60 +5979,60 @@
         }
       }
     },
-    "When No Windows Remain" : {
-      "comment" : "Section header for yielding focus when the last window disappears.",
+    "When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling minimizes a frontmost app, restores all minimized windows, and leaves background app activation native." : {
+      "comment" : "Direct Advanced pane helper describing AX focus, restore-all, and Dock cycling.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn keine Fenster sichtbar sind"
+            "value" : "Wenn aktiviert, hebt Command Reopen ein Fenster per Bedienungshilfen hervor. „Alle wiederherstellen“ bringt alle minimierten Fenster zurück. Der Dock-Klick-Zyklus minimiert eine App im Vordergrund, stellt alle minimierten Fenster wieder her und aktiviert Apps im Hintergrund wie gewohnt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lorsqu’aucune fenêtre n’est visible"
+            "value" : "Une fois activé, Command Reopen utilise Accessibilité pour relever une fenêtre. « Tout restaurer » ramène toutes les fenêtres réduites. Le cycle par clic sur le Dock réduit l’app au premier plan, restaure toutes les fenêtres réduites et conserve l’activation native des apps en arrière-plan."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "表示中のウインドウがないとき"
+            "value" : "有効にすると、アクセシビリティでウインドウを前面に出します。「すべて復元」では最小化した全ウインドウを戻します。Dockクリックの切り替えは前面のAppを最小化し、最小化された全ウインドウを復元します。バックグラウンドAppは通常どおりアクティブになります。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无可见窗口时"
+            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；Dock 点击循环会最小化前台 App、恢复全部已最小化窗口，并保留后台 App 的原生激活行为。"
           }
         }
       }
     },
-    "When you close or minimize an app’s last window, automatically hand focus back to the previous app so Cmd+Tab can bring it right back." : {
+    "When you close or minimize an app’s last window, focus returns so Cmd+Tab brings it right back." : {
       "comment" : "Helper text explaining focus handoff on window close or minimize.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gibt den Fokus nach dem Schließen oder Minimieren des letzten Fensters automatisch an die vorherige App zurück, damit Cmd+Tab sie direkt wieder öffnen kann."
+            "value" : "Schließt oder minimierst du das letzte Fenster einer App, kehrt der Fokus zurück – Cmd+Tab holt sie sofort wieder her."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Transfère automatiquement le focus à l’app précédente après la fermeture ou la réduction de la dernière fenêtre, pour que Cmd+Tab puisse la rouvrir aussitôt."
+            "value" : "Quand vous fermez ou réduisez la dernière fenêtre d’une app, le focus revient : Cmd+Tab la ramène aussitôt."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最後のウインドウを閉じるか最小化したとき、直前の App に自動でフォーカスを移します。次の Cmd+Tab で即座に復元できます。"
+            "value" : "App の最後のウインドウを閉じるか最小化すると、フォーカスが戻り、Cmd+Tab ですぐに切り替えられます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "关闭或最小化最后一个窗口后，自动将焦点移交至上一活跃应用，避免空白残留，并让下一次 Cmd+Tab 能直接切回。"
+            "value" : "关闭或最小化某个 App 的最后一个窗口后，焦点自动交还，Cmd+Tab 即可立刻切回。"
           }
         }
       }

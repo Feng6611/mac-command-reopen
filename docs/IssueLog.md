@@ -123,10 +123,11 @@ action at mouse-down; delayed execution refreshes AX window handles but cannot
 re-plan from post-click state.
 Multi-window logs then showed the Dock could still re-show the first TextEdit
 window after successful AX minimize writes: the workspace activation callback
-was followed by mutation only about 176 ms later. The monitor now distinguishes
-that background-activation path from an already-frontmost click, waiting 750 ms
-only when Dock-driven workspace activation is still settling while retaining
-the 150 ms frontmost response.
+was followed by mutation only about 176 ms later. The final policy no longer
+minimizes an app while the Dock is activating it. Background apps with visible
+windows keep native activation; foreground apps minimize after 150 ms; and an
+all-minimized app restores after 150 ms. A single coordinator now owns the
+click intent used by both activation suppression and exactly-once execution.
 
 ### Resolution boundary
 
