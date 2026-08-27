@@ -209,17 +209,32 @@ Its optional Restore All setting applies that operation to every minimized
 window. Any missing permission, AX failure, or unavailable target returns to
 the same native reopen fallback.
 
-Dock cycling is deliberately narrower than generic mouse activation: a global
+Dock cycling is a separate, default-off setting under Advanced Mode. It is
+deliberately narrower than generic mouse activation: a global
 click must AX-hit an `AXDockItem`, resolve an app bundle URL, and then match that
-same process's workspace activation within one second. Each accepted click
-re-reads the target's current AX windows and trust state; if all eligible
-windows are minimized it restores them, otherwise it minimizes them. There is
-no retained per-app cycle state to become stale after a PID or window-set
-change.
+same process's workspace activation within one second. At mouse-down, the
+monitor snapshots the target's AX minimized states and locks either Restore All
+or Minimize All into that short-lived, PID-bound intent. After native Dock
+activation settles, execution refreshes the AX window elements but never
+re-plans from the state Dock just changed. There is no retained per-app cycle
+state beyond that single click intent to become stale after a PID or window-set
+change. The hit test consumes `NSEvent.cgEvent.location`, because AX expects
+Quartz's top-left-relative screen coordinates rather than AppKit's flipped
+global coordinates. A confirmed workspace activation waits for the Dock's
+native multi-window activation to settle before mutating windows. An
+already-frontmost target uses a shorter delay because no workspace activation
+animation is in flight. The cycle reports success only when every eligible AX
+window reaches the requested minimized state.
+Eligibility means the window exposes a readable `kAXMinimized` attribute;
+non-window panels without that capability are excluded from the cycle.
+The minimize branch never calls `NSRunningApplication.activate`: the Dock has
+already activated the target, and a second asynchronous activation can undo a
+successful AX minimize. Restore All still activates before raising windows.
 
 ### Verification
 
-Behavior tests cover opt-in policy, focused versus all-window scope, Dock cycle
+Behavior tests cover opt-in policy, focused versus all-window scope, the
+independently persisted Dock setting, Dock cycle
 planning, Dock-role filtering, and click-to-activation PID correlation. Build
 both distributions and inspect the MAS artifact's empty app entitlement plist;
 manual Direct smoke still needs a real Accessibility grant and Dock click.

@@ -3962,6 +3962,35 @@
         }
       }
     },
+    "Cycle Windows from Dock Click" : {
+      "comment" : "Toggle enabling Direct AX window cycling for confirmed Dock app clicks.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster per Dock-Klick umschalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterner les fenêtres via le Dock"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dockクリックでウインドウを切り替える"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击 Dock 循环窗口"
+          }
+        }
+      }
+    },
     "Restore All Minimized Windows" : {
       "comment" : "Toggle restoring every minimized AX window in Direct advanced mode.",
       "localizations" : {
@@ -4514,31 +4543,31 @@
         }
       }
     },
-    "When enabled, Command Reopen uses Accessibility to raise a window. Restore All also brings back every minimized window. Clicking a confirmed Dock app icon cycles that app’s eligible windows." : {
+    "When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling alternates between minimizing and restoring an app’s windows." : {
       "comment" : "Direct Advanced pane helper describing AX focus, restore-all, and Dock cycling.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, hebt Command Reopen ein Fenster per Bedienungshilfen hervor. „Alle wiederherstellen“ bringt alle minimierten Fenster zurück. Ein bestätigter Klick auf das Dock-Symbol wechselt zwischen Minimieren und Wiederherstellen."
+            "value" : "Wenn aktiviert, hebt Command Reopen ein Fenster per Bedienungshilfen hervor. „Alle wiederherstellen“ bringt alle minimierten Fenster zurück. Der Dock-Klick-Zyklus wechselt zwischen dem Minimieren und Wiederherstellen der Fenster einer App."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une fois activé, Command Reopen utilise Accessibilité pour relever une fenêtre. « Tout restaurer » ramène toutes les fenêtres réduites. Un clic confirmé sur l’icône du Dock alterne réduction et restauration."
+            "value" : "Une fois activé, Command Reopen utilise Accessibilité pour relever une fenêtre. « Tout restaurer » ramène toutes les fenêtres réduites. Le cycle par clic sur le Dock alterne la réduction et la restauration des fenêtres d’une app."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "有効にすると、アクセシビリティでウインドウを前面に出します。「すべて復元」では最小化した全ウインドウを戻し、Dock アイコンの確認済みクリックで最小化と復元を切り替えます。"
+            "value" : "有効にすると、アクセシビリティでウインドウを前面に出します。「すべて復元」では最小化した全ウインドウを戻します。Dockクリックの切り替えでは、Appのウインドウを最小化または復元します。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”还会恢复所有最小化窗口。确认点击 Dock App 图标后，可在最小化与展开之间循环。"
+            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；Dock 点击循环可在最小化与展开 App 窗口之间切换。"
           }
         }
       }

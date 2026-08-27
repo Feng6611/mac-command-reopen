@@ -50,11 +50,18 @@ struct AdvancedSettingsView: View {
                     systemImage: "macwindow.on.rectangle"
                 )
                 .disabled(isFeatureLocked || !settings.isAdvancedModeEnabled || !isAccessibilityAuthorized)
+
+                KikiSettingsToggleRow(
+                    appLanguage.string("Cycle Windows from Dock Click"),
+                    isOn: $settings.cyclesWindowsFromDockClick,
+                    systemImage: "dock.rectangle"
+                )
+                .disabled(isFeatureLocked || !settings.isAdvancedModeEnabled || !isAccessibilityAuthorized)
             } header: {
                 Text(appLanguage.string("Advanced Mode"))
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("When enabled, Command Reopen uses Accessibility to raise a window. Restore All also brings back every minimized window. Clicking a confirmed Dock app icon cycles that app’s eligible windows.")
+                    appLanguage.string("When enabled, Command Reopen uses Accessibility to raise a window. Restore All brings back every minimized window. Dock Click Cycling alternates between minimizing and restoring an app’s windows.")
                 )
             }
         }

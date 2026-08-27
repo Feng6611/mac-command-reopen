@@ -21,11 +21,19 @@ final class AdvancedWindowRestoreSettings: ObservableObject {
         }
     }
 
+    @Published var cyclesWindowsFromDockClick: Bool {
+        didSet {
+            guard cyclesWindowsFromDockClick != oldValue else { return }
+            defaults[AppDefaults.advancedWindowRestoreDockClickCycle] = cyclesWindowsFromDockClick
+        }
+    }
+
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         _isAdvancedModeEnabled = Published(initialValue: defaults[AppDefaults.advancedWindowRestoreEnabled])
         _restoresAllWindows = Published(initialValue: defaults[AppDefaults.advancedWindowRestoreAllWindows])
+        _cyclesWindowsFromDockClick = Published(initialValue: defaults[AppDefaults.advancedWindowRestoreDockClickCycle])
     }
 }

@@ -63,6 +63,7 @@ final class AppLifecycleCoordinator {
         DockClickMonitor.shared.start(
             isEnabled: {
                 AdvancedWindowRestoreSettings.shared.isAdvancedModeEnabled
+                    && AdvancedWindowRestoreSettings.shared.cyclesWindowsFromDockClick
                     && ActivationMonitor.shared.isFeatureEnabled
                     && self.accessController.isCoreFeatureAvailable
             },
@@ -73,8 +74,11 @@ final class AppLifecycleCoordinator {
                     at: date
                 )
             },
-            onDockAppClick: { bundleIdentifier in
-                ActivationMonitor.shared.cycleWindowsForConfirmedDockClick(bundleIdentifier: bundleIdentifier)
+            onDockAppClick: { bundleIdentifier, action in
+                ActivationMonitor.shared.cycleWindowsForConfirmedDockClick(
+                    bundleIdentifier: bundleIdentifier,
+                    action: action
+                )
             }
         )
 #endif

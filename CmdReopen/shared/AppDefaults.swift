@@ -20,6 +20,7 @@ enum AppDefaults {
         static let preferredLanguage = "cmdreopenPreferredLanguage"
         static let advancedWindowRestoreEnabled = "cmdreopenAdvancedWindowRestoreEnabled"
         static let advancedWindowRestoreAllWindows = "cmdreopenAdvancedWindowRestoreAllWindows"
+        static let advancedWindowRestoreDockClickCycle = "cmdreopenAdvancedWindowRestoreDockClickCycle"
         /// When the win-back offer was first presented. The 20%-off window
         /// runs a fixed time from this moment and never reopens; see
         /// `TrialExitOffer`.
@@ -59,6 +60,7 @@ enum AppDefaults {
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
     static let advancedWindowRestoreEnabled = Defaults.Key<Bool>(RawKey.advancedWindowRestoreEnabled, default: false)
     static let advancedWindowRestoreAllWindows = Defaults.Key<Bool>(RawKey.advancedWindowRestoreAllWindows, default: false)
+    static let advancedWindowRestoreDockClickCycle = Defaults.Key<Bool>(RawKey.advancedWindowRestoreDockClickCycle, default: false)
     static let winbackOfferFirstShownAt = Defaults.Key<Date?>(RawKey.winbackOfferFirstShownAt, default: nil)
 #if DEBUG
     static let winbackDebugForced = Defaults.Key<Bool>(RawKey.winbackDebugForced, default: false)

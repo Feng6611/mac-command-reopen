@@ -685,19 +685,26 @@ final class ActivationMonitor: ObservableObject {
 
     /// A global monitor passes only confirmed Dock AX hits here. Other mouse
     /// activations retain the normal activation path and never toggle windows.
-    func cycleWindowsForConfirmedDockClick(bundleIdentifier: String) {
+    func cycleWindowsForConfirmedDockClick(
+        bundleIdentifier: String,
+        action: DockWindowCycleAction
+    ) {
 #if DIRECT
         guard isFeatureEnabled,
               accessController.isCoreFeatureAvailable,
               advancedWindowRestoreSettings.isAdvancedModeEnabled,
+              advancedWindowRestoreSettings.cyclesWindowsFromDockClick,
               !userExcludedBundleIDs.contains(bundleIdentifier),
               !Self.isIgnoredBundleID(bundleIdentifier),
               bundleIdentifier != Bundle.main.bundleIdentifier else {
             return
         }
-        let action = accessibilityWindowRestorer.cycleWindows(bundleIdentifier: bundleIdentifier)
-        guard action != .none else { return }
-        AppLogger.activation.notice("Dock AX click \(action == .restoreAll ? "restored" : "minimized") all eligible windows for \(bundleIdentifier).")
+        let completedAction = accessibilityWindowRestorer.cycleWindows(
+            bundleIdentifier: bundleIdentifier,
+            action: action
+        )
+        guard completedAction != .none else { return }
+        AppLogger.activation.notice("Dock AX click \(completedAction == .restoreAll ? "restored" : "minimized") all eligible windows for \(bundleIdentifier).")
 #endif
     }
 
@@ -705,13 +712,32 @@ final class ActivationMonitor: ObservableObject {
         bundleIdentifier: String,
         processIdentifier: pid_t,
         at date: Date
-    ) {
+    ) -> DockWindowCycleAction {
 #if DIRECT
+        guard isFeatureEnabled,
+              accessController.isCoreFeatureAvailable,
+              advancedWindowRestoreSettings.isAdvancedModeEnabled,
+              advancedWindowRestoreSettings.cyclesWindowsFromDockClick,
+              !userExcludedBundleIDs.contains(bundleIdentifier),
+              !Self.isIgnoredBundleID(bundleIdentifier),
+              bundleIdentifier != Bundle.main.bundleIdentifier else {
+            pendingDockClickIntent = nil
+            return .none
+        }
+        let action = accessibilityWindowRestorer.plannedCycleAction(bundleIdentifier: bundleIdentifier)
+        guard action != .none else {
+            pendingDockClickIntent = nil
+            return .none
+        }
         pendingDockClickIntent = DockClickActivationIntent(
             bundleIdentifier: bundleIdentifier,
             processIdentifier: processIdentifier,
+            action: action,
             expiresAt: date.addingTimeInterval(1)
         )
+        return action
+#else
+        return .none
 #endif
     }
 
@@ -719,6 +745,10 @@ final class ActivationMonitor: ObservableObject {
 #if DIRECT
         guard let intent = pendingDockClickIntent else { return false }
         defer { pendingDockClickIntent = nil }
+        guard advancedWindowRestoreSettings.isAdvancedModeEnabled,
+              advancedWindowRestoreSettings.cyclesWindowsFromDockClick else {
+            return false
+        }
         return intent.matches(
             bundleIdentifier: application.bundleIdentifier,
             processIdentifier: application.processIdentifier,

@@ -100,13 +100,41 @@ pane; confirm the same from the menu bar item with no window open.
 Accessibility is TCC-controlled and the Dock hierarchy is system-owned. A
 unit-tested hit-test and a successful build cannot prove that a specific macOS
 release exposes every third-party window as mutable AX, nor that the user's Dock
-click produces the expected activation ordering.
+click produces the expected activation ordering. The first right-side Dock
+smoke exposed one concrete bridge bug: `NSEvent.locationInWindow` was passed to
+an AX API that requires Quartz top-left screen coordinates. The monitor now
+uses `NSEvent.cgEvent.location` and keeps that coordinate contract under test.
+The same smoke showed that minimizing immediately from the workspace activation
+observer could be undone by the Dock finishing its native activation. Dock AX
+mutation waits for the corresponding activation path to settle and verifies
+every final minimized state.
+The cycle also filters out AX panels that do not expose `kAXMinimized`, and its
+runtime log records only window indexes, AX error codes, and boolean states—not
+window titles or content.
+Four-click TextEdit logging then showed both AX writes returning success while
+the main window immediately became visible again. The cycle was redundantly
+calling `NSRunningApplication.activate` before minimizing; that call is now
+restricted to Restore All.
+The next live smoke clarified the remaining deterministic failure: every click
+first expanded a window through the Dock and then minimized it. Planning after
+the 150 ms settle delay was observing the Dock-mutated visible state and always
+choosing Minimize All. The click intent now snapshots and carries the planned
+action at mouse-down; delayed execution refreshes AX window handles but cannot
+re-plan from post-click state.
+Multi-window logs then showed the Dock could still re-show the first TextEdit
+window after successful AX minimize writes: the workspace activation callback
+was followed by mutation only about 176 ms later. The monitor now distinguishes
+that background-activation path from an already-frontmost click, waiting 750 ms
+only when Dock-driven workspace activation is still settling while retaining
+the 150 ms frontmost response.
 
 ### Resolution boundary
 
 Keep the feature Direct-only, opt-in, and safely native-fallbacked. Before a
 Direct release, grant Accessibility on a clean account and verify focused
 restore, Restore All, failed AX fallback, and a Dock click for a multi-window
-app. Revoke permission and confirm normal Cmd+Tab continues without prompts.
+app after explicitly enabling Dock Click Cycling. Disable that setting and
+confirm Dock clicks no longer suppress the normal activation path. Revoke
+permission and confirm normal Cmd+Tab continues without prompts.
 For MAS, inspect final entitlements and dependency linkage to ensure the
 advanced UI and Apple Events exceptions do not ship.
