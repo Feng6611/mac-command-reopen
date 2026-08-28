@@ -307,22 +307,6 @@ private struct FinishStepView: View {
             }
             .padding(.top, DS.Spacing.lg)
         }
-        .onAppear {
-            // Checked on arrival rather than after the fact: this app only
-            // works while it is running, so a Mac that reboots without it
-            // looks like an app that stopped working rather than one that was
-            // never asked to start. The toggle is on screen and reversible in
-            // the same breath, which is what separates a sensible default
-            // from a decision made behind the user's back.
-            //
-            // When macOS holds the registration for approval, the prompt comes
-            // up here rather than later: this step says the app will be there
-            // after every restart, and a switch that quietly stayed off makes
-            // that sentence untrue on the one screen the user is reading it.
-            if !launchAtLoginManager.isEnabled {
-                LaunchAtLoginApproval.present(for: launchAtLoginManager.setEnabled(true))
-            }
-        }
     }
 
     private var bodyText: String {
@@ -330,7 +314,7 @@ private struct FinishStepView: View {
         appLanguage.string(localized: "Your free trial is active — 14 days, and nothing is charged until you pick a plan.",
             comment: "Subtitle of the final onboarding step in the App Store build.")
 #else
-        appLanguage.string(localized: "Command Reopen is running, and it will be there after every restart.",
+        appLanguage.string(localized: "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart.",
             comment: "Subtitle of the final onboarding step in the free build.")
 #endif
     }

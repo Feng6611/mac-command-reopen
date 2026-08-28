@@ -1280,31 +1280,31 @@
         }
       }
     },
-    "Command Reopen is running, and it will be there after every restart." : {
+    "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart." : {
       "comment" : "Subtitle of the final onboarding step in the free build.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen läuft — und ist auch nach jedem Neustart wieder da."
+            "value" : "Command Reopen läuft. Aktiviere \u201eBeim Anmelden starten\u201c, damit es nach jedem Neustart bereit ist."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen tourne, et il sera là après chaque redémarrage."
+            "value" : "Command Reopen tourne. Activez \u00ab Lancer \u00e0 l\u2019ouverture de session \u00bb pour qu\u2019il soit pr\u00eat apr\u00e8s chaque red\u00e9marrage."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen が動いています。再起動しても、そのまま使えます。"
+            "value" : "Command Reopen は起動しています。\u300c\u30ed\u30b0\u30a4\u30f3\u6642\u306b\u8d77\u52d5\u300d\u3092\u30aa\u30f3\u306b\u3059\u308b\u3068\u3001\u518d\u8d77\u52d5\u5f8c\u3082\u3059\u3050\u306b\u4f7f\u3048\u307e\u3059\u3002"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen 已经在运行，重启之后也会自己回来。"
+            "value" : "Command Reopen 正在运行。开启\u201c登录时启动\u201d后，每次重启后都会保持就绪。"
           }
         }
       }
