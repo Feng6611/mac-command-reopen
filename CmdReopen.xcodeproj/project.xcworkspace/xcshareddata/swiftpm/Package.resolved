@@ -1,5 +1,5 @@
 {
-  "originHash" : "b3d77fe1477d8d8192d6a97e57ddcf7296e05e74fe1eccbe76804a58b4dd4c15",
+  "originHash" : "cd648274600c0b1beefa1f19f11b9a7941d9db36be18f404135ee1037342837b",
   "pins" : [
     {
       "identity" : "confettiswiftui",
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "5bfac4928f000fabdbef7e4ed0251399bb0841c9",
         "version" : "9.0.8"
+      }
+    },
+    {
+      "identity" : "kiki_mackit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/Kiki_mackit.git",
+      "state" : {
+        "revision" : "367b13464d2049d7d9cf721b94b6e57d0ff2e318",
+        "version" : "0.10.0"
+      }
+    },
+    {
+      "identity" : "kikicommercekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/KikiCommerceKit.git",
+      "state" : {
+        "revision" : "63626fb2419796695c743be7189844fd9aa125a9",
+        "version" : "0.3.0"
       }
     },
     {

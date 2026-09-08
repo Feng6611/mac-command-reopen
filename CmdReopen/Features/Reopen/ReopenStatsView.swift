@@ -19,9 +19,9 @@ enum StatTimeRange: CaseIterable {
     @MainActor
     var title: String {
         switch self {
-        case .day:   return AppLanguage.shared.string("Day")
-        case .week:  return AppLanguage.shared.string("Week")
-        case .month: return AppLanguage.shared.string("Month")
+        case .day:   return AppLanguage.shared.string("By Day")
+        case .week:  return AppLanguage.shared.string("By Week")
+        case .month: return AppLanguage.shared.string("By Month")
         }
     }
 }
@@ -87,13 +87,23 @@ struct ReopenStatsView: View {
             guard !appeared else { return }
             appeared = true
             _ = reopenStatsStore.requestReviewIfEligible(for: .statsOpened)
-            let total = Double(reopenStatsStore.totalSuccessfulReopens)
-            if reduceMotion {
+            updateHeroTotal()
+        }
+        .onChange(of: reopenStatsStore.totalSuccessfulReopens) { _ in
+            updateHeroTotal()
+        }
+        .transaction { transaction in
+            if reduceMotion { transaction.animation = nil; transaction.disablesAnimations = true }
+        }
+    }
+
+    private func updateHeroTotal() {
+        let total = Double(reopenStatsStore.totalSuccessfulReopens)
+        if reduceMotion {
+            heroTarget = total
+        } else {
+            withAnimation(.easeOut(duration: 0.8)) {
                 heroTarget = total
-            } else {
-                withAnimation(.easeOut(duration: 0.8).delay(0.15)) {
-                    heroTarget = total
-                }
             }
         }
     }
@@ -110,7 +120,7 @@ struct ReopenStatsView: View {
                     )
                     .foregroundStyle(.primary)
 
-                    Text("total reopens")
+                    Text(appLanguage.string("total reopens"))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -155,7 +165,7 @@ struct ReopenStatsView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 132)
+                    .frame(minWidth: 220)
                 }
 
                 let allZero = trendData.allSatisfy { $0.count == 0 }
@@ -170,13 +180,18 @@ struct ReopenStatsView: View {
 #endif
 
                     if allZero {
-                        EmptyStateView(
-                            systemImage: "chart.bar",
-                            text: appLanguage.string("Start using Command Reopen to see trends")
-                        )
+                        VStack(spacing: DS.Spacing.sm) {
+                            EmptyStateView(
+                                systemImage: "chart.bar",
+                                text: appLanguage.string("Start using Command Reopen to see trends")
+                            )
+                            Button(appLanguage.string("Learn Mac window shortcuts")) {
+                                SettingsNavigationModel.shared.presentMacShortcuts()
+                            }
+                        }
                     }
                 }
-                .animation(.easeInOut(duration: 0.3), value: timeRange)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: timeRange)
             }
         }
         .groupBoxStyle(.dsStats)
@@ -234,7 +249,7 @@ struct ReopenStatsView: View {
 #endif
                 }
             }
-            .animation(.easeInOut(duration: 0.3), value: timeRange)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: timeRange)
         }
         .groupBoxStyle(.dsStats)
         .opacity(appeared ? 1 : 0)

@@ -10,10 +10,10 @@ import SwiftUI
 @main
 struct CmdReopenApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var activationMonitor = ActivationMonitor.shared
-    @StateObject private var reopenStatsStore = ReopenStatsStore.shared
-    @StateObject private var accessController = AppAccessController.shared
-    @StateObject private var settingsNavigationModel = SettingsNavigationModel.shared
+    @StateObject private var activationMonitor = AppComposition.shared.activationMonitor
+    @StateObject private var reopenStatsStore = AppComposition.shared.reopenStats
+    @StateObject private var accessController = AppComposition.shared.accessController
+    @StateObject private var settingsNavigationModel = AppComposition.shared.settingsNavigation
     @StateObject private var appLanguage = AppLanguage.shared
 #if DIRECT
     @StateObject private var advancedWindowRestoreSettings = AdvancedWindowRestoreSettings.shared

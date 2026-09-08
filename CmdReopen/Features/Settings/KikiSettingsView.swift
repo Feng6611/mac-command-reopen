@@ -57,15 +57,9 @@ struct SettingsView: View {
 #endif
 
     var body: some View {
-        // Sized here as well as on the window controller: the SwiftUI ideal is
-        // what the Settings window settles at, so the AppKit side alone leaves
-        // the pane at Kiki's generic default height.
+        // The registered controller supplies the shared AppKit/SwiftUI layout.
         KikiSettingsCoordinatorView(
-            coordinator: SettingsWindowController.shared.coordinator,
-            width: DS.Window.settingsWidth,
-            height: DS.Window.settingsHeight,
-            minimumWidth: DS.Window.settingsWidth,
-            minimumHeight: DS.Window.settingsMinimumHeight
+            coordinator: SettingsWindowController.shared.coordinator
         ) { tab in
             switch tab {
             case .general:
@@ -79,62 +73,71 @@ struct SettingsView: View {
             }
         }
         .id(appLanguage.selected)
-        .sheet(isPresented: $route.isMacShortcutsPresented) {
-            MacShortcutsSheet()
+        .sheet(item: $route.presentedSheet, onDismiss: {
+            route.sheetDidDismiss(canPresent: canPresentSheet)
+        }) { sheet in
+            sheetContent(sheet)
+                .environment(\.locale, appLanguage.locale)
         }
+    }
+
+    private func canPresentSheet(_ sheet: SettingsSheet) -> Bool {
 #if APPSTORE
-        .sheet(isPresented: $route.isPaywallSheetPresented) {
+        if sheet == .trialExit {
+            return TrialExitOffer.resolve(accessModel: accessModel) != nil
+        }
+#else
+        if sheet != .shortcuts { return false }
+#endif
+        return true
+    }
+
+    @ViewBuilder
+    private func sheetContent(_ sheet: SettingsSheet) -> some View {
+        switch sheet {
+        case .shortcuts:
+            MacShortcutsSheet()
+        case .paywall:
+#if APPSTORE
             PaywallSheetView(
                 accessModel: accessModel,
                 context: .settings,
-                // Closing the paywall after the trial ended is the only moment
-                // the app knows the user decided not to pay. `TrialExitOffer`
-                // resolves to nil in every other case, including a close that
-                // followed a purchase.
-                onFinish: {
-                    guard TrialExitOffer.resolve(accessModel: accessModel) != nil else { return }
-                    route.presentTrialExitOffer()
-                },
                 onPurchaseCompleted: {
-                    _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
+                    route.performAfterDismiss {
+                        _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
+                    }
                 }
             )
-        }
-        .sheet(isPresented: $route.isTrialExitOfferPresented) {
-            // Resolved again on presentation rather than carried over from the
-            // paywall's close: the sheet is asked for one run loop later, and
-            // anything that changed access state in between should cancel it.
+#else
+            EmptyView()
+#endif
+        case .trialExit:
+#if APPSTORE
             if let offer = TrialExitOffer.resolve(accessModel: accessModel) {
                 TrialExitOfferView(accessModel: accessModel, offer: offer)
             }
-        }
+#else
+            EmptyView()
+#endif
 #if DEBUG
-        .sheet(isPresented: $route.isTrialExitOfferDebugPreviewPresented) {
+        case .trialExitDebug:
+#if APPSTORE
             TrialExitOfferView(
                 accessModel: accessModel,
                 offer: .debugPreview,
                 marksOfferShown: false,
                 rendersAvailableProductForPreview: true
             )
+#else
+            EmptyView()
+#endif
+#endif
         }
-#endif
-#endif
     }
 
     private var aboutPane: some View {
-        // KikiStandardAboutPane has no extension slot. Compose the same public
-        // Kiki atoms so the DEBUG-only controls can be their own final section.
-        KikiSettingsPane {
-            Section {
-                KikiAppIdentityView(
-                    appName: aboutMetadata.appName,
-                    versionText: aboutMetadata.displayVersion
-                )
-                .padding(.vertical, DS.Spacing.xl)
-                .listRowBackground(Color(nsColor: .windowBackgroundColor))
-            }
-
-            Section {
+        KikiStandardAboutPane(metadata: aboutMetadata)
+            .statusContent {
                 standardAboutStatusRow
 #if APPSTORE
                 // The same banner General shows, rather than a second design
@@ -145,15 +148,7 @@ struct SettingsView: View {
                 }
 #endif
             }
-#if !APPSTORE
-            Section {
-                DirectSupportCardRow()
-            }
-#endif
-
-            // The left side identifies the destination; only the right-side
-            // value and action icon are interactive.
-            Section {
+            .additionalLinks {
                 SettingsTrailingLinkRow(
                     title: appLanguage.string("Made by"),
                     value: ExternalLinks.developerName,
@@ -177,19 +172,14 @@ struct SettingsView: View {
                     urlString: ExternalLinks.githubURL,
                     systemImage: "chevron.left.forwardslash.chevron.right"
                 )
-            } footer: {
-                VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                    KikiSettingsHelperText(
-                        appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
-                    )
-                    if let copyright = aboutMetadata.copyright, !copyright.isEmpty {
-                        Text(copyright)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+                KikiSettingsHelperText(
+                    appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
+                )
             }
-
+            .additionalSections {
+#if !APPSTORE
+                Section { DirectSupportCardRow() }
+#endif
 #if DEBUG && APPSTORE
             Section {
                 ProAccessDebugRows(

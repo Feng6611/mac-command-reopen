@@ -7,7 +7,6 @@
 
 import AppKit
 import Combine
-import ConfettiSwiftUI
 import KikiOnboarding
 import SwiftUI
 import os
@@ -20,12 +19,11 @@ import KikiCommerceCore
 @MainActor
 enum CommandReopenOnboardingFlow {
     static let windowSize = CGSize(width: 680, height: 600)
-    static let stepCount = 4
+    static let stepCount = 3
 
     enum StepID {
         static let welcome = "welcome"
         static let tryMinimize = "tryMinimize"
-        static let success = "success"
         static let finish = "finish"
     }
 
@@ -42,9 +40,6 @@ enum CommandReopenOnboardingFlow {
             },
             .custom(id: StepID.tryMinimize) { _ in
                 AnyView(TryMinimizeStepView(model: tryMinimizeModel, onMinimize: onMinimize))
-            },
-            .custom(id: StepID.success) { navigation in
-                AnyView(SuccessStepView(navigation: navigation))
             },
             .custom(id: StepID.finish) { navigation in
                 AnyView(FinishStepView(navigation: navigation))
@@ -184,93 +179,6 @@ private struct TryMinimizeStepView: View {
     }
 }
 
-private struct SuccessStepView: View {
-    @ObservedObject private var appLanguage = AppLanguage.shared
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    let navigation: KikiOnboardingNavigation
-
-    @State private var showsWedge = false
-    @State private var confettiTrigger = 0
-
-    var body: some View {
-        KikiOnboardingScaffold(
-            appName: "Command Reopen",
-            title: AppLanguage.shared.string("It works!"),
-            bodyText: AppLanguage.shared.string("Cmd+Tab now brings your windows back."),
-            appIcon: NSApp.applicationIconImage,
-            primaryAction: KikiOnboardingAction(title: AppLanguage.shared.string("Continue"), action: navigation.advance),
-            tint: DS.Colors.brandPrimary,
-            size: CommandReopenOnboardingFlow.windowSize,
-            stepIndex: 2,
-            stepCount: CommandReopenOnboardingFlow.stepCount,
-            background: .plain,
-            contentAlignment: .centered
-        ) {
-            // The single takeaway of this step: the product's wedge. A quiet
-            // material panel (not a stark white card) keeps it native. The
-            // confetti cannon fires from an invisible anchor — celebration
-            // without a celebratory icon competing with the content.
-            VStack(spacing: DS.Spacing.sm) {
-                Color.clear
-                    .frame(width: 1, height: 1)
-                    .confettiCannon(
-                        trigger: $confettiTrigger,
-                        num: 30,
-                        confettis: [.shape(.circle), .shape(.roundedCross)],
-                        colors: [DS.Colors.brandPrimary, .orange, .purple, .pink],
-                        confettiSize: 8,
-                        rainHeight: 420,
-                        radius: 260
-                    )
-
-                Image(systemName: "checkmark.shield.fill")
-                    .font(.system(size: 40, weight: .medium))
-                    .foregroundStyle(DS.Colors.brandPrimary)
-                    .padding(.bottom, DS.Spacing.xs)
-
-                Text(appLanguage.string("Zero permissions"))
-                    .font(.title2.bold())
-
-                Text(appLanguage.string("Core restore needs no Accessibility or Screen Recording."))
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.vertical, DS.Spacing.xxl)
-            .padding(.horizontal, DS.Spacing.xxl)
-            .frame(maxWidth: .infinity)
-            .background(
-                .thinMaterial,
-                in: RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
-                    .strokeBorder(DS.Colors.cardBorder, lineWidth: 1)
-            )
-            .padding(.top, DS.Spacing.lg)
-            .scaleEffect(showsWedge ? 1 : 0.94)
-            .opacity(showsWedge ? 1 : 0)
-        }
-        .onAppear {
-            NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
-            // Reduce Motion turns the celebration off, not the payoff: the
-            // wedge appears at once with no spring, and the confetti — pure
-            // decoration — is skipped entirely.
-            guard !reduceMotion else {
-                showsWedge = true
-                return
-            }
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.8).delay(0.15)) {
-                showsWedge = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                confettiTrigger += 1
-            }
-        }
-    }
-}
-
 /// The last step, and the only one that changes anything about the machine.
 ///
 /// It answers "what happens now": the app keeps running across restarts, and
@@ -289,17 +197,26 @@ private struct FinishStepView: View {
             bodyText: bodyText,
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(
-                title: AppLanguage.shared.string("Continue"),
+                title: AppLanguage.shared.string("Get Started"),
                 action: navigation.finish
             ),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
-            stepIndex: 3,
+            stepIndex: 2,
             stepCount: CommandReopenOnboardingFlow.stepCount,
             background: .plain,
             contentAlignment: .centered
         ) {
             VStack(spacing: DS.Spacing.lg) {
+                Text(appLanguage.string("Zero permissions — it works with the normal Cmd+Tab behavior."))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                Label(appLanguage.string("Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings."), systemImage: "menubar.rectangle")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 launchAtLoginCard
 #if !APPSTORE
                 communityBuildNote
@@ -844,9 +761,6 @@ final class OnboardingWindowController {
         // which is a strange thing to hand someone thirty seconds in.
         DispatchQueue.main.async {
             SettingsWindowController.shared.show(
-                activationMonitor: .shared,
-                reopenStatsStore: .shared,
-                accessController: .shared,
                 initialTab: .general
             )
         }

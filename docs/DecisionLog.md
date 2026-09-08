@@ -1,5 +1,33 @@
 # Decision Log
 
+## D-008 — App-owned composition and explicit presentation
+
+- Date: 2026-09-06
+- Status: Accepted
+
+`AppComposition` owns the application services. Existing shared accessors forward
+to this graph. `ActivationMonitor` delegates pure decisions to `ReopenPolicy`
+and execution to `WindowReopenExecutor`; its expired-access callback reaches
+`AppRouter` without opening a window. Access state remains visible in Settings
+and the menu, where users can explicitly open commerce surfaces.
+
+Settings intentionally omits the master Enable toggle and its Status section.
+The excluded-application editor caches the installed catalog asynchronously and
+updates running applications incrementally. One optional `SettingsSheet` owns
+presentation. Replacements wait for native dismissal and revalidate eligibility;
+purchase review follow-up also waits for dismissal. Closing a paywall does not
+open another offer. This supersedes D-003's automatic paywall-close trigger:
+eligible users open the offer from Settings, starting its clock on first display.
+The custom review introduction and existing eligibility policy remain intact.
+
+Verification (2026-09-07): all 109 application unit tests passed; the registry's
+eight-project verification matrix passed, including the existing app UI tests.
+Kiki ran 100 Swift Testing cases plus its XCTest suites. MAS build, development
+signature/configuration checks and process launch passed; Direct compiled.
+The matrix uses each caller's configured package references, including pinned
+remote versions. Interactive visual inspection remains unverified because the
+computer-use connection timed out; no purchase transaction was performed.
+
 ## D-001 — Keep onboarding Cmd+Tab ordering in Command Reopen
 
 - Date: 2026-07-25

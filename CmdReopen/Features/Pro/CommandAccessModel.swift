@@ -11,7 +11,7 @@ import KikiRevenueCat
 /// owns only Command Reopen's onboarding completion and expired-access prompt.
 @MainActor
 final class CommandAccessModel: ObservableObject {
-    static let shared = CommandAccessModel()
+    static var shared: CommandAccessModel { AppComposition.shared.commandAccess }
 
     let accessManager: KikiAccessManager
     @Published private(set) var shouldOpenProSettings = false
@@ -90,6 +90,12 @@ final class CommandAccessModel: ObservableObject {
     var activeWinbackOffer: TrialExitOffer? {
         guard winbackOfferFirstShownAt != nil else { return nil }
         return TrialExitOffer.resolve(accessModel: self)
+    }
+
+    /// Eligible offers are discovered in Settings. The 48-hour clock starts
+    /// only when the user explicitly opens the offer, never on paywall close.
+    var availableWinbackOffer: TrialExitOffer? {
+        TrialExitOffer.resolve(accessModel: self)
     }
 
     var accessEntitlementState: AccessEntitlementState {

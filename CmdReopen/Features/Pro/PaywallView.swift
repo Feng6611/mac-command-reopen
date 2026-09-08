@@ -69,7 +69,7 @@ struct PaywallSheetView: View {
                 onFinish()
 
                 guard context == .settings, didCompletePurchase else { return }
-                DispatchQueue.main.async(execute: onPurchaseCompleted)
+                onPurchaseCompleted()
             }
         )
     }

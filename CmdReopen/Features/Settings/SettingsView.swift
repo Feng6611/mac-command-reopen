@@ -25,14 +25,14 @@ struct SettingsTabContent: View {
 
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     @State private var appLookupQuery = ""
-    @State private var applicationCatalog: [ExcludedApplicationInfo] = []
+    @StateObject private var applicationCatalog = ApplicationCatalogCache()
 
     private var isFeatureLocked: Bool {
         !accessController.isCoreFeatureAvailable
     }
 
     private var appLookupResults: [ExcludedApplicationInfo] {
-        appLookupProvider.search(query: appLookupQuery, in: applicationCatalog)
+        appLookupProvider.search(query: appLookupQuery, in: applicationCatalog.applications)
     }
 
     var body: some View {
@@ -44,6 +44,11 @@ struct SettingsTabContent: View {
             if isFeatureLocked {
                 Section {
                     lockedBanner
+#if APPSTORE
+                    WinbackOfferRow(accessModel: accessModel) {
+                        route.presentTrialExitOffer()
+                    }
+#endif
                 }
             }
 
@@ -121,15 +126,19 @@ struct SettingsTabContent: View {
             SettingsWindowController.shared.refreshLocalizedTabs()
         }
         .task {
-            await Task.yield()
-            refreshApplicationCatalog()
+            for application in NSWorkspace.shared.runningApplications {
+                addRunningApplication(application)
+            }
             clearInitialFocus()
+            await applicationCatalog.loadInstalledApplications()
         }
-        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { _ in
-            refreshApplicationCatalog()
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { notification in
+            guard let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            addRunningApplication(application)
         }
-        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { _ in
-            refreshApplicationCatalog()
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { notification in
+            guard let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+            applicationCatalog.applicationTerminated(processID: application.processIdentifier)
         }
     }
 
@@ -175,27 +184,24 @@ struct SettingsTabContent: View {
 
         activationMonitor.addExcludedBundleID(result.bundleID)
         appLookupQuery = ""
-        refreshApplicationCatalog()
     }
 
     private func removeExcludedBundleID(_ bundleID: String) {
         activationMonitor.removeExcludedBundleID(bundleID)
-        refreshApplicationCatalog()
     }
 
-    private func refreshApplicationCatalog() {
-        let selfBundleID = Bundle.main.bundleIdentifier
-
-        let userApps = NSWorkspace.shared.runningApplications
-            .filter { app in
-                guard app.activationPolicy == .regular,
-                      let bundleID = app.bundleIdentifier else {
-                    return false
-                }
-                return bundleID != selfBundleID
-            }
-
-        applicationCatalog = appLookupProvider.applicationCatalog(runningApplications: userApps)
+    private func addRunningApplication(_ application: NSRunningApplication) {
+        guard application.activationPolicy == .regular,
+              let bundleID = application.bundleIdentifier,
+              bundleID != Bundle.main.bundleIdentifier else { return }
+        applicationCatalog.applicationLaunched(
+            processID: application.processIdentifier,
+            application: ExcludedApplicationInfo(
+                bundleID: bundleID,
+                applicationURL: application.bundleURL,
+                displayName: application.localizedName
+            )
+        )
     }
 
     private func clearInitialFocus() {

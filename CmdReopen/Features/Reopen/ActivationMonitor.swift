@@ -11,46 +11,12 @@ import Defaults
 import Foundation
 import os
 
-struct ForegroundWindowObservationState: Equatable {
-    private(set) var hasObservedVisibleWindow = false
-    private(set) var consecutiveMissingSamples = 0
-
-    mutating func observe(
-        hasVisibleWindow: Bool,
-        requiredMissingSamples: Int
-    ) -> Bool {
-        if hasVisibleWindow {
-            hasObservedVisibleWindow = true
-            consecutiveMissingSamples = 0
-            return false
-        }
-
-        guard hasObservedVisibleWindow else {
-            return false
-        }
-
-        consecutiveMissingSamples += 1
-        guard consecutiveMissingSamples >= max(1, requiredMissingSamples) else {
-            return false
-        }
-
-        reset()
-        return true
-    }
-
-    mutating func reset() {
-        hasObservedVisibleWindow = false
-        consecutiveMissingSamples = 0
-    }
-}
-
 /// Monitors app activation and sends a reopen request when the user switches to an app
 /// via Command+Tab (or other non-mouse activation), unless the app was recently launched.
 final class ActivationMonitor: ObservableObject {
     private enum Constants {
         static let reopenEvaluationDelay: TimeInterval = 0.2
         static let recentLaunchSuppressionInterval: TimeInterval = 0.9
-        static let bundleDebounceInterval: TimeInterval = 0.1
         static let selfTriggerSuppressInterval: TimeInterval = 0.3
         static let rapidReturnSuppressionInterval: TimeInterval = 2.0
         static let foregroundWindowPollingInterval: TimeInterval = 0.15
@@ -74,7 +40,7 @@ final class ActivationMonitor: ObservableObject {
 
     private static let universalControlBundleID = "com.apple.universalcontrol"
 
-    static let shared = ActivationMonitor()
+    static var shared: ActivationMonitor { AppComposition.shared.activationMonitor }
 
     @Published var isFeatureEnabled: Bool {
         didSet {
@@ -115,19 +81,19 @@ final class ActivationMonitor: ObservableObject {
     private let notificationCenter: NotificationCenter
     private let workspace: NSWorkspace
     private let defaults: UserDefaults
-    private let reopenStatsStore: ReopenStatsStore
+    private let windowReopenExecutor: WindowReopenExecutor
     private let accessController: FeatureAvailabilityProviding
     private let windowInfoProvider: WindowInfoListing
     private let accessibilityWindowRestorer: AccessibilityWindowRestoring
     private let advancedWindowRestoreSettings: AdvancedWindowRestoreSettings
     private let dockClickIntentCoordinator: DockClickIntentCoordinator
+    private let onExpiredReopenNeeded: @MainActor () -> Void
     private var activationObserver: NSObjectProtocol?
     private var foregroundWindowTimer: Timer?
     private var latestForegroundApplication: NSRunningApplication?
     private var monitoredForegroundApplication: NSRunningApplication?
     private var foregroundReturnTarget: NSRunningApplication?
     private var foregroundWindowObservation = ForegroundWindowObservationState()
-    private var lastReopenDates: [String: Date] = [:]
     private var selfTriggeredSuppressUntil: [String: Date] = [:]
     private var lastActivationDates: [String: Date] = [:]
     private var lastFrontmostBundleID: String?
@@ -141,17 +107,24 @@ final class ActivationMonitor: ObservableObject {
          windowInfoProvider: WindowInfoListing = CoreGraphicsWindowInfoProvider(),
          accessibilityWindowRestorer: AccessibilityWindowRestoring = WindowRestorerFactory.makeDefault(),
          advancedWindowRestoreSettings: AdvancedWindowRestoreSettings = .shared,
-         dockClickIntentCoordinator: DockClickIntentCoordinator = .shared) {
+         dockClickIntentCoordinator: DockClickIntentCoordinator = .shared,
+         onExpiredReopenNeeded: @escaping @MainActor () -> Void = {}) {
         AppDefaults.migrateLegacyKeys(in: defaults)
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
         self.defaults = defaults
-        self.reopenStatsStore = reopenStatsStore ?? .shared
+        self.windowReopenExecutor = WindowReopenExecutor(
+            workspace: workspace,
+            reopenStatsStore: reopenStatsStore ?? .shared,
+            accessibilityWindowRestorer: accessibilityWindowRestorer,
+            advancedWindowRestoreSettings: advancedWindowRestoreSettings
+        )
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
         self.accessibilityWindowRestorer = accessibilityWindowRestorer
         self.advancedWindowRestoreSettings = advancedWindowRestoreSettings
         self.dockClickIntentCoordinator = dockClickIntentCoordinator
+        self.onExpiredReopenNeeded = onExpiredReopenNeeded
         let storedValue = defaults[AppDefaults.featureEnabled]
         let storedAutomaticSwitcherReordering = defaults[AppDefaults.automaticSwitcherReordering]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
@@ -546,10 +519,8 @@ final class ActivationMonitor: ObservableObject {
                     return
                 }
                 self.recordExpiredNudge(at: now)
-#if APPSTORE
-                self.presentExpiredPaywallNudge()
-                AppLogger.activation.info("Trial expired nudge: allowing one-time reopen and showing paywall.")
-#endif
+                self.onExpiredReopenNeeded()
+                AppLogger.activation.info("Trial expired nudge: allowing one-time reopen and notifying the app router.")
             }
             self.reopenApplication(withBundleIdentifier: bundleID, at: now)
         }
@@ -573,17 +544,6 @@ final class ActivationMonitor: ObservableObject {
     private func recordExpiredNudge(at date: Date = Date()) {
         defaults.set(date, forKey: Self.lastExpiredNudgeDateKey)
     }
-
-#if APPSTORE
-    private func presentExpiredPaywallNudge() {
-        Task { @MainActor in
-            SettingsWindowController.shared.show(
-                initialTab: .about,
-                presentsPaywall: true
-            )
-        }
-    }
-#endif
 
     private func shouldSuppressRecentlyLaunchedReopen(for app: NSRunningApplication, now: Date) -> Bool {
         guard Self.shouldSuppressRecentLaunch(
@@ -611,78 +571,9 @@ final class ActivationMonitor: ObservableObject {
     }
 
     private func reopenApplication(withBundleIdentifier bundleID: String, at now: Date = Date()) {
-        guard let appURL = workspace.urlForApplication(withBundleIdentifier: bundleID) else {
-            AppLogger.activation.error("Unable to resolve URL for bundle id \(bundleID).")
-            return
+        windowReopenExecutor.reopenApplication(withBundleIdentifier: bundleID, at: now) { [weak self] in
+            self?.selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
         }
-
-        if Self.shouldDebounceReopen(
-            lastReopenDate: lastReopenDates[bundleID],
-            now: now,
-            interval: Constants.bundleDebounceInterval
-        ) {
-            let elapsed = now.timeIntervalSince(lastReopenDates[bundleID] ?? now)
-            AppLogger.activation.debug("Skipping reopen for \(bundleID) due to debounce (\(elapsed)s elapsed).")
-            return
-        }
-        lastReopenDates[bundleID] = now
-
-        let accessibilityResult = advancedWindowRestoreResult(for: bundleID)
-        switch accessibilityResult {
-        case .restored(let windowCount):
-            let runningApplication = workspace.runningApplications.first {
-                $0.bundleIdentifier == bundleID
-            }
-            _ = reopenStatsStore.recordSuccessfulReopen(
-                bundleID: bundleID,
-                localizedName: runningApplication?.localizedName,
-                bundleURL: runningApplication?.bundleURL,
-                activationPolicy: runningApplication?.activationPolicy
-            )
-            AppLogger.activation.notice(
-                "Restored \(windowCount) window(s) for \(bundleID) through Accessibility."
-            )
-            return
-        case .unavailable, .failed:
-            if advancedWindowRestoreSettings.isAdvancedModeEnabled {
-                AppLogger.activation.info("Accessibility restore unavailable for \(bundleID); using native reopen.")
-            }
-        }
-
-        // Ignore one immediate echo activation caused by our own reopen request.
-        selfTriggeredSuppressUntil[bundleID] = now.addingTimeInterval(Constants.selfTriggerSuppressInterval)
-
-        AppLogger.activation.notice("Re-opening \(bundleID). build=\(AppLogger.buildSignature)")
-        let configuration = NSWorkspace.OpenConfiguration()
-        configuration.activates = true
-        configuration.createsNewApplicationInstance = false
-
-        workspace.openApplication(at: appURL, configuration: configuration) { [weak self] openedApp, error in
-            self?.handleReopenCompletion(
-                requestedBundleID: bundleID,
-                openedBundleID: openedApp?.bundleIdentifier,
-                localizedName: openedApp?.localizedName,
-                openedProcessIdentifier: openedApp?.processIdentifier,
-                error: error,
-                openedBundleURL: openedApp?.bundleURL,
-                openedActivationPolicy: openedApp?.activationPolicy
-            )
-        }
-    }
-
-    private func advancedWindowRestoreResult(for bundleIdentifier: String) -> AccessibilityWindowRestoreResult {
-#if DIRECT
-        guard let mode = AdvancedWindowRestorePolicy.mode(
-            isAdvancedModeEnabled: advancedWindowRestoreSettings.isAdvancedModeEnabled,
-            restoresAllWindows: advancedWindowRestoreSettings.restoresAllWindows
-        ) else { return .unavailable }
-        return accessibilityWindowRestorer.restoreWindows(
-            bundleIdentifier: bundleIdentifier,
-            mode: mode
-        )
-#else
-        return .unavailable
-#endif
     }
 
     /// A global monitor passes only confirmed Dock AX hits here. Other mouse
@@ -773,24 +664,15 @@ final class ActivationMonitor: ObservableObject {
         openedBundleURL: URL? = nil,
         openedActivationPolicy: NSApplication.ActivationPolicy? = nil
     ) {
-        if let error {
-            AppLogger.activation.error("Failed to re-open \(requestedBundleID): \(error.localizedDescription)")
-            return
-        }
-
-        let recordedBundleID = openedBundleID ?? requestedBundleID
-        _ = reopenStatsStore.recordSuccessfulReopen(
-            bundleID: recordedBundleID,
+        windowReopenExecutor.handleReopenCompletion(
+            requestedBundleID: requestedBundleID,
+            openedBundleID: openedBundleID,
             localizedName: localizedName,
-            bundleURL: openedBundleURL,
-            activationPolicy: openedActivationPolicy
+            openedProcessIdentifier: openedProcessIdentifier,
+            error: error,
+            openedBundleURL: openedBundleURL,
+            openedActivationPolicy: openedActivationPolicy
         )
-
-        if let openedProcessIdentifier {
-            AppLogger.activation.debug("Re-opened \(recordedBundleID), pid \(openedProcessIdentifier)")
-        } else {
-            AppLogger.activation.debug("Re-opened \(recordedBundleID)")
-        }
     }
 
     private func shouldIgnoreSelfTriggeredActivation(bundleID: String) -> Bool {
@@ -814,19 +696,15 @@ final class ActivationMonitor: ObservableObject {
     }
 
     static func shouldSuppressRecentLaunch(launchDate: Date?, now: Date, interval: TimeInterval) -> Bool {
-        guard let launchDate else { return false }
-        let elapsed = now.timeIntervalSince(launchDate)
-        return elapsed >= 0 && elapsed <= interval
+        ReopenPolicy.shouldSuppressRecentLaunch(launchDate: launchDate, now: now, interval: interval)
     }
 
     static func shouldDebounceReopen(lastReopenDate: Date?, now: Date, interval: TimeInterval) -> Bool {
-        guard let lastReopenDate else { return false }
-        return now.timeIntervalSince(lastReopenDate) < interval
+        ReopenPolicy.shouldDebounceReopen(lastReopenDate: lastReopenDate, now: now, interval: interval)
     }
 
     static func shouldIgnoreSelfTriggered(until: Date?, now: Date) -> Bool {
-        guard let until else { return false }
-        return now <= until
+        ReopenPolicy.shouldIgnoreSelfTriggered(until: until, now: now)
     }
 
     static func shouldShowExpiredNudge(
@@ -834,8 +712,7 @@ final class ActivationMonitor: ObservableObject {
         now: Date,
         calendar: Calendar = .current
     ) -> Bool {
-        guard let lastNudgeDate else { return true }
-        return !calendar.isDate(lastNudgeDate, inSameDayAs: now)
+        ReopenPolicy.shouldShowExpiredNudge(lastNudgeDate: lastNudgeDate, now: now, calendar: calendar)
     }
 
     static func hasVisibleWindow(
@@ -862,14 +739,13 @@ final class ActivationMonitor: ObservableObject {
         now: Date,
         interval: TimeInterval
     ) -> Bool {
-        guard let previousFrontmostBundleID,
-              previousFrontmostBundleID != targetBundleID,
-              let targetLastActivationDate,
-              let previousBundleLastActivationDate else {
-            return false
-        }
-        let targetGap = now.timeIntervalSince(targetLastActivationDate)
-        let previousGap = now.timeIntervalSince(previousBundleLastActivationDate)
-        return targetGap >= 0 && targetGap < interval && previousGap >= 0 && previousGap < interval
+        ReopenPolicy.shouldSuppressRapidReturn(
+            previousFrontmostBundleID: previousFrontmostBundleID,
+            targetBundleID: targetBundleID,
+            targetLastActivationDate: targetLastActivationDate,
+            previousBundleLastActivationDate: previousBundleLastActivationDate,
+            now: now,
+            interval: interval
+        )
     }
 }

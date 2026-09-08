@@ -15,7 +15,7 @@ protocol FeatureAvailabilityProviding: AnyObject {
 
 @MainActor
 final class AppAccessController: ObservableObject, FeatureAvailabilityProviding {
-    static let shared = AppAccessController.makeShared()
+    static var shared: AppAccessController { AppComposition.shared.accessController }
 
     @Published private(set) var entitlementState: AccessEntitlementState
     @Published private(set) var shouldOpenProSettings = false
@@ -141,7 +141,7 @@ final class AppAccessController: ObservableObject, FeatureAvailabilityProviding 
         return resolvedCommerceStateSource
     }
 
-    private static func makeShared() -> AppAccessController {
+    static func makeDefault() -> AppAccessController {
         switch DistributionChannel.current {
         case .direct:
             AppAccessController(distributionChannel: .direct)

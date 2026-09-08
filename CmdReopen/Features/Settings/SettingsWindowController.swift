@@ -1,69 +1,89 @@
 import AppKit
 import Combine
 import KikiSettings
-import os
+
+enum SettingsSheet: String, Identifiable {
+    case shortcuts, paywall, trialExit
+#if DEBUG
+    case trialExitDebug
+#endif
+    var id: String { rawValue }
+}
 
 @MainActor
 final class SettingsNavigationModel: ObservableObject {
-    static let shared = SettingsNavigationModel()
-    @Published var isPaywallSheetPresented = false
-    @Published var isTrialExitOfferPresented = false
-    @Published var isMacShortcutsPresented = false
+    static var shared: SettingsNavigationModel { AppComposition.shared.settingsNavigation }
+
+    @Published var presentedSheet: SettingsSheet? {
+        didSet {
+            if oldValue != nil, presentedSheet == nil { isDismissing = true }
+        }
+    }
+    private(set) var isDismissing = false
+    private var pendingSheet: SettingsSheet?
+    private var afterDismiss: (() -> Void)?
+
+    var isPresenting: Bool { presentedSheet != nil || isDismissing }
+
+    func presentPaywall() { present(.paywall) }
+    func presentMacShortcuts() { present(.shortcuts) }
+    func presentTrialExitOffer() { present(.trialExit) }
 #if DEBUG
-    @Published var isTrialExitOfferDebugPreviewPresented = false
+    func presentTrialExitOfferDebugPreview() { present(.trialExitDebug) }
 #endif
-    func presentPaywall() {
-        isPaywallSheetPresented = true
-    }
 
-    func presentMacShortcuts() {
-        isMacShortcutsPresented = true
-    }
-
-    /// Presents the trial-exit offer after the paywall has finished closing.
-    ///
-    /// The paywall dismisses itself, so the offer cannot replace it in place;
-    /// asking for a second sheet while the first is still on screen is what
-    /// makes AppKit drop one of them. The hop to the next run loop lets the
-    /// first sheet retract before the card is asked for.
-    func presentTrialExitOffer() {
-        DispatchQueue.main.async { [self] in
-            isTrialExitOfferPresented = true
+    private func present(_ sheet: SettingsSheet) {
+        guard presentedSheet != sheet else { return }
+        if isPresenting {
+            pendingSheet = sheet
+            presentedSheet = nil
+        } else {
+            presentedSheet = sheet
         }
     }
 
-#if DEBUG
-    func presentTrialExitOfferDebugPreview() {
-        DispatchQueue.main.async { [self] in
-            isTrialExitOfferDebugPreviewPresented = true
+    /// Run purchase follow-up only after the native sheet has closed.
+    func performAfterDismiss(_ action: @escaping () -> Void) {
+        afterDismiss = action
+    }
+
+    func sheetDidDismiss(canPresent: (SettingsSheet) -> Bool = { _ in true }) {
+        isDismissing = false
+        let next = pendingSheet
+        pendingSheet = nil
+        let action = afterDismiss
+        afterDismiss = nil
+        if let next, canPresent(next) {
+            presentedSheet = next
+        } else {
+            action?()
         }
     }
-#endif
 }
 
 @MainActor
 final class SettingsWindowController {
-    static let shared = SettingsWindowController()
+    static var shared: SettingsWindowController { AppComposition.shared.settingsWindow }
+    private let navigation: SettingsNavigationModel
+    private let onPrepare: () -> Void
+    let coordinator: KikiSettingsCoordinator<SettingsTab>
 
-    let coordinator = KikiSettingsCoordinator(
-        tabs: SettingsTab.kikiTabs(language: .shared),
-        initialTab: SettingsTab.general,
-        windowController: KikiSettingsWindowController(
-            frameAutosaveName: "CommandReopen.SettingsWindow",
-            idealContentSize: CGSize(
-                width: DS.Window.settingsWidth,
-                height: DS.Window.settingsHeight
-            ),
-            minimumContentSize: CGSize(
-                width: DS.Window.settingsWidth,
-                height: DS.Window.settingsMinimumHeight
-            ),
-            maximumContentSize: CGSize(
-                width: DS.Window.settingsWidth,
-                height: DS.Window.settingsHeight
+    init(navigation: SettingsNavigationModel, onPrepare: @escaping () -> Void) {
+        self.navigation = navigation
+        self.onPrepare = onPrepare
+        coordinator = KikiSettingsCoordinator(
+            tabs: SettingsTab.kikiTabs(language: .shared),
+            initialTab: .general,
+            windowController: KikiSettingsWindowController(
+                frameAutosaveName: "CommandReopen.SettingsWindow",
+                layout: KikiSettingsWindowLayout(
+                    ideal: CGSize(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight),
+                    minimum: CGSize(width: DS.Window.settingsWidth, height: DS.Window.settingsMinimumHeight),
+                    maximum: CGSize(width: DS.Window.settingsWidth, height: DS.Window.settingsHeight)
+                )
             )
         )
-    )
+    }
 
     var isVisible: Bool { coordinator.isVisible }
 
@@ -71,66 +91,32 @@ final class SettingsWindowController {
         coordinator.updateTabs(SettingsTab.kikiTabs(language: .shared))
     }
 
-    func prepareForSettingsScene(
-        accessController: AppAccessController? = nil,
-        initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
-    ) {
-        if let initialTab {
-            AppLogger.lifecycle.notice("Preparing settings scene. initialTab=\(initialTab.rawValue)")
-            coordinator.select(initialTab)
-        }
-
+    func prepareForSettingsScene(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        if let initialTab { coordinator.select(initialTab) }
         if presentsPaywall {
             coordinator.select(.about)
-            SettingsNavigationModel.shared.presentPaywall()
+            navigation.presentPaywall()
         }
-
         coordinator.prepare()
-
-        // The About pane states purchase status; asking for it when the window
-        // opens is what keeps that row from showing the result of a check that
-        // ran minutes ago, or never finished.
-        Task { await AppLifecycleCoordinator.shared.refreshCommerceStateForSettings() }
+        onPrepare()
     }
 
-    func show(
-        activationMonitor: ActivationMonitor? = nil,
-        reopenStatsStore: ReopenStatsStore? = nil,
-        accessController: AppAccessController? = nil,
-        initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
-    ) {
-        prepareForSettingsScene(
-            accessController: accessController,
-            initialTab: initialTab,
-            presentsPaywall: presentsPaywall
-        )
+    func show(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        prepareForSettingsScene(initialTab: initialTab, presentsPaywall: presentsPaywall)
         coordinator.open()
     }
 }
 
+/// Compatibility entry for AppKit menu actions; all routes reach the app router.
 @MainActor
 final class SettingsOpener {
     static let shared = SettingsOpener()
 
-    func prepare(
-        initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
-    ) {
-        SettingsWindowController.shared.prepareForSettingsScene(
-            initialTab: initialTab,
-            presentsPaywall: presentsPaywall
-        )
+    func prepare(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        AppComposition.shared.router.prepareSettings(initialTab: initialTab, presentsPaywall: presentsPaywall)
     }
 
-    func open(
-        initialTab: SettingsTab? = nil,
-        presentsPaywall: Bool = false
-    ) {
-        SettingsWindowController.shared.show(
-            initialTab: initialTab,
-            presentsPaywall: presentsPaywall
-        )
+    func open(initialTab: SettingsTab? = nil, presentsPaywall: Bool = false) {
+        AppComposition.shared.router.openSettings(initialTab: initialTab, presentsPaywall: presentsPaywall)
     }
 }

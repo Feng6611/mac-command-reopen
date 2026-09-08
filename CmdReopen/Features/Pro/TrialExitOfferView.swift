@@ -7,7 +7,7 @@ import KikiCommerceCore
 import KikiPaywall
 import SwiftUI
 
-/// The win-back card shown when someone closes the paywall after their trial
+/// The win-back card explicitly opened from Settings after the trial
 /// ended without buying, and re-opened from the banners while the discount
 /// window holds.
 ///
@@ -46,7 +46,7 @@ struct TrialExitOfferView: View {
         ) {
             VStack(spacing: DS.Spacing.md) {
                 Text(appLanguage.string(localized: "20% off, before you go",
-                    comment: "Title of the win-back card shown when the paywall is closed after the trial ended."))
+                    comment: "Title of the win-back card opened from Settings after the trial ended."))
                     .font(.title.bold())
                     .multilineTextAlignment(.center)
 
@@ -199,7 +199,9 @@ struct TrialExitOfferView: View {
             defer { isPurchasing = false }
             do {
                 try await accessModel.purchase(.winbackLifetime)
-                _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
+                SettingsNavigationModel.shared.performAfterDismiss {
+                    _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)
+                }
                 dismiss()
             } catch CommercePurchaseError.purchaseCancelled {
                 // The user changed their mind; the card stays as it was.
@@ -225,7 +227,7 @@ struct WinbackOfferRow: View {
     let onOpen: () -> Void
 
     var body: some View {
-        if let offer = accessModel.activeWinbackOffer {
+        if let offer = accessModel.availableWinbackOffer {
             Button(action: onOpen) {
                 HStack(spacing: DS.Spacing.sm) {
                     Image(systemName: "tag.fill")
@@ -237,7 +239,9 @@ struct WinbackOfferRow: View {
 
                     Spacer(minLength: 0)
 
-                    Text(offer.countdownText())
+                    Text(accessModel.winbackOfferFirstShownAt == nil
+                         ? appLanguage.string("View offer")
+                         : offer.countdownText())
                         .font(.caption)
                         .foregroundStyle(.secondary)
 

@@ -11,7 +11,7 @@ import KikiCommerceCore
 
 @MainActor
 final class ProCommerceStateSource: CommerceStateSource {
-    static let shared = ProCommerceStateSource(proStatusManager: .shared)
+    static var shared: ProCommerceStateSource { AppComposition.shared.commerceSource }
 
     private let proStatusManager: CommandAccessModel
 

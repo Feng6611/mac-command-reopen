@@ -15,7 +15,7 @@ import KikiCommerceCore
 
 @MainActor
 final class StatusBarMenuController {
-    static let shared = StatusBarMenuController()
+    static var shared: StatusBarMenuController { AppComposition.shared.statusBar }
 
     /// Never localized — it is the product name, and it also fills the `%@` in
     /// the shared `Quit %@` menu string.

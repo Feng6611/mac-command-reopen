@@ -20,10 +20,13 @@ final class AppLifecycleCoordinator {
         static let reviewPromptDelayNanoseconds: UInt64 = 1_500_000_000
     }
 
-    static let shared = AppLifecycleCoordinator()
+    static var shared: AppLifecycleCoordinator { AppComposition.shared.lifecycle }
 
     private let accessController: AppAccessController
     private let statusBarController: StatusBarMenuController
+    private let activationMonitor: ActivationMonitor
+    private let reopenStatsStore: ReopenStatsStore
+    private let router: AppRouter
     private var cancellables: Set<AnyCancellable> = []
     private var hasCompletedInitialCommerceRefresh = false
     private var lastCommerceRefreshAt: Date?
@@ -32,10 +35,16 @@ final class AppLifecycleCoordinator {
     private var isRelaunchedForOnboarding = false
 #endif
 
-    init(accessController: AppAccessController? = nil,
-         statusBarController: StatusBarMenuController? = nil) {
-        self.accessController = accessController ?? .shared
-        self.statusBarController = statusBarController ?? .shared
+    init(accessController: AppAccessController,
+         statusBarController: StatusBarMenuController,
+         activationMonitor: ActivationMonitor,
+         reopenStatsStore: ReopenStatsStore,
+         router: AppRouter) {
+        self.accessController = accessController
+        self.statusBarController = statusBarController
+        self.activationMonitor = activationMonitor
+        self.reopenStatsStore = reopenStatsStore
+        self.router = router
     }
 
     func applicationWillFinishLaunching() {
@@ -56,7 +65,7 @@ final class AppLifecycleCoordinator {
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
         AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
         statusBarController.install(
-            activationMonitor: .shared,
+            activationMonitor: activationMonitor,
             accessController: accessController
         )
 #if DIRECT
@@ -64,11 +73,11 @@ final class AppLifecycleCoordinator {
             isEnabled: {
                 AdvancedWindowRestoreSettings.shared.isAdvancedModeEnabled
                     && AdvancedWindowRestoreSettings.shared.cyclesWindowsFromDockClick
-                    && ActivationMonitor.shared.isFeatureEnabled
+                    && self.activationMonitor.isFeatureEnabled
                     && self.accessController.isCoreFeatureAvailable
             },
             onDockAppIntent: { bundleIdentifier, processIdentifier, date, targetWasFrontmost in
-                ActivationMonitor.shared.registerPendingDockClick(
+                self.activationMonitor.registerPendingDockClick(
                     bundleIdentifier: bundleIdentifier,
                     processIdentifier: processIdentifier,
                     at: date,
@@ -76,7 +85,7 @@ final class AppLifecycleCoordinator {
                 )
             },
             onDockAppClick: { intent in
-                ActivationMonitor.shared.cycleWindowsForConfirmedDockClick(intent)
+                self.activationMonitor.cycleWindowsForConfirmedDockClick(intent)
             }
         )
 #endif
@@ -89,11 +98,7 @@ final class AppLifecycleCoordinator {
 #if DEBUG
         if shouldAutoShowSettingsForDebugLaunch && !isRelaunchedForOnboarding {
             AppLogger.lifecycle.notice("Debug launch detected. Opening settings window for visibility.")
-            SettingsWindowController.shared.show(
-                activationMonitor: .shared,
-                reopenStatsStore: .shared,
-                accessController: accessController
-            )
+            router.openSettings()
         }
 #endif
 
@@ -124,7 +129,7 @@ final class AppLifecycleCoordinator {
 #if DIRECT
         DockClickMonitor.shared.stop()
 #endif
-        ReopenStatsStore.shared.flush()
+        reopenStatsStore.flush()
     }
 
 #if DEBUG
@@ -155,17 +160,7 @@ final class AppLifecycleCoordinator {
                     return
                 }
 
-                if !SettingsWindowController.shared.isVisible {
-                    SettingsWindowController.shared.show(
-                        activationMonitor: .shared,
-                        reopenStatsStore: .shared,
-                        accessController: self.accessController,
-                        initialTab: .about,
-                        presentsPaywall: true
-                    )
-                }
-
-                self.accessController.markPromptHandled()
+                self.router.handleExpiredAccess()
             }
             .store(in: &cancellables)
     }
@@ -190,18 +185,8 @@ final class AppLifecycleCoordinator {
         }
 #endif
 
-        if accessController.shouldOpenProSettings, !isOnboardingVisible {
-            if !SettingsWindowController.shared.isVisible {
-                SettingsWindowController.shared.show(
-                    activationMonitor: .shared,
-                    reopenStatsStore: .shared,
-                    accessController: accessController,
-                    initialTab: .about,
-                    presentsPaywall: true
-                )
-            }
-
-            accessController.markPromptHandled()
+        if accessController.shouldOpenProSettings {
+            router.handleExpiredAccess()
         }
     }
 
@@ -215,7 +200,7 @@ final class AppLifecycleCoordinator {
     private func scheduleLaunchReviewRequest() {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: Constants.reviewPromptDelayNanoseconds)
-            _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .applicationLaunched)
+            _ = reopenStatsStore.requestReviewIfEligible(for: .applicationLaunched)
         }
     }
 
