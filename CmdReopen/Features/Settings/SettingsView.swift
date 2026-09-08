@@ -102,25 +102,16 @@ struct SettingsTabContent: View {
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
 
-        }
-        // A reference guide, not a setting: a lightweight footer link on the
-        // window background instead of a full-weight card row inside the Form.
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                route.presentMacShortcuts()
-            } label: {
-                HStack(spacing: DS.Spacing.xxs) {
-                    Text(appLanguage.string("Mac window shortcuts"))
-                    Image(systemName: "chevron.right")
-                        .font(.caption2)
-                }
-                .font(.callout)
-                .foregroundStyle(DS.Colors.brandPrimary)
-                .contentShape(Rectangle())
+            Section {
+                KikiSettingsLinkRow(
+                    title: appLanguage.string("Mac window shortcuts"),
+                    value: "",
+                    urlString: "",
+                    systemImage: "keyboard",
+                    trailingSystemImage: "chevron.right",
+                    action: { route.presentMacShortcuts() }
+                )
             }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, DS.Spacing.sm)
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()

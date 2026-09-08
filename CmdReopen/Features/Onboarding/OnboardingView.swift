@@ -279,6 +279,9 @@ private struct SuccessStepView: View {
 /// Dock icon and lives in the menu bar.
 private struct FinishStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
+#if APPSTORE
+    @ObservedObject private var accessModel = CommandAccessModel.shared
+#endif
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
     let navigation: KikiOnboardingNavigation
 
@@ -289,7 +292,7 @@ private struct FinishStepView: View {
             bodyText: bodyText,
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(
-                title: AppLanguage.shared.string("Continue"),
+                title: AppLanguage.shared.string("Get Started"),
                 action: navigation.finish
             ),
             tint: DS.Colors.brandPrimary,
@@ -300,6 +303,10 @@ private struct FinishStepView: View {
             contentAlignment: .centered
         ) {
             VStack(spacing: DS.Spacing.lg) {
+                Label(appLanguage.string("Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings."), systemImage: "menubar.rectangle")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 launchAtLoginCard
 #if !APPSTORE
                 communityBuildNote
@@ -309,12 +316,18 @@ private struct FinishStepView: View {
         }
     }
 
-    private var bodyText: String {
+    private var bodyText: String? {
 #if APPSTORE
-        appLanguage.string(localized: "Your free trial is active — 14 days, and nothing is charged until you pick a plan.",
-            comment: "Subtitle of the final onboarding step in the App Store build.")
+        switch accessModel.status {
+        case .trial:
+            return appLanguage.string("Your free trial is active — 14 days, and nothing is charged until you pick a plan.")
+        case .expired:
+            return appLanguage.string("Upgrade to continue automatic window reopening.")
+        case .notStarted, .pro:
+            return nil
+        }
 #else
-        appLanguage.string(localized: "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart.",
+        return appLanguage.string(localized: "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart.",
             comment: "Subtitle of the final onboarding step in the free build.")
 #endif
     }
