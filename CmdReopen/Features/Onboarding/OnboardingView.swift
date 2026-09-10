@@ -618,46 +618,13 @@ final class OnboardingWindowController {
     /// tutorial is the product-specific exception: it must be miniaturizable
     /// so users can exercise Command Reopen's Cmd+Tab behavior.
     ///
-    /// The activation hand-off happens BEFORE the window miniaturizes: the
-    /// Cmd+Tab switcher's first slot is the frontmost app, so Command Reopen
-    /// must already be the *previous* app by the time the user can press
-    /// Cmd+Tab. Handing off first closes the race where a fast user pressed
-    /// Cmd+Tab while we were still frontmost.
+    /// The activation hand-off happens after AppKit has started the native
+    /// minimize animation. That leaves the return target frontmost when the
+    /// user presses Cmd+Tab, without hiding the animation.
     private func miniaturizeTutorialWindow() {
-        guard coordinator?.window != nil else {
-            return
-        }
-
-        tryMinimizeModel.clearRetryHint()
-        guard let target = returnTargetOrFinder() else {
-            tryMinimizeModel.showRetryHint()
-            AppLogger.lifecycle.error("Onboarding activation hand-off has no eligible return target.")
-            return
-        }
-
-        confirmActivation(of: target) { [weak self] didActivate in
-            guard let self else { return }
-            guard didActivate else {
-                self.tryMinimizeModel.showRetryHint()
-                AppLogger.lifecycle.error("Onboarding return-target activation was not confirmed.")
-                return
-            }
-            guard self.isWaitingForCommandTabReturn,
-                  let window = self.coordinator?.window else {
-                return
-            }
-
-            window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
-            window.animationBehavior = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-                ? .none
-                : .documentWindow
-            // Keep the return target frontmost for Cmd+Tab ordering, but put
-            // the inactive onboarding window onscreen so AppKit's native Dock
-            // animation remains visible.
-            window.orderFrontRegardless()
-            window.displayIfNeeded()
-            window.miniaturize(nil)
-        }
+        guard let window = coordinator?.window else { return }
+        window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
+        window.miniaturize(nil)
     }
 
     static func styleMaskEnablingMiniaturization(
@@ -783,7 +750,33 @@ final class OnboardingWindowController {
         tryMinimizeModel.clearRetryHint()
         minimizeReturnSession.recordWindowDidMiniaturize()
         scheduleReturnTimeout()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            self?.handOffToReturnTargetAfterMiniaturizing()
+        }
         AppLogger.lifecycle.debug("Onboarding minimize tutorial is awaiting app activation.")
+    }
+
+    /// Miniaturize while Command Reopen is still active so AppKit can show the
+    /// native Dock animation. Once it finishes, hand focus to the previously
+    /// active app; that makes Command Reopen the next Cmd+Tab destination.
+    private func handOffToReturnTargetAfterMiniaturizing() {
+        guard isWaitingForCommandTabReturn,
+              minimizeReturnSession.isAwaitingApplicationReturn else {
+            return
+        }
+
+        guard let target = returnTargetOrFinder() else {
+            tryMinimizeModel.showRetryHint()
+            AppLogger.lifecycle.error("Onboarding activation hand-off has no eligible return target.")
+            return
+        }
+
+        confirmActivation(of: target) { [weak self] didActivate in
+            guard let self else { return }
+            guard !didActivate else { return }
+            self.tryMinimizeModel.showRetryHint()
+            AppLogger.lifecycle.error("Onboarding return-target activation was not confirmed.")
+        }
     }
 
     /// If the user does not return with a single Cmd+Tab press, recover the
