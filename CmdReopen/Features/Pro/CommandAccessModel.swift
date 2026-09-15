@@ -92,12 +92,6 @@ final class CommandAccessModel: ObservableObject {
         return TrialExitOffer.resolve(accessModel: self)
     }
 
-    /// Eligible offers are discovered in Settings. The 48-hour clock starts
-    /// only when the user explicitly opens the offer, never on paywall close.
-    var availableWinbackOffer: TrialExitOffer? {
-        TrialExitOffer.resolve(accessModel: self)
-    }
-
     var accessEntitlementState: AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
             return .trial

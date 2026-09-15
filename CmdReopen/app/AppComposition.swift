@@ -19,6 +19,9 @@ final class AppComposition {
         },
         openSettings: { [weak self] tab, paywall in
             self?.settingsWindow.show(initialTab: tab, presentsPaywall: paywall)
+        },
+        isSettingsVisible: { [weak self] in
+            self?.settingsWindow.isVisible ?? false
         }
     )
     lazy var activationMonitor: ActivationMonitor = ActivationMonitor(

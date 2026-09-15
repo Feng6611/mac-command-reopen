@@ -6,12 +6,16 @@
 import Foundation
 import KikiCommerceCore
 
-/// The win-back offer users can open from Settings after their trial ends
-/// without buying: the lifetime unlock at 20% off,
+/// The win-back offer Command Reopen makes when someone closes the paywall
+/// after their trial ended without buying: the lifetime unlock at 20% off,
 /// purchasable on the spot, or the free GitHub build.
 ///
-/// The offer is a separate discounted SKU purchased inside the card.
-/// Closing the regular paywall does not present this card or start its clock.
+/// Closing that paywall is the only moment the app knows for certain that the
+/// user decided not to pay, and the last one before they either forget the app
+/// or delete it. The offer is a separate discounted SKU rather than a code:
+/// macOS has no in-app redemption sheet, and a code would send the user
+/// hunting for the App Store's redeem screen at the exact moment they are
+/// already leaving.
 ///
 /// The discount runs for **two days from its first presentation** and never
 /// returns. Inside that window the card can be reopened from the banners in

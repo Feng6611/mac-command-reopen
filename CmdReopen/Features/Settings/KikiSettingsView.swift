@@ -102,6 +102,15 @@ struct SettingsView: View {
             PaywallSheetView(
                 accessModel: accessModel,
                 context: .settings,
+                // Closing the paywall after the trial ended is the only moment
+                // the app knows the user decided not to pay — and the moment
+                // the win-back clock starts. `TrialExitOffer` resolves to nil
+                // in every other case, including a close that followed a
+                // purchase, so this never pitches a discount at a buyer.
+                onFinish: {
+                    guard TrialExitOffer.resolve(accessModel: accessModel) != nil else { return }
+                    route.presentTrialExitOffer()
+                },
                 onPurchaseCompleted: {
                     route.performAfterDismiss {
                         _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .purchaseCompleted)

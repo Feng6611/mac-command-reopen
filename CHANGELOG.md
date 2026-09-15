@@ -1,14 +1,20 @@
 # Changelog / 更新日志
 
-## Unreleased
+## 1.5.1 — 2026-09-15
 
 ### English
 
 - Added **Show Menu Bar Icon** in Settings › General. Turn it off to run Command Reopen with no menu bar presence; it keeps working in the background, and launching the app again opens Settings. A login launch never opens a window.
+- Onboarding no longer turns on Launch at Login for you. The switch waits for you to choose, and the final step is worded to match.
+- The minimize step plays the native Dock animation again.
+- The final step names where to find the app in the menu bar, and its button reads Get Started.
 
 ### 中文
 
 - 在「设置 › 通用」中新增 **显示菜单栏图标**。关闭后 Command Reopen 不再显示菜单栏图标，继续在后台运行；再次启动 App 即可打开设置。登录时自动启动不会弹出窗口。
+- 引导流程不再自动开启「登录时打开」：改由你自行选择，最后一步文案据此调整。
+- 最小化步骤恢复播放原生 Dock 动画。
+- 最后一步说明应用在菜单栏的位置，按钮文案改为「开始使用」。
 
 ## 1.5.0 — 2026-08-25
 

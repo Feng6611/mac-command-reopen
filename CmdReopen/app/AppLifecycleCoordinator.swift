@@ -214,8 +214,14 @@ final class AppLifecycleCoordinator {
         }
 #endif
 
-        if accessController.shouldOpenProSettings {
+        // An onboarding window opened from Settings is visible without this
+        // launch having presented it, so the paywall waits rather than landing
+        // on top of the tutorial.
+        if accessController.shouldOpenProSettings, !isOnboardingVisible {
             router.handleExpiredAccess()
+            // The paywall is this launch's foreground presentation, so the
+            // hidden-icon rule below must not ask for Settings a second time.
+            didOpenSettingsForLaunch = true
         }
 
         presentSettingsForLaunchIfNeeded()

@@ -24,22 +24,26 @@ before Finder becomes frontmost, leaving Command Reopen in the wrong slot.
   fresh foreground instance through LaunchServices before showing onboarding.
   Terminate the old process only after the new instance exists. This recreates
   the real first-launch process condition without adding a release restart path.
-- Confirm the return target is frontmost before miniaturizing the tutorial
-  window.
+- Miniaturize while Command Reopen is still frontmost so AppKit runs its native
+  Dock animation, then hand focus to the return target 150 ms later from
+  `windowDidMiniaturize`. This supersedes the original fix, which handed off
+  first and then miniaturized the inactive window — that kept the ordering
+  tighter but hid the animation the tutorial is teaching.
 - Retry cooperative activation for up to three seconds and keep the tutorial
   available for retry if the hand-off is not confirmed.
 - Start the initial Commerce refresh on the next main-actor turn without the
   previous fixed one-second delay; readiness remains the presentation gate.
-- After the return target is confirmed frontmost, order the inactive onboarding
-  window onscreen and use AppKit's native document-window minimization behavior.
-  This preserves Cmd+Tab order while keeping the Dock animation visible and
-  respects the system Reduce Motion setting.
 - Keep the actual previous foreground app as the return target; Finder remains
   only a fallback.
 - While onboarding is active, suppress Command Reopen's normal reopen engine
   for external apps, including already-queued delayed evaluations. The
   onboarding controller remains responsible for restoring only its own window,
   and normal reopen behavior resumes when onboarding closes or finishes.
+
+The animation-first order widens the window in which a very fast Cmd+Tab could
+land while Command Reopen is still frontmost. Acceptance step 3 below is the
+check for it; if it fails in practice, the hand-off has to move back before the
+minimize and the animation is what gets traded away instead.
 
 ### Manual acceptance
 

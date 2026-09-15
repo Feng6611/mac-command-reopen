@@ -227,7 +227,7 @@ struct WinbackOfferRow: View {
     let onOpen: () -> Void
 
     var body: some View {
-        if let offer = accessModel.availableWinbackOffer {
+        if let offer = accessModel.activeWinbackOffer {
             Button(action: onOpen) {
                 HStack(spacing: DS.Spacing.sm) {
                     Image(systemName: "tag.fill")
@@ -239,9 +239,7 @@ struct WinbackOfferRow: View {
 
                     Spacer(minLength: 0)
 
-                    Text(accessModel.winbackOfferFirstShownAt == nil
-                         ? appLanguage.string("View offer")
-                         : offer.countdownText())
+                    Text(offer.countdownText())
                         .font(.caption)
                         .foregroundStyle(.secondary)
 

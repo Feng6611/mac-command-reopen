@@ -1,5 +1,51 @@
 # Decision Log
 
+## D-010 — Expiry asks; declining the paywall is what starts the discount
+
+- Date: 2026-09-15
+- Status: Accepted; restores D-003's trigger and narrows D-008
+
+D-008 replaced two behaviours that existed in 1.5.0: an expired trial stopped
+opening the paywall and merely left access state visible in Settings, and the
+win-back clock moved from the paywall's close to the user explicitly opening
+the offer. Both were wrong for this product. The reasoning is worth recording
+because the D-008 version reads as more restrained and is easy to re-derive.
+
+**Expiry asks, it does not wait.** The nudge on a Cmd+Tab reopen is a
+once-a-day event that exists precisely because the feature the user wanted has
+stopped working. Resolving that into "mark the prompt handled" left the app
+silent at the one moment the user is looking for an explanation and has not
+yet learned there is something to buy. A trial that ends must say so where the
+decision is made, so expiry opens Settings › About on the paywall again. Two
+things still hold the line D-008 was protecting: the window only opens when
+none is already showing, and a visible onboarding window suppresses it rather
+than being covered.
+
+**The clock starts on a decline, not on a look.** `winbackOfferFirstShownAt`
+is what makes "48 hours" true. D-008's version left the banner eligible to
+appear the moment a trial expired, before the user had declined anything — a
+countdown for a clock that had not started, advertising a discount to someone
+who may still have been about to pay full price. It also meant the banner's
+first appearance could not be the paywall close, so the one moment the app
+knows the user decided not to pay was the one moment nothing happened.
+
+The offer is therefore resolved on paywall close, excluding a close that
+followed a purchase, and `activeWinbackOffer` gates every banner on the clock
+having started. `TrialExitOffer.resolve` itself is unchanged from 1.5.0 and the
+two-day window, receipt threshold, and unlisted SKU all keep their meaning.
+
+D-008's other decisions stand: app-owned composition, the router, one sheet at
+a time, and caching the excluded-app catalog.
+
+### Verification
+
+`SettingsAndStatusBarPresentationTests` covers expiry opening Settings › About
+on the paywall, and expiry leaving an already-open Settings window alone.
+`TrialExitOfferTests` covers that a purchase resolves to no offer, that the
+window runs from the first showing rather than the latest, and that it closes
+after two days. A manual pass is still required for the paywall-close-to-card
+transition, which crosses two sheets, and for the purchase itself.
+
 ## D-009 — The menu bar icon is a shortcut into Settings, not the only entrance
 
 - Date: 2026-09-15
@@ -65,22 +111,24 @@ the API contract rather than an observed login. See I-004.
 ## D-008 — App-owned composition and explicit presentation
 
 - Date: 2026-09-06
-- Status: Accepted
+- Status: Accepted; amended by D-010
 
 `AppComposition` owns the application services. Existing shared accessors forward
 to this graph. `ActivationMonitor` delegates pure decisions to `ReopenPolicy`
 and execution to `WindowReopenExecutor`; its expired-access callback reaches
-`AppRouter` without opening a window. Access state remains visible in Settings
+`AppRouter`. Access state remains visible in Settings
 and the menu, where users can explicitly open commerce surfaces.
 
 Settings intentionally omits the master Enable toggle and its Status section.
 The excluded-application editor caches the installed catalog asynchronously and
 updates running applications incrementally. One optional `SettingsSheet` owns
 presentation. Replacements wait for native dismissal and revalidate eligibility;
-purchase review follow-up also waits for dismissal. Closing a paywall does not
-open another offer. This supersedes D-003's automatic paywall-close trigger:
-eligible users open the offer from Settings, starting its clock on first display.
+purchase review follow-up also waits for dismissal.
 The custom review introduction and existing eligibility policy remain intact.
+
+D-010 restores two behaviours this entry had changed: expiry opens the paywall
+rather than only marking the prompt handled, and closing the paywall starts the
+win-back clock rather than leaving it to an explicit open.
 
 Verification (2026-09-07): all 109 application unit tests passed; the registry's
 eight-project verification matrix passed, including the existing app UI tests.
@@ -165,7 +213,7 @@ was already granted during app launch.
 ## D-003 — One discounted way back when the trial ends without a purchase
 
 - Date: 2026-08-10
-- Status: Accepted
+- Status: Accepted; its paywall-close trigger restored by D-010 after D-008 dropped it
 
 ### Context
 
