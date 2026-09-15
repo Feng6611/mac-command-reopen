@@ -139,3 +139,39 @@ confirm Dock clicks no longer suppress the normal activation path. Revoke
 permission and confirm normal Cmd+Tab continues without prompts.
 For MAS, inspect final entitlements and dependency linkage to ensure the
 advanced UI and Apple Events exceptions do not ship.
+
+## I-004 — Login-item launch could not be exercised end to end
+
+- Date: 2026-09-15
+- Status: Open manual verification boundary
+
+### Risk
+
+"Hide Menu Bar Icon" relies on telling a login-item launch apart from a
+deliberate one: the first must stay silent, the second must open Settings. The
+signal is `keyAELaunchedAsLogInItem` in the launch Apple Event, and it only
+exists under a real login.
+
+### What was verified
+
+The user-launch half is observed, not assumed. Under a real LaunchServices
+launch of a Debug Direct build, instrumented logging showed the `aevt`/`oapp`
+open-application event present at `applicationDidFinishLaunching` with `lgit`
+absent, and the window list matched each expected outcome in all four
+situations (see D-009).
+
+### What was not
+
+A login item starting the app could not be produced in this environment:
+`launchctl bootstrap` of a LaunchAgent did not run its program, and Gatekeeper
+refuses to launch an ad-hoc probe app through LaunchServices, so no harness was
+available for a real login launch. The `lgit` branch is therefore covered by
+the SDK-documented attribute (`AERegistry.h`, present since 10.4 for exactly
+this purpose) and by unit tests over the policy, not by an observed login.
+
+### Resolution boundary
+
+Before release, enable Launch at Login, sign out and back in, and confirm
+Reopen starts with no window whether the icon is shown or hidden. Then launch
+the app from Finder and confirm Settings opens when the icon is hidden and
+stays closed when it is not.

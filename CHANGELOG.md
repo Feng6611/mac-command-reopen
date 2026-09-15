@@ -1,5 +1,15 @@
 # Changelog / 更新日志
 
+## Unreleased
+
+### English
+
+- Added **Show Menu Bar Icon** in Settings › General. Turn it off to run Command Reopen with no menu bar presence; it keeps working in the background, and launching the app again opens Settings. A login launch never opens a window.
+
+### 中文
+
+- 在「设置 › 通用」中新增 **显示菜单栏图标**。关闭后 Command Reopen 不再显示菜单栏图标，继续在后台运行；再次启动 App 即可打开设置。登录时自动启动不会弹出窗口。
+
 ## 1.5.0 — 2026-08-25
 
 ### English

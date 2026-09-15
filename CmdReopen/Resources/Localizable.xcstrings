@@ -2478,6 +2478,35 @@
         }
       }
     },
+    "Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings." : {
+      "comment" : "Helper text under the Show Menu Bar Icon toggle, explaining how to reopen Settings once the icon is hidden.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blende das Menüleisten-Symbol aus, während Reopen im Hintergrund weiterläuft. Starte Reopen jederzeit erneut, um die Einstellungen zu öffnen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquez l’icône dans la barre des menus pendant que Reopen continue de fonctionner en arrière-plan. Relancez Reopen à tout moment pour ouvrir les réglages."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen がバックグラウンドで動作を続ける間、メニューバーのアイコンを非表示にします。Reopen をもう一度起動すると、いつでも設定を開けます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏菜单栏图标，Reopen 继续在后台运行。随时再次启动 Reopen 即可打开设置。"
+          }
+        }
+      }
+    },
     "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it." : {
       "comment" : "Body copy for Command Reopen's one-time custom review prompt.",
       "extractionState" : "stale",
@@ -4755,6 +4784,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享使用体验，获赠 Pro 终身授权"
+          }
+        }
+      }
+    },
+    "Show Menu Bar Icon" : {
+      "comment" : "Toggle label for keeping the app icon in the menu bar.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüleisten-Symbol anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher l’icône dans la barre des menus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーにアイコンを表示"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示菜单栏图标"
           }
         }
       }

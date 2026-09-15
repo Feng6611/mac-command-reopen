@@ -22,6 +22,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
+    /// Sent when the user opens an already-running copy — Dock, Spotlight, or
+    /// Launchpad. Claimed unconditionally so the app decides what it means.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        lifecycleCoordinator.applicationShouldHandleReopen()
+        return true
+    }
+
     func applicationDidBecomeActive(_ notification: Notification) {
         lifecycleCoordinator.applicationDidBecomeActive()
     }

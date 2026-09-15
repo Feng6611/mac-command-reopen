@@ -1,5 +1,67 @@
 # Decision Log
 
+## D-009 — The menu bar icon is a shortcut into Settings, not the only entrance
+
+- Date: 2026-09-15
+- Status: Accepted
+
+### Context
+
+Some users want Command Reopen running without a permanent menu bar presence.
+Hiding the icon is the easy half. The hard half is what replaces it: the status
+item is also the only way to reach Settings, so removing it without an
+alternative strands anyone who later wants to change a setting or quit.
+
+Three ways to get back were considered. A global hotkey adds a shortcut to
+learn and a key to conflict with other apps. Terminal commands are not a
+gesture a normal user has. Opening the app again is the one action the user
+already performs, needs no explanation, and costs nothing to support.
+
+### Decision
+
+- **One setting, default on.** "Show Menu Bar Icon" in Settings › General.
+  On is the shipped behavior, so nothing changes until the user asks for it.
+- **Launching the app again is the way back in.** With the icon hidden, a
+  deliberate launch — Finder, Spotlight, Launchpad, or opening the running
+  copy — opens Settings. The helper text states this, so the rule is taught
+  where the decision is made rather than discovered by trial.
+- **A login-item launch never opens a window.** That is the whole point of
+  hiding the icon, and an open window at every login would be worse than the
+  icon ever was. Distinguishing the two is the load-bearing part of this
+  feature; `keyAELaunchedAsLogInItem` in the launch Apple Event is the
+  documented signal, and it is read before the first run loop turn because it
+  does not survive past it.
+- **Onboarding outranks the setting.** A first launch already has a foreground
+  presentation; a second window competing for the same moment is noise. The
+  icon rule applies from the second launch on.
+- **Hiding is the user's own choice, and it stays hidden.** Nothing brings the
+  icon back except the switch itself.
+
+The status item is removed by releasing `KikiMenuBarController`, whose `deinit`
+calls `removeStatusItem`. That keeps visibility to one piece of state instead
+of a live `NSStatusItem` plus a flag that can disagree with it.
+
+### Verification
+
+`LaunchPresentationPolicyTests` pins all four launch situations: a login-item
+launch opens nothing, a user launch opens Settings only when the icon is
+hidden, onboarding keeps the first launch, and re-opening a running copy opens
+Settings only when the icon is hidden and onboarding is not showing.
+`MenuBarIconSettingsTests` covers the on-by-default value and persistence.
+
+Runtime verification (2026-09-15, Direct Debug build, isolated bundle ID so the
+installed app's preferences were untouched): with the icon hidden a launch
+produced a layer-0 Settings window and no status item, and re-opening that
+running process reopened Settings while the PID stayed the same; with the icon
+visible the same launch and re-open produced no window, matching the behavior
+before this change. Instrumented logging confirmed the `aevt`/`oapp` launch
+event is present at did-finish-launching under a real LaunchServices launch and
+that `lgit` reads false there.
+
+A real login-item launch remains unverified: launchd could not be exercised in
+this environment, so the `lgit` path is covered by the documented attribute and
+the API contract rather than an observed login. See I-004.
+
 ## D-008 — App-owned composition and explicit presentation
 
 - Date: 2026-09-06

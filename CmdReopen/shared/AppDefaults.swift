@@ -18,6 +18,7 @@ enum AppDefaults {
         static let trialStartDate = "cmdreopenTrialStartDate"
         static let hasSeenOnboarding = "cmdreopenHasSeenOnboarding"
         static let preferredLanguage = "cmdreopenPreferredLanguage"
+        static let showsMenuBarIcon = "cmdreopenShowsMenuBarIcon"
         static let advancedWindowRestoreEnabled = "cmdreopenAdvancedWindowRestoreEnabled"
         static let advancedWindowRestoreAllWindows = "cmdreopenAdvancedWindowRestoreAllWindows"
         static let advancedWindowRestoreDockClickCycle = "cmdreopenAdvancedWindowRestoreDockClickCycle"
@@ -58,6 +59,9 @@ enum AppDefaults {
     static let universalControlExcludedMigrated = Defaults.Key<Bool>(RawKey.universalControlExcludedMigrated, default: false)
     static let trialStartDate = Defaults.Key<Date?>(RawKey.trialStartDate, default: nil)
     static let hasSeenOnboarding = Defaults.Key<Bool>(RawKey.hasSeenOnboarding, default: false)
+    /// The menu bar icon is the app's shortcut into Settings, so it is present
+    /// until the user asks for a quiet menu bar.
+    static let showsMenuBarIcon = Defaults.Key<Bool>(RawKey.showsMenuBarIcon, default: true)
     static let advancedWindowRestoreEnabled = Defaults.Key<Bool>(RawKey.advancedWindowRestoreEnabled, default: false)
     static let advancedWindowRestoreAllWindows = Defaults.Key<Bool>(RawKey.advancedWindowRestoreAllWindows, default: false)
     static let advancedWindowRestoreDockClickCycle = Defaults.Key<Bool>(RawKey.advancedWindowRestoreDockClickCycle, default: false)

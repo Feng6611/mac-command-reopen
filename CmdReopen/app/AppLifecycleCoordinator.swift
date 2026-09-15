@@ -27,10 +27,16 @@ final class AppLifecycleCoordinator {
     private let activationMonitor: ActivationMonitor
     private let reopenStatsStore: ReopenStatsStore
     private let router: AppRouter
+    private let launchSource: LaunchSourceProviding
+    private let iconSettings: MenuBarIconSettings
     private var cancellables: Set<AnyCancellable> = []
     private var hasCompletedInitialCommerceRefresh = false
     private var lastCommerceRefreshAt: Date?
     private var isRefreshingCommerce = false
+    /// Captured at launch: the login-item attribute is only readable while the
+    /// launch Apple Event is being processed, so it cannot be looked up later.
+    private var isLoginItemLaunch = false
+    private var didOpenSettingsForLaunch = false
 #if DEBUG
     private var isRelaunchedForOnboarding = false
 #endif
@@ -39,12 +45,16 @@ final class AppLifecycleCoordinator {
          statusBarController: StatusBarMenuController,
          activationMonitor: ActivationMonitor,
          reopenStatsStore: ReopenStatsStore,
-         router: AppRouter) {
+         router: AppRouter,
+         launchSource: LaunchSourceProviding,
+         iconSettings: MenuBarIconSettings) {
         self.accessController = accessController
         self.statusBarController = statusBarController
         self.activationMonitor = activationMonitor
         self.reopenStatsStore = reopenStatsStore
         self.router = router
+        self.launchSource = launchSource
+        self.iconSettings = iconSettings
     }
 
     func applicationWillFinishLaunching() {
@@ -61,9 +71,11 @@ final class AppLifecycleCoordinator {
     }
 
     func applicationDidFinishLaunching() {
+        isLoginItemLaunch = launchSource.isLoginItemLaunch
+
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
-        AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build)")
+        AppLogger.lifecycle.notice("Application did finish launching. version=\(version) build=\(build) loginItem=\(self.isLoginItemLaunch, privacy: .public)")
         statusBarController.install(
             activationMonitor: activationMonitor,
             accessController: accessController
@@ -98,6 +110,7 @@ final class AppLifecycleCoordinator {
 #if DEBUG
         if shouldAutoShowSettingsForDebugLaunch && !isRelaunchedForOnboarding {
             AppLogger.lifecycle.notice("Debug launch detected. Opening settings window for visibility.")
+            didOpenSettingsForLaunch = true
             router.openSettings()
         }
 #endif
@@ -110,8 +123,24 @@ final class AppLifecycleCoordinator {
         hasCompletedInitialCommerceRefresh = true
         if accessController.shouldShowOnboarding {
             OnboardingWindowController.shared.showIfNeeded(accessController: accessController)
+        } else {
+            presentSettingsForLaunchIfNeeded()
         }
 #endif
+    }
+
+    /// Opening a running copy is the way back into Settings once the menu bar
+    /// icon is hidden, so it is handled here rather than left to AppKit.
+    func applicationShouldHandleReopen() {
+        guard LaunchPresentationPolicy.shouldOpenSettingsOnReopen(
+            showsMenuBarIcon: iconSettings.showsMenuBarIcon,
+            isOnboardingVisible: isOnboardingVisible
+        ) else {
+            return
+        }
+
+        AppLogger.lifecycle.notice("Re-launch with the menu bar icon hidden. Opening Settings.")
+        router.openSettings()
     }
 
     func applicationDidBecomeActive() {
@@ -188,6 +217,40 @@ final class AppLifecycleCoordinator {
         if accessController.shouldOpenProSettings {
             router.handleExpiredAccess()
         }
+
+        presentSettingsForLaunchIfNeeded()
+    }
+
+    /// Brings up Settings when this launch is the user's only way in.
+    ///
+    /// With the menu bar icon hidden, launching the app is the entrance the
+    /// product promises, so a deliberate launch opens Settings while a
+    /// login-item launch and a launch that is presenting onboarding do not.
+    private func presentSettingsForLaunchIfNeeded() {
+        guard !didOpenSettingsForLaunch else {
+            return
+        }
+
+        guard LaunchPresentationPolicy.shouldOpenSettingsAtLaunch(
+            isLoginItemLaunch: isLoginItemLaunch,
+            showsMenuBarIcon: iconSettings.showsMenuBarIcon,
+            shouldShowOnboarding: isOnboardingTakingOver
+        ) else {
+            return
+        }
+
+        didOpenSettingsForLaunch = true
+        AppLogger.lifecycle.notice("Menu bar icon hidden. Opening Settings for this launch.")
+        router.openSettings()
+    }
+
+    /// Whether onboarding owns this launch's foreground presentation.
+    private var isOnboardingTakingOver: Bool {
+#if DEBUG
+        isRelaunchedForOnboarding || accessController.shouldShowOnboarding
+#else
+        accessController.shouldShowOnboarding
+#endif
     }
 
     private func scheduleInitialCommerceRefresh() {

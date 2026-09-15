@@ -29,6 +29,7 @@
 - **Zero permissions for core reopen** — the main Cmd+Tab reopen behavior needs no Accessibility or Screen Recording permission
 - **Native switcher preserved** — works invisibly behind the stock Cmd+Tab UI
 - **Configurable exclude list** for apps you don't want restored
+- **Optional menu bar icon** — hide it to run fully in the background, then launch the app again whenever you want Settings
 - **Lightweight** menu bar app, <2 MB, near-zero CPU
 - **Open source** (MIT) and fully auditable
 

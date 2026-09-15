@@ -26,13 +26,16 @@ final class AppComposition {
         accessController: accessController,
         onExpiredReopenNeeded: { [weak self] in self?.router.handleExpiredAccess() }
     )
-    lazy var statusBar = StatusBarMenuController()
+    lazy var menuBarIconSettings = MenuBarIconSettings.shared
+    lazy var statusBar = StatusBarMenuController(iconSettings: menuBarIconSettings)
     lazy var lifecycle: AppLifecycleCoordinator = AppLifecycleCoordinator(
         accessController: accessController,
         statusBarController: statusBar,
         activationMonitor: activationMonitor,
         reopenStatsStore: reopenStats,
-        router: router
+        router: router,
+        launchSource: SystemLaunchSource(),
+        iconSettings: menuBarIconSettings
     )
 #if APPSTORE
     lazy var commandAccess = CommandAccessModel()

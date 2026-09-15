@@ -27,6 +27,12 @@ final class StatusBarMenuController {
     })
     private weak var activationMonitor: ActivationMonitor?
     private weak var accessController: AppAccessController?
+    private let iconSettings: MenuBarIconSettings
+    private var cancellables: Set<AnyCancellable> = []
+
+    init(iconSettings: MenuBarIconSettings = .shared) {
+        self.iconSettings = iconSettings
+    }
 
     func install(
         activationMonitor: ActivationMonitor,
@@ -35,11 +41,36 @@ final class StatusBarMenuController {
         self.activationMonitor = activationMonitor
         self.accessController = accessController
 
-        guard menuBarController == nil else {
-            return
-        }
+        // Applied once for the current value, then kept in step: the menu bar
+        // is only reachable while the icon exists, so the Settings toggle is
+        // the only way to bring it back.
+        applyIconVisibility(iconSettings.showsMenuBarIcon)
+        iconSettings.$showsMenuBarIcon
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] showsIcon in
+                self?.applyIconVisibility(showsIcon)
+            }
+            .store(in: &cancellables)
+    }
 
-        menuBarController = KikiMenuBarController(
+    /// Creates or removes the status item to match the user's choice.
+    ///
+    /// `KikiMenuBarController` owns its `NSStatusItem` and removes it on
+    /// release, so dropping the reference is what hides the icon — there is no
+    /// separate visibility call to keep in sync.
+    private func applyIconVisibility(_ isVisible: Bool) {
+        if isVisible {
+            guard menuBarController == nil else { return }
+            menuBarController = makeMenuBarController()
+        } else {
+            menuBarController = nil
+        }
+        AppLogger.lifecycle.notice("Menu bar icon visible=\(isVisible, privacy: .public)")
+    }
+
+    private func makeMenuBarController() -> KikiMenuBarController {
+        KikiMenuBarController(
             title: "Command Reopen",
             autosaveName: "CommandReopen.StatusItem",
             systemImageName: "command",

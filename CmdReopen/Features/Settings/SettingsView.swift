@@ -24,6 +24,7 @@ struct SettingsTabContent: View {
     private let appLookupProvider = ApplicationLookupProvider()
 
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
+    @StateObject private var menuBarIconSettings = MenuBarIconSettings.shared
     @State private var appLookupQuery = ""
     @StateObject private var applicationCatalog = ApplicationCatalogCache()
 
@@ -88,6 +89,21 @@ struct SettingsTabContent: View {
             } footer: {
                 KikiSettingsHelperText(
                     appLanguage.string("When you close or minimize an app’s last window, focus returns so Cmd+Tab brings it right back.")
+                )
+            }
+
+            // The icon is a shortcut into Settings, not the only entrance:
+            // hiding it moves that job onto launching the app again, which the
+            // helper text states so nobody has to guess how to get back.
+            Section {
+                KikiSettingsToggleRow(
+                    appLanguage.string("Show Menu Bar Icon"),
+                    isOn: menuBarIconSettings.showsMenuBarIconBinding,
+                    systemImage: "menubar.rectangle"
+                )
+            } footer: {
+                KikiSettingsHelperText(
+                    appLanguage.string("Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings.")
                 )
             }
 
