@@ -44,8 +44,9 @@ final class ProCommerceStateSource: CommerceStateSource {
             proStatusManager.accessManager.$status,
             proStatusManager.accessManager.$readiness
         )
-            .map { [self] _, _ in
-                proStatusManager.accessEntitlementState
+            .map { status, readiness in
+                // Published emits before its stored property changes.
+                CommandAccessModel.entitlementState(status: status, readiness: readiness)
             }
             .eraseToAnyPublisher()
     }

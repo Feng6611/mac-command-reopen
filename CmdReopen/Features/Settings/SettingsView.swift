@@ -75,6 +75,18 @@ struct SettingsTabContent: View {
                     guard isEnabled else { return }
                     _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
                 }
+                // The icon is a shortcut into Settings, not the only entrance:
+                // hiding it moves that job onto launching the app again, which the
+                // helper text states so nobody has to guess how to get back.
+                KikiSettingsToggleRow(
+                    appLanguage.string("Show Menu Bar Icon"),
+                    isOn: menuBarIconSettings.showsMenuBarIconBinding,
+                    systemImage: "menubar.rectangle"
+                )
+            } footer: {
+                KikiSettingsHelperText(
+                    appLanguage.string("Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings.")
+                )
             }
 
             Section {
@@ -92,21 +104,6 @@ struct SettingsTabContent: View {
                 )
             }
 
-            // The icon is a shortcut into Settings, not the only entrance:
-            // hiding it moves that job onto launching the app again, which the
-            // helper text states so nobody has to guess how to get back.
-            Section {
-                KikiSettingsToggleRow(
-                    appLanguage.string("Show Menu Bar Icon"),
-                    isOn: menuBarIconSettings.showsMenuBarIconBinding,
-                    systemImage: "menubar.rectangle"
-                )
-            } footer: {
-                KikiSettingsHelperText(
-                    appLanguage.string("Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings.")
-                )
-            }
-
             ExcludedAppsSection(
                 bundleIDs: activationMonitor.sortedUserExcludedBundleIDs,
                 isDisabled: isFeatureLocked,
@@ -117,17 +114,6 @@ struct SettingsTabContent: View {
                 addApplicationAction: addLookupResult
             )
             .opacity(isFeatureLocked ? 0.5 : 1)
-
-            Section {
-                KikiSettingsLinkRow(
-                    title: appLanguage.string("Mac window shortcuts"),
-                    value: "",
-                    urlString: "",
-                    systemImage: "keyboard",
-                    trailingSystemImage: "chevron.right",
-                    action: { route.presentMacShortcuts() }
-                )
-            }
         }
         .onChange(of: appLanguage.selected) { _ in
             SettingsWindowController.shared.refreshLocalizedTabs()

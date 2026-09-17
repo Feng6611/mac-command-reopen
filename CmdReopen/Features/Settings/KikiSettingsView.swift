@@ -148,6 +148,14 @@ struct SettingsView: View {
         KikiStandardAboutPane(metadata: aboutMetadata)
             .statusContent {
                 standardAboutStatusRow
+                KikiSettingsLinkRow(
+                    title: appLanguage.string("Mac window shortcuts"),
+                    value: "",
+                    urlString: "",
+                    systemImage: "keyboard",
+                    trailingSystemImage: "chevron.right",
+                    action: { route.presentMacShortcuts() }
+                )
 #if APPSTORE
                 // The same banner General shows, rather than a second design
                 // for the same state: one offer, one way it looks, wherever
@@ -256,7 +264,7 @@ struct SettingsView: View {
     private var accessPresentation: KikiAccessStatusPresentation {
         let language = AppLanguage.shared
 #if APPSTORE
-        switch accessModel.readiness {
+        switch accessModel.presentationReadiness {
         case .idle, .loading:
             return KikiAccessStatusPresentation(
                 tone: .neutral,

@@ -51,6 +51,14 @@ final class CommandAccessModel: ObservableObject {
 
     var status: KikiAccessState { accessManager.status }
     var readiness: KikiAccessReadiness { accessManager.readiness }
+    var presentationReadiness: KikiAccessReadiness {
+#if DEBUG
+        if let mode = debugProAccessOverride, mode != .live { return .ready }
+#endif
+        // An active cached entitlement remains useful during a background check.
+        if status.isActive { return .ready }
+        return readiness
+    }
     var availablePlans: [KikiAccessPlanProduct] { accessManager.availablePlans }
     var lastError: CommercePurchaseError? { accessManager.lastError }
     var purchaseInProgressPlan: CommercePlan? {
@@ -93,6 +101,10 @@ final class CommandAccessModel: ObservableObject {
     }
 
     var accessEntitlementState: AccessEntitlementState {
+        Self.entitlementState(status: status, readiness: readiness)
+    }
+
+    static func entitlementState(status: KikiAccessState, readiness: KikiAccessReadiness) -> AccessEntitlementState {
         if case .degraded = readiness, !status.isActive {
             return .trial
         }
@@ -112,6 +124,9 @@ final class CommandAccessModel: ObservableObject {
     }
 
     func refresh() async {
+#if DEBUG
+        if let mode = debugProAccessOverride, mode != .live { return }
+#endif
         await accessManager.refresh()
     }
 
