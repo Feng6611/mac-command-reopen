@@ -47,20 +47,12 @@
 			remoteGlobalIDString = 748FCE1A2EB5027A0099C190;
 			remoteInfo = CmdReopen;
 		};
-		748FCE382EB5027D0099C190 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 748FCE132EB5027A0099C190 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 748FCE1A2EB5027A0099C190;
-			remoteInfo = CmdReopen;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		7408919C2F0645A90099E62A /* CommandReopenNew.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CommandReopenNew.icon; sourceTree = "<group>"; };
 		748FCE1B2EB5027B0099C190 /* Command Reopen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		748FCE2D2EB5027D0099C190 /* CmdReopenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CmdReopenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		748FCE372EB5027D0099C190 /* CmdReopenUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CmdReopenUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A0A1E022F1A00010099C190 /* Config/BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/BuildNumber.xcconfig; sourceTree = SOURCE_ROOT; };
 		9B1000022F2000010099C190 /* Command Reopen Direct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Command Reopen Direct.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -74,11 +66,6 @@
 		748FCE302EB5027D0099C190 /* CmdReopenTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = CmdReopenTests;
-			sourceTree = "<group>";
-		};
-		748FCE3A2EB5027D0099C190 /* CmdReopenUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CmdReopenUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -110,13 +97,6 @@
 			files = (
 				8D3000022F4400010099C190 /* KikiCommerceCore in Frameworks */,
 				8D3000122F4400010099C190 /* KikiCommerceTesting in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		748FCE342EB5027D0099C190 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,7 +134,6 @@
 			children = (
 				748FCE1D2EB5027B0099C190 /* CmdReopen */,
 				748FCE302EB5027D0099C190 /* CmdReopenTests */,
-				748FCE3A2EB5027D0099C190 /* CmdReopenUITests */,
 				748FCE1C2EB5027B0099C190 /* Products */,
 				7408919C2F0645A90099E62A /* CommandReopenNew.icon */,
 				56759C152FAA22EF007FDA28 /* Recovered References */,
@@ -167,7 +146,6 @@
 				748FCE1B2EB5027B0099C190 /* Command Reopen.app */,
 				9B1000022F2000010099C190 /* Command Reopen Direct.app */,
 				748FCE2D2EB5027D0099C190 /* CmdReopenTests.xctest */,
-				748FCE372EB5027D0099C190 /* CmdReopenUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -234,29 +212,6 @@
 			productReference = 748FCE2D2EB5027D0099C190 /* CmdReopenTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		748FCE362EB5027D0099C190 /* CmdReopenUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 748FCE472EB5027D0099C190 /* Build configuration list for PBXNativeTarget "CmdReopenUITests" */;
-			buildPhases = (
-				748FCE332EB5027D0099C190 /* Sources */,
-				748FCE342EB5027D0099C190 /* Frameworks */,
-				748FCE352EB5027D0099C190 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				748FCE392EB5027D0099C190 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				748FCE3A2EB5027D0099C190 /* CmdReopenUITests */,
-			);
-			name = CmdReopenUITests;
-			packageProductDependencies = (
-			);
-			productName = CmdReopenUITests;
-			productReference = 748FCE372EB5027D0099C190 /* CmdReopenUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 		9B1000062F2000010099C190 /* Command Reopen Direct */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B10000A2F2000010099C190 /* Build configuration list for PBXNativeTarget "Command Reopen Direct" */;
@@ -312,10 +267,6 @@
 						CreatedOnToolsVersion = 26.0.1;
 						TestTargetID = 748FCE1A2EB5027A0099C190;
 					};
-					748FCE362EB5027D0099C190 = {
-						CreatedOnToolsVersion = 26.0.1;
-						TestTargetID = 748FCE1A2EB5027A0099C190;
-					};
 					9B1000062F2000010099C190 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
@@ -349,7 +300,6 @@
 				748FCE1A2EB5027A0099C190 /* Command Reopen */,
 				9B1000062F2000010099C190 /* Command Reopen Direct */,
 				748FCE2C2EB5027D0099C190 /* CmdReopenTests */,
-				748FCE362EB5027D0099C190 /* CmdReopenUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -368,14 +318,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		748FCE352EB5027D0099C190 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,13 +373,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		748FCE332EB5027D0099C190 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		9B1000052F2000010099C190 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,11 +387,6 @@
 			isa = PBXTargetDependency;
 			target = 748FCE1A2EB5027A0099C190 /* Command Reopen */;
 			targetProxy = 748FCE2E2EB5027D0099C190 /* PBXContainerItemProxy */;
-		};
-		748FCE392EB5027D0099C190 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 748FCE1A2EB5027A0099C190 /* Command Reopen */;
-			targetProxy = 748FCE382EB5027D0099C190 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -742,48 +672,6 @@
 			};
 			name = Release;
 		};
-		748FCE482EB5027D0099C190 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = Q3DZRXLGA3;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.CmdReopenUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Command Reopen";
-			};
-			name = Debug;
-		};
-		748FCE492EB5027D0099C190 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = Q3DZRXLGA3;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.CmdReopenUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Command Reopen";
-			};
-			name = Release;
-		};
 		74FF0EC82F09581A0007D992 /* Release-Direct */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -920,27 +808,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Command Reopen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Command Reopen";
-			};
-			name = "Release-Direct";
-		};
-		74FF0ECB2F09581A0007D992 /* Release-Direct */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = Q3DZRXLGA3;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.NewWorld.CmdReopenUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "Command Reopen";
 			};
 			name = "Release-Direct";
 		};
@@ -1170,16 +1037,6 @@
 				748FCE452EB5027D0099C190 /* Debug */,
 				748FCE462EB5027D0099C190 /* Release */,
 				74FF0ECA2F09581A0007D992 /* Release-Direct */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		748FCE472EB5027D0099C190 /* Build configuration list for PBXNativeTarget "CmdReopenUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				748FCE482EB5027D0099C190 /* Debug */,
-				748FCE492EB5027D0099C190 /* Release */,
-				74FF0ECB2F09581A0007D992 /* Release-Direct */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

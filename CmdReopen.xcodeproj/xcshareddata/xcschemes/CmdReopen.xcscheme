@@ -41,17 +41,6 @@
                ReferencedContainer = "container:CmdReopen.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "748FCE362EB5027D0099C190"
-               BuildableName = "CmdReopenUITests.xctest"
-               BlueprintName = "CmdReopenUITests"
-               ReferencedContainer = "container:CmdReopen.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
