@@ -5,11 +5,11 @@
 <h1 align="center">Command Reopen</h1>
 
 <p align="center">
-  <strong>Fix Cmd+Tab for minimized and closed windows on macOS.</strong>
+  <strong>Make Cmd+Tab bring back minimized and closed windows.</strong>
 </p>
 
 <p align="center">
-  Cmd+Tab to an app with a minimized or closed window — and nothing happens. Command Reopen makes the native Cmd+Tab restore those windows, the way it should have always worked.
+  You Cmd+Tab to an app, it becomes active — and its window stays in the Dock. Command Reopen fixes that inside the native switcher, with zero permissions.
 </p>
 
 <p align="center">
@@ -19,111 +19,91 @@
 </p>
 
 <p align="center">
-  <sub>Prefer a free build? Grab the DMG from <a href="https://github.com/Feng6611/mac-command-reopen/releases">GitHub Releases</a> · <a href="https://commandreopen.com">Landing</a> · <a href="README_CN.md">中文</a></sub>
+  <sub><a href="https://commandreopen.com">Website</a> · <a href="README_CN.md">中文</a></sub>
 </p>
 
+<p align="center">
+  <img src="assets/screenshots-en.png" alt="Command Reopen: Cmd+Tab restores a minimized window from the Dock; Settings with the excluded apps list; menu bar menu, no Accessibility or Screen Recording permission needed" width="900">
+</p>
+
+## The Cmd+Tab gap
+
+| Shortcut | What happens | Does Cmd+Tab bring it back? |
+|---|---|---|
+| `Cmd+H` | Hides the app | Yes |
+| `Cmd+M` | Minimizes the window to the Dock | **No** |
+| `Cmd+W` | Closes the window | **No** |
+
+Hide an app and Cmd+Tab brings it right back. Minimize or close its window and Cmd+Tab only activates the app — the window stays gone, and you reach for the mouse. The one native workaround (Cmd+Tab, hold Option, release Cmd) restores a single window, and few people know it exists.
+
+Command Reopen closes that gap. Every Cmd+Tab switch lands on a window.
 
 ## Features
 
-- **Restore minimized and closed windows** with Cmd+Tab — if an app has no open windows, a new one is created automatically
-- **Zero permissions for core reopen** — the main Cmd+Tab reopen behavior needs no Accessibility or Screen Recording permission
-- **Native switcher preserved** — works invisibly behind the stock Cmd+Tab UI
-- **Configurable exclude list** for apps you don't want restored
-- **Optional menu bar icon** — hide it to run fully in the background, then launch the app again whenever you want Settings
-- **Lightweight** menu bar app, <2 MB, near-zero CPU
-- **Open source** (MIT) and fully auditable
+- **Minimized windows come back** — switch to an app and its minimized window leaves the Dock on its own.
+- **Closed windows reopen** — if you closed the app's last window, switching to it opens a fresh one.
+- **Focus returns when the last window goes** — close or minimize an app's last window and focus moves to the previous app, so the next Cmd+Tab brings it back.
+- **The native switcher stays** — no launcher, window manager, or custom switcher. Same Cmd+Tab, same muscle memory.
+- **Exclude any app** — search by name or bundle ID; excluded apps keep the standard Cmd+Tab behavior.
+- **Quiet in the background** — a small menu bar app, under 5 MB, near-zero CPU. Hide the menu bar icon if you prefer.
 
-## macOS Window Shortcuts You Should Know
+## Zero permissions
 
-| Shortcut | Action |
-|---|---|
-| `Cmd+Tab` | Switch between apps |
-| `` Cmd+` `` | Switch windows within the same app |
-| `Cmd+H` | Hide current app (Cmd+Tab brings it back) |
-| `Cmd+M` | Minimize current window to Dock |
-| `Cmd+W` | Close current window |
-| `Cmd+Option+H` | Hide all other apps |
-| `Cmd+Tab` → hold `Option` → release `Cmd` | Restore one minimized window (native workaround) |
+- **No Accessibility** permission.
+- **No Screen Recording** permission.
+- **Sandboxed** and distributed through the Mac App Store.
+- **No tracking** — everything runs on your Mac.
 
-Notice the gap? **Cmd+H** (Hide) works perfectly with Cmd+Tab — the window comes right back. But **Cmd+M** (Minimize) and **Cmd+W** (Close) don't — Cmd+Tab switches to the app but the window stays gone.
+Most window tools need Accessibility to move windows around. Command Reopen doesn't, because it never touches another app's windows directly. It listens for app activation with `NSWorkspace.didActivateApplicationNotification`, checks the public CoreGraphics window list (`CGWindowListCopyWindowInfo`) for a visible window, and only when there is none asks the app to reopen through `NSWorkspace.openApplication(at:configuration:)` — the same request macOS sends when you click an app's Dock icon.
 
-That's exactly what Command Reopen fixes. Every Cmd+Tab switch restores your windows automatically.
+You don't have to take my word for it: the source is MIT-licensed, and the reopen logic lives in [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen).
 
-## How It Works
+## Install
 
-Command Reopen listens for app activation events via `NSWorkspace.didActivateApplicationNotification`. When you Cmd+Tab to an app, it first checks whether that app already has a visible on-screen window by inspecting the public CoreGraphics window list (`CGWindowListCopyWindowInfo`). Only if no visible window is found does it send a restore request through `NSWorkspace.openApplication(at:configuration:)`. This brings back minimized windows and recreates closed ones — all using standard macOS APIs that require no special permissions.
+**[Download Command Reopen on the Mac App Store](https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8)** — requires macOS 13 Ventura or later.
 
-The application graph is owned by [AppComposition.swift](CmdReopen/app/AppComposition.swift).
-[ActivationMonitor.swift](CmdReopen/Features/Reopen/ActivationMonitor.swift) coordinates activation and window observation,
-[ReopenPolicy.swift](CmdReopen/Features/Reopen/ReopenPolicy.swift) holds pure decisions, and
-[WindowReopenExecutor.swift](CmdReopen/Features/Reopen/WindowReopenExecutor.swift) executes restoration with native fallback.
-Commerce routes belong to the app router, while review eligibility and presentation live in
-[ReviewPromptPolicy.swift](CmdReopen/Features/Review/ReviewPromptPolicy.swift).
+Open it once and it runs from the menu bar. Turn on Launch at Login in Settings to keep it running after a restart.
 
 ## FAQ
 
-**Why does Cmd+Tab not restore minimized windows?**
+**Why doesn't Cmd+Tab restore minimized windows on a Mac?**
 
-macOS treats minimized windows as intentionally "put away." Cmd+Tab switches the active application but does not restore minimized windows by design. The only native workaround is Cmd+Tab → hold Option → release Cmd, which restores only one window at a time — and most users don't know it exists.
+macOS treats a minimized window as deliberately put away, so Cmd+Tab activates the app and leaves the window in the Dock. The built-in workaround — Cmd+Tab, hold Option, then release Cmd — restores only one window at a time.
 
 **Does Command Reopen need any permissions?**
 
-No special permissions for the core app behavior. It uses `NSWorkspace` APIs available to sandboxed apps and needs no Accessibility or Screen Recording permission for Cmd+Tab reopen.
+No. It needs neither Accessibility nor Screen Recording permission. It uses `NSWorkspace` APIs that any sandboxed app can call.
 
-The optional Direct-build Advanced Window Restore mode uses Accessibility to
-raise a window or restore all minimized windows. It is off by default, shown
-separately in Settings, and always falls back to native reopen when unavailable.
-Dock-click window cycling has its own default-off switch inside Advanced Mode:
-background apps activate normally, while clicking a frontmost app minimizes
-its windows and clicking an all-minimized app restores them.
+**Does it change the Cmd+Tab switcher?**
 
-**Does it change the Cmd+Tab interface?**
+No. The native switcher looks and works exactly as before; Command Reopen acts only after you pick an app.
 
-No. The native Cmd+Tab switcher stays exactly the same. Command Reopen works invisibly behind it — you won't notice any visual difference.
+**Can it reopen closed windows, not just minimized ones?**
 
-**Can it reopen windows that were closed, not just minimized?**
+Yes. If the app you switch to has no open windows, Command Reopen asks it to open a new one.
 
-Yes. If you Cmd+Tab to an app that has no open windows, Command Reopen will create a new window automatically.
+**Can I turn it off for certain apps?**
+
+Yes. Add them to Excluded Apps in Settings and they keep the standard Cmd+Tab behavior.
 
 ## Privacy
 
 Command Reopen keeps window handling and app-specific activity on your Mac and
 does not collect or transmit product analytics. See [PRIVACY.md](PRIVACY.md).
 
-## RevenueCat development configuration
-
-The App Store target reads its public RevenueCat SDK key from the gitignored
-`Config/LocalSecrets.xcconfig`; copy `Config/LocalSecrets.example.xcconfig` to
-that path and replace the placeholder. Never place RevenueCat secret REST keys
-or App Store Connect private keys in the app configuration.
-
-Command Reopen does not use RevenueCat Test Store. Both App Store configurations
-use the same Apple public SDK key (`appl_`): Debug is an Apple Development-signed
-build whose StoreKit transactions are routed to Apple Sandbox, while Release is
-the production MAS build. All App Store builds reject `test_` keys.
-
-Build the Apple Sandbox app without disabling code signing:
+## Building from source
 
 ```sh
-xcodebuild -project CmdReopen.xcodeproj -scheme CmdReopen-MAS \
-  -configuration Debug -destination 'platform=macOS,arch=arm64' \
-  -derivedDataPath build/AppleSandboxDerivedData build
+./script/build_and_run.sh --verify
 ```
 
-The App Store build guard runs after the app is produced and verifies that the
-final app embeds the configured public key under the production bundle ID. A
-valid Apple Development certificate is required; an ad-hoc or unsigned build is
-not an Apple Sandbox build.
-
-Use `./script/build_and_run.sh --verify` for the normal local loop. It stops
-other Command Reopen instances, builds Debug with signing enabled, validates the
-final RevenueCat key/Bundle ID and signature, then launches the deterministic
-Apple Sandbox product.
+Signing, the App Store build configuration, and the code map are covered in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## About
 
 Built by [chenfeng](https://github.com/Feng6611) — I make small,
-permission-light Mac utilities. More: [Clipboard Drop](https://apps.apple.com/app/id6768068044) · [Obsidian plugins](https://github.com/Feng6611)
+permission-light Mac utilities, plus a couple of Obsidian plugins:
+[Open in Terminal](https://github.com/Feng6611/Obsidian-open-in-Teminal) and [File Ignore](https://github.com/Feng6611/Obsidian-File-Ignore).
 
 ## License
 

@@ -5,11 +5,11 @@
 <h1 align="center">Command Reopen</h1>
 
 <p align="center">
-  <strong>让 macOS 原生 Cmd+Tab 自动恢复最小化和关闭的窗口。</strong>
+  <strong>按 Cmd+Tab，最小化和关掉的窗口自己回来。</strong>
 </p>
 
 <p align="center">
-  Cmd+Tab 切到某个应用——什么都没发生，窗口还缩在 Dock 里，或者之前关掉了根本没打开。Command Reopen 让原生 Cmd+Tab 自动把这些窗口恢复回来，像本该的那样工作。
+  用 Cmd+Tab 切到某个应用，应用是激活了，窗口却还缩在程序坞里。Command Reopen 在原生切换器里把这件事补上，而且不要任何权限。
 </p>
 
 <p align="center">
@@ -19,66 +19,89 @@
 </p>
 
 <p align="center">
-  <sub>想要免费版本？去 <a href="https://github.com/Feng6611/mac-command-reopen/releases">GitHub Releases</a> 下载 DMG · <a href="https://commandreopen.com">产品主页</a> · <a href="README.md">English</a></sub>
+  <sub><a href="https://commandreopen.com">官网</a> · <a href="README.md">English</a></sub>
 </p>
 
+<p align="center">
+  <img src="assets/screenshots-zh.png" alt="Command Reopen：按 Cmd+Tab 从程序坞还原最小化窗口；设置页的排除应用列表；菜单栏菜单，无需辅助功能和屏幕录制权限" width="900">
+</p>
 
-## 功能特点
+## Cmd+Tab 缺的那一块
 
-- **恢复最小化和已关闭的窗口** —— Cmd+Tab 切过去自动恢复；如果应用没有打开的窗口，会自动新建
-- **零权限** —— 不需要辅助功能、不需要屏幕录制，什么都不需要
-- **保留原生切换器** —— 在 Cmd+Tab 原生界面背后静默工作，界面不变
-- **自定义排除列表** —— 你不想被恢复的应用可以排除
-- **可选菜单栏图标** —— 隐藏后完全在后台运行，需要设置时再次启动 App 即可
-- **轻量** —— 菜单栏应用，<2 MB，几乎零 CPU 占用
-- **开源**（MIT），代码完全可审计
+| 快捷键 | 效果 | Cmd+Tab 能切回来吗？ |
+|---|---|---|
+| `Cmd+H` | 隐藏应用 | 能 |
+| `Cmd+M` | 窗口最小化到程序坞 | **不能** |
+| `Cmd+W` | 关闭窗口 | **不能** |
 
-## macOS 窗口操作快捷键
+隐藏的应用，Cmd+Tab 一按就回来了；可窗口一旦最小化或关掉，Cmd+Tab 只会激活应用，窗口不出来，最后还得伸手去点鼠标。系统倒是留了个办法：Cmd+Tab 选中后按住 Option 再松开 Cmd，但一次只能还原一个窗口，知道的人也不多。
 
-| 快捷键 | 功能 |
-|---|---|
-| `Cmd+Tab` | 在应用之间切换 |
-| `` Cmd+` `` | 在同一应用的多个窗口间切换 |
-| `Cmd+H` | 隐藏当前应用（Cmd+Tab 可以恢复） |
-| `Cmd+M` | 最小化当前窗口到 Dock |
-| `Cmd+W` | 关闭当前窗口 |
-| `Cmd+Option+H` | 隐藏其他所有应用 |
-| `Cmd+Tab` → 按住 `Option` → 松开 `Cmd` | 恢复一个最小化窗口（原生方法） |
+Command Reopen 就是来补这一块的：每次 Cmd+Tab，切过去都有窗口。
 
-注意到问题了吗？**Cmd+H**（隐藏）和 Cmd+Tab 配合得很好——窗口可以直接恢复。但 **Cmd+M**（最小化）和 **Cmd+W**（关闭）不行——Cmd+Tab 会切到应用，但窗口不会回来。
+## 功能
 
-这正是 Command Reopen 解决的问题。每次 Cmd+Tab 切换都会自动恢复你的窗口。
+- **最小化的窗口自动还原**：切到应用，窗口自己从程序坞出来。
+- **关掉的窗口重新打开**：最后一个窗口已经关了，切过去会新开一个。
+- **最后一个窗口没了，焦点自动交还**：关掉或最小化应用的最后一个窗口后，焦点回到上一个应用，下次 Cmd+Tab 就能切回来。
+- **原生切换器照旧**：不换启动器，不装窗口管理器，也没有自定义切换器。还是那个 Cmd+Tab，手感不变。
+- **可以排除任意应用**：按名称或 Bundle ID 搜索添加，被排除的应用保持系统默认行为。
+- **安静待在后台**：菜单栏小工具，不到 5 MB，几乎不占 CPU；嫌菜单栏挤，图标也能隐藏。
 
-## 工作原理
+## 零权限
 
-Command Reopen 通过 `NSWorkspace.didActivateApplicationNotification` 监听应用激活事件。当你用 Cmd+Tab 切换到某个应用时，它会先用公开的 CoreGraphics 窗口列表 API（`CGWindowListCopyWindowInfo`）检查这个应用当前是否已经有可见窗口。只有在没有找到可见窗口时，才会通过 `NSWorkspace.openApplication(at:configuration:)` 发送恢复请求。这会恢复最小化的窗口并重新创建已关闭的窗口——全部使用标准 macOS API，无需任何特殊权限。
+- **不要辅助功能权限**
+- **不要屏幕录制权限**
+- **沙盒运行**，通过 Mac App Store 分发
+- **不追踪**，一切都在你的 Mac 上完成
 
-核心逻辑约 300 行，集中在一个文件中：[ActivationMonitor.swift](CmdReopen/Features/Reopen/ActivationMonitor.swift)。
+大多数窗口工具要靠辅助功能权限去挪动窗口，Command Reopen 用不着，因为它从不直接碰别的应用的窗口。它通过 `NSWorkspace.didActivateApplicationNotification` 得知你切到了哪个应用，再用公开的 CoreGraphics 窗口列表（`CGWindowListCopyWindowInfo`）看看有没有可见窗口；只有一个都没有时，才通过 `NSWorkspace.openApplication(at:configuration:)` 请应用重新打开窗口——和你点一下程序坞图标时系统发出的请求是同一个。
+
+不必只听我说：源代码以 MIT 协议公开，恢复逻辑就在 [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen) 目录下。
+
+## 安装
+
+**[在 Mac App Store 下载 Command Reopen](https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8)**，需要 macOS 13 Ventura 或更高版本。
+
+打开一次后它就常驻菜单栏。想开机后自动运行，在设置里打开「登录时打开」即可。
 
 ## 常见问题
 
-**为什么 Cmd+Tab 不能恢复最小化的窗口？**
+**为什么 Mac 上 Cmd+Tab 不能还原最小化的窗口？**
 
-macOS 将最小化的窗口视为用户有意"收起"。Cmd+Tab 只切换活跃应用，不会恢复最小化的窗口。唯一的原生方法是 Cmd+Tab → 按住 Option → 松开 Cmd，但这一次只能恢复一个窗口，而且大多数用户根本不知道这个操作。
+macOS 把最小化的窗口当作你有意收起来的，所以 Cmd+Tab 只激活应用，窗口留在程序坞里。系统自带的办法是 Cmd+Tab 选中后按住 Option 再松开 Cmd，但一次只能还原一个窗口。
 
 **Command Reopen 需要什么权限？**
 
-核心功能不需要任何权限。它使用沙盒应用可用的 `NSWorkspace` API，无需辅助功能权限、无需屏幕录制权限。
+什么权限都不需要，辅助功能和屏幕录制都不用。它只调用沙盒应用本来就能用的 `NSWorkspace` API。
 
-Direct 版本另有默认关闭的“高级窗口恢复”模式：它需要辅助功能权限，可抬起窗口或恢复所有最小化窗口；不可用时始终回退到原生恢复。
-Dock 点击窗口循环在高级模式中有独立开关，同样默认关闭：后台 App 保持原生激活；点击前台 App 会最小化其窗口，点击全部已最小化的 App 会恢复窗口。
+**它会改变 Cmd+Tab 切换器吗？**
 
-**它会改变 Cmd+Tab 的界面吗？**
+不会。原生切换器的样子和用法都不变，Command Reopen 只在你选定应用之后才介入。
 
-不会。原生 Cmd+Tab 切换器完全不变。Command Reopen 在后台静默工作，你不会看到任何视觉变化。
+**关掉的窗口也能恢复，而不只是最小化的？**
 
-**除了最小化的窗口，已关闭的窗口也能恢复吗？**
+能。切到的应用如果一个窗口都没有，Command Reopen 会请它新开一个。
 
-可以。如果 Cmd+Tab 切到一个没有打开窗口的应用，Command Reopen 会自动创建新窗口。
+**可以对某些应用关掉这个功能吗？**
+
+可以。在设置里把它们加进「排除 App」，这些应用就保持系统默认的 Cmd+Tab 行为。
 
 ## 隐私
 
-Command Reopen 不收集任何数据。所有操作在本地运行。详见 [PRIVACY.md](PRIVACY.md)。
+窗口处理和各应用的使用记录都只保存在你的 Mac 上，Command Reopen 不收集、也不上传任何产品分析数据。详见 [PRIVACY.md](PRIVACY.md)。
+
+## 从源码构建
+
+```sh
+./script/build_and_run.sh --verify
+```
+
+签名、App Store 构建配置和代码结构说明见 [DEVELOPMENT.md](DEVELOPMENT.md)（英文）。
+
+## 关于作者
+
+我是 [chenfeng](https://github.com/Feng6611)，一个人做一些权限需求尽量少的 Mac 小工具，也写了两个 Obsidian 插件：
+[Open in Terminal](https://github.com/Feng6611/Obsidian-open-in-Teminal) 和 [File Ignore](https://github.com/Feng6611/Obsidian-File-Ignore)。
 
 ## 许可证
 
