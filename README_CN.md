@@ -42,27 +42,11 @@ Command Reopen 就是来补这一块的：每次 Cmd+Tab，切过去都有窗口
 
 - **最小化的窗口自动还原**：切到应用，窗口自己从程序坞出来。
 - **关掉的窗口重新打开**：最后一个窗口已经关了，切过去会新开一个。
+- **零权限**：不要辅助功能，也不要屏幕录制。沙盒运行，通过 Mac App Store 分发，不做任何追踪。
 - **最后一个窗口没了，焦点自动交还**：关掉或最小化应用的最后一个窗口后，焦点回到上一个应用，下次 Cmd+Tab 就能切回来。
 - **原生切换器照旧**：不换启动器，不装窗口管理器，也没有自定义切换器。还是那个 Cmd+Tab，手感不变。
 - **可以排除任意应用**：按名称或 Bundle ID 搜索添加，被排除的应用保持系统默认行为。
 - **安静待在后台**：菜单栏小工具，不到 5 MB，几乎不占 CPU；嫌菜单栏挤，图标也能隐藏。
-
-## 零权限
-
-- **不要辅助功能权限**
-- **不要屏幕录制权限**
-- **沙盒运行**，通过 Mac App Store 分发
-- **不追踪**，一切都在你的 Mac 上完成
-
-大多数窗口工具要靠辅助功能权限去挪动窗口，Command Reopen 用不着，因为它从不直接碰别的应用的窗口。它通过 `NSWorkspace.didActivateApplicationNotification` 得知你切到了哪个应用，再用公开的 CoreGraphics 窗口列表（`CGWindowListCopyWindowInfo`）看看有没有可见窗口；只有一个都没有时，才通过 `NSWorkspace.openApplication(at:configuration:)` 请应用重新打开窗口——和你点一下程序坞图标时系统发出的请求是同一个。
-
-不必只听我说：源代码以 MIT 协议公开，恢复逻辑就在 [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen) 目录下。
-
-## 安装
-
-**[在 Mac App Store 下载 Command Reopen](https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8)**，需要 macOS 13 Ventura 或更高版本。
-
-打开一次后它就常驻菜单栏。想开机后自动运行，在设置里打开「登录时打开」即可。
 
 ## 常见问题
 
@@ -72,7 +56,7 @@ macOS 把最小化的窗口当作你有意收起来的，所以 Cmd+Tab 只激�
 
 **Command Reopen 需要什么权限？**
 
-什么权限都不需要，辅助功能和屏幕录制都不用。它只调用沙盒应用本来就能用的 `NSWorkspace` API。
+什么权限都不需要，辅助功能和屏幕录制都不用，因为它从不直接碰别的应用的窗口。它通过 `NSWorkspace.didActivateApplicationNotification` 得知你切到了哪个应用，再用公开的 CoreGraphics 窗口列表（`CGWindowListCopyWindowInfo`）看看有没有可见窗口；只有一个都没有时，才通过 `NSWorkspace.openApplication(at:configuration:)` 请应用重新打开窗口——和你点一下程序坞图标时系统发出的请求是同一个。想核实的话，代码就在 [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen)。
 
 **它会改变 Cmd+Tab 切换器吗？**
 
@@ -90,19 +74,7 @@ macOS 把最小化的窗口当作你有意收起来的，所以 Cmd+Tab 只激�
 
 窗口处理和各应用的使用记录都只保存在你的 Mac 上，Command Reopen 不收集、也不上传任何产品分析数据。详见 [PRIVACY.md](PRIVACY.md)。
 
-## 从源码构建
-
-```sh
-./script/build_and_run.sh --verify
-```
-
-签名、App Store 构建配置和代码结构说明见 [DEVELOPMENT.md](DEVELOPMENT.md)（英文）。
-
 ## 关于作者
 
 我是 [chenfeng](https://github.com/Feng6611)，一个人做一些权限需求尽量少的 Mac 小工具，也写了两个 Obsidian 插件：
 [Open in Terminal](https://github.com/Feng6611/Obsidian-open-in-Teminal) 和 [File Ignore](https://github.com/Feng6611/Obsidian-File-Ignore)。
-
-## 许可证
-
-[MIT](LICENSE)
