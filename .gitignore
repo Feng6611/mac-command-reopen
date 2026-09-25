@@ -31,7 +31,6 @@ DESIGN_NOTES.md
 fastlane/
 docs/*
 !docs/icon.svg
-!docs/CLAUDE.md
 !docs/DESIGN.md
 !docs/DecisionLog.md
 !docs/IssueLog.md

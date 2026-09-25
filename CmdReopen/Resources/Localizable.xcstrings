@@ -70,7 +70,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "残り %lld 日"
+                  "value" : "残り%lld日"
                 }
               }
             }
@@ -153,7 +153,7 @@
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "残り %lld 回"
+                  "value" : "残り%lld回"
                 }
               }
             }
@@ -202,244 +202,6 @@
         }
       }
     },
-    "By Day" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Tag"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By Day"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Par jour"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日別"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按天"
-          }
-        }
-      }
-    },
-    "By Month" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Monat"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By Month"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Par mois"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月別"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按月"
-          }
-        }
-      }
-    },
-    "By Week" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Woche"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "By Week"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Par semaine"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週別"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按周"
-          }
-        }
-      }
-    },
-    "Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du findest Command Reopen in der Menüleiste am oberen Bildschirmrand. Klicke auf das ⌘-Symbol, um die Einstellungen zu öffnen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen se trouve dans la barre des menus en haut de l’écran. Cliquez sur l’icône ⌘ pour ouvrir les réglages."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen は画面上部のメニューバーにあります。⌘ アイコンをクリックすると設定が開きます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen 位于屏幕顶部的菜单栏中。点击 ⌘ 图标即可打开设置。"
-          }
-        }
-      }
-    },
-    "Get Started" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Loslegen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Get Started"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Commencer"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使い始める"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始使用"
-          }
-        }
-      }
-    },
-    "Learn Mac window shortcuts" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac-Fensterkurzbefehle kennenlernen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Learn Mac window shortcuts"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Découvrir les raccourcis des fenêtres sur Mac"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac のウインドウ操作のショートカットを見る"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "了解 Mac 窗口快捷键"
-          }
-        }
-      }
-    },
-    "Zero permissions — it works with the normal Cmd+Tab behavior." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Berechtigungen nötig – funktioniert mit dem gewohnten Cmd+Tab-Verhalten."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zero permissions — it works with the normal Cmd+Tab behavior."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune autorisation requise — fonctionne avec le comportement habituel de Cmd+Tab."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "権限の許可は不要 — いつもどおり Cmd+Tab で使えます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无需任何权限，沿用系统原有的 Cmd+Tab 操作方式。"
-          }
-        }
-      }
-    },
     "⌘ and the key above Tab" : {
       "comment" : "Names the keys for the window-cycling shortcut, whose second key differs by keyboard layout. Keep ⌘ verbatim.",
       "localizations" : {
@@ -458,7 +220,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘ と Tab の上のキー"
+            "value" : "⌘とTabの上のキー"
           }
         },
         "zh-Hans" : {
@@ -490,7 +252,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "残り 2 日"
+            "value" : "残り2日"
           }
         },
         "zh-Hans" : {
@@ -548,7 +310,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro 永久ライセンス 20% オフ"
+            "value" : "Pro買い切り版が20%オフ"
           }
         },
         "zh-Hans" : {
@@ -577,7 +339,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お別れの前に、20% 特別割引"
+            "value" : "お別れの前に、20%特別割引"
           }
         },
         "zh-Hans" : {
@@ -704,36 +466,6 @@
         }
       }
     },
-    "Add App" : {
-      "comment" : "Form row label for adding an excluded app.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter une app"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App を追加"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "添加 App"
-          }
-        }
-      }
-    },
     "Added" : {
       "localizations" : {
         "de" : {
@@ -838,73 +570,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "高度なウインドウ復元でほかの App を操作するには、アクセシビリティの許可が必要です。基本機能には権限は不要です。"
+            "value" : "高度なウインドウ復元でほかのAppを操作するには、アクセシビリティの許可が必要です。基本機能には権限は不要です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "高级窗口恢复仅在你授予辅助功能权限后才可控制其他 App 的窗口。核心功能无需任何权限。"
-          }
-        }
-      }
-    },
-    "After the last window closes or minimizes, bring the previous app forward so one Cmd+Tab returns here." : {
-      "comment" : "Footer explaining automatic Cmd+Tab ordering after the foreground app loses its last visible window.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn das letzte Fenster geschlossen oder minimiert wird, kommt die vorherige App nach vorn, damit ein Cmd+Tab hierher zurückführt."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Après la fermeture ou la réduction de la dernière fenêtre, l’app précédente passe au premier plan afin qu’un seul Cmd+Tab vous ramène ici."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最後のウインドウを閉じるか最小化すると前のアプリを前面にし、Cmd+Tab 1回でここに戻れるようにします。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭或最小化最后一个窗口后，将上一个 App 切到前台，让你按一次 Cmd+Tab 就能返回。"
-          }
-        }
-      }
-    },
-    "All Command Reopen features are available." : {
-      "comment" : "Subtitle in the About pane for the Direct (non-App-Store) build; all features are included.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Funktionen von Command Reopen sind verfügbar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toutes les fonctionnalités de Command Reopen sont disponibles."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen のすべての機能をご利用いただけます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen 的全部功能均已可用。"
           }
         }
       }
@@ -956,7 +628,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ログイン時に Command Reopen を開くことを許可"
+            "value" : "ログイン時にCommand Reopenを開くことを許可"
           }
         },
         "zh-Hans" : {
@@ -1050,35 +722,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "程序窗口"
-          }
-        }
-      }
-    },
-    "App name or bundle ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App-Name oder Bundle-ID"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nom de l’app ou identifiant de bundle"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App名またはBundle ID"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App 名称或 Bundle ID"
           }
         }
       }
@@ -1198,6 +841,108 @@
         }
       }
     },
+    "By Day" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Tag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Day"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par jour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日別"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按天"
+          }
+        }
+      }
+    },
+    "By Month" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Monat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Month"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par mois"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月別"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按月"
+          }
+        }
+      }
+    },
+    "By Week" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Woche"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By Week"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Par semaine"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週別"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按周"
+          }
+        }
+      }
+    },
     "Checking purchases…" : {
       "localizations" : {
         "de" : {
@@ -1232,7 +977,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klicken Sie unten zum Minimieren und drücken Sie dann einmal Cmd+Tab."
+            "value" : "Klicke unten zum Minimieren und drücke dann einmal Cmd+Tab."
           }
         },
         "fr" : {
@@ -1244,7 +989,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下のボタンで最小化し、Cmd+Tab を1回押すとウインドウが戻ります。"
+            "value" : "下のボタンで最小化し、Cmd+Tabを1回押すとウインドウが戻ります。"
           }
         },
         "zh-Hans" : {
@@ -1257,7 +1002,7 @@
     },
     "Close" : {
       "comment" : "Accessibility label for the sheet's close button.",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1343,35 +1088,6 @@
         }
       }
     },
-    "Closing or minimizing an app’s last window leaves it frontmost with nothing on screen. Command Reopen hands focus back — one Cmd+Tab still returns you." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gibt den Fokus an die vorherige App zurück, wenn keine Fenster mehr sichtbar sind."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redonne le focus à l'app précédente lorsqu'aucune fenêtre n'est visible."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "表示中のウインドウがなくなったとき、直前の App にフォーカスを自動で戻します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当某个 App 没有可见窗口时，自动切回上一个使用的 App。"
-          }
-        }
-      }
-    },
     "Cmd+Tab" : {
       "comment" : "Onboarding flow diagram, step 2 label. Keep the key names in Latin in every locale.",
       "localizations" : {
@@ -1401,42 +1117,13 @@
         }
       }
     },
-    "Cmd+Tab back to an app and macOS leaves your minimized windows in the Dock. Turn one on to bring all of its windows back automatically." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stellt beim Wechseln mit Cmd+Tab alle minimierten Fenster der aktivierten Apps wieder her."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restaure automatiquement toutes les fenêtres réduites lors du passage avec Cmd+Tab."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有効にした App では、Cmd+Tab で切替時にすべての最小化ウインドウを復元します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开启以下 App 后，按 Cmd+Tab 切回时将自动恢复其全部最小化窗口。"
-          }
-        }
-      }
-    },
     "Cmd+Tab now brings your windows back." : {
       "comment" : "Onboarding success step body. Keep Cmd+Tab in Latin.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cmd+Tab bringt Ihre Fenster jetzt zurück."
+            "value" : "Cmd+Tab bringt deine Fenster jetzt zurück."
           }
         },
         "fr" : {
@@ -1448,7 +1135,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "これからは Cmd+Tab でウインドウが戻ってきます。"
+            "value" : "これからはCmd+Tabでウインドウが戻ってきます。"
           }
         },
         "zh-Hans" : {
@@ -1477,7 +1164,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen をログイン項目に追加できませんでした"
+            "value" : "Command Reopenをログイン項目に追加できませんでした"
           }
         },
         "zh-Hans" : {
@@ -1488,61 +1175,31 @@
         }
       }
     },
-    "Command Reopen fills the gap between ⌘M and ⌘⇥." : {
-      "comment" : "Footnote on the Mac shortcuts sheet explaining this app's role in the system's window shortcuts.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen schließt die Lücke zwischen ⌘M und ⌘⇥."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen comble le vide entre ⌘M et ⌘⇥."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen は ⌘M と ⌘⇥ の間のギャップを埋めます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen 补齐了 ⌘M 最小化与 ⌘⇥ 切回之间的断层。"
-          }
-        }
-      }
-    },
     "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart." : {
       "comment" : "Subtitle of the final onboarding step in the free build.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen läuft. Aktiviere \u201eBeim Anmelden starten\u201c, damit es nach jedem Neustart bereit ist."
+            "value" : "Command Reopen läuft. Aktiviere „Beim Anmelden starten“, damit es nach jedem Neustart bereit ist."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen tourne. Activez \u00ab Lancer \u00e0 l\u2019ouverture de session \u00bb pour qu\u2019il soit pr\u00eat apr\u00e8s chaque red\u00e9marrage."
+            "value" : "Command Reopen tourne. Activez « Lancer à l’ouverture de session » pour qu’il soit prêt après chaque redémarrage."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen は起動しています。\u300c\u30ed\u30b0\u30a4\u30f3\u6642\u306b\u8d77\u52d5\u300d\u3092\u30aa\u30f3\u306b\u3059\u308b\u3068\u3001\u518d\u8d77\u52d5\u5f8c\u3082\u3059\u3050\u306b\u4f7f\u3048\u307e\u3059\u3002"
+            "value" : "Command Reopenは起動しています。「ログイン時に起動」をオンにすると、再起動後もすぐに使えます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen 正在运行。开启\u201c登录时启动\u201d后，每次重启后都会保持就绪。"
+            "value" : "Command Reopen 正在运行。开启“登录时启动”后，每次重启后都会保持就绪。"
           }
         }
       }
@@ -1622,7 +1279,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "トライアル期間中は Command Reopen Pro が有効です。"
+            "value" : "トライアル期間中はCommand Reopen Proが有効です。"
           }
         },
         "zh-Hans" : {
@@ -1777,34 +1434,6 @@
         }
       }
     },
-    "Day" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tag"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jour"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日"
-          }
-        }
-      }
-    },
     "Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies." : {
 
     },
@@ -1843,7 +1472,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nicht zurückgekommen? Drücken Sie Cmd+Tab erneut."
+            "value" : "Nicht zurückgekommen? Drücke Cmd+Tab erneut."
           }
         },
         "fr" : {
@@ -1855,43 +1484,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "戻ってきませんか？ もう一度 Cmd+Tab をお試しください。"
+            "value" : "戻ってきませんか？ もう一度Cmd+Tabをお試しください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "窗口没出来？再按一次 Cmd+Tab。"
-          }
-        }
-      }
-    },
-    "Direct version" : {
-      "comment" : "'Direct' is the non-App-Store distribution channel; keep as a proper noun.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Direct-Version"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version Direct"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Direct版"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Direct 版本"
           }
         }
       }
@@ -1970,7 +1569,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen を有効にする"
+            "value" : "Command Reopenを有効にする"
           }
         },
         "zh-Hans" : {
@@ -2028,7 +1627,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen を気に入っていただけましたか？"
+            "value" : "Command Reopenを気に入っていただけましたか？"
           }
         },
         "zh-Hans" : {
@@ -2057,7 +1656,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての機能を制限なく利用できます。App Store 版の購入は開発支援につながります。"
+            "value" : "すべての機能を制限なく利用できます。App Store版の購入は開発支援につながります。"
           }
         },
         "zh-Hans" : {
@@ -2086,7 +1685,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "復元対象外にする App を自由に設定"
+            "value" : "復元対象外にするAppを自由に設定"
           }
         },
         "zh-Hans" : {
@@ -2115,7 +1714,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "除外 App"
+            "value" : "除外App"
           }
         },
         "zh-Hans" : {
@@ -2144,7 +1743,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "除外した App は macOS の標準動作となり、ウインドウを自動復元しません。"
+            "value" : "除外したAppはmacOSの標準動作となり、ウインドウを自動復元しません。"
           }
         },
         "zh-Hans" : {
@@ -2183,32 +1782,36 @@
         }
       }
     },
-    "Feedback" : {
-      "comment" : "About row title for the feedback-reward offer.",
-      "extractionState" : "stale",
+    "Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Feedback"
+            "value" : "Du findest Command Reopen in der Menüleiste am oberen Bildschirmrand. Klicke auf das ⌘-Symbol, um die Einstellungen zu öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find Command Reopen in the menu bar at the top of your screen. Click the ⌘ icon to open Settings."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Retours"
+            "value" : "Command Reopen se trouve dans la barre des menus en haut de l’écran. Cliquez sur l’icône ⌘ pour ouvrir les réglages."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フィードバック"
+            "value" : "Command Reopenは画面上部のメニューバーにあります。⌘アイコンをクリックすると設定が開きます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "反馈"
+            "value" : "Command Reopen 位于屏幕顶部的菜单栏中。点击 ⌘ 图标即可打开设置。"
           }
         }
       }
@@ -2231,7 +1834,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cmd+Tab で最小化・閉じたウインドウを復元"
+            "value" : "Cmd+Tabで最小化・閉じたウインドウを復元"
           }
         },
         "zh-Hans" : {
@@ -2357,36 +1960,6 @@
         }
       }
     },
-    "Get lifetime at 20% off" : {
-      "comment" : "Purchase button on the win-back card; buys the discounted lifetime unlock immediately.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lifetime mit 20 % Rabatt holen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obtenir la version à vie à −20 %"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "20%オフで買い切り版を入手"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "以八折获取买断版"
-          }
-        }
-      }
-    },
     "Get on Mac App Store" : {
       "localizations" : {
         "de" : {
@@ -2404,13 +1977,47 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mac App Store で入手"
+            "value" : "Mac App Storeで入手"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "前往 Mac App Store 获取"
+          }
+        }
+      }
+    },
+    "Get Started" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loslegen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commencer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使い始める"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始使用"
           }
         }
       }
@@ -2433,7 +2040,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App を隠す"
+            "value" : "Appを隠す"
           }
         },
         "zh-Hans" : {
@@ -2462,43 +2069,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reopen がバックグラウンドで動作を続ける間、メニューバーのアイコンを非表示にします。Reopen をもう一度起動すると、いつでも設定を開けます。"
+            "value" : "Reopenがバックグラウンドで動作を続ける間、メニューバーのアイコンを非表示にします。Reopenをもう一度起動すると、いつでも設定を開けます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "隐藏菜单栏图标，Reopen 继续在后台运行。随时再次启动 Reopen 即可打开设置。"
-          }
-        }
-      }
-    },
-    "If Command Reopen has made Cmd+Tab feel better, a quick App Store review helps more people find it." : {
-      "comment" : "Body copy for Command Reopen's one-time custom review prompt.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn Command Reopen Cmd+Tab für dich verbessert hat, hilft eine kurze App-Store-Bewertung mehr Menschen, die App zu entdecken."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si Command Reopen a amélioré votre utilisation de Cmd+Tab, un avis rapide sur l’App Store aidera davantage de personnes à le découvrir."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopen で Cmd+Tab が使いやすくなったなら、App Store での短いレビューが、より多くの人に見つけてもらう助けになります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果 Command Reopen 让 Cmd+Tab 更好用了，花一点时间在 App Store 留下评价，可以帮助更多人发现它。"
           }
         }
       }
@@ -2521,7 +2098,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen で Cmd+Tab が使いやすくなったなら、App Store での短いレビューが他のユーザーの助けになります。"
+            "value" : "Command ReopenでCmd+Tabが使いやすくなったなら、App Storeでの短いレビューが他のユーザーの助けになります。"
           }
         },
         "zh-Hans" : {
@@ -2557,66 +2134,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果价格是唯一的犹豫，这份特别优惠将于今日截止。"
-          }
-        }
-      }
-    },
-    "If the price was the sticking point, here’s a smaller one. It ends today." : {
-      "comment" : "Subtitle of the win-back card during the discount window's final day.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der 20 % Rabatt auf die Lifetime-Version endet heute."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La remise de 20 % sur la version à vie se termine aujourd’hui."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "買い切り版の20%オフは本日で終了します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "买断版专属 8 折优惠今日截止。"
-          }
-        }
-      }
-    },
-    "If the price was the sticking point, here’s a smaller one. It holds for 2 days, then it’s gone." : {
-      "comment" : "Subtitle of the win-back card while more than a day of the discount window remains.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sichern Sie sich die Lifetime-Version mit 20 % Rabatt. Gültig für 2 Tage."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profitez de la version à vie avec 20 % de remise. Valable pendant 2 jours."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "買い切り版を20%オフで提供します。2日間限定です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "享买断版专属 8 折优惠，48 小时内有效。"
           }
         }
       }
@@ -2674,36 +2191,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "成功了！"
-          }
-        }
-      }
-    },
-    "Keep app next in Cmd+Tab" : {
-      "comment" : "Settings toggle that keeps an app second in Cmd+Tab after its last visible window disappears.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App als Nächstes in Cmd+Tab behalten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Garder l’app suivante dans Cmd+Tab"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cmd+Tab の次の位置に App を保持"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "让 App 保持在 Cmd+Tab 下一位"
           }
         }
       }
@@ -2784,7 +2271,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "過去 12 か月"
+            "value" : "過去12か月"
           }
         },
         "zh-Hans" : {
@@ -2813,7 +2300,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "過去 12 週"
+            "value" : "過去12週"
           }
         },
         "zh-Hans" : {
@@ -2842,7 +2329,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "過去 30 日"
+            "value" : "過去30日"
           }
         },
         "zh-Hans" : {
@@ -2881,6 +2368,40 @@
         }
       }
     },
+    "Learn Mac window shortcuts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac-Fensterkurzbefehle kennenlernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn Mac window shortcuts"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Découvrir les raccourcis des fenêtres sur Mac"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macのウインドウ操作のショートカットを見る"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "了解 Mac 窗口快捷键"
+          }
+        }
+      }
+    },
     "Lifetime" : {
       "comment" : "One-time purchase tier (opposite of the yearly subscription).",
       "localizations" : {
@@ -2899,7 +2420,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "永久版"
+            "value" : "買い切り版"
           }
         },
         "zh-Hans" : {
@@ -3001,7 +2522,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS lässt neue Anmeldeobjekte erst nach Ihrer Freigabe zu. Öffnen Sie die Anmeldeobjekte und aktivieren Sie Command Reopen."
+            "value" : "macOS lässt neue Anmeldeobjekte erst nach deiner Freigabe zu. Öffne die Anmeldeobjekte und aktiviere Command Reopen."
           }
         },
         "fr" : {
@@ -3013,13 +2534,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新しいログイン項目は、許可するまで macOS が保留します。「ログイン項目」を開いて Command Reopen をオンにしてください。"
+            "value" : "新しいログイン項目は、許可するまでmacOSが保留します。「ログイン項目」を開いてCommand Reopenをオンにしてください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS 需要你的授权才能启用开机启动。请前往「系统设置」>「通用」>「登录项」中允许 Command Reopen。"
+            "value" : "macOS 需要你的授权才能启用开机启动。请前往“系统设置”>“通用”>“登录项”中允许 Command Reopen。"
           }
         }
       }
@@ -3030,7 +2551,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS hat die Anfrage abgelehnt. Sie können Command Reopen in den Anmeldeobjekten selbst hinzufügen."
+            "value" : "macOS hat die Anfrage abgelehnt. Du kannst Command Reopen in den Anmeldeobjekten selbst hinzufügen."
           }
         },
         "fr" : {
@@ -3042,13 +2563,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS が要求を拒否しました。「ログイン項目」で手動で Command Reopen を追加できます。"
+            "value" : "macOSが要求を拒否しました。「ログイン項目」で手動でCommand Reopenを追加できます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "系统请求未通过。你可以在 macOS「登录项」设置中手动添加 Command Reopen。"
+            "value" : "系统请求未通过。你可以在 macOS“登录项”设置中手动添加 Command Reopen。"
           }
         }
       }
@@ -3197,34 +2718,6 @@
         }
       }
     },
-    "Month" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monat"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mois"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月"
-          }
-        }
-      }
-    },
     "most restored app" : {
       "comment" : "Label under the name of the app whose windows were restored most during the trial.",
       "localizations" : {
@@ -3243,7 +2736,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最も多く復元した App"
+            "value" : "最も多く復元したApp"
           }
         },
         "zh-Hans" : {
@@ -3279,36 +2772,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "需要授权"
-          }
-        }
-      }
-    },
-    "Nine of them, and where this app fits" : {
-      "comment" : "Subtitle on the General-pane row opening the Mac window shortcuts sheet.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wichtige Kurzbefehle für Fenster und Wechsel"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Raccourcis utiles pour les fenêtres"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "よく使うウインドウ操作と切り替え"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac 常用窗口与切换快捷键"
           }
         }
       }
@@ -3359,7 +2822,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "除外 App はありません"
+            "value" : "除外Appはありません"
           }
         },
         "zh-Hans" : {
@@ -3376,7 +2839,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Internetverbindung. Stellen Sie eine Verbindung her und laden Sie die Kaufoptionen erneut."
+            "value" : "Keine Internetverbindung. Stelle eine Verbindung her und lade die Kaufoptionen erneut."
           }
         },
         "fr" : {
@@ -3501,7 +2964,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro ではない"
+            "value" : "Proではない"
           }
         },
         "zh-Hans" : {
@@ -3514,7 +2977,7 @@
     },
     "Not selected" : {
       "comment" : "VoiceOver value for an unselected paywall plan card (Kiki_mackit KikiPaywall).",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3635,7 +3098,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Source unter MIT-Lizenz. Command Reopen benötigt keine Systemberechtigungen — und Sie müssen uns das nicht glauben, sondern können es im Quellcode nachprüfen."
+            "value" : "Open Source unter MIT-Lizenz. Command Reopen benötigt keine Systemberechtigungen — und du musst uns das nicht glauben, sondern kannst es im Quellcode nachprüfen."
           }
         },
         "fr" : {
@@ -3647,43 +3110,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "MIT ライセンスのオープンソースです。Command Reopen はシステム権限を一切必要としません。その点はソースコードでご確認いただけます。"
+            "value" : "MITライセンスのオープンソースです。Command Reopenはシステム権限を一切必要としません。その点はソースコードでご確認いただけます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "以 MIT 协议开源。Command Reopen 不需要任何系统权限——你可以在源代码里自己核实，不必只听我们说。"
-          }
-        }
-      }
-    },
-    "Open the form" : {
-      "comment" : "Button on the feedback offer card; opens the feedback form in a browser.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Formular öffnen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir le formulaire"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フォームを開く"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "打开表单"
           }
         }
       }
@@ -3864,7 +3297,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro-Zugriff"
+            "value" : "Pro-Zugang"
           }
         },
         "fr" : {
@@ -3876,7 +3309,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro アクセス"
+            "value" : "Proアクセス"
           }
         },
         "zh-Hans" : {
@@ -3893,7 +3326,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kauf abgeschlossen, aber der Pro-Zugriff wird noch synchronisiert. Bitte warten Sie einen Moment oder verwenden Sie „Kauf wiederherstellen“."
+            "value" : "Kauf abgeschlossen, aber der Pro-Zugang wird noch synchronisiert. Bitte warte einen Moment oder verwende „Kauf wiederherstellen“."
           }
         },
         "fr" : {
@@ -3911,7 +3344,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "购买已完成，但 Pro 权限仍在同步。请稍候，或点按「恢复购买」。"
+            "value" : "购买已完成，但 Pro 权限仍在同步。请稍候，或点按“恢复购买”。"
           }
         }
       }
@@ -3921,7 +3354,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kaufoptionen sind derzeit nicht verfügbar. Versuchen Sie es später erneut oder stellen Sie einen bestehenden Kauf wieder her."
+            "value" : "Kaufoptionen sind derzeit nicht verfügbar. Versuche es später erneut oder stelle einen bestehenden Kauf wieder her."
           }
         },
         "fr" : {
@@ -4006,7 +3439,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Käufe sind auf diesem Mac deaktiviert. Prüfen Sie die Inhalts- und Datenschutzbeschränkungen in der Bildschirmzeit."
+            "value" : "Käufe sind auf diesem Mac deaktiviert. Prüfe die Inhalts- und Datenschutzbeschränkungen in der Bildschirmzeit."
           }
         },
         "fr" : {
@@ -4018,13 +3451,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "この Mac では購入が許可されていません。スクリーンタイムのコンテンツとプライバシーの制限を確認してください。"
+            "value" : "このMacでは購入が許可されていません。スクリーンタイムのコンテンツとプライバシーの制限を確認してください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此 Mac 已关闭购买功能。请检查「屏幕使用时间」中的内容和隐私访问限制。"
+            "value" : "此 Mac 已关闭购买功能。请检查“屏幕使用时间”中的内容和隐私访问限制。"
           }
         }
       }
@@ -4035,7 +3468,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Käufe sind in dieser Version nicht verfügbar. Bitte wenden Sie sich an den Support."
+            "value" : "Käufe sind in dieser Version nicht verfügbar. Bitte wende dich an den Support."
           }
         },
         "fr" : {
@@ -4054,35 +3487,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此版本无法进行购买。请联系支持。"
-          }
-        }
-      }
-    },
-    "Purchases couldn't be restored." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Käufe konnten nicht wiederhergestellt werden."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les achats n’ont pas pu être restaurés."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "購入を復元できませんでした。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法恢复购买。"
           }
         }
       }
@@ -4133,7 +3537,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ を終了"
+            "value" : "%@を終了"
           }
         },
         "zh-Hans" : {
@@ -4162,7 +3566,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App を終了"
+            "value" : "Appを終了"
           }
         },
         "zh-Hans" : {
@@ -4191,7 +3595,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Store で評価"
+            "value" : "App Storeで評価"
           }
         },
         "zh-Hans" : {
@@ -4220,7 +3624,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ を削除"
+            "value" : "%@を削除"
           }
         },
         "zh-Hans" : {
@@ -4346,66 +3750,6 @@
         }
       }
     },
-    "Restored in your trial" : {
-      "comment" : "Caption under the trial reopen count on the paywall; one line only.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In Ihrer Testphase wiederhergestellt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restaurées pendant l’essai"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "トライアル中に復元"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "试用期内已恢复"
-          }
-        }
-      }
-    },
-    "restored most often" : {
-      "comment" : "Label under the name of the app whose windows were restored most during the trial.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Am häufigsten wiederhergestellt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le plus souvent restaurée"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最も復元された App"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最常恢复"
-          }
-        }
-      }
-    },
     "Restores minimized and closed windows on Cmd+Tab" : {
       "localizations" : {
         "de" : {
@@ -4423,7 +3767,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最小化・閉じたウインドウを Cmd+Tab で復元"
+            "value" : "最小化・閉じたウインドウをCmd+Tabで復元"
           }
         },
         "zh-Hans" : {
@@ -4481,7 +3825,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "直前の App にフォーカスを戻す"
+            "value" : "直前のAppにフォーカスを戻す"
           }
         },
         "zh-Hans" : {
@@ -4510,7 +3854,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen を評価"
+            "value" : "Command Reopenを評価"
           }
         },
         "zh-Hans" : {
@@ -4568,7 +3912,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "同じ App、別の応援方法"
+            "value" : "同じApp、別の応援方法"
           }
         },
         "zh-Hans" : {
@@ -4597,7 +3941,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App 名または Bundle ID を検索…"
+            "value" : "App名またはBundle IDを検索…"
           }
         },
         "zh-Hans" : {
@@ -4638,7 +3982,7 @@
     },
     "Selected" : {
       "comment" : "VoiceOver value for a selected paywall plan card (Kiki_mackit KikiPaywall).",
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4690,66 +4034,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置…"
-          }
-        }
-      }
-    },
-    "Share feedback, get a discount code" : {
-      "comment" : "Title of the App Store feedback offer card in About.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feedback teilen, Lifetime sichern"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Donnez votre avis, recevez la version à vie"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィードバックで買い切り版を獲得"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "提反馈，获赠买断版"
-          }
-        }
-      }
-    },
-    "Share how you use Command Reopen, get Pro" : {
-      "comment" : "Title of the App Store feedback offer card in About.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feedback teilen, Pro Lifetime sichern"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partagez votre avis, recevez Pro à vie"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用体験を共有して Pro 永久版を獲得"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享使用体验，获赠 Pro 终身授权"
           }
         }
       }
@@ -4903,7 +4187,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Starten Sie die kostenlose Testphase, wenn Sie bereit sind."
+            "value" : "Starte die kostenlose Testphase, wenn du bereit bist."
           }
         },
         "fr" : {
@@ -4931,7 +4215,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwenden Sie Command Reopen, um Trends zu sehen"
+            "value" : "Verwende Command Reopen, um Trends zu sehen"
           }
         },
         "fr" : {
@@ -4943,7 +4227,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen を使い始めるとトレンドが表示されます"
+            "value" : "Command Reopenを使い始めるとトレンドが表示されます"
           }
         },
         "zh-Hans" : {
@@ -5001,7 +4285,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "統計 — %@ 件を復元"
+            "value" : "統計 — %@件を復元"
           }
         },
         "zh-Hans" : {
@@ -5088,7 +4372,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dock に残ったまま"
+            "value" : "Dockに残ったまま"
           }
         },
         "zh-Hans" : {
@@ -5145,7 +4429,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App を切り替える"
+            "value" : "Appを切り替える"
           }
         },
         "zh-Hans" : {
@@ -5174,7 +4458,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App に切り替え"
+            "value" : "Appに切り替え"
           }
         },
         "zh-Hans" : {
@@ -5232,73 +4516,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "同じ App のウインドウを切り替える"
+            "value" : "同じAppのウインドウを切り替える"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在同一个 App 里切换窗口"
-          }
-        }
-      }
-    },
-    "Tell us how it fits your day. An account we can act on earns the lifetime unlock." : {
-      "comment" : "Body of the App Store feedback offer card in About.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sagen Sie uns, wie die App Ihren Alltag erleichtert. Wertvolles Feedback belohnen wir mit einem Lifetime-Code."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dites-nous comment l’app s’intègre à votre quotidien. Tout retour utile recevra un code à vie."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日々のワークフローでの活用法をお聞かせください。改善につながる内容には永久コードをお贈りします。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "告诉我们它如何融入你的工作流。采纳的建议或优质分享将获赠 Pro 终身兑换码。"
-          }
-        }
-      }
-    },
-    "Tell us what works and what doesn't — a report we can act on earns a lifetime discount code." : {
-      "comment" : "Body of the App Store feedback offer card in About.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sagen Sie uns, was funktioniert und was nicht — für nützliches Feedback gibt es einen Lifetime-Code."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dites-nous ce qui va et ne va pas : un retour exploitable vous vaut un code pour la version à vie."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使い心地をお聞かせください。改善につながる内容には買い切り版コードをお贈りします。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "告诉我们你的使用体验，有参考价值的反馈将获赠终身买断兑换码。"
           }
         }
       }
@@ -5377,7 +4601,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App は戻るが、ウインドウは Dock に入ったまま。"
+            "value" : "Appは戻るが、ウインドウはDockに入ったまま。"
           }
         },
         "zh-Hans" : {
@@ -5394,7 +4618,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der App Store hat diesen Kauf noch nicht vollständig synchronisiert. Bitte versuchen Sie es gleich erneut oder verwenden Sie „Kauf wiederherstellen“."
+            "value" : "Der App Store hat diesen Kauf noch nicht vollständig synchronisiert. Bitte versuche es gleich erneut oder verwende „Kauf wiederherstellen“."
           }
         },
         "fr" : {
@@ -5406,13 +4630,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Store でこの購入の同期がまだ完了していません。しばらくしてからもう一度お試しいただくか、「購入を復元」をご利用ください。"
+            "value" : "App Storeでこの購入の同期がまだ完了していません。しばらくしてからもう一度お試しいただくか、「購入を復元」をご利用ください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Store 尚未同步完这笔购买。请稍后再试，或点按「恢复购买」。"
+            "value" : "App Store 尚未同步完这笔购买。请稍后再试，或点按“恢复购买”。"
           }
         }
       }
@@ -5423,7 +4647,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der App Store bietet diesen Plan derzeit nicht an. Versuchen Sie es später erneut."
+            "value" : "Der App Store bietet diesen Plan derzeit nicht an. Versuche es später erneut."
           }
         },
         "fr" : {
@@ -5435,42 +4659,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Store は現在このプランを提供していません。しばらくしてからもう一度お試しください。"
+            "value" : "App Storeは現在このプランを提供していません。しばらくしてからもう一度お試しください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Store 暂时没有提供此方案。请稍后再试。"
-          }
-        }
-      }
-    },
-    "The free trial couldn't be started." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die kostenlose Testphase konnte nicht gestartet werden."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L’essai gratuit n’a pas pu être démarré."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料トライアルを開始できませんでした。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无法开始免费试用。"
           }
         }
       }
@@ -5608,7 +4803,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料版は機能制限なしで永久に使えます。App Store 版の購入は開発支援と自動更新になります。"
+            "value" : "無料版は機能制限なしで永久に使えます。App Store版の購入は開発支援と自動更新になります。"
           }
         },
         "zh-Hans" : {
@@ -5905,36 +5100,6 @@
         }
       }
     },
-    "Unavailable" : {
-      "comment" : "Kiki commerce readiness value — user cannot buy or restore right now.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht verfügbar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Indisponible"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "利用不可"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不可用"
-          }
-        }
-      }
-    },
     "Unlock Lifetime with 20% Off" : {
       "comment" : "Purchase button on the win-back card; buys the discounted lifetime unlock immediately.",
       "localizations" : {
@@ -5953,7 +5118,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "20%オフで Pro 永久版を入手"
+            "value" : "20%オフでPro買い切り版を入手"
           }
         },
         "zh-Hans" : {
@@ -6037,7 +5202,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro にアップグレード…"
+            "value" : "Proにアップグレード…"
           }
         },
         "zh-Hans" : {
@@ -6082,7 +5247,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Command Reopen Pro-Zugriff wird überprüft."
+            "value" : "Dein Command Reopen Pro-Zugang wird überprüft."
           }
         },
         "fr" : {
@@ -6094,7 +5259,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen Pro のアクセスを確認しています。"
+            "value" : "Command Reopen Proのアクセスを確認しています。"
           }
         },
         "zh-Hans" : {
@@ -6166,7 +5331,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Kaufstatus konnte nicht überprüft werden. Versuchen Sie es erneut, wenn Sie online sind."
+            "value" : "Dein Kaufstatus konnte nicht überprüft werden. Versuche es erneut, wenn du online bist."
           }
         },
         "fr" : {
@@ -6214,34 +5379,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "网站"
-          }
-        }
-      }
-    },
-    "Week" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Woche"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Semaine"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "週"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "周"
           }
         }
       }
@@ -6322,7 +5459,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App の最後のウインドウを閉じるか最小化すると、フォーカスが戻り、Cmd+Tab ですぐに切り替えられます。"
+            "value" : "Appの最後のウインドウを閉じるか最小化すると、フォーカスが戻り、Cmd+Tabですぐに切り替えられます。"
           }
         },
         "zh-Hans" : {
@@ -6361,36 +5498,6 @@
         }
       }
     },
-    "window hidden" : {
-      "comment" : "Onboarding flow diagram, caption under 'Minimized'. Lowercase fragment, no period.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "im Dock"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dans le Dock"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dock に入ったまま"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "停留在 Dock"
-          }
-        }
-      }
-    },
     "Windows" : {
       "comment" : "Section of the Mac shortcuts sheet covering window-level shortcuts.",
       "localizations" : {
@@ -6420,66 +5527,6 @@
         }
       }
     },
-    "windows restored" : {
-      "comment" : "Label under the number of windows the app restored during the trial.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiederhergestellte Fenster"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenêtres restaurées"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復元したウインドウ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已恢复窗口"
-          }
-        }
-      }
-    },
-    "Windows restored" : {
-      "comment" : "Caption under the lifetime reopen count on the paywall; one line only.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenster wiederhergestellt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fenêtres restaurées"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復元したウインドウ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已恢复窗口"
-          }
-        }
-      }
-    },
     "windows restored in trial" : {
       "comment" : "Label under the number of windows the app restored during the trial.",
       "localizations" : {
@@ -6498,7 +5545,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "試用中に復元したウインドウ"
+            "value" : "トライアル中に復元したウインドウ"
           }
         },
         "zh-Hans" : {
@@ -6527,7 +5574,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro 未有効時、Cmd+Tab ではウインドウは Dock に残ります。"
+            "value" : "Pro未有効時、Cmd+TabではウインドウはDockに残ります。"
           }
         },
         "zh-Hans" : {
@@ -6585,7 +5632,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ウインドウを最小化または閉じた後、Cmd+Tab で切り替えると自動でウインドウが復元されます。"
+            "value" : "ウインドウを最小化または閉じた後、Cmd+Tabで切り替えると自動でウインドウが復元されます。"
           }
         },
         "zh-Hans" : {
@@ -6630,7 +5677,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre 14-tägige Testphase ist aktiv. Keine automatische Belastung."
+            "value" : "Deine 14-tägige Testphase ist aktiv. Keine automatische Belastung."
           }
         },
         "fr" : {
@@ -6659,7 +5706,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre kostenlose Testphase ist aktiv."
+            "value" : "Deine kostenlose Testphase ist aktiv."
           }
         },
         "fr" : {
@@ -6671,7 +5718,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料試用期間中です"
+            "value" : "無料トライアル中です"
           }
         },
         "zh-Hans" : {
@@ -6682,43 +5729,13 @@
         }
       }
     },
-    "Your plan" : {
-      "comment" : "Caption under the purchased plan name on the paywall; one line only.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ihr Plan"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre formule"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ご利用プラン"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的方案"
-          }
-        }
-      }
-    },
     "Your Pro access ends on %@. Everything keeps working until then." : {
       "comment" : "Paywall subtitle for a subscriber who turned off auto-renew.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Pro-Zugang endet am %@. Bis dahin funktioniert alles weiter."
+            "value" : "Dein Pro-Zugang endet am %@. Bis dahin funktioniert alles weiter."
           }
         },
         "fr" : {
@@ -6730,7 +5747,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro アクセスは %@ に終了します。それまではすべてご利用いただけます。"
+            "value" : "Proアクセスは%@に終了します。それまではすべてご利用いただけます。"
           }
         },
         "zh-Hans" : {
@@ -6747,7 +5764,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Pro-Zugang läuft nie ab. Vielen Dank für Ihre Unterstützung!"
+            "value" : "Dein Pro-Zugang läuft nie ab. Vielen Dank für deine Unterstützung!"
           }
         },
         "fr" : {
@@ -6759,13 +5776,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro アクセスは永久に有効です。開発へのご支援ありがとうございます。"
+            "value" : "Proアクセスは永久に有効です。開発へのご支援ありがとうございます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "你的 Pro 专属权益永久有效，感谢支持独立开发。"
+            "value" : "你的 Pro 权限永久有效，感谢支持独立开发。"
           }
         }
       }
@@ -6776,7 +5793,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihr Pro-Zugang verlängert sich am %@."
+            "value" : "Dein Pro-Zugang verlängert sich am %@."
           }
         },
         "fr" : {
@@ -6788,7 +5805,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pro アクセスは %@ に更新されます。"
+            "value" : "Proアクセスは%@に更新されます。"
           }
         },
         "zh-Hans" : {
