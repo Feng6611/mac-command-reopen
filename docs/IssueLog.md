@@ -179,3 +179,30 @@ Before release, enable Launch at Login, sign out and back in, and confirm
 Reopen starts with no window whether the icon is shown or hidden. Then launch
 the app from Finder and confirm Settings opens when the icon is hidden and
 stays closed when it is not.
+
+## I-005 — The purchase sheet lost the trial receipt in 1.4.2
+
+- Date: 2026-09-28
+- Status: Fixed locally; ships with the next release
+
+### Symptom
+
+From 1.4.2 through 1.5.1 the purchase sheet showed no stat card. The expired
+subtitle still read "Without Pro, Cmd+Tab leaves them minimized again", where
+"them" referred to the missing figures. A Pro owner opening the About status
+row saw both plan cards with their plan selected and a Done button.
+
+### Cause
+
+`a787ded` (Prepare Command Reopen 1.4.2 distributions) moved the paywall to
+`KikiAccessPaywallSheet`'s `displayPlanIDs` initializer and removed the
+`stats:` argument along with the analytics code. Neither the commit nor this
+log recorded it as intended. The same change dropped the owned-access stats,
+and Commerce 0.3.0 does not hide plans for an entitled user.
+
+### Resolution
+
+Restored the trial receipt as paywall stats and replaced the Pro state with
+`ProAccessStatusView` (D-011). Rendering the sheets offscreen for each access
+state is what exposed it; unit tests cannot see a missing argument to a view.
+

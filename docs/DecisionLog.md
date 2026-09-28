@@ -1,5 +1,63 @@
 # Decision Log
 
+## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
+
+- Date: 2026-09-28
+- Status: Accepted
+
+### Context
+
+Rendering the 1.5.1 sheets showed three surfaces working against the product.
+The purchase sheet had lost the trial receipt in the 1.4.2 packaging change
+(I-005), so the full-price decision carried no evidence while the discounted
+win-back card, shown only after a decline, did. A Pro owner opening the About
+status row saw both price cards with their plan pre-selected. The one-time
+custom review window could be spent at a login-item launch, where it takes
+focus and answers Return while the user is typing elsewhere, and it asked
+expired users — whose feature had just stopped — for a review.
+
+### Decision
+
+- **Headline states the trial's position.** `PaywallHeadline` maps access
+  state to "ends in N days", "ends today", "has ended", or the product name.
+  The product name told someone whose Cmd+Tab had just stopped working nothing
+  about why.
+- **The receipt leads the sheet in both trial and expired states,** with the
+  win-back card's labels so one receipt reads one way everywhere. When it is
+  present the feature bullets are dropped; below the five-reopen threshold the
+  bullets remain the only argument.
+- **Owners get a status view, not a purchase surface.** `ProAccessStatusView`
+  is composed from `KikiPaywall` atoms because `KikiAccessPaywallSheet` always
+  lists plans and, with none, reports that purchase options are unavailable.
+  A sheet in which a purchase or restore starts stays the paywall until
+  dismissed, so the success message and review follow-up are not swapped out.
+- **Review requests go only to users with working access.** The policy takes
+  an audience predicate; production passes `isCoreFeatureAvailable`, so trial
+  and Pro qualify and an expired trial does not.
+- **The custom window is reserved for in-app moments** — purchase completed and
+  Statistics opened. Launch and Launch-at-Login triggers use StoreKit's prompt
+  and leave the one-time custom window unspent.
+- **Its copy is the user's count, not a mood question.** "143 windows brought
+  back" plus the lead app, or a thank-you with the count after a purchase. The
+  request never asks for a rating level or a positive review (D-007 still
+  holds).
+
+### Not done
+
+Moving Restore Purchase to a footer link needs `KikiAccessPaywallSheet` to
+set `.footerLink` on its restore action. That is a Commerce release, and
+ClipDrop's `commerce_version_policy: current` would have to follow it, so it
+is left for a Kiki release train.
+
+### Verification
+
+`ConversionCopyTests` covers headline resolution and the English/Chinese
+review copy. `ActivationMonitorAndReopenStatsTests` covers the lapsed-access
+gate, launch triggers using StoreKit without spending the custom prompt, and
+the custom prompt carrying count and lead app. Trial, expired and Pro sheets
+and both review variants were rendered offscreen in English and Chinese; a
+manual pass is still needed for the purchase → review hand-off in the sandbox.
+
 ## D-010 — Expiry asks; declining the paywall is what starts the discount
 
 - Date: 2026-09-15

@@ -203,14 +203,16 @@ final class ReopenStatsStore: ObservableObject {
         defaults: UserDefaults = .standard,
         storageKey: String = "com.cmdreopen.reopenStats",
         distributionChannel: DistributionChannel = .current,
-        appReviewPrompter: (any AppReviewPrompting)? = nil
+        appReviewPrompter: (any AppReviewPrompting)? = nil,
+        isReviewAudienceEligible: @escaping @MainActor () -> Bool = { true }
     ) {
         self.defaults = defaults
         self.storageKey = storageKey
         self.reviewPromptPolicy = ReviewPromptPolicy(
             defaults: defaults,
             distributionChannel: distributionChannel,
-            appReviewPrompter: appReviewPrompter
+            appReviewPrompter: appReviewPrompter,
+            isAudienceEligible: isReviewAudienceEligible
         )
         let loaded = Self.loadSnapshot(defaults: defaults, storageKey: storageKey)
             ?? Self.migrateSnapshot(defaults: defaults, from: LegacyStorageKey.reopenStats, to: storageKey)
@@ -270,13 +272,17 @@ final class ReopenStatsStore: ObservableObject {
         reviewPromptPolicy.requestReviewIfEligible(
             for: trigger,
             totalSuccessfulReopens: totalSuccessfulReopens,
+            leadAppName: topApps(1).first?.displayName,
             now: now
         )
     }
 
 #if DEBUG
     func presentCustomReviewPromptPreview() {
-        reviewPromptPolicy.presentCustomReviewPromptPreview()
+        reviewPromptPolicy.presentCustomReviewPromptPreview(
+            totalSuccessfulReopens: totalSuccessfulReopens,
+            leadAppName: topApps(1).first?.displayName
+        )
     }
 #endif
 

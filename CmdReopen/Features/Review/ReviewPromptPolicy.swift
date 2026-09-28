@@ -10,8 +10,27 @@ protocol AppReviewPrompting {
 }
 
 enum AppReviewPromptPresentation: Equatable {
-    case custom
+    case custom(ReviewPromptContent)
     case system
+}
+
+/// What the one-time custom prompt says, taken from the user's own history.
+///
+/// A generic "Enjoying the app?" is easy to wave away and invites a rating
+/// of the mood rather than the product. The count is what this app has
+/// actually done for this person, so the request argues from that instead.
+struct ReviewPromptContent: Equatable {
+    enum Moment: Equatable {
+        /// Right after a purchase: thank first, then ask.
+        case purchase
+        /// While the user is looking at what the app has done.
+        case usage
+    }
+
+    let moment: Moment
+    let reopenCount: Int
+    /// The app whose windows came back most often, when there is one.
+    let leadAppName: String?
 }
 
 enum ReviewPromptTrigger: Equatable {
@@ -25,6 +44,20 @@ enum ReviewPromptTrigger: Equatable {
     fileprivate var requiresReopenHistory: Bool {
         self != .purchaseCompleted
     }
+
+    /// Whether this moment may spend the one-time custom prompt.
+    ///
+    /// Only moments the user started inside the app qualify: a purchase they
+    /// just finished, or the Statistics pane they just opened. A launch — often
+    /// a login-item launch while the user is typing elsewhere — or a toggle in
+    /// onboarding is not a moment to open a window that takes focus and
+    /// answers Return, so those fall back to StoreKit's own prompt.
+    fileprivate var allowsCustomPrompt: Bool {
+        switch self {
+        case .purchaseCompleted, .statsOpened: true
+        case .launchAtLoginEnabled, .applicationLaunched: false
+        }
+    }
 }
 
 @MainActor
@@ -33,25 +66,23 @@ final class StoreKitAppReviewPrompter: AppReviewPrompting {
 
     func present(_ presentation: AppReviewPromptPresentation) {
         switch presentation {
-        case .custom:
-            presentCustomPrompt()
+        case .custom(let content):
+            presentCustomPrompt(content)
         case .system:
             SKStoreReviewController.requestReview()
         }
     }
 
-    private func presentCustomPrompt() {
+    private func presentCustomPrompt(_ content: ReviewPromptContent) {
         let language = AppLanguage.shared
         customPromptController.show(
             configuration: KikiReviewPromptConfiguration(
                 windowTitle: language.string(localized: "Review Command Reopen",
                     comment: "Window title for Command Reopen's one-time custom review prompt."),
-                title: language.string(localized: "Enjoying Command Reopen?",
-                    comment: "Headline for Command Reopen's one-time custom review prompt."),
-                message: language.string(localized: "If it’s made Cmd+Tab feel better, a quick App Store review helps more people find it.",
-                    comment: "Body copy for Command Reopen's one-time custom review prompt."),
-                primaryActionTitle: language.string(localized: "Rate on App Store",
-                    comment: "Primary action in Command Reopen's one-time custom review prompt."),
+                title: Self.title(for: content, language: language),
+                message: Self.message(for: content, language: language),
+                primaryActionTitle: language.string(localized: "Write a Review",
+                    comment: "Primary action in Command Reopen's one-time custom review prompt; opens the App Store's write-review page."),
                 secondaryActionTitle: language.string(localized: "Not Now",
                     comment: "Dismiss action in Command Reopen's one-time custom review prompt.")
             ),
@@ -63,6 +94,44 @@ final class StoreKitAppReviewPrompter: AppReviewPrompting {
             }
             NSWorkspace.shared.open(url)
         }
+    }
+
+    static func title(for content: ReviewPromptContent, language: AppLanguage) -> String {
+        switch content.moment {
+        case .purchase:
+            return language.string(localized: "Thanks for buying Command Reopen",
+                comment: "Headline of the review prompt shown right after a purchase.")
+        case .usage:
+            return language.string(localized: "\(content.reopenCount) windows brought back",
+                comment: "Headline of the review prompt: how many windows Command Reopen has restored for this user. Plural-aware.")
+        }
+    }
+
+    static func message(for content: ReviewPromptContent, language: AppLanguage) -> String {
+        let ask = language.string(localized: "If it has saved you some Cmd+Tab hassle, a short App Store review helps others with the same problem find it.",
+            comment: "The request in Command Reopen's review prompt. Must not ask for a rating or a positive review.")
+
+        switch content.moment {
+        case .purchase where content.reopenCount > 0:
+            let count = language.string(localized: "It has brought back \(content.reopenCount) windows so far.",
+                comment: "Review prompt after a purchase: windows restored for this user so far. Plural-aware.")
+            return Self.join(count, ask, language: language)
+        case .usage:
+            guard let leadAppName = content.leadAppName else { return ask }
+            let lead = language.string(localized: "Most of them were in \(leadAppName).",
+                comment: "Review prompt: the app whose windows were restored most often. %@ is an app name.")
+            return Self.join(lead, ask, language: language)
+        case .purchase:
+            return ask
+        }
+    }
+
+    /// Joins two localized sentences. Chinese and Japanese sentences end in a
+    /// full-width stop and take no space after it.
+    private static func join(_ first: String, _ second: String, language: AppLanguage) -> String {
+        let code = language.locale.language.languageCode?.identifier
+        let separator = (code == "zh" || code == "ja") ? "" : " "
+        return first + separator + second
     }
 }
 
@@ -87,16 +156,23 @@ final class ReviewPromptPolicy {
     private let defaults: UserDefaults
     private let distributionChannel: DistributionChannel
     private let appReviewPrompter: any AppReviewPrompting
+    private let isAudienceEligible: @MainActor () -> Bool
     private var hasRequestedReviewThisLaunch = false
 
+    /// - Parameter isAudienceEligible: whether the app is working for this user
+    ///   right now. An expired trial has switched the feature off and has just
+    ///   been shown a paywall; asking that user for a review invites a rating
+    ///   of the price rather than the product.
     init(
         defaults: UserDefaults = .standard,
         distributionChannel: DistributionChannel = .current,
-        appReviewPrompter: (any AppReviewPrompting)? = nil
+        appReviewPrompter: (any AppReviewPrompting)? = nil,
+        isAudienceEligible: @escaping @MainActor () -> Bool = { true }
     ) {
         self.defaults = defaults
         self.distributionChannel = distributionChannel
         self.appReviewPrompter = appReviewPrompter ?? StoreKitAppReviewPrompter()
+        self.isAudienceEligible = isAudienceEligible
     }
 
     /// Called during store initialization, after its snapshot migration, as before.
@@ -115,10 +191,12 @@ final class ReviewPromptPolicy {
     func requestReviewIfEligible(
         for trigger: ReviewPromptTrigger,
         totalSuccessfulReopens: Int,
+        leadAppName: String? = nil,
         now: Date = Date()
     ) -> Bool {
         guard distributionChannel == .appStore,
-              !hasRequestedReviewThisLaunch else {
+              !hasRequestedReviewThisLaunch,
+              isAudienceEligible() else {
             return false
         }
 
@@ -140,14 +218,19 @@ final class ReviewPromptPolicy {
         defaults.set(requestTimestamps, forKey: ReviewPrompt.requestTimestampsKey)
         hasRequestedReviewThisLaunch = true
         let presentation: AppReviewPromptPresentation
-        if defaults.bool(forKey: ReviewPrompt.customPromptShownKey) {
-            presentation = .system
-        } else {
+        if trigger.allowsCustomPrompt,
+           !defaults.bool(forKey: ReviewPrompt.customPromptShownKey) {
             // Persist at presentation time. Kiki reports which visible action
             // was chosen, but neither the app nor StoreKit can prove that a
             // person submitted a review.
             defaults.set(true, forKey: ReviewPrompt.customPromptShownKey)
-            presentation = .custom
+            presentation = .custom(ReviewPromptContent(
+                moment: trigger == .purchaseCompleted ? .purchase : .usage,
+                reopenCount: totalSuccessfulReopens,
+                leadAppName: leadAppName
+            ))
+        } else {
+            presentation = .system
         }
         appReviewPrompter.present(presentation)
         return true
@@ -156,8 +239,14 @@ final class ReviewPromptPolicy {
 #if DEBUG
     /// Exercises the production Kiki surface without consuming the one-time
     /// custom-prompt flag or an annual review-request slot.
-    func presentCustomReviewPromptPreview() {
-        appReviewPrompter.present(.custom)
+    func presentCustomReviewPromptPreview(totalSuccessfulReopens: Int, leadAppName: String?) {
+        appReviewPrompter.present(.custom(ReviewPromptContent(
+            moment: .usage,
+            // A fresh development install has no history; show a
+            // representative count rather than a prompt that reads "0".
+            reopenCount: totalSuccessfulReopens > 0 ? totalSuccessfulReopens : 143,
+            leadAppName: totalSuccessfulReopens > 0 ? leadAppName : "Xcode"
+        )))
     }
 #endif
 

@@ -1,5 +1,19 @@
 # Changelog / 更新日志
 
+## Unreleased
+
+### English
+
+- The purchase sheet opened from Settings › About leads with your own figures again — windows restored during the trial and the app they came back in most — and its title states where the trial stands: days left, ends today, or ended. A 1.4.2 packaging change had dropped those figures, leaving a subtitle that referred to them.
+- Pro owners opening the same row now see what they own, until when, and how many windows it has restored, instead of the purchase options.
+- The one-time review request now shows only after a purchase or when you open Statistics, states how many windows Command Reopen has brought back, and is never shown once a trial has ended. Launch-time requests are left to the standard App Store prompt.
+
+### 中文
+
+- 从「设置 › 关于」打开的购买页重新以你自己的数据开头——试用期内恢复的窗口数和恢复最多的 App；标题直接说明试用状态：还剩几天、今天结束或已结束。1.4.2 的打包改动曾让这组数据消失，只留下指代它的副标题。
+- 已购买 Pro 的用户点开同一行时，看到的是所购方案、到期时间和累计恢复的窗口数，而不再是购买选项。
+- 一次性评分请求只在购买完成或打开统计页时出现，会说明 Command Reopen 已帮你找回多少窗口；试用结束后不再请求评分。启动时的请求改由 App Store 标准弹窗处理。
+
 ## 1.5.1 — 2026-09-15
 
 ### English

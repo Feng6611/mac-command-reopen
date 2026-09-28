@@ -1609,35 +1609,6 @@
         }
       }
     },
-    "Enjoying Command Reopen?" : {
-      "comment" : "Headline for Command Reopen’s one-time custom review prompt.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gefällt dir Command Reopen?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous appréciez Command Reopen ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Reopenを気に入っていただけましたか？"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "用得还顺手吗？"
-          }
-        }
-      }
-    },
     "Every feature, no limits, for as long as you want it. The Mac App Store version is the same app — buying it is how the work gets paid for." : {
       "comment" : "Body of the free build's note on the final onboarding step.",
       "localizations" : {
@@ -2076,35 +2047,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隐藏菜单栏图标，Reopen 继续在后台运行。随时再次启动 Reopen 即可打开设置。"
-          }
-        }
-      }
-    },
-    "If it’s made Cmd+Tab feel better, a quick App Store review helps more people find it." : {
-      "comment" : "Body copy for Command Reopen’s one-time custom review prompt.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wenn die App dein Cmd+Tab verbessert hat, hilft eine kurze Bewertung im App Store anderen Nutzern."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si l’app a amélioré votre utilisation de Cmd+Tab, un avis sur l’App Store aidera d’autres utilisateurs."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command ReopenでCmd+Tabが使いやすくなったなら、App Storeでの短いレビューが他のユーザーの助けになります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果它让你的 Cmd+Tab 更加顺手，一份好评能帮助更多 Mac 用户发现它。"
           }
         }
       }
@@ -5556,35 +5498,6 @@
         }
       }
     },
-    "Without Pro, Cmd+Tab leaves them minimized again." : {
-      "comment" : "Expired-trial paywall subtitle, naming what stopped working.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ohne Pro bleiben Fenster beim Cmd+Tab im Dock minimiert."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans Pro, Cmd+Tab laisse les fenêtres réduites dans le Dock."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pro未有効時、Cmd+TabではウインドウはDockに残ります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未解锁时，按 Cmd+Tab 窗口仍会停留在 Dock 中。"
-          }
-        }
-      }
-    },
     "Yearly" : {
       "comment" : "Yearly subscription tier.",
       "localizations" : {
@@ -5696,35 +5609,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "14 天免费试用已开启，无任何自动扣费。"
-          }
-        }
-      }
-    },
-    "Your free trial is active." : {
-      "comment" : "Paywall subtitle when free trial is active.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine kostenlose Testphase ist aktiv."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre essai gratuit est en cours."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料トライアル中です"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "免费试用进行中"
           }
         }
       }
@@ -5869,6 +5753,533 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "零权限——沙盒运行，无需任何授权"
+          }
+        }
+      }
+    },
+    "Your free trial ends in %lld days" : {
+      "comment" : "Paywall title while the trial runs; plural-aware in the catalog.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your free trial ends in %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Your free trial ends in %lld days"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Deine kostenlose Testphase endet in %lld Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Deine kostenlose Testphase endet in %lld Tagen"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre essai gratuit se termine dans %lld jour"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Votre essai gratuit se termine dans %lld jours"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "無料トライアルはあと%lld日で終了します"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "免费试用将在 %lld 天后结束"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Your free trial ends today" : {
+      "comment" : "Paywall title during the trial's final day.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine kostenlose Testphase endet heute"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre essai gratuit se termine aujourd’hui"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルは今日で終了します"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用今天结束"
+          }
+        }
+      }
+    },
+    "Your free trial has ended" : {
+      "comment" : "Paywall title after the trial ended without a purchase.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine kostenlose Testphase ist beendet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre essai gratuit est terminé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアルは終了しました"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用已结束"
+          }
+        }
+      }
+    },
+    "Choose a plan to keep Cmd+Tab bringing your windows back after the trial." : {
+      "comment" : "Paywall subtitle while the free trial is still running.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle einen Plan, damit Cmd+Tab deine Fenster auch nach der Testphase zurückholt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez une formule pour que Cmd+Tab continue de ramener vos fenêtres après l’essai."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プランを選ぶと、トライアル終了後もCmd+Tabでウインドウが戻ります。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择一个方案，试用结束后 Cmd+Tab 仍会帮你恢复窗口。"
+          }
+        }
+      }
+    },
+    "Cmd+Tab has stopped restoring your windows." : {
+      "comment" : "Paywall subtitle after the trial ended, naming what stopped working.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab stellt deine Fenster nicht mehr wieder her."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab ne restaure plus vos fenêtres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tabでウインドウが復元されなくなりました。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab 已停止恢复你的窗口。"
+          }
+        }
+      }
+    },
+    "Write a Review" : {
+      "comment" : "Primary action in Command Reopen's one-time custom review prompt; opens the App Store's write-review page.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewertung schreiben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rédiger un avis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レビューを書く"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撰写评论"
+          }
+        }
+      }
+    },
+    "Thanks for buying Command Reopen" : {
+      "comment" : "Headline of the review prompt shown right after a purchase.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danke, dass du Command Reopen gekauft hast"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merci d’avoir acheté Command Reopen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopenをご購入いただきありがとうございます"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "感谢购买 Command Reopen"
+          }
+        }
+      }
+    },
+    "%lld windows brought back" : {
+      "comment" : "Headline of the review prompt: how many windows Command Reopen has restored for this user. Plural-aware.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld window brought back"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld windows brought back"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Fenster zurückgeholt"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fenêtre restaurée"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld fenêtres restaurées"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個のウインドウを復元しました"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "已帮你找回 %lld 个窗口"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "If it has saved you some Cmd+Tab hassle, a short App Store review helps others with the same problem find it." : {
+      "comment" : "The request in Command Reopen's review prompt. Must not ask for a rating or a positive review.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn dir Command Reopen Ärger mit Cmd+Tab erspart hat, hilft eine kurze Bewertung im App Store anderen mit demselben Problem, die App zu finden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si l’app vous a épargné des tracas avec Cmd+Tab, un court avis sur l’App Store aide d’autres personnes confrontées au même problème à la trouver."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tabの手間が減ったと感じたら、App Storeに短いレビューを書いていただけると、同じ問題に困っている人が見つけやすくなります。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果它帮你省去了 Cmd+Tab 的麻烦，在 App Store 写几句评论，能让遇到同样问题的人找到它。"
+          }
+        }
+      }
+    },
+    "It has brought back %lld windows so far." : {
+      "comment" : "Review prompt after a purchase: windows restored for this user so far. Plural-aware.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It has brought back %lld window so far."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "It has brought back %lld windows so far."
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Bisher hat es %lld Fenster zurückgeholt."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Elle a déjà restauré %lld fenêtre."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Elle a déjà restauré %lld fenêtres."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "これまでに%lld個のウインドウを復元しました。"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "到目前为止，它已帮你找回 %lld 个窗口。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Windows restored" : {
+      "comment" : "Caption under the lifetime reopen count on the Pro status sheet; one line only.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederhergestellte Fenster"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtres restaurées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元したウインドウ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已恢复窗口"
+          }
+        }
+      }
+    },
+    "Your plan" : {
+      "comment" : "Caption under the purchased plan name on the Pro status sheet; one line only.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Plan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre formule"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ご利用プラン"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的方案"
+          }
+        }
+      }
+    },
+    "Most of them were in %@." : {
+      "comment" : "Review prompt: the app whose windows were restored most often. %@ is an app name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die meisten davon in %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La plupart dans %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最も多かったのは%@です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其中最多的是 %@。"
           }
         }
       }

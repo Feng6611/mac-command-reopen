@@ -16,6 +16,29 @@ enum PaywallPresentationContext {
     }
 }
 
+/// What the paywall's headline says, decided by access state alone.
+///
+/// The product name told a user whose trial had just ended nothing about why
+/// Cmd+Tab stopped working. The headline now states the one fact the user
+/// opened the sheet — or had it opened for them — to learn.
+enum PaywallHeadline: Equatable {
+    case trialEnds(inDays: Int)
+    case trialEndsToday
+    case trialEnded
+    case product
+
+    static func resolve(status: KikiAccessState) -> PaywallHeadline {
+        switch status {
+        case .trial(.time(let daysRemaining, _)):
+            return daysRemaining > 1 ? .trialEnds(inDays: daysRemaining) : .trialEndsToday
+        case .expired:
+            return .trialEnded
+        case .notStarted, .trial, .pro:
+            return .product
+        }
+    }
+}
+
 struct PaywallSheetView: View {
     @ObservedObject var accessModel: CommandAccessModel
     @ObservedObject private var appLanguage = AppLanguage.shared
@@ -23,10 +46,36 @@ struct PaywallSheetView: View {
     var onFinish: () -> Void = {}
     var onPurchaseCompleted: () -> Void = {}
 
+    /// Set once a purchase or restore starts in this sheet. The purchase flow
+    /// finishes inside the paywall — success message, dismissal, the review
+    /// request — so a status that turns Pro mid-flow must not swap the sheet
+    /// out from under it.
+    @State private var hasTransactedInSheet = false
+
     var body: some View {
-        // The user's trial history changes the expired-state explanation.
-        // Only while a trial is running or has just ended: the copy says "in
-        // your trial", which would contradict a sheet offering to start one.
+        Group {
+            if accessModel.status.isPro, !hasTransactedInSheet {
+                // Someone who already paid opened this to check what they
+                // own. A catalog of prices, with their plan pre-selected,
+                // read as "did my purchase go through?".
+                ProAccessStatusView(accessModel: accessModel, onDone: onFinish)
+            } else {
+                paywall
+            }
+        }
+        .onChange(of: accessModel.accessManager.purchaseInProgressPlanID) { planID in
+            if planID != nil { hasTransactedInSheet = true }
+        }
+        .onChange(of: accessModel.accessManager.isRestoringPurchases) { isRestoring in
+            if isRestoring { hasTransactedInSheet = true }
+        }
+    }
+
+    private var paywall: some View {
+        // The user's own trial figures are the argument for paying, so they
+        // lead the sheet as its stat card. Only while a trial is running or
+        // has just ended: the labels say "in trial", which would contradict a
+        // sheet offering to start one.
         let receipt = accessModel.status.hasTrialHistory
             ? TrialReceipt.make(trialStartedAt: accessModel.trialStartedAt)
             : nil
@@ -35,20 +84,17 @@ struct PaywallSheetView: View {
             manager: accessModel.accessManager,
             context: context.kikiContext,
             copy: KikiAccessPaywallCopy(
-                title: appLanguage.string(localized: "Command Reopen Pro", comment: "Product tier name — do not translate."),
-                proSubtitle: proSubtitle,
-                trialSubtitle: appLanguage.string(localized: "Your free trial is active."),
-                // With a receipt the figures above already make the case, so
-                // this line only has to name what stops.
-                expiredSubtitle: receipt == nil
-                    ? appLanguage.string(localized: "Upgrade to continue automatic window reopening.")
-                    : appLanguage.string(localized: "Without Pro, Cmd+Tab leaves them minimized again.", comment: "Expired-trial paywall subtitle, naming what stopped working."),
+                title: headline,
+                proSubtitle: "",
+                trialSubtitle: appLanguage.string(localized: "Choose a plan to keep Cmd+Tab bringing your windows back after the trial.",
+                    comment: "Paywall subtitle while the free trial is still running."),
+                expiredSubtitle: appLanguage.string(localized: "Cmd+Tab has stopped restoring your windows.",
+                    comment: "Paywall subtitle after the trial ended, naming what stopped working."),
                 notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 14 days. No payment now — nothing auto-renews."),
-                features: [
-                    appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab"),
-                    appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"),
-                    appLanguage.string(localized: "Exclude apps you don’t want restored")
-                ],
+                // With the user's own figures on the sheet, feature bullets
+                // only push the prices further down. Without them, the
+                // bullets are the only case being made.
+                features: receipt == nil ? features : [],
                 purchaseActionTitle: purchaseActionTitle,
                 trialActionTitle: appLanguage.string(localized: "Start free trial"),
                 restoreActionTitle: appLanguage.string(localized: "Restore Purchase"),
@@ -60,6 +106,7 @@ struct PaywallSheetView: View {
                 noActivePurchaseMessage: appLanguage.string(localized: "No active purchase found on this account."),
                 purchaseErrorMessage: appLanguage.string(localized: "The purchase couldn't be completed.")
             ),
+            stats: receipt.map { TrialReceiptStats.make(for: $0) } ?? [],
             footerLinks: footerLinks,
             displayPlanIDs: RevenueCatConfiguration.visiblePaywallPlanIDs,
             planPresentation: localizedPlanPresentation(for:),
@@ -74,6 +121,30 @@ struct PaywallSheetView: View {
         )
     }
 
+    private var headline: String {
+        switch PaywallHeadline.resolve(status: accessModel.status) {
+        case .trialEnds(let days):
+            return appLanguage.string(localized: "Your free trial ends in \(days) days",
+                comment: "Paywall title while the trial runs; plural-aware in the catalog.")
+        case .trialEndsToday:
+            return appLanguage.string(localized: "Your free trial ends today",
+                comment: "Paywall title during the trial's final day.")
+        case .trialEnded:
+            return appLanguage.string(localized: "Your free trial has ended",
+                comment: "Paywall title after the trial ended without a purchase.")
+        case .product:
+            return appLanguage.string(localized: "Command Reopen Pro", comment: "Product tier name — do not translate.")
+        }
+    }
+
+    private var features: [String] {
+        [
+            appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab"),
+            appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"),
+            appLanguage.string(localized: "Exclude apps you don’t want restored")
+        ]
+    }
+
     /// The purchase button names the outcome, not the transaction.
     ///
     /// It deliberately says nothing about how long access lasts: this one label
@@ -85,31 +156,6 @@ struct PaywallSheetView: View {
             return appLanguage.string(localized: "Turn it back on", comment: "Purchase button after the trial ended, when the feature has already stopped.")
         }
         return appLanguage.string(localized: "Keep it working", comment: "Purchase button while the feature is still running on a trial.")
-    }
-
-    /// What someone who already paid opened this sheet to check: whether the
-    /// access is really theirs, and until when. Kept to the facts — they are
-    /// past being sold to.
-    private var proSubtitle: String {
-        switch accessModel.status.renewalState {
-        case .renews(let date, _, _):
-            return appLanguage.string(localized: "Your Pro access renews on \(format(date)).",
-                comment: "Paywall subtitle for a subscriber whose plan auto-renews."
-            )
-        case .ends(let date, _, _):
-            return appLanguage.string(localized: "Your Pro access ends on \(format(date)). Everything keeps working until then.",
-                comment: "Paywall subtitle for a subscriber who turned off auto-renew."
-            )
-        case nil:
-            // Lifetime, and anything else with no expiry to report.
-            return appLanguage.string(localized: "Your Pro access never expires. Thank you for buying it.",
-                comment: "Paywall subtitle for a one-time purchase, which has no renewal date."
-            )
-        }
-    }
-
-    private func format(_ date: Date) -> String {
-        date.formatted(.dateTime.year().month(.abbreviated).day().locale(appLanguage.locale))
     }
 
     /// The access manager retains its commerce configuration for the whole
