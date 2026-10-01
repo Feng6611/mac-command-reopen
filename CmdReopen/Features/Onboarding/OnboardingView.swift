@@ -59,7 +59,8 @@ enum CommandReopenOnboardingFlow {
                 completionKey: AppDefaults.RawKey.hasSeenOnboarding,
                 canSkip: false,
                 tint: DS.Colors.brandPrimary,
-                windowAutosaveName: "CmdReopen.OnboardingWindow",
+                // An empty AppKit autosave name disables frame persistence.
+                windowAutosaveName: "",
                 windowTitle: AppLanguage.shared.string("Welcome"),
                 windowSize: windowSize,
                 minimumWindowSize: windowSize,
@@ -603,11 +604,27 @@ final class OnboardingWindowController {
         )
         self.coordinator = coordinator
         coordinator.start()
+        positionOnboardingWindow()
         installObservers()
     }
 
     func close() {
         coordinator?.close()
+    }
+
+    /// Onboarding opens in a predictable position instead of restoring a frame.
+    /// Kiki 0.10.0 skips centering whenever an autosave name is supplied,
+    /// including the empty name that disables AppKit frame persistence.
+    private func positionOnboardingWindow() {
+        guard let window = coordinator?.window else { return }
+        window.isRestorable = false
+        guard let screen = NSScreen.main ?? window.screen else { return }
+
+        let visibleFrame = screen.visibleFrame
+        window.setFrameOrigin(NSPoint(
+            x: visibleFrame.midX - window.frame.width / 2,
+            y: visibleFrame.midY - window.frame.height / 2
+        ))
     }
 
     private var isWaitingForCommandTabReturn: Bool {
