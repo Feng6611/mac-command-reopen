@@ -59,7 +59,8 @@ enum CommandReopenOnboardingFlow {
                 completionKey: AppDefaults.RawKey.hasSeenOnboarding,
                 canSkip: false,
                 tint: DS.Colors.brandPrimary,
-                windowAutosaveName: "CmdReopen.OnboardingWindow",
+                // An empty AppKit autosave name disables frame persistence; Kiki 0.10.1 centers the window.
+                windowAutosaveName: "",
                 windowTitle: AppLanguage.shared.string("Welcome"),
                 windowSize: windowSize,
                 minimumWindowSize: windowSize,
