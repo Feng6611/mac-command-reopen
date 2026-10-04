@@ -1,12 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
-    "%lld" : {
-
-    },
+    "" : {},
+    "%lld" : {},
     "%lld days left" : {
       "comment" : "Trial time remaining in the About pane; plural-aware in the catalog.",
       "localizations" : {
@@ -231,9 +227,7 @@
         }
       }
     },
-    "👑" : {
-
-    },
+    "👑" : {},
     "2 days left" : {
       "comment" : "Status label for win-back offer remaining time.",
       "localizations" : {
@@ -1400,7 +1394,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "点击 Dock 循环窗口"
+            "value" : "点按程序坞循环窗口"
           }
         }
       }
@@ -1434,9 +1428,7 @@
         }
       }
     },
-    "Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies." : {
-
-    },
+    "Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies." : {},
     "Developer Testing" : {
       "comment" : "Section title in About for debug controls.",
       "localizations" : {
@@ -1782,7 +1774,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen 位于屏幕顶部的菜单栏中。点击 ⌘ 图标即可打开设置。"
+            "value" : "Command Reopen 位于屏幕顶部的菜单栏中。点按 ⌘ 图标即可打开设置。"
           }
         }
       }
@@ -2022,31 +2014,31 @@
         }
       }
     },
-    "Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings." : {
+    "Hide the menu bar icon while Command Reopen continues running in the background. Launch Command Reopen again anytime to open Settings." : {
       "comment" : "Helper text under the Show Menu Bar Icon toggle, explaining how to reopen Settings once the icon is hidden.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Blende das Menüleisten-Symbol aus, während Reopen im Hintergrund weiterläuft. Starte Reopen jederzeit erneut, um die Einstellungen zu öffnen."
+            "value" : "Blende das Menüleisten-Symbol aus, während Command Reopen im Hintergrund weiterläuft. Starte Command Reopen jederzeit erneut, um die Einstellungen zu öffnen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Masquez l’icône dans la barre des menus pendant que Reopen continue de fonctionner en arrière-plan. Relancez Reopen à tout moment pour ouvrir les réglages."
+            "value" : "Masquez l’icône dans la barre des menus pendant que Command Reopen continue de fonctionner en arrière-plan. Relancez Command Reopen à tout moment pour ouvrir les réglages."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reopenがバックグラウンドで動作を続ける間、メニューバーのアイコンを非表示にします。Reopenをもう一度起動すると、いつでも設定を開けます。"
+            "value" : "Command Reopenがバックグラウンドで動作を続ける間、メニューバーのアイコンを非表示にします。Command Reopenをもう一度起動すると、いつでも設定を開けます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "隐藏菜单栏图标，Reopen 继续在后台运行。随时再次启动 Reopen 即可打开设置。"
+            "value" : "隐藏菜单栏图标，Command Reopen 继续在后台运行。随时再次启动 Command Reopen 即可打开设置。"
           }
         }
       }
@@ -2149,7 +2141,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continuer"
+            "value" : "Continuer à l’utiliser"
           }
         },
         "ja" : {
@@ -4186,7 +4178,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Statistik"
+            "value" : "Statistiken"
           }
         },
         "fr" : {
@@ -4320,7 +4312,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "停留在 Dock"
+            "value" : "停留在程序坞"
           }
         }
       }
@@ -4549,7 +4541,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App 切回来了，窗口还在 Dock 里。"
+            "value" : "App 切回来了，窗口还在程序坞里。"
           }
         }
       }
@@ -5042,6 +5034,35 @@
         }
       }
     },
+    "Turn on Command Reopen in Accessibility to use its optional advanced window restore mode." : {
+      "comment" : "Authorization assistant prompt for Accessibility",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere Command Reopen in den Bedienungshilfen, um den optionalen erweiterten Fenstermodus zu nutzen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez Command Reopen dans Accessibilité pour utiliser le mode avancé de restauration des fenêtres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「アクセシビリティ」でCommand Reopenをオンにすると、オプションの高度なウインドウ復元モードを使用できます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在“辅助功能”中开启 Command Reopen，即可使用可选的高级窗口恢复模式。"
+          }
+        }
+      }
+    },
     "Unlock Lifetime with 20% Off" : {
       "comment" : "Purchase button on the win-back card; buys the discounted lifetime unlock immediately.",
       "localizations" : {
@@ -5378,7 +5399,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；Dock 点击循环会最小化前台 App、恢复全部已最小化窗口，并保留后台 App 的原生激活行为。"
+            "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；程序坞点按循环会最小化前台 App、恢复全部已最小化窗口，并保留后台 App 的原生激活行为。"
           }
         }
       }

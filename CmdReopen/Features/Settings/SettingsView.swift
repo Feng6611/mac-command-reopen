@@ -85,7 +85,7 @@ struct SettingsTabContent: View {
                 )
             } footer: {
                 KikiSettingsHelperText(
-                    appLanguage.string("Hide the menu bar icon while Reopen continues running in the background. Launch Reopen again anytime to open Settings.")
+                    appLanguage.string("Hide the menu bar icon while Command Reopen continues running in the background. Launch Command Reopen again anytime to open Settings.")
                 )
             }
 
@@ -257,6 +257,7 @@ private struct ExcludedApplicationRow: View {
     let bundleID: String
     let isDisabled: Bool
     let removeAction: (String) -> Void
+    @ObservedObject private var appLanguage = AppLanguage.shared
 
     private var applicationInfo: ExcludedApplicationInfo {
         ExcludedApplicationInfo(bundleID: bundleID)
@@ -275,8 +276,14 @@ private struct ExcludedApplicationRow: View {
             }
             .buttonStyle(.borderless)
             .disabled(isDisabled)
-            .help("Remove \(applicationInfo.displayName)")
-            .accessibilityLabel("Remove \(applicationInfo.displayName)")
+            .help(appLanguage.string(
+                localized: "Remove \(applicationInfo.displayName)",
+                comment: "Accessibility label; %@ is the app display name being removed from the exclusion list."
+            ))
+            .accessibilityLabel(appLanguage.string(
+                localized: "Remove \(applicationInfo.displayName)",
+                comment: "Accessibility label; %@ is the app display name being removed from the exclusion list."
+            ))
         }
     }
 }

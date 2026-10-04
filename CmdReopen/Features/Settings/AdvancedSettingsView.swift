@@ -82,7 +82,10 @@ struct AdvancedSettingsView: View {
         guard !isAccessibilityAuthorized else { return }
         KikiAuthorizationAssistant.shared.present(
             panel: .accessibility,
-            instruction: "Turn on Command Reopen in Accessibility to use its optional advanced window restore mode."
+            instruction: appLanguage.string(
+                localized: "Turn on Command Reopen in Accessibility to use its optional advanced window restore mode.",
+                comment: "Authorization assistant prompt for Accessibility"
+            )
         )
     }
 
