@@ -1,5 +1,36 @@
 # Decision Log
 
+## D-012 — Product analytics comes back, through KikiAnalyticsKit
+
+- Date: 2026-10-18
+- Status: Accepted; event table and rollout pending
+
+### Context
+
+1.4.2 removed PostHog from every distribution. It was a deliberate choice not
+to collect analytics then, not a technical failure. Since then the app has had
+no way to measure activation, value retention or the paywall funnel; D-003 and
+D-010 had to be designed without a dashboard to confirm them.
+
+### Decision
+
+Re-add product analytics through the shared `KikiAnalyticsKit`
+(`../KikiAnalyticsKit/Docs/Design.md`) instead of restoring the 1.4.1 app-owned
+code. The Kit locks the privacy defaults: anonymous installation UUID, no
+identify, no GeoIP, no replay or error capture; SDK lifecycle events and device
+properties stay on. No consent prompt and no Settings toggle in the first
+release; the policy discloses the collection. Revenue comes from RevenueCat's
+PostHog integration with `postHogUserID` set to the same installation UUID.
+
+### Not done
+
+- The event table (`docs/Analytics.md`) is still to be designed.
+- Whether the Direct / Community build is instrumented is undecided.
+- `PRIVACY.md`, README, `PrivacyInfo.xcprivacy` and the App Privacy label
+  still say no analytics; they change in the release that ships it, not before.
+- The PostHog project token is not set: `LocalSecrets.xcconfig` stays empty
+  until the owner fills it, and the Kit sends nothing without it.
+
 ## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
 
 - Date: 2026-09-28
