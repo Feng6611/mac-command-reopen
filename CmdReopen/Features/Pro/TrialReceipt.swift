@@ -15,7 +15,7 @@ extension KikiAccessState {
     var hasTrialHistory: Bool {
         switch self {
         case .trial, .expired: true
-        case .notStarted, .pro: false
+        case .notStarted, .free, .pro: false
         }
     }
 }

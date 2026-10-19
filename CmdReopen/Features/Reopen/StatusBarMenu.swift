@@ -201,7 +201,7 @@ final class StatusBarMenuController {
         case .trial(.usage(_, let used, let limit)):
             return AppLanguage.shared.string(localized: "\(max(0, limit - used)) uses left",
                 comment: "Trial usage remaining in the About pane; plural-aware in the catalog.")
-        case .notStarted, .expired, .pro:
+        case .notStarted, .free, .expired, .pro:
             return nil
         }
     }

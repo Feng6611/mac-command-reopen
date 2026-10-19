@@ -110,7 +110,7 @@ final class CommandAccessModel: ObservableObject {
         }
 
         switch status {
-        case .notStarted, .expired:
+        case .notStarted, .free, .expired:
             return .expired
         case .trial:
             return .trial

@@ -305,7 +305,9 @@ struct SettingsView: View {
                 subtitle: language.string(localized: "Command Reopen Pro is active during the trial."),
                 actionTitle: language.string(localized: "View plans")
             )
-        case .expired:
+        // `.free` exists only under a disabled trial policy; Command Reopen's trial
+        // auto-starts, so it is unreachable here and shares the expired copy.
+        case .expired, .free:
             return KikiAccessStatusPresentation(
                 tone: .expired,
                 title: language.string(localized: "Trial ended"),

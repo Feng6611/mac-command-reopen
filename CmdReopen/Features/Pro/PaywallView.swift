@@ -33,7 +33,7 @@ enum PaywallHeadline: Equatable {
             return daysRemaining > 1 ? .trialEnds(inDays: daysRemaining) : .trialEndsToday
         case .expired:
             return .trialEnded
-        case .notStarted, .trial, .pro:
+        case .notStarted, .free, .trial, .pro:
             return .product
         }
     }

@@ -324,7 +324,7 @@ private struct FinishStepView: View {
             return appLanguage.string("Your free trial is active — 14 days, and nothing is charged until you pick a plan.")
         case .expired:
             return appLanguage.string("Upgrade to continue automatic window reopening.")
-        case .notStarted, .pro:
+        case .notStarted, .free, .pro:
             return nil
         }
 #else
