@@ -1,15 +1,21 @@
 # Changelog / 更新日志
 
-## Unreleased
+## 1.5.2 — 2026-10-20
 
 ### English
 
+- New installs get a 2-day free trial instead of 14. Installs that already had a trial keep their 14 days.
+- Finishing the tutorial now ends on the purchase sheet. During a trial older than 3 days, the sheet also appears once a day, at that day's 10th restored window.
+- Yearly is no longer sold. Lifetime is the only plan on the purchase sheet; existing yearly subscribers keep their access until the period ends.
 - The purchase sheet opened from Settings › About leads with your own figures again — windows restored during the trial and the app they came back in most — and its title states where the trial stands: days left, ends today, or ended. A 1.4.2 packaging change had dropped those figures, leaving a subtitle that referred to them.
 - Pro owners opening the same row now see what they own, until when, and how many windows it has restored, instead of the purchase options.
 - The one-time review request now shows only after a purchase or when you open Statistics, states how many windows Command Reopen has brought back, and is never shown once a trial has ended. Launch-time requests are left to the standard App Store prompt.
 
 ### 中文
 
+- 新安装的免费试用从 14 天缩短为 2 天；已经有过试用的安装仍按 14 天计算。
+- 完成引导后直接显示购买页；试用超过 3 天后，每天恢复窗口满 10 次时再显示一次。
+- 不再销售年付方案，购买页只保留买断。已订阅年付的用户可继续使用到当前周期结束。
 - 从「设置 › 关于」打开的购买页重新以你自己的数据开头——试用期内恢复的窗口数和恢复最多的 App；标题直接说明试用状态：还剩几天、今天结束或已结束。1.4.2 的打包改动曾让这组数据消失，只留下指代它的副标题。
 - 已购买 Pro 的用户点开同一行时，看到的是所购方案、到期时间和累计恢复的窗口数，而不再是购买选项。
 - 一次性评分请求只在购买完成或打开统计页时出现，会说明 Command Reopen 已帮你找回多少窗口；试用结束后不再请求评分。启动时的请求改由 App Store 标准弹窗处理。
@@ -27,8 +33,8 @@
 
 - 在「设置 › 通用」中新增 **显示菜单栏图标**。关闭后 Command Reopen 不再显示菜单栏图标，继续在后台运行；再次启动 App 即可打开设置。登录时自动启动不会弹出窗口。
 - 引导流程不再自动开启「登录时打开」：改由你自行选择，最后一步文案据此调整。
-- 最小化步骤恢复播放原生 Dock 动画。
-- 最后一步说明应用在菜单栏的位置，按钮文案改为「开始使用」。
+- 最小化步骤恢复播放原生程序坞动画。
+- 最后一步说明 App 在菜单栏的位置，按钮文案改为「开始使用」。
 
 ## 1.5.0 — 2026-08-25
 

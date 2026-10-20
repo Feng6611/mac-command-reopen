@@ -39,4 +39,28 @@ final class AppRouter {
         }
         accessController.markPromptHandled()
     }
+
+    static let lastTrialUsagePaywallDateKey = "lastTrialUsagePaywallDate"
+
+    /// A running trial that has been used heavily gets the paywall once a day.
+    /// The paywall sheet exists only on the App Store build.
+    func handleTrialUsage(
+        todayReopenCount: Int,
+        now: Date = Date(),
+        defaults: UserDefaults = .standard
+    ) {
+#if APPSTORE
+        guard ReopenPolicy.shouldPresentTrialUsagePaywall(
+            isTrialActive: accessController.entitlementState == .trial,
+            trialStartedAt: defaults.object(forKey: AppDefaults.RawKey.trialStartDate) as? Date,
+            todayReopenCount: todayReopenCount,
+            lastPresentedDate: defaults.object(forKey: Self.lastTrialUsagePaywallDateKey) as? Date,
+            now: now
+        ), !isSettingsVisible() else {
+            return
+        }
+        defaults.set(now, forKey: Self.lastTrialUsagePaywallDateKey)
+        open(.about, true)
+#endif
+    }
 }

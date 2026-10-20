@@ -38,7 +38,29 @@ enum RevenueCatConfiguration {
     /// the exact moment they are already leaving.
     nonisolated static let winbackLifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime20"
     nonisolated static let grandfatheringCutoffVersion = "1.2.0"
-    nonisolated static let trialDuration: TimeInterval = 14 * 24 * 60 * 60
+    /// Trial length for installs that first launch on 1.5.2 or later.
+    nonisolated static let trialDuration: TimeInterval = 2 * 24 * 60 * 60
+    /// Trial length of installs that already had a trial before 1.5.2. They
+    /// keep the 14 days they were promised when it started.
+    nonisolated static let legacyTrialDuration: TimeInterval = 14 * 24 * 60 * 60
+    nonisolated static let trialDurationDaysKey = "cmdreopenTrialDurationDays"
+
+    /// The trial length this install is entitled to, decided once and stored.
+    ///
+    /// An install that already has a trial start date predates the 2-day
+    /// trial and keeps 14 days; any other install gets 2. The answer is
+    /// written on first resolution so it cannot change when the start date
+    /// is written later. Call after legacy key migration.
+    nonisolated static func resolveTrialDuration(defaults: UserDefaults) -> TimeInterval {
+        if let storedDays = defaults.object(forKey: trialDurationDaysKey) as? Int, storedDays > 0 {
+            return TimeInterval(storedDays) * 24 * 60 * 60
+        }
+
+        let isExistingTrial = defaults.object(forKey: "cmdreopenTrialStartDate") != nil
+        let duration = isExistingTrial ? legacyTrialDuration : trialDuration
+        defaults.set(Int(duration / (24 * 60 * 60)), forKey: trialDurationDaysKey)
+        return duration
+    }
 
     nonisolated static var commerceConfiguration: CommerceConfiguration {
         CommerceConfiguration(
@@ -68,6 +90,10 @@ enum RevenueCatConfiguration {
     }
 
     nonisolated static var accessConfiguration: KikiAccessConfiguration {
+        accessConfiguration(trialDuration: trialDuration)
+    }
+
+    nonisolated static func accessConfiguration(trialDuration: TimeInterval) -> KikiAccessConfiguration {
         KikiAccessConfiguration(
             plans: [
                 KikiAccessPlan(
@@ -113,6 +139,6 @@ enum RevenueCatConfiguration {
     /// Plans the regular paywall lists. Excludes the win-back SKU, which is
     /// sold only from the retention card.
     nonisolated static var visiblePaywallPlanIDs: [String] {
-        [CommercePlan.yearly.rawValue, CommercePlan.lifetime.rawValue]
+        [CommercePlan.lifetime.rawValue]
     }
 }

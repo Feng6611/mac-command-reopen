@@ -10,7 +10,7 @@ Direct / Community 版是否埋点待定。
 | --- | --- | --- | --- |
 | Q1 | 装上之后有没有真正用起来？ | 激活率：7 天内至少 2 个价值日 | `app first opened` → `onboarding *` → `value day` |
 | Q2 | 留下来的人还在受益吗？ | 每周受益用户（WBU）、按价值日算的 D1 / D7 / D30 | `value day` |
-| Q3 | 14 天试用结束时，谁付费、谁走了？ | 到期前/后购买率，按使用量分桶 | `trial ended`、`paywall *`、`purchase result`、RevenueCat 事件 |
+| Q3 | 试用结束时（新安装 2 天，1.5.2 之前的安装 14 天），谁付费、谁走了？ | 到期前/后购买率，按使用量分桶 | `trial ended`、`paywall *`、`purchase result`、RevenueCat 事件 |
 | Q4 | 哪个 paywall 入口在起作用？ | 各 source 的展示 → 点购买 → 成功 | `paywall viewed` / `paywall action` / `purchase result` |
 | Q5 | 挽留卡（D-003 / D-010）值不值？ | 卡片出现率、九折购买率、去免费版的比例 | `winback offer *` |
 | Q6 | 用户在什么情况下关掉它？ | 关闭自动重开的比例、关之前用了多久 | `reopen toggled` |
@@ -41,7 +41,7 @@ Direct / Community 版是否埋点待定。
 
 | 事件 | 触发点 | 频率 | 属性 |
 | --- | --- | --- | --- |
-| `trial ended` | 本地 14 天试用第一次被判定为到期（`AppAccessController`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
+| `trial ended` | 本地试用第一次被判定为到期（`AppAccessController`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
 | `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`status_bar_upgrade` / `settings_about` / `trial_expired` / `winback_row`） |
 | `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `close`）、`plan`（`yearly` / `lifetime`，仅 purchase） |
 | `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`plan`、`error_category`（Commerce 的错误枚举，不带原文） |

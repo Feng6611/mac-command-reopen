@@ -7,10 +7,16 @@ final class AppComposition {
     static let shared = AppComposition()
 
     lazy var accessController = AppAccessController.makeDefault()
-    lazy var reopenStats = ReopenStatsStore(isReviewAudienceEligible: { [weak self] in
-        // Only ask someone the app is currently working for.
-        self?.accessController.isCoreFeatureAvailable ?? false
-    })
+    lazy var reopenStats: ReopenStatsStore = {
+        let store = ReopenStatsStore(isReviewAudienceEligible: { [weak self] in
+            // Only ask someone the app is currently working for.
+            self?.accessController.isCoreFeatureAvailable ?? false
+        })
+        store.onReopenRecorded = { [weak self] todayCount in
+            self?.router.handleTrialUsage(todayReopenCount: todayCount)
+        }
+        return store
+    }()
     lazy var settingsNavigation = SettingsNavigationModel()
     lazy var settingsWindow: SettingsWindowController = SettingsWindowController(navigation: settingsNavigation) { [weak self] in
         Task { await self?.lifecycle.refreshCommerceStateForSettings() }

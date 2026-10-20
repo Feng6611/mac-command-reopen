@@ -18,6 +18,33 @@ enum ReopenPolicy {
         return now <= until
     }
 
+    /// A trial older than this has had time to prove itself, so a heavy day
+    /// of use is worth one paywall.
+    static let trialUsagePaywallMinimumTrialAge: TimeInterval = 3 * 24 * 60 * 60
+    /// Successful reopens in one day that make a running trial ask once.
+    static let trialUsagePaywallDailyReopenThreshold = 10
+
+    /// Whether a running trial should be shown the paywall because today's
+    /// reopens reached the threshold: only once the trial is older than three
+    /// days, and at most once per calendar day.
+    static func shouldPresentTrialUsagePaywall(
+        isTrialActive: Bool,
+        trialStartedAt: Date?,
+        todayReopenCount: Int,
+        lastPresentedDate: Date?,
+        now: Date,
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard isTrialActive,
+              let trialStartedAt,
+              now.timeIntervalSince(trialStartedAt) > trialUsagePaywallMinimumTrialAge,
+              todayReopenCount >= trialUsagePaywallDailyReopenThreshold else {
+            return false
+        }
+        guard let lastPresentedDate else { return true }
+        return !calendar.isDate(lastPresentedDate, inSameDayAs: now)
+    }
+
     static func shouldShowExpiredNudge(
         lastNudgeDate: Date?,
         now: Date,

@@ -29,17 +29,20 @@ final class CommandAccessModel: ObservableObject {
     ) {
         AppDefaults.migrateLegacyKeys(in: defaults)
         self.defaults = defaults
+        let configuration = RevenueCatConfiguration.accessConfiguration(
+            trialDuration: RevenueCatConfiguration.resolveTrialDuration(defaults: defaults)
+        )
 
         if let commerceClient {
             self.accessManager = KikiAccessManager(
-                configuration: RevenueCatConfiguration.accessConfiguration,
+                configuration: configuration,
                 defaults: defaults,
                 commerceClient: commerceClient,
                 now: now
             )
         } else {
             self.accessManager = KikiAccessManager(
-                configuration: RevenueCatConfiguration.accessConfiguration,
+                configuration: configuration,
                 revenueCatConfiguration: RevenueCatConfiguration.providerConfiguration,
                 defaults: defaults,
                 now: now

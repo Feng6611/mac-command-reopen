@@ -38,3 +38,36 @@ Use `./script/build_and_run.sh --verify` for the normal local loop. It stops
 other Command Reopen instances, builds Debug with signing enabled, validates the
 final RevenueCat key/Bundle ID and signature, then launches the deterministic
 Apple Sandbox product.
+
+## Trial and paywall
+
+New installs get a 2-day trial; an install that already had a trial before 1.5.2 keeps 14 days
+(decided once and stored by `RevenueCatConfiguration.resolveTrialDuration`). Yearly is no longer
+sold; it stays configured only so existing subscribers resolve to their plan.
+
+The paywall opens only for these reasons:
+
+1. **Finishing onboarding**, always: "Get Started" on the last step opens the paywall as a sheet over
+   the onboarding window, unless the person already owns Pro (`OnboardingPaywallPolicy`); closing the
+   sheet finishes onboarding. App Store build only.
+2. **Heavy use during a trial**: once the trial is older than 3 days, the day's 10th successful reopen
+   shows it, at most once per calendar day (`ReopenPolicy.shouldPresentTrialUsagePaywall`, fired from
+   `ReopenStatsStore.onReopenRecorded` through `AppRouter.handleTrialUsage`). A 2-day trial never gets
+   there; it applies to the 14-day trials of older installs.
+3. **Trial ended**: `CommandAccessModel` raises `shouldOpenProSettings` once per session on the first
+   authoritative expired result (never on a first launch, never for an owner). `AppLifecycleCoordinator`
+   presents it after the first commerce refresh and never over onboarding.
+4. **Cmd+Tab while expired**, at most once a day (`ReopenPolicy.shouldShowExpiredNudge`).
+5. **The user asks**: menu bar item, Settings › About. Closing it after an expired trial may show the
+   win-back card (`TrialExitOffer`).
+
+A trial that is merely running never opens it by itself. These rules are covered by
+`CommandAccessModelTests`, `TrialExitOfferTests`, `ReopenPolicyTests` and `OnboardingPaywallPolicyTests`.
+
+## Releasing
+
+Run before tagging; tags have no `v` prefix. It is read-only and never tags or pushes.
+
+```sh
+scripts/pre_tag_check.sh 1.5.2
+```

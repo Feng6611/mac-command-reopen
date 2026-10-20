@@ -71,6 +71,12 @@ enum CommandReopenOnboardingFlow {
     }
 }
 
+/// Finishing onboarding always ends on the paywall, shown as a sheet over the
+/// last step, unless the person already owns Pro.
+enum OnboardingPaywallPolicy {
+    static func shouldPresentPaywall(ownsPro: Bool) -> Bool { !ownsPro }
+}
+
 // MARK: - Step Views
 
 private struct WelcomeStepView: View {
@@ -284,9 +290,31 @@ private struct FinishStepView: View {
     @ObservedObject private var accessModel = CommandAccessModel.shared
 #endif
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
+    @State private var showsPaywall = false
     let navigation: KikiOnboardingNavigation
 
     var body: some View {
+        scaffold
+#if APPSTORE
+            // Closing the sheet, bought or not, is what finishes onboarding.
+            .sheet(isPresented: $showsPaywall, onDismiss: navigation.finish) {
+                PaywallSheetView(accessModel: accessModel, context: .onboarding)
+                    .environment(\.locale, appLanguage.locale)
+            }
+#endif
+    }
+
+    private func getStarted() {
+#if APPSTORE
+        if OnboardingPaywallPolicy.shouldPresentPaywall(ownsPro: accessModel.status.isPro) {
+            showsPaywall = true
+            return
+        }
+#endif
+        navigation.finish()
+    }
+
+    private var scaffold: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
             title: AppLanguage.shared.string("You’re all set"),
@@ -294,7 +322,7 @@ private struct FinishStepView: View {
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(
                 title: AppLanguage.shared.string("Get Started"),
-                action: navigation.finish
+                action: getStarted
             ),
             tint: DS.Colors.brandPrimary,
             size: CommandReopenOnboardingFlow.windowSize,
@@ -321,7 +349,7 @@ private struct FinishStepView: View {
 #if APPSTORE
         switch accessModel.status {
         case .trial:
-            return appLanguage.string("Your free trial is active — 14 days, and nothing is charged until you pick a plan.")
+            return appLanguage.string("Your free trial is active — 2 days, and nothing is charged until you pick a plan.")
         case .expired:
             return appLanguage.string("Upgrade to continue automatic window reopening.")
         case .notStarted, .free, .pro:
@@ -849,6 +877,7 @@ final class OnboardingWindowController {
         // turned on, and the shortcuts sheet that places what they learned
         // inside the rest of the system. About is credits, status and price,
         // which is a strange thing to hand someone thirty seconds in.
+        // The paywall, when due, was already shown as a sheet on the last step.
         DispatchQueue.main.async {
             SettingsWindowController.shared.show(
                 initialTab: .general

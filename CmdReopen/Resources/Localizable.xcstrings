@@ -4977,30 +4977,30 @@
         }
       }
     },
-    "Try every Pro feature free for 14 days. No payment now — nothing auto-renews." : {
+    "Try every Pro feature free for 2 days. No payment now — nothing auto-renews." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Pro-Funktionen 14 Tage kostenlos testen. Keine automatische Verlängerung."
+            "value" : "Alle Pro-Funktionen 2 Tage kostenlos testen. Keine automatische Verlängerung."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essayez toutes les fonctionnalités Pro pendant 14 jours. Aucun renouvellement automatique."
+            "value" : "Essayez toutes les fonctionnalités Pro pendant 2 jours. Aucun renouvellement automatique."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての機能を14日間無料でお試しいただけます。自動更新はありません。"
+            "value" : "すべての機能を2日間無料でお試しいただけます。自動更新はありません。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免费试用 14 天完整功能。无需提前付款，不会自动扣费。"
+            "value" : "免费试用 2 天完整功能。无需提前付款，不会自动扣费。"
           }
         }
       }
@@ -5605,31 +5605,31 @@
         }
       }
     },
-    "Your free trial is active — 14 days, and nothing is charged until you pick a plan." : {
+    "Your free trial is active — 2 days, and nothing is charged until you pick a plan." : {
       "comment" : "Subtitle of the final onboarding step in the App Store build.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine 14-tägige Testphase ist aktiv. Keine automatische Belastung."
+            "value" : "Deine 2-tägige Testphase ist aktiv. Keine automatische Belastung."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre essai gratuit de 14 jours est actif. Aucun prélèvement automatique."
+            "value" : "Votre essai gratuit de 2 jours est actif. Aucun prélèvement automatique."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "14日間の無料トライアルが有効です。自動請求はありません。"
+            "value" : "2日間の無料トライアルが有効です。自動請求はありません。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "14 天免费试用已开启，无任何自动扣费。"
+            "value" : "2 天免费试用已开启，无任何自动扣费。"
           }
         }
       }

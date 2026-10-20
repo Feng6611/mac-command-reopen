@@ -90,7 +90,7 @@ struct PaywallSheetView: View {
                     comment: "Paywall subtitle while the free trial is still running."),
                 expiredSubtitle: appLanguage.string(localized: "Cmd+Tab has stopped restoring your windows.",
                     comment: "Paywall subtitle after the trial ended, naming what stopped working."),
-                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 14 days. No payment now — nothing auto-renews."),
+                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
                 // With the user's own figures on the sheet, feature bullets
                 // only push the prices further down. Without them, the
                 // bullets are the only case being made.

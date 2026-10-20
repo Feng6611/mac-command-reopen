@@ -64,6 +64,9 @@ final class ReopenStatsStore: ObservableObject {
 
     @Published private(set) var snapshot: Snapshot
 
+    /// Called after each recorded reopen with today's running count.
+    var onReopenRecorded: ((Int) -> Void)?
+
     private let defaults: UserDefaults
     private let storageKey: String
     private let reviewPromptPolicy: ReviewPromptPolicy
@@ -260,6 +263,7 @@ final class ReopenStatsStore: ObservableObject {
 
         snapshot = Self.trimmingDailyHistory(from: next)
         schedulePersistence()
+        onReopenRecorded?(todayCount)
         return true
     }
 
