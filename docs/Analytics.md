@@ -138,4 +138,4 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
 | Purchase History | App Functionality、Analytics | 否 | 否 |
 
 匿名 RevenueCat 用户不绑定姓名、邮箱或 Apple ID；安装 UUID 只用于 App 与收入事件对齐。
-公开隐私政策需同步部署到 `https://commandreopen.com/privacy/`。
+公开隐私政策已于 2026-10-21 同步部署并线上回读：`https://commandreopen.com/privacy/`（站点源码 `c7978a7`）。

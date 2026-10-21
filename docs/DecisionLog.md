@@ -38,7 +38,9 @@ Kit offline tests, 103 app unit tests, both Release builds and the local MAS
 artifact configuration check passed. The SDK spy verifies that identity is
 set once after RevenueCat configuration. No real purchase was made; delivery
 of the first RevenueCat transaction still needs confirmation when it occurs.
-The public policy at `https://commandreopen.com/privacy/` must match this rollout.
+The public policy at `https://commandreopen.com/privacy/` was deployed and read
+back on 2026-10-21 (site source `c7978a7`) with matching app analytics and
+production revenue disclosures.
 
 ## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
 
