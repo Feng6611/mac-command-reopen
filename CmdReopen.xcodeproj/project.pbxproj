@@ -303,7 +303,7 @@
 			packageReferences = (
 				8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */,
 				8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */,
-				8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */,
+				8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 				CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
@@ -1070,14 +1070,12 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../KikiAnalyticsKit;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
+		8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Feng6611/KikiAnalyticsKit.git";
+			requirement = { kind = exactVersion; version = 0.1.1; };
+		};
 		8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/KikiCommerceKit.git";
@@ -1193,17 +1191,17 @@
 		};
 		8E1000012F6000010099C190 /* KikiAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
 			productName = KikiAnalytics;
 		};
 		8E1000022F6000010099C190 /* KikiPostHog */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
 			productName = KikiPostHog;
 		};
 		8E1000032F6000010099C190 /* KikiAnalyticsTesting */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
 			productName = KikiAnalyticsTesting;
 		};
 /* End XCSwiftPackageProductDependency section */

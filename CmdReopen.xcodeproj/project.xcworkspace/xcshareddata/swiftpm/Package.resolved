@@ -1,5 +1,5 @@
 {
-  "originHash" : "e2d59a4211f2fc1350cde53929a5104b7b84ed460c366760044d2b3ba742117f",
+  "originHash" : "2ae896bf8d077737c6031d30241bc4371716f0eea206223b47049179bc6a0ee4",
   "pins" : [
     {
       "identity" : "confettiswiftui",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "b77dc2669b3b23557fb07b1c164fecfbc071f75e",
         "version" : "0.11.0"
+      }
+    },
+    {
+      "identity" : "kikianalyticskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Feng6611/KikiAnalyticsKit.git",
+      "state" : {
+        "revision" : "5d409291fea9ec68b054aa9d5857190639f15db8",
+        "version" : "0.1.1"
       }
     },
     {

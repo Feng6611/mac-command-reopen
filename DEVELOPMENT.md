@@ -70,7 +70,8 @@ Events are defined in `CmdReopen/Analytics/CommandReopenAnalytics.swift` and lis
 [docs/Analytics.md](docs/Analytics.md). Call `CommandReopenAnalytics.track(...)`; never import PostHog
 outside that file. Only the App Store build has a transport. The project token goes in
 `Config/LocalSecrets.xcconfig` as `KIKI_POSTHOG_PROJECT_TOKEN`; without it nothing is sent, and a
-Release App Store build fails.
+Release App Store build fails. Debug builds always use the no-op transport, even when a token
+is configured. The existing PostHog project is `mac-app` (528691); websites use separate projects.
 
 ## Releasing
 

@@ -141,7 +141,11 @@ private enum EntitlementLabel: String { case trial, expired, pro, unrestricted }
 enum CommandReopenAnalytics {
     static func make(entitlementState: @escaping () -> AccessEntitlementState) -> KikiAnalytics {
 #if APPSTORE
+#if DEBUG
+        let transport = KikiAnalyticsTransportFactory.none
+#else
         let transport = KikiAnalyticsTransportFactory.postHog(.fromInfoPlist())
+#endif
         let channel = KikiAnalyticsApp.Channel.appStore
 #else
         let transport = KikiAnalyticsTransportFactory.none

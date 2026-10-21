@@ -7,6 +7,7 @@
 
 import AppKit
 import Combine
+import KikiAnalytics
 import Defaults
 import os
 #if APPSTORE
@@ -58,6 +59,10 @@ final class AppLifecycleCoordinator {
     }
 
     func applicationWillFinishLaunching() {
+        // Classify the installation before commerce can create its trial marker.
+        // Lazy initialization at the first interaction would miss idle launches
+        // and classify a fresh installation as an existing analytics rollout.
+        _ = CommandReopenAnalytics.shared
         // Onboarding runs the Cmd+Tab tutorial, which needs a real app to tab
         // to and from, so a launch that will present it starts as .regular.
         // Every other launch is the steady state: menu bar only.
@@ -158,6 +163,7 @@ final class AppLifecycleCoordinator {
 #if DIRECT
         DockClickMonitor.shared.stop()
 #endif
+        CommandReopenAnalytics.shared.flush()
         reopenStatsStore.flush()
     }
 

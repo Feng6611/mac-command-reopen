@@ -149,12 +149,16 @@ else
 fi
 
 echo "   Kiki versions vs. latest tag in the workspace"
-for pair in "Kiki_mackit:Kiki_mackit" "KikiCommerceKit:KikiCommerceKit"; do
+for pair in "Kiki_mackit:Kiki_mackit" "KikiCommerceKit:KikiCommerceKit" "KikiAnalyticsKit:KikiAnalyticsKit"; do
   pkg="${pair%%:*}"
   pinned="$(awk -v n="XCRemoteSwiftPackageReference \"$pkg\"" '$0 ~ n && /= \{/ {f=1} f && /version = / {gsub(/[^0-9.]/, "", $0); sub(/^\.+/, "", $0); print; exit}' "$PBXPROJ")"
   repo="$ROOT/../$pkg"
   if [ -d "$repo/.git" ]; then
     latest="$(git -C "$repo" tag --sort=-v:refname | head -1)"
+    if [ -z "$latest" ]; then
+      bad "$pkg has no published local tag; release it before pinning this app"
+      continue
+    fi
     ahead="$(git -C "$repo" rev-list --count "$latest"..HEAD 2>/dev/null || echo 0)"
     if [ "$pinned" = "$latest" ]; then
       pass "$pkg pinned $pinned = latest tag"

@@ -39,8 +39,8 @@ nothing is used for advertising or cross-app tracking.
 
 The free GitHub build does not send analytics.
 
-Purchase events (starts, renewals, cancellations) reach the same analytics
-project from RevenueCat under that same random identifier.
+The RevenueCat-to-PostHog integration is not enabled in this release;
+RevenueCat purchase events are not sent to this analytics project.
 
 ## Purchases
 

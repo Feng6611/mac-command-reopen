@@ -3,7 +3,7 @@
 ## D-012 — Product analytics comes back, through KikiAnalyticsKit
 
 - Date: 2026-10-18
-- Status: Accepted; implemented in 1.5.2 (App Store build), pending the PostHog token
+- Status: Accepted; implemented in 1.5.2 (App Store build), PostHog token configured; exact Kit 0.1.1; first live lifecycle event verified
 
 ### Context
 
@@ -33,13 +33,16 @@ PostHog integration with `postHogUserID` set to the same installation UUID.
 
 - The App Privacy label in App Store Connect must be updated by the owner
   (Product Interaction and Device ID, not linked, not used for tracking).
-- The PostHog project token is not set: `LocalSecrets.xcconfig` stays empty
-  until the owner fills it, and the Kit sends nothing without it. Release App
-  Store archives fail without it.
+- The existing PostHog `mac-app` project (528691) supplies the token through
+  ignored `LocalSecrets.xcconfig`. Release App Store builds require it; Debug
+  always uses the no-op transport even with a configured token.
+- Project-side IP discard is enabled (`anonymize_ips = true`). A real Release
+  launch produced `Application Installed`, read back on 2026-10-21; details
+  and test coverage are recorded in `docs/Analytics.md`.
 - RevenueCat's PostHog integration needs KikiCommerceKit's `postHogUserID` to be
   released and adopted; revenue events do not join the app's events before that.
-- KikiAnalyticsKit is referenced by local path until it is tagged; switch to an
-  exact version before tagging this app.
+- KikiAnalyticsKit 0.1.1 is published and pinned exactly; the resolved revision
+  must match its immutable remote tag before tagging this app.
 
 ## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
 

@@ -1,6 +1,6 @@
-# Command Reopen 事件表（草案）
+# Command Reopen 事件表
 
-状态：**已实现（1.5.2，App Store 版）**，2026-10-21。需要 PostHog project token 才会发送；没有 token 时 Kit 不初始化 SDK、零请求。决定见 `DecisionLog.md` D-012；
+状态：**已实现（1.5.2，App Store 版）**，2026-10-21。PostHog `mac-app` 项目（528691）的 token 已写入本地忽略配置；Release App Store 才发送，Debug 始终不发送。没有 token 时 Kit 不初始化 SDK、零请求。决定见 `DecisionLog.md` D-012；
 组件和锁死的隐私配置见 `../../KikiAnalyticsKit/Docs/Design.md`。只有 App Store 版带 PostHog 传输；Direct / Community 版链接 Kit 但用 `.none`，不发送任何数据。
 
 ## 要回答的问题
@@ -40,7 +40,7 @@
 
 | 事件 | 触发点 | 频率 | 属性 |
 | --- | --- | --- | --- |
-| `trial ended` | 本地试用第一次被判定为到期（`AppAccessController`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
+| `trial ended` | 本地试用第一次被判定为到期（`CommandAccessModel`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
 | `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`onboarding` / `trial_usage` / `trial_expired` / `status_bar_upgrade` / `settings_about`） |
 | `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `close`）、`plan`（`lifetime` / `winback_lifetime`，仅 purchase） |
 | `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`error_category`（`network` / `unavailable` / `not_allowed` / `no_active_purchase` / `other`，不带原文；paywall 里不带 `plan`） |
@@ -80,7 +80,7 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
 
 ## 实现要点
 
-- 老用户判断（`isExistingUser`）：`ReopenStatsStore` 已有记录，或 onboarding 已完成，就记 `analytics_rollout`。
+- 老用户判断（`isExistingUser`）：onboarding 已完成，或首次 analytics 初始化前已有试用开始时间，就记 `analytics_rollout`。
 - `RevenueCatConfiguration(postHogUserID: analytics.installationID.uuidString)`。
 - 每个触发点都在 App 的 `CommandReopenAnalytics` 门面里有一个带业务含义的方法；视图不直接拼事件。
 - 单测用 `RecordingAnalyticsTransport` 断言：演示不产生 `value day`；同一天第二次重开不再发；
@@ -109,3 +109,18 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
 - 收入：RevenueCat 的 PostHog 集成需要 KikiCommerceKit 的 `postHogUserID`（在 Commerce main，尚未发版）；
   发版并升级后，把 `analytics.installationID` 传给 RevenueCatConfiguration，收入事件才会落在同一个用户上。
 - 老用户首次打开按 `first_open_kind = analytics_rollout` 计，不计入新安装。
+
+## 2026-10-21 接入验证
+
+- PostHog 项目：沿用 `mac-app`（528691），与网站项目分开。
+- 依赖：远端精确版本 KikiAnalyticsKit `0.1.1`（`5d40929`），不再使用本地路径。
+- token：已写入被忽略的 `Config/LocalSecrets.xcconfig`，不提交 token。
+- Debug：无论是否配置 token，都使用 `.none`。
+- 启动：在试用创建之前初始化 analytics，确保新安装不会被试用标记误判为老用户；退出时 flush。
+- 项目侧 IP 丢弃：负责人开启后，工具回读 `anonymize_ips = true`。
+- 真实传输：2026-10-21 20:43:46（Asia/Shanghai）回读到 Release 应用的 `Application Installed`；
+  `app_id=command_reopen`、`app_version=1.5.2`、`build_number=37`、`distribution_channel=app_store`、
+  `$geoip_disable=true`、`$is_identified=false`。这条是 SDK 生命周期事件，不作新安装转化口径。
+- 验证：远端精确依赖下 103 项单元测试、MAS Release 和 Direct Release 构建通过；
+  Kit 离线测试 Debug 30 项、Release 31 项通过。
+- RevenueCat 收入对接：未启用；Commerce main 还依赖未发布的 Base API，不能直接发布整个 main。
