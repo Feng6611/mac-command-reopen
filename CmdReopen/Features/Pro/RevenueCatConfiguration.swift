@@ -82,10 +82,11 @@ enum RevenueCatConfiguration {
         )
     }
 
-    nonisolated static var providerConfiguration: KikiRevenueCat.RevenueCatConfiguration {
+    nonisolated static func providerConfiguration(postHogUserID: String? = nil) -> KikiRevenueCat.RevenueCatConfiguration {
         KikiRevenueCat.RevenueCatConfiguration(
             apiKey: apiKey,
-            offeringIdentifier: offeringIdentifier
+            offeringIdentifier: offeringIdentifier,
+            postHogUserID: postHogUserID
         )
     }
 

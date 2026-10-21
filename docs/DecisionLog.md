@@ -3,46 +3,42 @@
 ## D-012 — Product analytics comes back, through KikiAnalyticsKit
 
 - Date: 2026-10-18
-- Status: Accepted; implemented in 1.5.2 (App Store build), PostHog token configured; exact Kit 0.1.1; first live lifecycle event verified
+- Status: Accepted; implemented and configured on 2026-10-21 for 1.5.2.
 
-### Context
+### Context and decision
 
-1.4.2 removed PostHog from every distribution. It was a deliberate choice not
-to collect analytics then, not a technical failure. Since then the app has had
-no way to measure activation, value retention or the paywall funnel; D-003 and
-D-010 had to be designed without a dashboard to confirm them.
+1.4.2 deliberately removed analytics. Restore anonymous product measurement for
+activation, value retention, trial and purchase funnels using the independent
+KikiAnalyticsKit, with app-owned events in `docs/Analytics.md`. Keep installation
+UUIDs, no identify, no GeoIP, no replay or automatic error capture. There is no
+consent prompt or Settings toggle in this release; disclose collection accurately.
 
-### Decision
+### Implemented and configured
 
-Re-add product analytics through the shared `KikiAnalyticsKit`
-(`../KikiAnalyticsKit/Docs/Design.md`) instead of restoring the 1.4.1 app-owned
-code. The Kit locks the privacy defaults: anonymous installation UUID, no
-identify, no GeoIP, no replay or error capture; SDK lifecycle events and device
-properties stay on. No consent prompt and no Settings toggle in the first
-release; the policy discloses the collection. Revenue comes from RevenueCat's
-PostHog integration with `postHogUserID` set to the same installation UUID.
+- Exact KikiAnalyticsKit 0.1.1 and KikiCommerceKit 0.5.1. Commerce 0.5.1 is the
+  minimal identity release and excludes main's unreleased paywall additions.
+- Only App Store Release has a PostHog transport. Debug and Direct use `.none`.
+  Initialize before commerce trial creation; flush on normal termination.
+- Ignored local configuration supplies the `mac-app` project (528691) token.
+  IP discard is enabled. A real Release lifecycle event was read back on
+  2026-10-21; this is not evidence of a fresh-install conversion.
+- Composition passes the analytics installation UUID to Commerce's optional
+  `postHogUserID`. RevenueCat's anonymous app user ID and restore history remain
+  unchanged. Its PostHog integration is saved for production, US, default
+  purchase events and gross revenue; sandbox and subscriber-property export
+  stay off.
+- ASC labels published and read back: Device ID and Product Interaction for
+  Analytics; Purchase History for App Functionality and Analytics. All three
+  are not linked to identity and are not used for tracking. The app manifest
+  carries the same declarations.
 
-### Done in 1.5.2
+### Verification and release limits
 
-- Event table in `docs/Analytics.md`, implemented in `CmdReopen/Analytics/`.
-- Only the App Store build has a PostHog transport; the Direct / Community
-  build links the Kit with no transport and sends nothing.
-- `PRIVACY.md`, both READMEs and `PrivacyInfo.xcprivacy` now disclose it.
-
-### Not done
-
-- The App Privacy label in App Store Connect must be updated by the owner
-  (Product Interaction and Device ID, not linked, not used for tracking).
-- The existing PostHog `mac-app` project (528691) supplies the token through
-  ignored `LocalSecrets.xcconfig`. Release App Store builds require it; Debug
-  always uses the no-op transport even with a configured token.
-- Project-side IP discard is enabled (`anonymize_ips = true`). A real Release
-  launch produced `Application Installed`, read back on 2026-10-21; details
-  and test coverage are recorded in `docs/Analytics.md`.
-- RevenueCat's PostHog integration needs KikiCommerceKit's `postHogUserID` to be
-  released and adopted; revenue events do not join the app's events before that.
-- KikiAnalyticsKit 0.1.1 is published and pinned exactly; the resolved revision
-  must match its immutable remote tag before tagging this app.
+Kit offline tests, 103 app unit tests, both Release builds and the local MAS
+artifact configuration check passed. The SDK spy verifies that identity is
+set once after RevenueCat configuration. No real purchase was made; delivery
+of the first RevenueCat transaction still needs confirmation when it occurs.
+The public policy at `https://commandreopen.com/privacy/` must match this rollout.
 
 ## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
 

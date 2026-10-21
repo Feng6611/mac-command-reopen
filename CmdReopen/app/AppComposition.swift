@@ -57,7 +57,9 @@ final class AppComposition {
         iconSettings: menuBarIconSettings
     )
 #if APPSTORE
-    lazy var commandAccess = CommandAccessModel()
+    lazy var commandAccess = CommandAccessModel(
+        postHogUserID: analytics.installationID.uuidString
+    )
     lazy var commerceSource = ProCommerceStateSource(proStatusManager: commandAccess)
 #endif
 }

@@ -1079,7 +1079,7 @@
 		8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/KikiCommerceKit.git";
-			requirement = { kind = exactVersion; version = 0.5.0; };
+			requirement = { kind = exactVersion; version = 0.5.1; };
 		};
 		8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */ = {
 			isa = XCRemoteSwiftPackageReference;

@@ -39,8 +39,10 @@ nothing is used for advertising or cross-app tracking.
 
 The free GitHub build does not send analytics.
 
-The RevenueCat-to-PostHog integration is not enabled in this release;
-RevenueCat purchase events are not sent to this analytics project.
+RevenueCat sends purchase events, including lifetime purchases, renewals and
+cancellations, to the same PostHog project under the installation identifier.
+RevenueCat keeps its existing anonymous customer identifier for purchase
+validation and restores. No name, email or Apple ID is supplied to PostHog.
 
 ## Purchases
 

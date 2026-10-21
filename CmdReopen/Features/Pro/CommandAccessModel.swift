@@ -25,6 +25,7 @@ final class CommandAccessModel: ObservableObject {
     init(
         defaults: UserDefaults = .standard,
         commerceClient: (any CommerceClient)? = nil,
+        postHogUserID: String? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         AppDefaults.migrateLegacyKeys(in: defaults)
@@ -43,7 +44,7 @@ final class CommandAccessModel: ObservableObject {
         } else {
             self.accessManager = KikiAccessManager(
                 configuration: configuration,
-                revenueCatConfiguration: RevenueCatConfiguration.providerConfiguration,
+                revenueCatConfiguration: RevenueCatConfiguration.providerConfiguration(postHogUserID: postHogUserID),
                 defaults: defaults,
                 now: now
             )

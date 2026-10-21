@@ -106,8 +106,9 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
 
 - token：`Config/LocalSecrets.xcconfig` 的 `KIKI_POSTHOG_PROJECT_TOKEN`（`phc_` 开头，公开 token）；
   `KIKI_POSTHOG_HOST` 留空走默认 host。Release 的 App Store 构建缺 token 会在构建阶段失败（`scripts/check_posthog_config.sh`）。
-- 收入：RevenueCat 的 PostHog 集成需要 KikiCommerceKit 的 `postHogUserID`（在 Commerce main，尚未发版）；
-  发版并升级后，把 `analytics.installationID` 传给 RevenueCatConfiguration，收入事件才会落在同一个用户上。
+- 收入：RevenueCat 的 PostHog 集成使用 KikiCommerceKit `0.5.1` 的 `postHogUserID`。
+  `AppComposition` 将 `analytics.installationID.uuidString` 经 `CommandAccessModel` 传入 provider；
+  只设置 `$posthogUserId` 属性，不更改 RevenueCat 的 `app_user_id`。
 - 老用户首次打开按 `first_open_kind = analytics_rollout` 计，不计入新安装。
 
 ## 2026-10-21 接入验证
@@ -123,4 +124,18 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
   `$geoip_disable=true`、`$is_identified=false`。这条是 SDK 生命周期事件，不作新安装转化口径。
 - 验证：远端精确依赖下 103 项单元测试、MAS Release 和 Direct Release 构建通过；
   Kit 离线测试 Debug 30 项、Release 31 项通过。
-- RevenueCat 收入对接：未启用；Commerce main 还依赖未发布的 Base API，不能直接发布整个 main。
+- RevenueCat 收入对接：已在项目 `4a77b4bf` 保存 PostHog 集成，US、生产 token、默认 `rc_*` 购买事件、毛收入。
+  Sandbox key 留空；不发送订阅者自定义属性，不开启 RevenueCat Paywalls/Web Funnel 事件。
+- Commerce：精确 `0.5.1`（`cbe6794`），仅包含身份属性接入；main 的新 paywall API 不在这个 tag 内。
+- 收入端到端验证：未做真实购买；Kit 的离线 SDK spy 覆盖配置后仅设置一次身份属性，真实交易交付待下一笔购买确认。
+
+## ASC 隐私标签（2026-10-21 已发布回读）
+
+| 数据 | 用途 | 身份关联 | 追踪 |
+| --- | --- | --- | --- |
+| Device ID | Analytics | 否 | 否 |
+| Product Interaction | Analytics | 否 | 否 |
+| Purchase History | App Functionality、Analytics | 否 | 否 |
+
+匿名 RevenueCat 用户不绑定姓名、邮箱或 Apple ID；安装 UUID 只用于 App 与收入事件对齐。
+公开隐私政策需同步部署到 `https://commandreopen.com/privacy/`。

@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Feng6611/KikiCommerceKit.git",
       "state" : {
-        "revision" : "0bdb5a5c5cd2fc3b321ce2273a4d55e80ff7fc93",
-        "version" : "0.5.0"
+        "revision" : "cbe6794c2a739102a16ba9c686c5adb19ae949dd",
+        "version" : "0.5.1"
       }
     },
     {
