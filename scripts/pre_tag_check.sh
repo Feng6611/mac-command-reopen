@@ -114,9 +114,27 @@ else
   pass "LocalSecrets.xcconfig is untracked"
 fi
 if grep -q 'trialDuration: TimeInterval' CmdReopen/Features/Pro/RevenueCatConfiguration.swift; then
-  echo "     info: $(grep 'trialDuration: TimeInterval' CmdReopen/Features/Pro/RevenueCatConfiguration.swift | sed 's/^ *//')"
+  echo "     info: $(grep -m1 'static let trialDuration: TimeInterval' CmdReopen/Features/Pro/RevenueCatConfiguration.swift | sed 's/^ *//')"
   echo "     info: paywall plans: $(grep -A1 'visiblePaywallPlanIDs: \[String\]' CmdReopen/Features/Pro/RevenueCatConfiguration.swift | tail -1 | sed 's/^ *//')"
 fi
+
+echo "5b. Analytics"
+if [ -n "$(sed -n 's/^KIKI_POSTHOG_PROJECT_TOKEN *= *//p' "$BUILD_XCCONFIG" | tr -d ' ')" ]; then
+  bad "$BUILD_XCCONFIG commits a PostHog token; it belongs in LocalSecrets.xcconfig"
+else
+  pass "no PostHog token committed"
+fi
+if sed -n 's/^KIKI_POSTHOG_PROJECT_TOKEN *= *//p' Config/LocalSecrets.xcconfig 2>/dev/null | tr -d ' ' | grep -q '^phc_'; then
+  pass "LocalSecrets.xcconfig has a PostHog token (Release archive will pass the gate)"
+else
+  warn "no PostHog token in LocalSecrets.xcconfig; a Release App Store archive will fail"
+fi
+if grep -q 'XCLocalSwiftPackageReference' "$PBXPROJ"; then
+  bad "KikiAnalyticsKit is a local path reference; tag it and pin an exact version first"
+else
+  pass "no local package references"
+fi
+grep -q 'analytics' PRIVACY.md && pass "PRIVACY.md discloses analytics" || bad "PRIVACY.md does not mention analytics"
 
 echo "6. Kiki dependencies"
 floating="$(awk '

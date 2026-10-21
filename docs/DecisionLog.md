@@ -3,7 +3,7 @@
 ## D-012 — Product analytics comes back, through KikiAnalyticsKit
 
 - Date: 2026-10-18
-- Status: Accepted; event table and rollout pending
+- Status: Accepted; implemented in 1.5.2 (App Store build), pending the PostHog token
 
 ### Context
 
@@ -22,14 +22,24 @@ properties stay on. No consent prompt and no Settings toggle in the first
 release; the policy discloses the collection. Revenue comes from RevenueCat's
 PostHog integration with `postHogUserID` set to the same installation UUID.
 
+### Done in 1.5.2
+
+- Event table in `docs/Analytics.md`, implemented in `CmdReopen/Analytics/`.
+- Only the App Store build has a PostHog transport; the Direct / Community
+  build links the Kit with no transport and sends nothing.
+- `PRIVACY.md`, both READMEs and `PrivacyInfo.xcprivacy` now disclose it.
+
 ### Not done
 
-- The event table (`docs/Analytics.md`) is still to be designed.
-- Whether the Direct / Community build is instrumented is undecided.
-- `PRIVACY.md`, README, `PrivacyInfo.xcprivacy` and the App Privacy label
-  still say no analytics; they change in the release that ships it, not before.
+- The App Privacy label in App Store Connect must be updated by the owner
+  (Product Interaction and Device ID, not linked, not used for tracking).
 - The PostHog project token is not set: `LocalSecrets.xcconfig` stays empty
-  until the owner fills it, and the Kit sends nothing without it.
+  until the owner fills it, and the Kit sends nothing without it. Release App
+  Store archives fail without it.
+- RevenueCat's PostHog integration needs KikiCommerceKit's `postHogUserID` to be
+  released and adopted; revenue events do not join the app's events before that.
+- KikiAnalyticsKit is referenced by local path until it is tagged; switch to an
+  exact version before tagging this app.
 
 ## D-011 — The decision sheets argue from the user's own figures, and ask only people the app is working for
 

@@ -226,6 +226,9 @@ final class CommandAccessModel: ObservableObject {
                 hasResolvedInitialReadiness = true
             }
         }
+        if readiness == .ready, status == .expired {
+            reportTrialEnded()
+        }
         guard readiness == .ready,
               status == .expired,
               !isFirstLaunch,
@@ -236,6 +239,18 @@ final class CommandAccessModel: ObservableObject {
 
         shouldOpenProSettings = true
         hasPromptedForExpiredStateThisSession = true
+    }
+
+    /// The trial is local, so RevenueCat never sees it end; the Kit sends it
+    /// once per install.
+    private func reportTrialEnded() {
+        let stats = ReopenStatsStore.shared
+        let start = trialStartedAt
+        CommandReopenAnalytics.track(CommandReopenEvent.trialEnded(
+            activeDays: start.map { stats.activeDays(since: $0) } ?? 0,
+            valueBucketCount: start.map { stats.totalReopens(since: $0) } ?? 0,
+            winbackEligible: TrialReceipt.make(trialStartedAt: start) != nil
+        ))
     }
 }
 

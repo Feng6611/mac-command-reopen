@@ -72,6 +72,7 @@ struct SettingsTabContent: View {
                     systemImage: "power"
                 )
                 .onChange(of: launchAtLoginManager.isEnabled) { isEnabled in
+                    CommandReopenAnalytics.track(CommandReopenEvent.settingChanged(.launchAtLogin, enabled: isEnabled))
                     guard isEnabled else { return }
                     _ = ReopenStatsStore.shared.requestReviewIfEligible(for: .launchAtLoginEnabled)
                 }

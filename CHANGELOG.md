@@ -6,6 +6,7 @@
 
 - New installs get a 2-day free trial instead of 14. Installs that already had a trial keep their 14 days.
 - Finishing the tutorial now ends on the purchase sheet. During a trial older than 3 days, the sheet also appears once a day, at that day's 10th restored window.
+- The Mac App Store version now sends anonymous product analytics (no app names, window titles or personal data). The privacy policy lists what is sent; the GitHub build sends nothing.
 - Yearly is no longer sold. Lifetime is the only plan on the purchase sheet; existing yearly subscribers keep their access until the period ends.
 - The purchase sheet opened from Settings › About leads with your own figures again — windows restored during the trial and the app they came back in most — and its title states where the trial stands: days left, ends today, or ended. A 1.4.2 packaging change had dropped those figures, leaving a subtitle that referred to them.
 - Pro owners opening the same row now see what they own, until when, and how many windows it has restored, instead of the purchase options.
@@ -15,6 +16,7 @@
 
 - 新安装的免费试用从 14 天缩短为 2 天；已经有过试用的安装仍按 14 天计算。
 - 完成引导后直接显示购买页；试用超过 3 天后，每天恢复窗口满 10 次时再显示一次。
+- Mac App Store 版新增匿名产品分析（不含 App 名称、窗口标题和个人信息），隐私政策已列明；GitHub 版不上传任何数据。
 - 不再销售年付方案，购买页只保留买断。已订阅年付的用户可继续使用到当前周期结束。
 - 从「设置 › 关于」打开的购买页重新以你自己的数据开头——试用期内恢复的窗口数和恢复最多的 App；标题直接说明试用状态：还剩几天、今天结束或已结束。1.4.2 的打包改动曾让这组数据消失，只留下指代它的副标题。
 - 已购买 Pro 的用户点开同一行时，看到的是所购方案、到期时间和累计恢复的窗口数，而不再是购买选项。

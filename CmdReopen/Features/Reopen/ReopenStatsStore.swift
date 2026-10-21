@@ -139,6 +139,12 @@ final class ReopenStatsStore: ObservableObject {
         }
     }
 
+    /// Days on or after `startDate` that had at least one reopen.
+    func activeDays(since startDate: Date) -> Int {
+        let startKey = Self.dayKeyFormatter.string(from: startDate)
+        return snapshot.dailyCounts.filter { $0.key >= startKey && $0.value > 0 }.count
+    }
+
     func dailyStats(last days: Int = 30) -> [(date: Date, count: Int)] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())

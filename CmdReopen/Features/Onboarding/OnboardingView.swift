@@ -8,6 +8,7 @@
 import AppKit
 import Combine
 import ConfettiSwiftUI
+import KikiAnalytics
 import KikiOnboarding
 import SwiftUI
 import os
@@ -298,7 +299,7 @@ private struct FinishStepView: View {
 #if APPSTORE
             // Closing the sheet, bought or not, is what finishes onboarding.
             .sheet(isPresented: $showsPaywall, onDismiss: navigation.finish) {
-                PaywallSheetView(accessModel: accessModel, context: .onboarding)
+                PaywallSheetView(accessModel: accessModel, context: .onboarding, source: .onboarding)
                     .environment(\.locale, appLanguage.locale)
             }
 #endif
@@ -585,6 +586,11 @@ final class OnboardingWindowController {
     private var returnTimeoutWorkItem: DispatchWorkItem?
     private let returnTimeout: TimeInterval = 10
     private var shouldRestoreActivationPolicyOnClose = false
+    private var analyticsSession: KikiAnalyticsSessionID?
+    private var analyticsStartedAt = Date()
+    private var analyticsStepCancellable: AnyCancellable?
+    private var analyticsLastStep: CommandReopenEvent.OnboardingStep = .welcome
+    private var hasReportedCompletion = false
 #if DEBUG
     private var isRelaunchingForOnboarding = false
 #endif
@@ -631,8 +637,37 @@ final class OnboardingWindowController {
             }
         )
         self.coordinator = coordinator
+        beginAnalytics(for: coordinator)
         coordinator.start()
         installObservers()
+    }
+
+    private static let analyticsSteps: [CommandReopenEvent.OnboardingStep] = [.welcome, .tryMinimize, .success, .finish]
+
+    private func beginAnalytics(for coordinator: KikiOnboardingCoordinator) {
+        let analytics = CommandReopenAnalytics.shared
+        let session = analytics.newSession()
+        analyticsSession = session
+        analyticsStartedAt = Date()
+        hasReportedCompletion = false
+        analytics.track(KikiStandardEvent.onboardingStarted(session: session))
+        analyticsStepCancellable = coordinator.$currentStepIndex.sink { [weak self] index in
+            guard let self, Self.analyticsSteps.indices.contains(index) else { return }
+            let step = Self.analyticsSteps[index]
+            self.analyticsLastStep = step
+            CommandReopenAnalytics.track(CommandReopenEvent.onboardingStepViewed(session: session, step: step))
+        }
+    }
+
+    private func reportCompletion(_ outcome: CommandReopenEvent.OnboardingOutcome) {
+        guard !hasReportedCompletion else { return }
+        hasReportedCompletion = true
+        analyticsStepCancellable = nil
+        CommandReopenAnalytics.track(CommandReopenEvent.onboardingCompleted(
+            outcome: outcome,
+            lastStep: analyticsLastStep,
+            launchAtLogin: LaunchAtLoginManager.currentlyEnabled
+        ))
     }
 
     func close() {
@@ -767,6 +802,9 @@ final class OnboardingWindowController {
             window.deminiaturize(nil)
         }
         window.makeKeyAndOrderFront(nil)
+        CommandReopenAnalytics.track(CommandReopenEvent.onboardingDemoSucceeded(
+            durationMs: Int(Date().timeIntervalSince(analyticsStartedAt) * 1000)
+        ))
         coordinator.advance()
         AppLogger.lifecycle.notice("Onboarding minimize tutorial completed after app activation.")
     }
@@ -847,6 +885,7 @@ final class OnboardingWindowController {
     }
 
     private func handleWindowWillClose() {
+        reportCompletion(.closed)
         removeObservers()
         cancelActivationConfirmation()
         cancelReturnTimeout()
@@ -858,6 +897,7 @@ final class OnboardingWindowController {
     }
 
     private func handleFinished() {
+        reportCompletion(.finished)
         ActivationMonitor.shared.setOnboardingSessionActive(false)
         restoreActivationPolicyIfNeeded()
         coordinator = nil

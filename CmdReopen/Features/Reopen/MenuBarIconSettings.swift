@@ -20,6 +20,7 @@ final class MenuBarIconSettings: ObservableObject {
         didSet {
             guard showsMenuBarIcon != oldValue else { return }
             defaults[AppDefaults.showsMenuBarIcon] = showsMenuBarIcon
+            CommandReopenAnalytics.track(CommandReopenEvent.settingChanged(.showMenuBarIcon, enabled: showsMenuBarIcon))
         }
     }
 

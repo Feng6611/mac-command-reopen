@@ -130,6 +130,7 @@ final class StatusBarMenuController {
                 title: AppLanguage.shared.string("Upgrade to Pro…"),
                 badgeText: upgradeBadgeText(),
                 action: {
+                    PaywallSourceRelay.set(.statusBarUpgrade)
                     SettingsOpener.shared.open(
                         initialTab: .about,
                         presentsPaywall: true

@@ -37,6 +37,11 @@
 		9C2010062F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 		9C2010072F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 		A1C0A00130D1A0010099C190 /* KikiAuthorization in Frameworks */ = {isa = PBXBuildFile; productRef = A1C0A00230D1A0010099C190 /* KikiAuthorization */; };
+		8E10000A2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000B2F6000010099C190 /* KikiPostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000022F6000010099C190 /* KikiPostHog */; };
+		8E10000C2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000D2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000E2F6000010099C190 /* KikiAnalyticsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000032F6000010099C190 /* KikiAnalyticsTesting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +81,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				747A0FC8303DDD92002F75DA /* KikiMenuBar in Frameworks */,
+				8E10000A2F6000010099C190 /* KikiAnalytics in Frameworks */,
+				8E10000B2F6000010099C190 /* KikiPostHog in Frameworks */,
 				56759C132FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000012F4400010099C190 /* KikiCommerceCore in Frameworks */,
 				8D3000102F4400010099C190 /* KikiRevenueCat in Frameworks */,
@@ -97,6 +104,8 @@
 			files = (
 				8D3000022F4400010099C190 /* KikiCommerceCore in Frameworks */,
 				8D3000122F4400010099C190 /* KikiCommerceTesting in Frameworks */,
+				8E10000D2F6000010099C190 /* KikiAnalytics in Frameworks */,
+				8E10000E2F6000010099C190 /* KikiAnalyticsTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1C0A00130D1A0010099C190 /* KikiAuthorization in Frameworks */,
+				8E10000C2F6000010099C190 /* KikiAnalytics in Frameworks */,
 				56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */,
 				8D3000182F4400010099C190 /* KikiSettings in Frameworks */,
 				8D3000192F4400010099C190 /* KikiOnboarding in Frameworks */,
@@ -172,6 +182,8 @@
 			name = "Command Reopen";
 			packageProductDependencies = (
 				8D3000032F4400010099C190 /* KikiCommerceCore */,
+				8E1000012F6000010099C190 /* KikiAnalytics */,
+				8E1000022F6000010099C190 /* KikiPostHog */,
 				8D3000062F4400010099C190 /* KikiRevenueCat */,
 				8D3000072F4400010099C190 /* KikiCommercePresentation */,
 				8D3000092F4400010099C190 /* KikiSettings */,
@@ -207,6 +219,8 @@
 			packageProductDependencies = (
 				8D3000032F4400010099C190 /* KikiCommerceCore */,
 				8D3000082F4400010099C190 /* KikiCommerceTesting */,
+				8E1000012F6000010099C190 /* KikiAnalytics */,
+				8E1000032F6000010099C190 /* KikiAnalyticsTesting */,
 			);
 			productName = CmdReopenTests;
 			productReference = 748FCE2D2EB5027D0099C190 /* CmdReopenTests.xctest */;
@@ -237,6 +251,7 @@
 				8D30000F2F4400010099C190 /* KikiReview */,
 				8D30000E2F4400010099C190 /* KikiMenuBar */,
 				A1C0A00230D1A0010099C190 /* KikiAuthorization */,
+				8E1000012F6000010099C190 /* KikiAnalytics */,
 				9C2010042F3400010099C190 /* LaunchAtLogin */,
 				9C2010082F3401010099C190 /* Defaults */,
 				CF5000022F5900010099C190 /* ConfettiSwiftUI */,
@@ -288,6 +303,7 @@
 			packageReferences = (
 				8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */,
 				8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */,
+				8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */,
 				9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				9C2010092F3401010099C190 /* XCRemoteSwiftPackageReference "Defaults" */,
 				CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
@@ -343,6 +359,7 @@
 			inputPaths = (
 				"$(SRCROOT)/scripts/verify_appstore_configuration.sh",
 				"$(SRCROOT)/scripts/verify_revenuecat_api_key.sh",
+				"$(SRCROOT)/scripts/check_posthog_config.sh",
 				"$(SRCROOT)/Config/BuildNumber.xcconfig",
 				"$(SRCROOT)/Config/LocalSecrets.xcconfig",
 				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
@@ -1053,6 +1070,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../KikiAnalyticsKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1166,6 +1190,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
 			productName = ConfettiSwiftUI;
+		};
+		8E1000012F6000010099C190 /* KikiAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			productName = KikiAnalytics;
+		};
+		8E1000022F6000010099C190 /* KikiPostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			productName = KikiPostHog;
+		};
+		8E1000032F6000010099C190 /* KikiAnalyticsTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCLocalSwiftPackageReference "../KikiAnalyticsKit" */;
+			productName = KikiAnalyticsTesting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

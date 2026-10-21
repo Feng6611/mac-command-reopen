@@ -47,6 +47,7 @@ final class ActivationMonitor: ObservableObject {
             guard self.isFeatureEnabled != oldValue else { return }
             defaults[AppDefaults.featureEnabled] = self.isFeatureEnabled
             self.updateObservationState()
+            CommandReopenAnalytics.track(CommandReopenEvent.reopenToggled(enabled: self.isFeatureEnabled))
             AppLogger.activation.notice("Feature toggled to \(self.isFeatureEnabled ? "ON" : "OFF")")
         }
     }
@@ -56,6 +57,7 @@ final class ActivationMonitor: ObservableObject {
             guard isAutomaticSwitcherReorderingEnabled != oldValue else { return }
             defaults[AppDefaults.automaticSwitcherReordering] = isAutomaticSwitcherReorderingEnabled
             updateForegroundWindowPollingState()
+            CommandReopenAnalytics.track(CommandReopenEvent.settingChanged(.returnFocus, enabled: isAutomaticSwitcherReorderingEnabled))
             AppLogger.activation.notice(
                 "Automatic Cmd+Tab reordering toggled to \(self.isAutomaticSwitcherReorderingEnabled ? "ON" : "OFF")"
             )
@@ -66,6 +68,7 @@ final class ActivationMonitor: ObservableObject {
         didSet {
             guard userExcludedBundleIDs != oldValue else { return }
             defaults[AppDefaults.excludedBundleIDs] = Array(userExcludedBundleIDs).sorted()
+            CommandReopenAnalytics.track(CommandReopenEvent.excludedAppsChanged(count: userExcludedBundleIDs.count))
             AppLogger.activation.notice("Updated user exclude list: \(self.userExcludedBundleIDs.count) bundle IDs")
         }
     }

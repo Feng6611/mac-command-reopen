@@ -1,4 +1,5 @@
 #if APPSTORE
+import KikiAnalytics
 import KikiCommerceCore
 import KikiCommercePresentation
 import KikiPaywall
@@ -43,6 +44,9 @@ struct PaywallSheetView: View {
     @ObservedObject var accessModel: CommandAccessModel
     @ObservedObject private var appLanguage = AppLanguage.shared
     let context: PaywallPresentationContext
+    /// Why the sheet opened; `nil` takes the reason the opening route left in
+    /// `PaywallSourceRelay`.
+    var source: PaywallSource?
     var onFinish: () -> Void = {}
     var onPurchaseCompleted: () -> Void = {}
 
@@ -51,6 +55,7 @@ struct PaywallSheetView: View {
     /// request — so a status that turns Pro mid-flow must not swap the sheet
     /// out from under it.
     @State private var hasTransactedInSheet = false
+    @State private var analyticsSession = CommandReopenAnalytics.shared.newSession()
 
     var body: some View {
         Group {
@@ -60,14 +65,61 @@ struct PaywallSheetView: View {
                 // read as "did my purchase go through?".
                 ProAccessStatusView(accessModel: accessModel, onDone: onFinish)
             } else {
-                paywall
+                paywall.onAppear {
+                    // One viewed event per sheet: the session id dedupes re-appearance.
+                    track(.paywallViewed(session: analyticsSession, source: source ?? PaywallSourceRelay.take()))
+                }
             }
         }
         .onChange(of: accessModel.accessManager.purchaseInProgressPlanID) { planID in
-            if planID != nil { hasTransactedInSheet = true }
+            guard let planID else { return }
+            hasTransactedInSheet = true
+            track(.paywallAction(session: analyticsSession, action: .purchase, plan: Self.planKind(planID)))
         }
         .onChange(of: accessModel.accessManager.isRestoringPurchases) { isRestoring in
-            if isRestoring { hasTransactedInSheet = true }
+            guard isRestoring else { return }
+            hasTransactedInSheet = true
+            track(.paywallAction(session: analyticsSession, action: .restore, plan: nil))
+        }
+        .onChange(of: accessModel.accessManager.commerceFeedback) { feedback in
+            guard let feedback else { return }
+            let (result, error) = Self.outcome(of: feedback)
+            track(.purchaseResult(session: analyticsSession, result: result, plan: nil, error: error))
+        }
+    }
+
+    private func track(_ event: CommandReopenEvent) {
+        CommandReopenAnalytics.track(event)
+    }
+
+    private func track(_ event: KikiStandardEvent) {
+        CommandReopenAnalytics.track(event)
+    }
+
+    private static func planKind(_ planID: String) -> CommandReopenEvent.PlanKind? {
+        switch CommercePlan(planID) {
+        case .lifetime: .lifetime
+        case .winbackLifetime: .winbackLifetime
+        default: nil
+        }
+    }
+
+    static func outcome(
+        of feedback: KikiCommerceFeedback
+    ) -> (CommandReopenEvent.PurchaseOutcome, CommandReopenEvent.ErrorCategory?) {
+        switch feedback {
+        case .purchaseSucceeded, .restoreSucceeded: (.success, nil)
+        case .noActivePurchase: (.failed, .noActivePurchase)
+        case .error(let error):
+            switch error {
+            case .purchaseCancelled: (.cancelled, nil)
+            case .activationPending: (.pending, nil)
+            case .network: (.failed, .network)
+            case .offeringUnavailable, .productUnavailable, .packageNotFound, .productIdentifierMissing:
+                (.failed, .unavailable)
+            case .purchaseNotAllowed: (.failed, .notAllowed)
+            default: (.failed, .other)
+            }
         }
     }
 
@@ -113,6 +165,9 @@ struct PaywallSheetView: View {
             tint: DS.Colors.brandPrimary,
             onFinish: {
                 let didCompletePurchase = accessModel.accessManager.commerceFeedback == .purchaseSucceeded
+                if !didCompletePurchase {
+                    track(.paywallAction(session: analyticsSession, action: .close, plan: nil))
+                }
                 onFinish()
 
                 guard context == .settings, didCompletePurchase else { return }

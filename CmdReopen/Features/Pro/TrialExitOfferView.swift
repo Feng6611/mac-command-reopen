@@ -33,6 +33,7 @@ struct TrialExitOfferView: View {
 
     @State private var isPurchasing = false
     @State private var purchaseFailed = false
+    @State private var hasReportedAction = false
 
     var body: some View {
         KikiPaywallShell(
@@ -108,8 +109,20 @@ struct TrialExitOfferView: View {
         }
         .onAppear {
             if marksOfferShown {
+                // The first presentation starts the clock; later ones are re-opens.
+                let isFirstShowing = accessModel.winbackOfferFirstShownAt == nil
                 accessModel.markWinbackOfferShown()
+                if isFirstShowing {
+                    CommandReopenAnalytics.track(CommandReopenEvent.winbackOfferShown(
+                        valueBucketCount: offer.receipt.reopenCount
+                    ))
+                } else {
+                    trackAction(.reopened)
+                }
             }
+        }
+        .onDisappear {
+            if marksOfferShown, !hasReportedAction { trackAction(.dismiss) }
         }
         .task {
             await accessModel.loadOfferings()
@@ -184,7 +197,16 @@ struct TrialExitOfferView: View {
         )
     }
 
+    private func trackAction(_ action: CommandReopenEvent.WinbackAction) {
+        hasReportedAction = action != .reopened
+        CommandReopenAnalytics.track(CommandReopenEvent.winbackOfferAction(
+            action: action,
+            daysLeft: offer.daysRemaining()
+        ))
+    }
+
     private func openFreeBuild() {
+        trackAction(.freeBuild)
         dismiss()
         guard let url = URL(string: ExternalLinks.freeBuildURL) else { return }
         urlOpener.open(url)
@@ -192,6 +214,7 @@ struct TrialExitOfferView: View {
 
     private func purchase() {
         guard !isPurchasing else { return }
+        trackAction(.purchase)
         isPurchasing = true
         purchaseFailed = false
 

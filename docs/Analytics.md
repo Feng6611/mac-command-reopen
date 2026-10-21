@@ -1,8 +1,7 @@
 # Command Reopen 事件表（草案）
 
-状态：**草案，待确认，未实现**。2026-10-18。决定见 `DecisionLog.md` D-012；
-组件和锁死的隐私配置见 `../../KikiAnalyticsKit/Docs/Design.md`。首期只覆盖 App Store 版（`#if APPSTORE`），
-Direct / Community 版是否埋点待定。
+状态：**已实现（1.5.2，App Store 版）**，2026-10-21。需要 PostHog project token 才会发送；没有 token 时 Kit 不初始化 SDK、零请求。决定见 `DecisionLog.md` D-012；
+组件和锁死的隐私配置见 `../../KikiAnalyticsKit/Docs/Design.md`。只有 App Store 版带 PostHog 传输；Direct / Community 版链接 Kit 但用 `.none`，不发送任何数据。
 
 ## 要回答的问题
 
@@ -34,7 +33,7 @@ Direct / Community 版是否埋点待定。
 | `onboarding started` | `OnboardingWindowController` 首次展示 | 每会话 | `session_id` |
 | `onboarding step viewed` | 每一步出现 | 每会话每步 | `session_id`、`step`（`welcome` / `try_minimize` / `success` / `finish`） |
 | `onboarding demo succeeded` | 演示里真的 Cmd+Tab 回来了（`OnboardingTryMinimizeModel` 成功） | 每装一次 | `duration_ms`（从 started 起） |
-| `onboarding completed` | coordinator 完成或窗口被关闭 | 每装一次 | `outcome`（`finished` / `closed`）、`last_step`、`launch_at_login`（bool） |
+| `onboarding completed` | 点 Get Started 并关闭 paywall sheet（`finished`，每装一次），或窗口被关闭（`closed`，每次） | 每装一次 | `outcome`（`finished` / `closed`）、`last_step`、`launch_at_login`（bool） |
 | `value day` | 见上面的定义（`ActivationMonitor` → `ReopenStatsStore`） | 每天一次 | `value_bucket`（累计成功重开次数分桶）；Kit 自动附加 `active_day_index`、`days_since_first_open` |
 
 ### 付费
@@ -42,9 +41,9 @@ Direct / Community 版是否埋点待定。
 | 事件 | 触发点 | 频率 | 属性 |
 | --- | --- | --- | --- |
 | `trial ended` | 本地试用第一次被判定为到期（`AppAccessController`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
-| `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`status_bar_upgrade` / `settings_about` / `trial_expired` / `winback_row`） |
-| `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `close`）、`plan`（`yearly` / `lifetime`，仅 purchase） |
-| `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`plan`、`error_category`（Commerce 的错误枚举，不带原文） |
+| `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`onboarding` / `trial_usage` / `trial_expired` / `status_bar_upgrade` / `settings_about`） |
+| `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `close`）、`plan`（`lifetime` / `winback_lifetime`，仅 purchase） |
+| `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`error_category`（`network` / `unavailable` / `not_allowed` / `no_active_purchase` / `other`，不带原文；paywall 里不带 `plan`） |
 | `winback offer shown` | `TrialExitOfferView` 第一次出现（`winbackOfferFirstShownAt` 被写入时） | 每装一次 | `value_bucket` |
 | `winback offer action` | 卡片上的选择，或从 Settings 行重新打开 | 每次 | `action`（`purchase` / `free_build` / `dismiss` / `reopened`）、`days_left` |
 
@@ -55,7 +54,7 @@ Direct / Community 版是否埋点待定。
 
 | 事件 | 触发点 | 频率 | 属性 |
 | --- | --- | --- | --- |
-| `reopen toggled` | 菜单栏或设置里切换"启用 Command Reopen" | 每次 | `enabled`（bool）、`surface`（`status_bar` / `settings`） |
+| `reopen toggled` | 菜单栏或设置里切换"启用 Command Reopen" | 每次 | `enabled`（bool）；不区分入口 |
 | `setting changed` | 设置里改了开关或选项 | 每次 | `setting`（`launch_at_login` / `show_menu_bar_icon` / `return_focus` / `language`）、`enabled`（bool，开关类）或 `language`（App 支持的语言枚举） |
 | `excluded apps changed` | 排除列表增删 | 每次 | `count_bucket`（只有数量分桶，不带任何 App） |
 | `review prompt shown` | `ReviewPromptPolicy` 实际展示或请求 | 每次 | `kind`（`custom` / `system_request`） |
@@ -92,3 +91,21 @@ Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
 - Direct / Community 版是否埋点；如果埋，没有 paywall，只发激活、价值和使用习惯这几组。
 - `onboarding step viewed` 是否值得保留：只有 4 步，可以用 `last_step` 代替。
 - `value_bucket` 用累计次数还是近 7 天次数：累计更简单，近 7 天更能看出流失前的下降。
+
+## 触发 paywall 的入口与 `source`
+
+| `source` | 入口 |
+| --- | --- |
+| `onboarding` | 引导最后一步点 Get Started，paywall 作为 sheet 出现在引导窗口上（Pro 用户跳过） |
+| `trial_usage` | 试用超过 3 天后，当天第 10 次成功恢复 |
+| `trial_expired` | 试用结束后的启动 / 状态变化，或 Cmd+Tab 每日提示 |
+| `status_bar_upgrade` | 菜单栏「Upgrade to Pro…」 |
+| `settings_about` | 设置 › 关于 里的入口（默认值） |
+
+## 接入与配置
+
+- token：`Config/LocalSecrets.xcconfig` 的 `KIKI_POSTHOG_PROJECT_TOKEN`（`phc_` 开头，公开 token）；
+  `KIKI_POSTHOG_HOST` 留空走默认 host。Release 的 App Store 构建缺 token 会在构建阶段失败（`scripts/check_posthog_config.sh`）。
+- 收入：RevenueCat 的 PostHog 集成需要 KikiCommerceKit 的 `postHogUserID`（在 Commerce main，尚未发版）；
+  发版并升级后，把 `analytics.installationID` 传给 RevenueCatConfiguration，收入事件才会落在同一个用户上。
+- 老用户首次打开按 `first_open_kind = analytics_rollout` 计，不计入新安装。

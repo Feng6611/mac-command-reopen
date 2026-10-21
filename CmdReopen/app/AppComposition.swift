@@ -1,4 +1,5 @@
 import Foundation
+import KikiAnalytics
 
 /// Owns the long-lived application graph. Compatibility `shared` properties
 /// forward here; they never construct a second mutable service.
@@ -7,13 +8,19 @@ final class AppComposition {
     static let shared = AppComposition()
 
     lazy var accessController = AppAccessController.makeDefault()
+    lazy var analytics: KikiAnalytics = CommandReopenAnalytics.make(
+        entitlementState: { [weak self] in self?.accessController.entitlementState ?? .expired }
+    )
     lazy var reopenStats: ReopenStatsStore = {
         let store = ReopenStatsStore(isReviewAudienceEligible: { [weak self] in
             // Only ask someone the app is currently working for.
             self?.accessController.isCoreFeatureAvailable ?? false
         })
         store.onReopenRecorded = { [weak self] todayCount in
-            self?.router.handleTrialUsage(todayReopenCount: todayCount)
+            guard let self else { return }
+            // A successful, non-helper reopen is the day's value.
+            self.analytics.track(KikiStandardEvent.valueDay(changes: store.totalSuccessfulReopens))
+            self.router.handleTrialUsage(todayReopenCount: todayCount)
         }
         return store
     }()

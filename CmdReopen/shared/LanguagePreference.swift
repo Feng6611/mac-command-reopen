@@ -43,6 +43,7 @@ final class AppLanguage: ObservableObject {
         didSet {
             guard selected != oldValue else { return }
             defaults.set(selected.rawValue, forKey: Self.storageKey)
+            CommandReopenAnalytics.track(CommandReopenEvent.languageChanged(selected))
             clearLegacyLanguageOverride()
         }
     }

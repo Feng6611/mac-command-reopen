@@ -35,6 +35,7 @@ final class AppRouter {
     /// for on top of the window already showing it.
     func handleExpiredAccess() {
         if !isSettingsVisible() {
+            PaywallSourceRelay.set(.trialExpired)
             open(.about, true)
         }
         accessController.markPromptHandled()
@@ -60,6 +61,7 @@ final class AppRouter {
             return
         }
         defaults.set(now, forKey: Self.lastTrialUsagePaywallDateKey)
+        PaywallSourceRelay.set(.trialUsage)
         open(.about, true)
 #endif
     }

@@ -36,6 +36,8 @@ final class LaunchAtLoginManager: ObservableObject, LaunchAtLoginManaging {
 
     private static var service: SMAppService { .mainApp }
 
+    static var currentlyEnabled: Bool { service.status == .enabled }
+
     @discardableResult
     func setEnabled(_ enabled: Bool) -> LaunchAtLoginOutcome {
         let service = Self.service

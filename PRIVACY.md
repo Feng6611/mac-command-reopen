@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: August 6, 2026
+Last updated: October 21, 2026
 
 This Privacy Policy applies to Command Reopen, a macOS menu bar app.
 
@@ -24,8 +24,23 @@ This data stays on your device unless you delete the app or reset its local cont
 
 ## Analytics
 
-Command Reopen does not collect or transmit product analytics, usage data, or
-personal information.
+The Mac App Store version sends anonymous product analytics to PostHog so the
+developer can see whether onboarding, the trial and the purchase flow work. The
+events describe how the app itself is used, such as finishing onboarding, a day
+on which it restored a window, opening the purchase sheet, changing a setting,
+or the trial ending. Each event carries a random identifier generated on your
+Mac when the app first runs, the app version, your macOS version and device
+model, and your access state (trial, expired or Pro). Counts are sent as ranges.
+
+It never includes the names or bundle IDs of other apps, window titles, URLs,
+your excluded app list, activation history, or anything you type. The identifier
+is not linked to your name, Apple ID or email, location is not collected, and
+nothing is used for advertising or cross-app tracking.
+
+The free GitHub build does not send analytics.
+
+Purchase events (starts, renewals, cancellations) reach the same analytics
+project from RevenueCat under that same random identifier.
 
 ## Purchases
 
@@ -43,10 +58,11 @@ needed for the standard native fallback.
 
 ## Third Parties
 
-For Mac App Store billing and entitlement management, Command Reopen relies on:
+For Mac App Store billing, entitlement management and anonymous product analytics, Command Reopen relies on:
 
 - Apple App Store / StoreKit
 - RevenueCat
+- PostHog (anonymous product analytics, Mac App Store version only)
 
 Those services operate under their own privacy terms.
 

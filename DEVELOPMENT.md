@@ -64,6 +64,14 @@ The paywall opens only for these reasons:
 A trial that is merely running never opens it by itself. These rules are covered by
 `CommandAccessModelTests`, `TrialExitOfferTests`, `ReopenPolicyTests` and `OnboardingPaywallPolicyTests`.
 
+## Analytics
+
+Events are defined in `CmdReopen/Analytics/CommandReopenAnalytics.swift` and listed in
+[docs/Analytics.md](docs/Analytics.md). Call `CommandReopenAnalytics.track(...)`; never import PostHog
+outside that file. Only the App Store build has a transport. The project token goes in
+`Config/LocalSecrets.xcconfig` as `KIKI_POSTHOG_PROJECT_TOKEN`; without it nothing is sent, and a
+Release App Store build fails.
+
 ## Releasing
 
 Run before tagging; tags have no `v` prefix. It is read-only and never tags or pushes.

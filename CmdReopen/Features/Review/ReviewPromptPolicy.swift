@@ -67,8 +67,10 @@ final class StoreKitAppReviewPrompter: AppReviewPrompting {
     func present(_ presentation: AppReviewPromptPresentation) {
         switch presentation {
         case .custom(let content):
+            CommandReopenAnalytics.track(CommandReopenEvent.reviewPromptShown(.custom))
             presentCustomPrompt(content)
         case .system:
+            CommandReopenAnalytics.track(CommandReopenEvent.reviewPromptShown(.systemRequest))
             SKStoreReviewController.requestReview()
         }
     }
@@ -88,6 +90,7 @@ final class StoreKitAppReviewPrompter: AppReviewPrompting {
             ),
             tint: DS.Colors.brandPrimary
         ) { action in
+            CommandReopenAnalytics.track(CommandReopenEvent.reviewPromptAction(action == .review ? .review : .notNow))
             guard action == .review,
                   let url = URL(string: AppStoreLinks.reviewURL) else {
                 return

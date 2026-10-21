@@ -42,7 +42,7 @@ Command Reopen addresses this gap. When you switch to an app that has no visible
 
 - **Restore minimized windows** — Switch to an app and Command Reopen requests a reopen event allowing the app to restore a minimized window from the Dock.
 - **Reopen closed windows** — If an app has no open windows when you switch to it, Command Reopen requests a new default window.
-- **Zero permissions** — Requires neither Accessibility nor Screen Recording permission. Sandboxed, distributed through the Mac App Store, with no tracking.
+- **Zero permissions** — Requires neither Accessibility nor Screen Recording permission. Sandboxed, distributed through the Mac App Store, with no advertising or cross-app tracking.
 - **Return focus when the last window closes** — When you close or minimize an app's last window, focus shifts to your previous app so subsequent Cmd+Tab cycles stay natural.
 - **Native switcher remains unchanged** — No custom switcher, overlay, or third-party window manager. You keep the standard Cmd+Tab behavior and muscle memory.
 - **Exclude any app** — Filter apps by name or bundle identifier; excluded apps retain standard macOS Cmd+Tab behavior.
@@ -76,7 +76,7 @@ Yes. Add them to Excluded Apps in Settings, and they will keep standard macOS Cm
 
 ## Privacy
 
-Command Reopen keeps window handling and app-specific activity on your Mac and does not collect or transmit product analytics. See [PRIVACY.md](PRIVACY.md).
+Command Reopen keeps window handling and app-specific activity on your Mac. The Mac App Store version sends anonymous product analytics (no app names, window titles or personal data); the GitHub build sends none. See [PRIVACY.md](PRIVACY.md).
 
 ## About
 
