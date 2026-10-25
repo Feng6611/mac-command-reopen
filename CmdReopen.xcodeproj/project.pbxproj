@@ -10,7 +10,6 @@
 		56759C132FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = CF5000022F5900010099C190 /* ConfettiSwiftUI */; };
 		56759C142FAA22EF007FDA28 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = CF5000022F5900010099C190 /* ConfettiSwiftUI */; };
 		7408919D2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
-		7408919E2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		7408919F2F0645A90099E62A /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		747A0FC8303DDD92002F75DA /* KikiMenuBar in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000E2F4400010099C190 /* KikiMenuBar */; };
 		747A0FC9303DDD92002F75DA /* KikiPaywall in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000B2F4400010099C190 /* KikiPaywall */; };
@@ -31,17 +30,17 @@
 		8D30001C2F4400010099C190 /* KikiDesign in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000D2F4400010099C190 /* KikiDesign */; };
 		8D30001D2F4400010099C190 /* KikiReview in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000F2F4400010099C190 /* KikiReview */; };
 		8D30001E2F4400010099C190 /* KikiReview in Frameworks */ = {isa = PBXBuildFile; productRef = 8D30000F2F4400010099C190 /* KikiReview */; };
+		8E10000A2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000B2F6000010099C190 /* KikiPostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000022F6000010099C190 /* KikiPostHog */; };
+		8E10000C2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000D2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
+		8E10000E2F6000010099C190 /* KikiAnalyticsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000032F6000010099C190 /* KikiAnalyticsTesting */; };
 		9B1000012F2000010099C190 /* CommandReopenNew.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7408919C2F0645A90099E62A /* CommandReopenNew.icon */; };
 		9C2010012F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010022F3400010099C190 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010042F3400010099C190 /* LaunchAtLogin */; };
 		9C2010062F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 		9C2010072F3401010099C190 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 9C2010082F3401010099C190 /* Defaults */; };
 		A1C0A00130D1A0010099C190 /* KikiAuthorization in Frameworks */ = {isa = PBXBuildFile; productRef = A1C0A00230D1A0010099C190 /* KikiAuthorization */; };
-		8E10000A2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
-		8E10000B2F6000010099C190 /* KikiPostHog in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000022F6000010099C190 /* KikiPostHog */; };
-		8E10000C2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
-		8E10000D2F6000010099C190 /* KikiAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000012F6000010099C190 /* KikiAnalytics */; };
-		8E10000E2F6000010099C190 /* KikiAnalyticsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1000032F6000010099C190 /* KikiAnalyticsTesting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -296,6 +295,7 @@
 				ja,
 				de,
 				fr,
+				"pt-BR",
 				Base,
 			);
 			mainGroup = 748FCE122EB5027A0099C190;
@@ -547,7 +547,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 37;
+				CURRENT_PROJECT_VERSION = 41;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -577,7 +577,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -601,7 +601,7 @@
 				CODE_SIGN_ENTITLEMENTS = CmdReopen/Resources/CmdReopen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 37;
+				CURRENT_PROJECT_VERSION = 41;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -631,7 +631,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -761,7 +761,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 37;
+				CURRENT_PROJECT_VERSION = 41;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Q3DZRXLGA3;
 				ENABLE_APP_SANDBOX = YES;
@@ -791,7 +791,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -878,7 +878,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -943,7 +943,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1010,7 +1010,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.5.2;
+				MARKETING_VERSION = 1.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dev.kkuk.CommandReopen;
 				PRODUCT_NAME = "Command Reopen Direct";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1071,22 +1071,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Feng6611/KikiAnalyticsKit.git";
-			requirement = { kind = exactVersion; version = 0.1.1; };
-		};
 		8D3000042F4400010099C190 /* XCRemoteSwiftPackageReference "KikiCommerceKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/KikiCommerceKit.git";
-			requirement = { kind = exactVersion; version = 0.5.1; };
+			requirement = {
+				kind = exactVersion;
+				version = 0.5.2;
+			};
 		};
 		8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/Kiki_mackit.git";
-			requirement = { kind = exactVersion; version = 0.11.0; };
+			requirement = {
+				kind = exactVersion;
+				version = 0.11.0;
+			};
 		};
-
+		8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Feng6611/KikiAnalyticsKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = 0.1.1;
+			};
+		};
 		9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Feng6611/LaunchAtLogin-Modern";
@@ -1169,6 +1177,21 @@
 			package = 8D3000052F4400010099C190 /* XCRemoteSwiftPackageReference "Kiki_mackit" */;
 			productName = KikiReview;
 		};
+		8E1000012F6000010099C190 /* KikiAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
+			productName = KikiAnalytics;
+		};
+		8E1000022F6000010099C190 /* KikiPostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
+			productName = KikiPostHog;
+		};
+		8E1000032F6000010099C190 /* KikiAnalyticsTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
+			productName = KikiAnalyticsTesting;
+		};
 		9C2010042F3400010099C190 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9C2010032F3400010099C190 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
@@ -1188,21 +1211,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CF5000012F5900010099C190 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
 			productName = ConfettiSwiftUI;
-		};
-		8E1000012F6000010099C190 /* KikiAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
-			productName = KikiAnalytics;
-		};
-		8E1000022F6000010099C190 /* KikiPostHog */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
-			productName = KikiPostHog;
-		};
-		8E1000032F6000010099C190 /* KikiAnalyticsTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8E1000002F6000010099C190 /* XCRemoteSwiftPackageReference "KikiAnalyticsKit" */;
-			productName = KikiAnalyticsTesting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

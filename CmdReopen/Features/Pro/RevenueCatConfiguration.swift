@@ -111,8 +111,7 @@ enum RevenueCatConfiguration {
                     title: String(localized: "Lifetime"),
                     fallbackDisplayPrice: "$10.99",
                     billingDetail: String(localized: "once"),
-                    subtitle: String(localized: "Pay once, use forever"),
-                    badge: String(localized: "Best Value")
+                    subtitle: String(localized: "Pay once, use forever")
                 ),
                 // Sold only from the retention card; `visiblePaywallPlanIDs`
                 // keeps it off the regular paywall so the discount never sits
@@ -128,7 +127,9 @@ enum RevenueCatConfiguration {
             ],
             defaultPlanID: CommercePlan.lifetime.rawValue,
             commerceConfiguration: commerceConfiguration,
-            trialPolicy: .autoStart(duration: trialDuration),
+            // Onboarding's last step starts the trial; leaving onboarding
+            // without a choice starts it too (D-013).
+            trialPolicy: .time(duration: trialDuration, startsOn: .explicit),
             storageKeys: KikiAccessStorageKeys(
                 trialStartedAt: "cmdreopenTrialStartDate",
                 debugProAccessOverride: "CmdReopen.Access.debugOverride",

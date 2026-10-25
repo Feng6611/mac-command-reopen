@@ -1,5 +1,56 @@
 # Decision Log
 
+## D-013 — Onboarding ends on the trial: a paywall step where starting it is the way forward
+
+- Date: 2026-10-26
+- Status: Accepted; supersedes D-002
+
+### Context
+
+1.5.2 ended onboarding on a paywall sheet over the last step. The trial had
+already started at first launch, so the sheet's headline was "Your free trial
+ends in 2 days" minutes after install, its primary button was the purchase,
+and a trial user's only way past it was the close button. Of 15 new installs
+from Oct 22, 10 reached the sheet and 2 finished onboarding; a missing close
+callback (I-006) kept the sheet open and 8 installs pressed close 190 times.
+
+### Decision
+
+- The trial starts explicitly (`KikiTrialPolicy.time(startsOn: .explicit)`).
+  Existing installs keep the start date they already have.
+- The paywall is onboarding's fifth step, not a sheet. Its primary action is
+  "Start 2-day free trial"; "Buy Lifetime" and "Restore Purchase" are
+  secondary (KikiCommerceKit 0.5.2 makes the trial primary in the onboarding
+  context while a trial can start). Owners of Pro skip the step.
+- Leaving onboarding without a choice — closing the window at any step, or
+  closing the paywall — starts the trial too, so Cmd+Tab never silently does
+  nothing after the demo showed it working.
+- Headline by context: onboarding states what the app does ("Keep every
+  window one Cmd+Tab away"); during a trial the paywall is "Command Reopen
+  Pro" with "Free trial · N days left" as the subtitle; after the trial the
+  headline stays "Your free trial has ended".
+- Before the trial starts the subtitle says buying is optional and there is
+  no subscription, and a footnote says no payment details are needed and
+  nothing renews. No launch or strike-through price: the win-back offer is
+  the only discount.
+- The setup step no longer mentions the trial; it covers the menu bar and
+  Launch at Login.
+
+### Alternatives
+
+- Keep the automatic trial and only add a "Continue" action: rejected; a
+  trial that started before the user chose anything cannot be offered as the
+  next step, and its countdown is the wrong first message.
+- Leave the trial unstarted when onboarding is closed early: rejected; an
+  invisible utility that does nothing reads as broken and gets deleted.
+
+### Review
+
+Design discussed with Gemini 3.8 Flash High (Paseo `agy`): it agreed on the
+step, the trial-first hierarchy and the close fallback, and argued against a
+launch price. Its copy was edited against the glossary; unverifiable claims
+(battery impact) and non-glossary plan names were dropped.
+
 ## D-012 — Product analytics comes back, through KikiAnalyticsKit
 
 - Date: 2026-10-18
@@ -272,6 +323,15 @@ request before launch finishes and presents onboarding after its initial
 commerce refresh. Release builds do not contain this replay/restart branch;
 real onboarding already begins during a fresh first launch.
 
+The relaunched process runs as a simulated new install
+(`DebugNewInstallSession`, a launch argument, so it lasts one process only).
+Its access state lives in a scratch defaults suite emptied at launch: the
+2-day trial starts fresh, and Pro access starts forced to Trial, because a new
+user owns nothing even when the sandbox account does. Offerings still load
+from RevenueCat, so the final paywall shows real prices. The developer's own
+trial, purchase and override in standard defaults are untouched, and the next
+normal launch uses them again.
+
 Keep the actual previous foreground app as the hand-off target, with Finder
 only as a fallback when that app is no longer eligible. Suppress external
 automatic reopen evaluation for the lifetime of onboarding, including delayed
@@ -295,7 +355,7 @@ test is still required because macOS owns the switcher ordering.
 ## D-002 — Start the trial independently of onboarding completion
 
 - Date: 2026-07-26
-- Status: Accepted
+- Status: Superseded by D-013 (2026-10-26)
 
 Command Reopen uses Kiki Commerce's automatic time trial, which writes the
 trial start time when the app's access manager is first created. Onboarding

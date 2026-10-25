@@ -2,7 +2,16 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {},
-    "%lld" : {},
+    "%lld" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
     "%lld days left" : {
       "comment" : "Trial time remaining in the About pane; plural-aware in the catalog.",
       "localizations" : {
@@ -79,6 +88,24 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "剩余 %lld 天"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dia restante"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld dias restantes"
                 }
               }
             }
@@ -166,6 +193,24 @@
               }
             }
           }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld uso restante"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld usos restantes"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -194,6 +239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 天"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldd"
           }
         }
       }
@@ -224,10 +275,25 @@
             "state" : "translated",
             "value" : "⌘ 加 Tab 上面那个键"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘ e a tecla acima do Tab"
+          }
         }
       }
     },
-    "👑" : {},
+    "👑" : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "👑"
+          }
+        }
+      }
+    },
     "2 days left" : {
       "comment" : "Status label for win-back offer remaining time.",
       "localizations" : {
@@ -253,6 +319,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "剩余 2 天"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 dias restantes"
           }
         }
       }
@@ -283,6 +355,12 @@
             "state" : "translated",
             "value" : "八折"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20% de desconto"
+          }
         }
       }
     },
@@ -311,6 +389,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro 终身版限时 8 折"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20% de desconto no Vitalício"
           }
         }
       }
@@ -341,6 +425,12 @@
             "state" : "translated",
             "value" : "临别特惠：立减 20%"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "20% de desconto antes de ir"
+          }
         }
       }
     },
@@ -369,6 +459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关于"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre"
           }
         }
       }
@@ -399,6 +495,12 @@
             "state" : "translated",
             "value" : "辅助功能"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acessibilidade"
+          }
         }
       }
     },
@@ -427,6 +529,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "活跃"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativo"
           }
         }
       }
@@ -457,6 +565,12 @@
             "state" : "translated",
             "value" : "添加"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionar"
+          }
         }
       }
     },
@@ -484,6 +598,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已添加"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adicionado"
           }
         }
       }
@@ -514,6 +634,12 @@
             "state" : "translated",
             "value" : "高级"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avançado"
+          }
         }
       }
     },
@@ -542,6 +668,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高级模式"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modo Avançado"
           }
         }
       }
@@ -572,6 +704,12 @@
             "state" : "translated",
             "value" : "高级窗口恢复仅在你授予辅助功能权限后才可控制其他 App 的窗口。核心功能无需任何权限。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A restauração avançada de janelas só pode controlar as janelas de outros apps depois que você conceder acesso à Acessibilidade. O Command Reopen básico não precisa de permissão."
+          }
         }
       }
     },
@@ -600,6 +738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "全部时间"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo o período"
           }
         }
       }
@@ -630,6 +774,12 @@
             "state" : "translated",
             "value" : "允许 Command Reopen 在登录时打开"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir que o Command Reopen abra no início da sessão"
+          }
         }
       }
     },
@@ -659,6 +809,12 @@
             "state" : "translated",
             "value" : "已允许"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitido"
+          }
         }
       }
     },
@@ -684,6 +840,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "App"
@@ -717,6 +879,12 @@
             "state" : "translated",
             "value" : "程序窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Exposé"
+          }
         }
       }
     },
@@ -746,6 +914,12 @@
             "state" : "translated",
             "value" : "App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
         }
       }
     },
@@ -773,6 +947,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "每年自动续期"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renovação automática anual"
           }
         }
       }
@@ -803,34 +983,11 @@
             "state" : "translated",
             "value" : "自动重现"
           }
-        }
-      }
-    },
-    "Best Value" : {
-      "comment" : "Badge on the recommended paywall plan.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beste Wahl"
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recommandé"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "おすすめ"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最推荐"
+            "value" : "automaticamente"
           }
         }
       }
@@ -866,6 +1023,12 @@
             "state" : "translated",
             "value" : "按天"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por Dia"
+          }
         }
       }
     },
@@ -899,6 +1062,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按月"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por Mês"
           }
         }
       }
@@ -934,6 +1103,12 @@
             "state" : "translated",
             "value" : "按周"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por Semana"
+          }
         }
       }
     },
@@ -961,6 +1136,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在检查购买项目…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando compras…"
           }
         }
       }
@@ -990,6 +1171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "点按下方按钮最小化，再按一次 Cmd+Tab 即可恢复。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clique abaixo e pressione Cmd+Tab uma vez — a janela volta imediatamente."
           }
         }
       }
@@ -1021,6 +1208,12 @@
             "state" : "translated",
             "value" : "关闭"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
         }
       }
     },
@@ -1049,6 +1242,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关闭窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar a janela"
           }
         }
       }
@@ -1079,6 +1278,12 @@
             "state" : "translated",
             "value" : "已关闭"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encerrada"
+          }
         }
       }
     },
@@ -1104,6 +1309,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cmd+Tab"
@@ -1137,6 +1348,12 @@
             "state" : "translated",
             "value" : "现在按 Cmd+Tab 就能找回窗口。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Cmd+Tab agora traz suas janelas de volta."
+          }
         }
       }
     },
@@ -1165,6 +1382,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法把 Command Reopen 添加到登录项"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível adicionar o Command Reopen aos Itens de Início de Sessão"
           }
         }
       }
@@ -1195,6 +1418,12 @@
             "state" : "translated",
             "value" : "Command Reopen 正在运行。开启“登录时启动”后，每次重启后都会保持就绪。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Command Reopen está em execução. Ative Abrir no Início de Sessão para mantê-lo pronto após cada reinicialização."
+          }
         }
       }
     },
@@ -1224,6 +1453,12 @@
             "state" : "translated",
             "value" : "后台常驻运行，确保窗口恢复随时生效。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Command Reopen só restaura janelas enquanto estiver em execução."
+          }
         }
       }
     },
@@ -1249,6 +1484,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen Pro"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Command Reopen Pro"
@@ -1281,6 +1522,12 @@
             "state" : "translated",
             "value" : "试用期间可使用 Command Reopen Pro。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Command Reopen Pro fica ativo durante o período de teste."
+          }
         }
       }
     },
@@ -1308,6 +1555,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "继续"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         }
       }
@@ -1338,6 +1591,12 @@
             "state" : "translated",
             "value" : "核心恢复无需辅助功能或屏幕录制权限。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A restauração básica não precisa de Acessibilidade nem de Gravação de Tela."
+          }
         }
       }
     },
@@ -1366,6 +1625,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次数"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contagem"
           }
         }
       }
@@ -1396,6 +1661,12 @@
             "state" : "translated",
             "value" : "点按程序坞循环窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar janelas ao clicar no Dock"
+          }
         }
       }
     },
@@ -1425,10 +1696,25 @@
             "state" : "translated",
             "value" : "日期"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
+          }
         }
       }
     },
-    "Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies." : {},
+    "Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies." : {
+      "localizations" : {
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apenas para depuração. Live limpa a substituição de acesso Pro. A janela de retenção precisa do acesso Pro definido como Expirado, a mesma condição aplicada pelo app."
+          }
+        }
+      }
+    },
     "Developer Testing" : {
       "comment" : "Section title in About for debug controls.",
       "localizations" : {
@@ -1454,6 +1740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开发者测试"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testes de Desenvolvedor"
           }
         }
       }
@@ -1484,6 +1776,12 @@
             "state" : "translated",
             "value" : "窗口没出来？再按一次 Cmd+Tab。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não voltou? Sem problemas — tente novamente."
+          }
         }
       }
     },
@@ -1511,6 +1809,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完成"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concluído"
           }
         }
       }
@@ -1541,6 +1845,12 @@
             "state" : "translated",
             "value" : "邮箱"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail"
+          }
         }
       }
     },
@@ -1568,6 +1878,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "启用 Command Reopen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativar o Command Reopen"
           }
         }
       }
@@ -1598,6 +1914,12 @@
             "state" : "translated",
             "value" : "今天截止"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termina hoje"
+          }
         }
       }
     },
@@ -1627,34 +1949,11 @@
             "state" : "translated",
             "value" : "功能完整且永久免费。在 App Store 购买可赞助后续开发。"
           }
-        }
-      }
-    },
-    "Exclude apps you don’t want restored" : {
-      "comment" : "Paywall feature item.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apps ausschließen, die nicht wiederhergestellt werden sollen"
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exclure les apps que vous ne souhaitez pas restaurer"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "復元対象外にするAppを自由に設定"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自定义无需恢复的排除 App"
+            "value" : "Todos os recursos, sem limites e pelo tempo que quiser. A versão da Mac App Store é o mesmo app — comprá-la é a forma de apoiar o desenvolvimento."
           }
         }
       }
@@ -1685,6 +1984,12 @@
             "state" : "translated",
             "value" : "排除 App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps Excluídos"
+          }
         }
       }
     },
@@ -1714,6 +2019,12 @@
             "state" : "translated",
             "value" : "排除的 App 将保持 macOS 默认行为，不自动恢复窗口。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os apps excluídos mantêm o comportamento padrão do Cmd+Tab."
+          }
         }
       }
     },
@@ -1741,6 +2052,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已过期"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expirado"
           }
         }
       }
@@ -1776,6 +2093,12 @@
             "state" : "translated",
             "value" : "Command Reopen 位于屏幕顶部的菜单栏中。点按 ⌘ 图标即可打开设置。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontre o Command Reopen na barra de menus na parte superior da tela. Clique no ícone ⌘ para abrir os Ajustes."
+          }
         }
       }
     },
@@ -1804,6 +2127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "让 Cmd+Tab 找回最小化和已关闭的窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corrija o Cmd+Tab para janelas minimizadas e fechadas"
           }
         }
       }
@@ -1834,6 +2163,12 @@
             "state" : "translated",
             "value" : "免费"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratuito"
+          }
         }
       }
     },
@@ -1863,6 +2198,12 @@
             "state" : "translated",
             "value" : "功能完整，没有任何锁。和 App Store 版是同一个 app。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recursos completos, nada bloqueado. O mesmo app da versão da App Store."
+          }
         }
       }
     },
@@ -1890,6 +2231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geral"
           }
         }
       }
@@ -1920,6 +2267,12 @@
             "state" : "translated",
             "value" : "去 App Store 购买"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obter na App Store"
+          }
         }
       }
     },
@@ -1947,6 +2300,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前往 Mac App Store 获取"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obter na Mac App Store"
           }
         }
       }
@@ -1982,6 +2341,12 @@
             "state" : "translated",
             "value" : "开始使用"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Começar"
+          }
         }
       }
     },
@@ -2010,6 +2375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "隐藏 App"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar o app"
           }
         }
       }
@@ -2040,6 +2411,12 @@
             "state" : "translated",
             "value" : "隐藏菜单栏图标，Command Reopen 继续在后台运行。随时再次启动 Command Reopen 即可打开设置。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oculte o ícone da barra de menus enquanto o Command Reopen continua em execução em segundo plano. Abra o Command Reopen novamente a qualquer momento para abrir os Ajustes."
+          }
         }
       }
     },
@@ -2068,6 +2445,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果价格是唯一的犹豫，这份特别优惠将于今日截止。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o preço era o obstáculo, aqui está um valor menor. Termina hoje."
           }
         }
       }
@@ -2098,6 +2481,12 @@
             "state" : "translated",
             "value" : "如果价格是唯一的犹豫，这份特别优惠将为你保留 48 小时。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o preço era o obstáculo, aqui está um valor menor. Válido por 48 horas."
+          }
         }
       }
     },
@@ -2126,34 +2515,11 @@
             "state" : "translated",
             "value" : "成功了！"
           }
-        }
-      }
-    },
-    "Keep it working" : {
-      "comment" : "Purchase button while the feature is still running on a trial.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiter nutzen"
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continuer à l’utiliser"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使い続ける"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "继续使用"
+            "value" : "Funciona!"
           }
         }
       }
@@ -2184,6 +2550,12 @@
             "state" : "translated",
             "value" : "语言"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
+          }
         }
       }
     },
@@ -2212,6 +2584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近 12 个月"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimos 12 meses"
           }
         }
       }
@@ -2242,6 +2620,12 @@
             "state" : "translated",
             "value" : "最近 12 周"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimas 12 semanas"
+          }
         }
       }
     },
@@ -2271,6 +2655,12 @@
             "state" : "translated",
             "value" : "最近 30 天"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Últimos 30 dias"
+          }
         }
       }
     },
@@ -2298,6 +2688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登录时打开"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir no Início de Sessão"
           }
         }
       }
@@ -2333,6 +2729,12 @@
             "state" : "translated",
             "value" : "了解 Mac 窗口快捷键"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conheça atalhos de janela do Mac"
+          }
         }
       }
     },
@@ -2362,6 +2764,12 @@
             "state" : "translated",
             "value" : "终身版"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vitalício"
+          }
         }
       }
     },
@@ -2390,6 +2798,12 @@
             "state" : "translated",
             "value" : "实时"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live"
+          }
         }
       }
     },
@@ -2417,6 +2831,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在载入购买选项…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carregando opções de compra…"
           }
         }
       }
@@ -2447,6 +2867,12 @@
             "state" : "translated",
             "value" : "窗口快捷键"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atalhos de janela do Mac"
+          }
         }
       }
     },
@@ -2475,6 +2901,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "macOS 需要你的授权才能启用开机启动。请前往“系统设置”>“通用”>“登录项”中允许 Command Reopen。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O macOS retém novos itens de início de sessão até que você os permita. Abra Itens de Início de Sessão e ative o Command Reopen."
           }
         }
       }
@@ -2505,6 +2937,12 @@
             "state" : "translated",
             "value" : "系统请求未通过。你可以在 macOS“登录项”设置中手动添加 Command Reopen。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O macOS recusou a solicitação. Você pode adicionar o Command Reopen manualmente em Itens de Início de Sessão."
+          }
         }
       }
     },
@@ -2533,6 +2971,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开发者"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Criado por"
           }
         }
       }
@@ -2563,6 +3007,12 @@
             "state" : "translated",
             "value" : "最小化窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimizar a janela"
+          }
         }
       }
     },
@@ -2590,6 +3040,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最小化此窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimizar Esta Janela"
           }
         }
       }
@@ -2620,6 +3076,12 @@
             "state" : "translated",
             "value" : "最小化"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimizada"
+          }
         }
       }
     },
@@ -2648,6 +3110,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "调度中心"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mission Control"
           }
         }
       }
@@ -2678,6 +3146,12 @@
             "state" : "translated",
             "value" : "最常恢复的 App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "app mais restaurado"
+          }
         }
       }
     },
@@ -2707,6 +3181,12 @@
             "state" : "translated",
             "value" : "需要授权"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necessário"
+          }
         }
       }
     },
@@ -2734,6 +3214,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此账户下没有有效的购买项目。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma compra ativa encontrada nesta conta."
           }
         }
       }
@@ -2764,6 +3250,12 @@
             "state" : "translated",
             "value" : "未添加排除 App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum app excluído"
+          }
         }
       }
     },
@@ -2793,6 +3285,12 @@
             "state" : "translated",
             "value" : "没有网络连接。请连接网络后重试以载入购买选项。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem conexão com a internet. Conecte-se e tente novamente para carregar as compras."
+          }
         }
       }
     },
@@ -2821,6 +3319,12 @@
             "state" : "translated",
             "value" : "没有找到匹配的 App。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhum app correspondente encontrado."
+          }
         }
       }
     },
@@ -2848,6 +3352,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "还没有恢复记录"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma atividade de reabertura ainda"
           }
         }
       }
@@ -2878,6 +3388,12 @@
             "state" : "translated",
             "value" : "以后再说"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agora Não"
+          }
         }
       }
     },
@@ -2905,6 +3421,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未解锁"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não Pro"
           }
         }
       }
@@ -2936,6 +3458,12 @@
             "state" : "translated",
             "value" : "未选中"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não selecionado"
+          }
         }
       }
     },
@@ -2964,6 +3492,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "引导页"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apresentação"
           }
         }
       }
@@ -2994,6 +3528,12 @@
             "state" : "translated",
             "value" : "一次性付费"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pagamento único"
+          }
         }
       }
     },
@@ -3022,6 +3562,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开登录项"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Itens de Início de Sessão"
           }
         }
       }
@@ -3052,6 +3598,12 @@
             "state" : "translated",
             "value" : "以 MIT 协议开源。Command Reopen 不需要任何系统权限——你可以在源代码里自己核实，不必只听我们说。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código aberto sob licença MIT. O Command Reopen não precisa de permissões do sistema — e você pode verificar isso no código-fonte em vez de apenas confiar na nossa palavra."
+          }
         }
       }
     },
@@ -3081,6 +3633,12 @@
             "state" : "translated",
             "value" : "探索其他使用方式"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras formas de usar"
+          }
         }
       }
     },
@@ -3108,6 +3666,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一次买断，永久使用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pague uma vez, use para sempre"
           }
         }
       }
@@ -3138,6 +3702,12 @@
             "state" : "translated",
             "value" : "购买页"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paywall"
+          }
         }
       }
     },
@@ -3167,6 +3737,12 @@
             "state" : "translated",
             "value" : "每年"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "por ano"
+          }
         }
       }
     },
@@ -3195,6 +3771,12 @@
             "state" : "translated",
             "value" : "隐私政策"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidade"
+          }
         }
       }
     },
@@ -3219,6 +3801,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pro"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pro"
@@ -3251,6 +3839,12 @@
             "state" : "translated",
             "value" : "Pro 权限"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acesso Pro"
+          }
         }
       }
     },
@@ -3280,6 +3874,12 @@
             "state" : "translated",
             "value" : "购买已完成，但 Pro 权限仍在同步。请稍候，或点按“恢复购买”。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra concluída, mas o acesso Pro ainda está sincronizando. Aguarde um momento ou use Restaurar Compra."
+          }
         }
       }
     },
@@ -3307,6 +3907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂时无法获取购买选项。请稍后再试，或恢复已有的购买。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As opções de compra estão indisponíveis no momento. Tente novamente mais tarde ou restaure uma compra existente."
           }
         }
       }
@@ -3336,6 +3942,12 @@
             "state" : "translated",
             "value" : "购买已恢复。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra restaurada."
+          }
         }
       }
     },
@@ -3363,6 +3975,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "购买成功，Pro 已解锁。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compra realizada com sucesso. Pro desbloqueado."
           }
         }
       }
@@ -3393,6 +4011,12 @@
             "state" : "translated",
             "value" : "此 Mac 已关闭购买功能。请检查“屏幕使用时间”中的内容和隐私访问限制。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As compras estão desativadas neste Mac. Verifique as restrições de conteúdo e privacidade no Tempo de Uso."
+          }
         }
       }
     },
@@ -3422,6 +4046,12 @@
             "state" : "translated",
             "value" : "此版本无法进行购买。请联系支持。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As compras não estão disponíveis nesta versão. Entre em contato com o suporte."
+          }
         }
       }
     },
@@ -3449,6 +4079,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法购买"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compras indisponíveis"
           }
         }
       }
@@ -3479,6 +4115,12 @@
             "state" : "translated",
             "value" : "退出 %@"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encerrar %@"
+          }
         }
       }
     },
@@ -3507,6 +4149,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "退出 App"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encerrar o app"
           }
         }
       }
@@ -3537,6 +4185,12 @@
             "state" : "translated",
             "value" : "去 App Store 评价"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaliar na App Store"
+          }
         }
       }
     },
@@ -3565,6 +4219,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移除 %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover %@"
           }
         }
       }
@@ -3595,6 +4255,12 @@
             "state" : "translated",
             "value" : "重新打开"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reabertura"
+          }
         }
       }
     },
@@ -3624,6 +4290,12 @@
             "state" : "translated",
             "value" : "恢复所有最小化窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar todas as janelas minimizadas"
+          }
         }
       }
     },
@@ -3651,6 +4323,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "恢复购买"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurar Compra"
           }
         }
       }
@@ -3681,6 +4359,12 @@
             "state" : "translated",
             "value" : "已恢复"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurada"
+          }
         }
       }
     },
@@ -3708,6 +4392,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按 Cmd+Tab 时恢复最小化和已关闭的窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaura janelas minimizadas e fechadas com Cmd+Tab"
           }
         }
       }
@@ -3738,6 +4428,12 @@
             "state" : "translated",
             "value" : "挽留特惠"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oferta de retenção"
+          }
         }
       }
     },
@@ -3766,6 +4462,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自动交还焦点给上一 App"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retornar foco ao app anterior"
           }
         }
       }
@@ -3796,6 +4498,12 @@
             "state" : "translated",
             "value" : "评价 Command Reopen"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaliar o Command Reopen"
+          }
         }
       }
     },
@@ -3824,6 +4532,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "好评弹窗"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitação de avaliação"
           }
         }
       }
@@ -3854,6 +4568,12 @@
             "state" : "translated",
             "value" : "相同的 App，另一种支持方式"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O mesmo app, pago de outra forma"
+          }
         }
       }
     },
@@ -3883,6 +4603,12 @@
             "state" : "translated",
             "value" : "搜索 App 名称或 Bundle ID…"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar nome do app ou bundle ID…"
+          }
         }
       }
     },
@@ -3910,6 +4636,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试一下"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja como funciona"
           }
         }
       }
@@ -3941,6 +4673,12 @@
             "state" : "translated",
             "value" : "已选中"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecionado"
+          }
         }
       }
     },
@@ -3968,6 +4706,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "设置…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes…"
           }
         }
       }
@@ -3998,6 +4742,12 @@
             "state" : "translated",
             "value" : "显示菜单栏图标"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar ícone na barra de menus"
+          }
         }
       }
     },
@@ -4026,6 +4776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "源代码"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código-fonte"
           }
         }
       }
@@ -4056,6 +4812,12 @@
             "state" : "translated",
             "value" : "桌面空间"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spaces"
+          }
         }
       }
     },
@@ -4085,6 +4847,12 @@
             "state" : "translated",
             "value" : "在 GitHub 点 Star"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dar uma estrela no GitHub"
+          }
         }
       }
     },
@@ -4112,6 +4880,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开始免费试用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar teste grátis"
           }
         }
       }
@@ -4141,6 +4915,12 @@
             "state" : "translated",
             "value" : "准备好了就开始免费试用。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicie o teste grátis quando estiver tudo pronto."
+          }
         }
       }
     },
@@ -4168,6 +4948,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "开始使用 Command Reopen 后即可查看趋势"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comece a usar o Command Reopen para ver tendências"
           }
         }
       }
@@ -4198,6 +4984,12 @@
             "state" : "translated",
             "value" : "统计"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estatísticas"
+          }
         }
       }
     },
@@ -4226,6 +5018,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "统计 — 已恢复 %@ 次"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estatísticas — %@ restauradas"
           }
         }
       }
@@ -4256,6 +5054,12 @@
             "state" : "translated",
             "value" : "统计"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estatísticas"
+          }
         }
       }
     },
@@ -4284,6 +5088,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "状态"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
           }
         }
       }
@@ -4314,6 +5124,12 @@
             "state" : "translated",
             "value" : "停留在程序坞"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "permanece no Dock"
+          }
         }
       }
     },
@@ -4341,6 +5157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "支持"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suporte"
           }
         }
       }
@@ -4371,6 +5193,12 @@
             "state" : "translated",
             "value" : "切换 App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar entre apps"
+          }
         }
       }
     },
@@ -4399,6 +5227,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切回 App"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "voltar ao app"
           }
         }
       }
@@ -4429,6 +5263,12 @@
             "state" : "translated",
             "value" : "切换桌面空间"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar entre Spaces"
+          }
         }
       }
     },
@@ -4458,6 +5298,12 @@
             "state" : "translated",
             "value" : "在同一个 App 里切换窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alternar entre janelas de um app"
+          }
         }
       }
     },
@@ -4486,6 +5332,12 @@
             "state" : "translated",
             "value" : "使用条款"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termos"
+          }
         }
       }
     },
@@ -4513,6 +5365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "测试流程"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testar fluxos"
           }
         }
       }
@@ -4543,6 +5401,12 @@
             "state" : "translated",
             "value" : "App 切回来了，窗口还在程序坞里。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O app volta. A janela permanece no Dock."
+          }
         }
       }
     },
@@ -4571,6 +5435,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Store 尚未同步完这笔购买。请稍后再试，或点按“恢复购买”。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A App Store ainda não concluiu a sincronização desta compra. Tente novamente em instantes ou use Restaurar Compra."
           }
         }
       }
@@ -4601,6 +5471,12 @@
             "state" : "translated",
             "value" : "App Store 暂时没有提供此方案。请稍后再试。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A App Store não está oferecendo este plano no momento. Tente novamente mais tarde."
+          }
         }
       }
     },
@@ -4628,6 +5504,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法完成购买。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível concluir a compra."
           }
         }
       }
@@ -4658,6 +5540,12 @@
             "state" : "translated",
             "value" : "购买已取消。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A compra foi cancelada."
+          }
         }
       }
     },
@@ -4686,6 +5574,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "窗口跟着一起回来。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A janela volta com ele."
           }
         }
       }
@@ -4716,6 +5610,12 @@
             "state" : "translated",
             "value" : "之后按"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e depois"
+          }
         }
       }
     },
@@ -4744,6 +5644,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "免费版功能完整且永久可用。在 App Store 购买可赞助后续开发并获得自动更新。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta versão gratuita tem todos os recursos e sempre terá. A versão da App Store é idêntica — comprá-la financia o desenvolvimento e garante atualizações automáticas."
           }
         }
       }
@@ -4774,6 +5680,12 @@
             "state" : "translated",
             "value" : "这是免费的社区版本"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta é a versão gratuita da comunidade"
+          }
         }
       }
     },
@@ -4802,6 +5714,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoje"
           }
         }
       }
@@ -4832,6 +5750,12 @@
             "state" : "translated",
             "value" : "最常恢复的 App"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Principais Apps"
+          }
         }
       }
     },
@@ -4860,6 +5784,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "累计恢复次数"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "total de reaberturas"
           }
         }
       }
@@ -4890,6 +5820,12 @@
             "state" : "translated",
             "value" : "趋势"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tendência"
+          }
         }
       }
     },
@@ -4917,6 +5853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teste"
           }
         }
       }
@@ -4946,6 +5888,12 @@
             "state" : "translated",
             "value" : "试用已结束"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teste encerrado"
+          }
         }
       }
     },
@@ -4974,33 +5922,11 @@
             "state" : "translated",
             "value" : "未开始试用"
           }
-        }
-      }
-    },
-    "Try every Pro feature free for 2 days. No payment now — nothing auto-renews." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Pro-Funktionen 2 Tage kostenlos testen. Keine automatische Verlängerung."
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essayez toutes les fonctionnalités Pro pendant 2 jours. Aucun renouvellement automatique."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての機能を2日間無料でお試しいただけます。自動更新はありません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "免费试用 2 天完整功能。无需提前付款，不会自动扣费。"
+            "value" : "Teste não iniciado"
           }
         }
       }
@@ -5031,6 +5957,12 @@
             "state" : "translated",
             "value" : "重新开启"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reativar"
+          }
         }
       }
     },
@@ -5059,6 +5991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在“辅助功能”中开启 Command Reopen，即可使用可选的高级窗口恢复模式。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ative o Command Reopen em Acessibilidade para usar seu modo opcional de restauração avançada de janelas."
           }
         }
       }
@@ -5089,6 +6027,12 @@
             "state" : "translated",
             "value" : "以特惠价解锁 Pro 终身版"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear Vitalício com 20% de desconto"
+          }
         }
       }
     },
@@ -5116,6 +6060,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "升级"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fazer upgrade"
           }
         }
       }
@@ -5145,6 +6095,12 @@
             "state" : "translated",
             "value" : "解锁以继续自动恢复窗口。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faça upgrade para continuar reabrindo janelas automaticamente."
+          }
         }
       }
     },
@@ -5172,6 +6128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "升级到 Pro…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fazer upgrade para o Pro…"
           }
         }
       }
@@ -5202,6 +6164,12 @@
             "state" : "translated",
             "value" : "使用高级窗口恢复"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar restauração avançada de janelas"
+          }
         }
       }
     },
@@ -5229,6 +6197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在验证你的 Command Reopen Pro 权限。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando o acesso ao Command Reopen Pro."
           }
         }
       }
@@ -5258,6 +6232,12 @@
             "state" : "translated",
             "value" : "查看选项"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver opções"
+          }
         }
       }
     },
@@ -5286,6 +6266,12 @@
             "state" : "translated",
             "value" : "查看方案"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver planos"
+          }
         }
       }
     },
@@ -5313,6 +6299,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无法验证你的购买状态。请在联网后重试。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível verificar o status da compra. Tente novamente quando estiver online."
           }
         }
       }
@@ -5343,6 +6335,12 @@
             "state" : "translated",
             "value" : "网站"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Site"
+          }
         }
       }
     },
@@ -5371,6 +6369,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "欢迎"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boas-vindas"
           }
         }
       }
@@ -5401,6 +6405,12 @@
             "state" : "translated",
             "value" : "启用后，Command Reopen 使用辅助功能抬起窗口；“恢复全部”会恢复所有最小化窗口；程序坞点按循环会最小化前台 App、恢复全部已最小化窗口，并保留后台 App 的原生激活行为。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando ativado, o Command Reopen usa a Acessibilidade para trazer uma janela para a frente. Restaurar Tudo traz de volta todas as janelas minimizadas. A Alternância ao Clicar no Dock minimiza o app em primeiro plano, restaura todas as janelas minimizadas e mantém nativa a ativação de apps em segundo plano."
+          }
         }
       }
     },
@@ -5430,6 +6440,12 @@
             "state" : "translated",
             "value" : "关闭或最小化某个 App 的最后一个窗口后，焦点自动交还，Cmd+Tab 即可立刻切回。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando você fecha ou minimiza a última janela de um app, o foco retorna para que o Cmd+Tab a traga de volta imediatamente."
+          }
         }
       }
     },
@@ -5457,6 +6473,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "挽回优惠期"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Janela de retenção"
           }
         }
       }
@@ -5487,6 +6509,12 @@
             "state" : "translated",
             "value" : "窗口"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Janelas"
+          }
         }
       }
     },
@@ -5515,6 +6543,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "试用期已恢复窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "janelas restauradas no teste"
           }
         }
       }
@@ -5545,6 +6579,12 @@
             "state" : "translated",
             "value" : "按年订阅"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anual"
+          }
         }
       }
     },
@@ -5574,6 +6614,12 @@
             "state" : "translated",
             "value" : "最小化或关闭窗口后，按 Cmd+Tab 切回，Command Reopen 会自动将其恢复到屏幕。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você minimiza uma janela, volta com Cmd+Tab — mas a janela sumiu. O Command Reopen resolve isso."
+          }
         }
       }
     },
@@ -5602,34 +6648,11 @@
             "state" : "translated",
             "value" : "一切就绪"
           }
-        }
-      }
-    },
-    "Your free trial is active — 2 days, and nothing is charged until you pick a plan." : {
-      "comment" : "Subtitle of the final onboarding step in the App Store build.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine 2-tägige Testphase ist aktiv. Keine automatische Belastung."
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre essai gratuit de 2 jours est actif. Aucun prélèvement automatique."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2日間の無料トライアルが有効です。自動請求はありません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2 天免费试用已开启，无任何自动扣费。"
+            "value" : "Tudo pronto"
           }
         }
       }
@@ -5660,6 +6683,12 @@
             "state" : "translated",
             "value" : "你的 Pro 权限将于 %@ 到期。在此之前一切照常。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O seu acesso Pro termina em %@. Tudo continuará funcionando até lá."
+          }
         }
       }
     },
@@ -5688,6 +6717,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你的 Pro 权限永久有效，感谢支持独立开发。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O seu acesso Pro nunca expira. Obrigado pela compra."
           }
         }
       }
@@ -5718,6 +6753,12 @@
             "state" : "translated",
             "value" : "你的 Pro 权限将于 %@ 续期。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O seu acesso Pro se renova em %@."
+          }
         }
       }
     },
@@ -5747,6 +6788,12 @@
             "state" : "translated",
             "value" : "零权限"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zero permissões"
+          }
         }
       }
     },
@@ -5775,117 +6822,11 @@
             "state" : "translated",
             "value" : "零权限——沙盒运行，无需任何授权"
           }
-        }
-      }
-    },
-    "Your free trial ends in %lld days" : {
-      "comment" : "Paywall title while the trial runs; plural-aware in the catalog.",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Your free trial ends in %lld day"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Your free trial ends in %lld days"
-                }
-              }
-            }
-          }
         },
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Deine kostenlose Testphase endet in %lld Tag"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Deine kostenlose Testphase endet in %lld Tagen"
-                }
-              }
-            }
-          }
-        },
-        "fr" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Votre essai gratuit se termine dans %lld jour"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Votre essai gratuit se termine dans %lld jours"
-                }
-              }
-            }
-          }
-        },
-        "ja" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "無料トライアルはあと%lld日で終了します"
-                }
-              }
-            }
-          }
-        },
-        "zh-Hans" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "免费试用将在 %lld 天后结束"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Your free trial ends today" : {
-      "comment" : "Paywall title during the trial's final day.",
-      "localizations" : {
-        "de" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine kostenlose Testphase endet heute"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre essai gratuit se termine aujourd’hui"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料トライアルは今日で終了します"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "免费试用今天结束"
+            "value" : "Zero permissões — em sandbox, nada a conceder"
           }
         }
       }
@@ -5916,34 +6857,11 @@
             "state" : "translated",
             "value" : "免费试用已结束"
           }
-        }
-      }
-    },
-    "Choose a plan to keep Cmd+Tab bringing your windows back after the trial." : {
-      "comment" : "Paywall subtitle while the free trial is still running.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle einen Plan, damit Cmd+Tab deine Fenster auch nach der Testphase zurückholt."
-          }
         },
-        "fr" : {
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choisissez une formule pour que Cmd+Tab continue de ramener vos fenêtres après l’essai."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プランを選ぶと、トライアル終了後もCmd+Tabでウインドウが戻ります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择一个方案，试用结束后 Cmd+Tab 仍会帮你恢复窗口。"
+            "value" : "O seu teste grátis terminou"
           }
         }
       }
@@ -5974,6 +6892,12 @@
             "state" : "translated",
             "value" : "Cmd+Tab 已停止恢复你的窗口。"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Cmd+Tab parou de restaurar suas janelas."
+          }
         }
       }
     },
@@ -6003,6 +6927,12 @@
             "state" : "translated",
             "value" : "撰写评论"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escrever uma Avaliação"
+          }
         }
       }
     },
@@ -6031,6 +6961,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "感谢购买 Command Reopen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obrigado por comprar o Command Reopen"
           }
         }
       }
@@ -6109,6 +7045,24 @@
               }
             }
           }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld janela restaurada"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld janelas restauradas"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -6137,6 +7091,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "如果它帮你省去了 Cmd+Tab 的麻烦，在 App Store 写几句评论，能让遇到同样问题的人找到它。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se o app poupou você de complicações com o Cmd+Tab, uma breve avaliação na App Store ajuda outras pessoas com o mesmo problema a encontrá-lo."
           }
         }
       }
@@ -6215,6 +7175,24 @@
               }
             }
           }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ele restaurou %lld janela até agora."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ele restaurou %lld janelas até agora."
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -6243,6 +7221,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已恢复窗口"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Janelas restauradas"
           }
         }
       }
@@ -6273,6 +7257,12 @@
             "state" : "translated",
             "value" : "你的方案"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu plano"
+          }
         }
       }
     },
@@ -6301,6 +7291,366 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "其中最多的是 %@。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A maioria delas foi no %@."
+          }
+        }
+      }
+    },
+    "Keep every window one Cmd+Tab away" : {
+      "comment" : "Paywall title at the end of onboarding, before the free trial starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのウインドウをCmd+Tabひとつで復元"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes Fenster per Cmd+Tab wiederherstellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer chaque fenêtre avec Cmd+Tab"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "任意窗口，按一次 Cmd+Tab 即可恢复"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenha qualquer janela a um Cmd+Tab de distância"
+          }
+        }
+      }
+    },
+    "Every feature, free for 2 days." : {
+      "comment" : "Paywall subtitle before the free trial has started, mainly at the end of onboarding. One short line.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所有功能，免费试用 2 天。"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての機能を2日間無料で。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen, 2 Tage kostenlos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctionnalités, gratuites pendant 2 jours."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos os recursos, grátis por 2 dias."
+          }
+        }
+      }
+    },
+    "Start 2-day free trial" : {
+      "comment" : "Starts the free trial; the primary button at the end of onboarding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2日間の無料トライアルを開始"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2-tägige kostenlose Testphase starten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrer l’essai gratuit de 2 jours"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始 2 天免费试用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar teste grátis de 2 dias"
+          }
+        }
+      }
+    },
+    "Buy Lifetime" : {
+      "comment" : "Purchase button before the trial ends; Lifetime is the plan name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "買い切り版を購入"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lifetime kaufen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acheter À vie"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "购买终身版"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprar Vitalício"
+          }
+        }
+      }
+    },
+    "No payment details needed. Nothing renews." : {
+      "comment" : "Paywall footnote before the free trial starts.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支払い情報は不要です。自動更新はありません。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Zahlungsdaten erforderlich. Keine automatische Verlängerung."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune information de paiement requise. Aucun renouvellement automatique."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无需提供付款信息，不会自动扣费。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não requer dados de pagamento. Nada se renova."
+          }
+        }
+      }
+    },
+    "Buy once, use on every Mac with your Apple Account" : {
+      "comment" : "Paywall feature: a Mac App Store purchase restores on every Mac signed in to the same Apple Account.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一度の購入で、同じApple AccountのすべてのMacで使えます"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einmal kaufen, auf jedem Mac mit deinem Apple Account nutzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achetez une fois, utilisez sur tous vos Mac avec votre compte Apple"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一次买断，登录同一 Apple 账户的所有 Mac 均可使用"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compre uma vez e use em qualquer Mac com a sua Conta Apple"
+          }
+        }
+      }
+    },
+    "Free trial · ends today" : {
+      "comment" : "Paywall subtitle on the free trial's last day.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料トライアル・今日で終了"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlose Testphase · endet heute"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essai gratuit · se termine aujourd’hui"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费试用 · 今天结束"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teste grátis · termina hoje"
+          }
+        }
+      }
+    },
+    "Free trial · %lld days left" : {
+      "comment" : "Paywall subtitle while the free trial runs; plural-aware in the catalog.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Free trial · %lld day left"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Free trial · %lld days left"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "無料トライアル・残り%lld日"
+                }
+              }
+            }
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kostenlose Testphase · noch %lld Tag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kostenlose Testphase · noch %lld Tage"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Essai gratuit · il reste %lld jour"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Essai gratuit · il reste %lld jours"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "免费试用 · 还剩 %lld 天"
+                }
+              }
+            }
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Teste grátis · %lld dia restante"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Teste grátis · %lld dias restantes"
+                }
+              }
+            }
           }
         }
       }

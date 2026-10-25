@@ -17,23 +17,23 @@ enum PaywallPresentationContext {
     }
 }
 
-/// What the paywall's headline says, decided by access state alone.
+/// What the paywall's headline says.
 ///
-/// The product name told a user whose trial had just ended nothing about why
-/// Cmd+Tab stopped working. The headline now states the one fact the user
-/// opened the sheet — or had it opened for them — to learn.
+/// Onboarding is the first look at the price, before the trial has started:
+/// it states what the app does. While a trial runs, its days left sit in the
+/// subtitle as status, not as a countdown headline. After the trial ends, the
+/// headline says so, because that is when the user has a decision to make.
 enum PaywallHeadline: Equatable {
-    case trialEnds(inDays: Int)
-    case trialEndsToday
+    case onboarding
     case trialEnded
     case product
 
-    static func resolve(status: KikiAccessState) -> PaywallHeadline {
+    static func resolve(status: KikiAccessState, context: PaywallPresentationContext) -> PaywallHeadline {
         switch status {
-        case .trial(.time(let daysRemaining, _)):
-            return daysRemaining > 1 ? .trialEnds(inDays: daysRemaining) : .trialEndsToday
         case .expired:
             return .trialEnded
+        case .notStarted where context == .onboarding:
+            return .onboarding
         case .notStarted, .free, .trial, .pro:
             return .product
         }
@@ -55,6 +55,10 @@ struct PaywallSheetView: View {
     /// request — so a status that turns Pro mid-flow must not swap the sheet
     /// out from under it.
     @State private var hasTransactedInSheet = false
+    /// Whether this sheet opened before the trial started. Kiki finishes the
+    /// sheet after "Start free trial" through the same callback as close; a
+    /// trial running by then means the user started it here.
+    @State private var opensBeforeTrial: Bool?
     @State private var analyticsSession = CommandReopenAnalytics.shared.newSession()
 
     var body: some View {
@@ -66,6 +70,9 @@ struct PaywallSheetView: View {
                 ProAccessStatusView(accessModel: accessModel, onDone: onFinish)
             } else {
                 paywall.onAppear {
+                    if opensBeforeTrial == nil {
+                        opensBeforeTrial = accessModel.status.canStartTrial
+                    }
                     // One viewed event per sheet: the session id dedupes re-appearance.
                     track(.paywallViewed(session: analyticsSession, source: source ?? PaywallSourceRelay.take()))
                 }
@@ -138,17 +145,18 @@ struct PaywallSheetView: View {
             copy: KikiAccessPaywallCopy(
                 title: headline,
                 proSubtitle: "",
-                trialSubtitle: appLanguage.string(localized: "Choose a plan to keep Cmd+Tab bringing your windows back after the trial.",
-                    comment: "Paywall subtitle while the free trial is still running."),
+                trialSubtitle: trialSubtitle,
                 expiredSubtitle: appLanguage.string(localized: "Cmd+Tab has stopped restoring your windows.",
                     comment: "Paywall subtitle after the trial ended, naming what stopped working."),
-                notStartedSubtitle: appLanguage.string(localized: "Try every Pro feature free for 2 days. No payment now — nothing auto-renews."),
+                notStartedSubtitle: appLanguage.string(localized: "Every feature, free for 2 days.",
+                    comment: "Paywall subtitle before the free trial has started, mainly at the end of onboarding. One short line."),
                 // With the user's own figures on the sheet, feature bullets
                 // only push the prices further down. Without them, the
                 // bullets are the only case being made.
                 features: receipt == nil ? features : [],
                 purchaseActionTitle: purchaseActionTitle,
-                trialActionTitle: appLanguage.string(localized: "Start free trial"),
+                trialActionTitle: appLanguage.string(localized: "Start 2-day free trial",
+                    comment: "Starts the free trial; the primary button at the end of onboarding."),
                 restoreActionTitle: appLanguage.string(localized: "Restore Purchase"),
                 doneActionTitle: appLanguage.string(localized: "Done"),
                 loadingOptionsMessage: appLanguage.string(localized: "Loading purchase options…"),
@@ -162,11 +170,18 @@ struct PaywallSheetView: View {
             footerLinks: footerLinks,
             displayPlanIDs: RevenueCatConfiguration.visiblePaywallPlanIDs,
             planPresentation: localizedPlanPresentation(for:),
+            note: trialNote,
             tint: DS.Colors.brandPrimary,
             onFinish: {
                 let didCompletePurchase = accessModel.accessManager.commerceFeedback == .purchaseSucceeded
                 if !didCompletePurchase {
-                    track(.paywallAction(session: analyticsSession, action: .close, plan: nil))
+                    let didStartTrial: Bool
+                    if opensBeforeTrial == true, case .trial = accessModel.status {
+                        didStartTrial = true
+                    } else {
+                        didStartTrial = false
+                    }
+                    track(.paywallAction(session: analyticsSession, action: didStartTrial ? .startTrial : .close, plan: nil))
                 }
                 onFinish()
 
@@ -177,13 +192,10 @@ struct PaywallSheetView: View {
     }
 
     private var headline: String {
-        switch PaywallHeadline.resolve(status: accessModel.status) {
-        case .trialEnds(let days):
-            return appLanguage.string(localized: "Your free trial ends in \(days) days",
-                comment: "Paywall title while the trial runs; plural-aware in the catalog.")
-        case .trialEndsToday:
-            return appLanguage.string(localized: "Your free trial ends today",
-                comment: "Paywall title during the trial's final day.")
+        switch PaywallHeadline.resolve(status: accessModel.status, context: context) {
+        case .onboarding:
+            return appLanguage.string(localized: "Keep every window one Cmd+Tab away",
+                comment: "Paywall title at the end of onboarding, before the free trial starts.")
         case .trialEnded:
             return appLanguage.string(localized: "Your free trial has ended",
                 comment: "Paywall title after the trial ended without a purchase.")
@@ -192,25 +204,46 @@ struct PaywallSheetView: View {
         }
     }
 
-    private var features: [String] {
-        [
-            appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab"),
-            appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"),
-            appLanguage.string(localized: "Exclude apps you don’t want restored")
-        ]
+    /// Trial status, not a countdown: the days left read as a fact.
+    private var trialSubtitle: String {
+        guard case .trial(.time(let days, _)) = accessModel.status, days > 1 else {
+            return appLanguage.string(localized: "Free trial · ends today",
+                comment: "Paywall subtitle on the free trial's last day.")
+        }
+        return appLanguage.string(localized: "Free trial · \(days) days left",
+            comment: "Paywall subtitle while the free trial runs; plural-aware in the catalog.")
     }
 
-    /// The purchase button names the outcome, not the transaction.
-    ///
-    /// It deliberately says nothing about how long access lasts: this one label
-    /// is shown for whichever plan happens to be selected, so any promise of
-    /// "forever" is false the moment the user picks the yearly card. Duration
-    /// belongs on the plan cards, which state it per plan.
+    /// Shown only while the trial can still be started, where charge anxiety
+    /// would otherwise stop someone from starting it.
+    private var trialNote: String? {
+        guard accessModel.status.canStartTrial else { return nil }
+        return appLanguage.string(localized: "No payment details needed. Nothing renews.",
+            comment: "Paywall footnote before the free trial starts.")
+    }
+
+    /// Onboarding's paywall is a fixed 520-point card inside the welcome
+    /// window, and two full-width buttons sit under the plan. Someone who has
+    /// just installed the app was asked for no permission, so that bullet is
+    /// left to Settings, where the card can grow.
+    private var features: [String] {
+        let restores = appLanguage.string(localized: "Restores minimized and closed windows on Cmd+Tab")
+        let everyMac = appLanguage.string(localized: "Buy once, use on every Mac with your Apple Account",
+            comment: "Paywall feature: a Mac App Store purchase restores on every Mac signed in to the same Apple Account.")
+        if context == .onboarding {
+            return [restores, everyMac]
+        }
+        return [restores, appLanguage.string(localized: "Zero permissions — sandboxed, nothing to grant"), everyMac]
+    }
+
+    /// After the trial ends the button names the outcome, because the feature
+    /// has already stopped. Before that it names the one plan the paywall
+    /// lists; the price stays on the card, in the storefront's currency.
     private var purchaseActionTitle: String {
         if case .expired = accessModel.status {
             return appLanguage.string(localized: "Turn it back on", comment: "Purchase button after the trial ended, when the feature has already stopped.")
         }
-        return appLanguage.string(localized: "Keep it working", comment: "Purchase button while the feature is still running on a trial.")
+        return appLanguage.string(localized: "Buy Lifetime", comment: "Purchase button before the trial ends; Lifetime is the plan name.")
     }
 
     /// The access manager retains its commerce configuration for the whole
@@ -230,7 +263,8 @@ struct PaywallSheetView: View {
         case .lifetime, .winbackLifetime:
             title = appLanguage.string(localized: "Lifetime")
             billingDetail = appLanguage.string(localized: "once")
-            badge = plan == .lifetime ? appLanguage.string(localized: "Best Value") : nil
+            // Lifetime is the only plan listed; "Best Value" compared it with nothing.
+            badge = nil
         default:
             title = product.title
             billingDetail = product.billingDetail

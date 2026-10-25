@@ -1,5 +1,21 @@
 # Changelog / 更新日志
 
+## 1.5.3 — 2026-10-26
+
+### English
+
+- The tutorial now ends on its own step where you start the 2-day free trial, with buying Lifetime as the other option. The trial no longer starts in the background at first launch; closing the tutorial early still starts it.
+- Fixed: closing the purchase sheet at the end of the tutorial did nothing, so the tutorial could not be finished.
+- The purchase sheet during a trial shows the days left as a status line instead of a countdown headline, and the only plan no longer carries a "Best Value" badge.
+- New: Brazilian Portuguese interface.
+
+### 中文
+
+- 引导最后一步改为单独的试用页：在这里开始 2 天免费试用，也可以直接买断终身版。试用不再在首次启动时自动开始；中途关闭引导也会开始试用。
+- 修复：引导结尾的购买页点关闭没有反应，导致无法完成引导。
+- 试用期间的购买页把剩余天数放在副标题里作为状态显示，不再用倒计时标题；唯一的方案不再标注“Best Value”。
+- 新增巴西葡萄牙语界面。
+
 ## 1.5.2 — 2026-10-20
 
 ### English

@@ -37,9 +37,9 @@ enum PaywallSourceRelay {
 }
 
 enum CommandReopenEvent: KikiAnalyticsEvent {
-    enum OnboardingStep: String { case welcome, tryMinimize = "try_minimize", success, finish }
+    enum OnboardingStep: String { case welcome, tryMinimize = "try_minimize", success, finish, paywall }
     enum OnboardingOutcome: String { case finished, closed }
-    enum PaywallActionKind: String { case purchase, restore, close }
+    enum PaywallActionKind: String { case purchase, restore, startTrial = "start_trial", close }
     enum PurchaseOutcome: String { case success, cancelled, pending, failed }
     enum PlanKind: String { case lifetime, winbackLifetime = "winback_lifetime" }
     enum ErrorCategory: String {

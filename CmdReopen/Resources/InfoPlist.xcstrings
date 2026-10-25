@@ -9,6 +9,12 @@
             "state" : "translated",
             "value" : "Command Reopen"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen"
+          }
         }
       }
     },
@@ -16,6 +22,12 @@
       "comment" : "Bundle name",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Command Reopen"
@@ -30,6 +42,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright © 2025 CHEN. All rights reserved."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright © 2025 CHEN. Todos os direitos reservados."
           }
         }
       }

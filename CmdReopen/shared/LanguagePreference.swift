@@ -14,6 +14,7 @@ enum SupportedLanguage: String, CaseIterable, Identifiable {
     case japanese = "ja"
     case german = "de"
     case french = "fr"
+    case portuguese = "pt-BR"
 
     var id: String { rawValue }
 
@@ -28,6 +29,7 @@ enum SupportedLanguage: String, CaseIterable, Identifiable {
         case .japanese: "日本語"
         case .german:   "Deutsch"
         case .french:   "Français"
+        case .portuguese: "Português (Brasil)"
         }
     }
 }

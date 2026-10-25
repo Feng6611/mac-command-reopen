@@ -21,13 +21,18 @@ import KikiCommerceCore
 @MainActor
 enum CommandReopenOnboardingFlow {
     static let windowSize = CGSize(width: 680, height: 600)
+#if APPSTORE
+    static let stepCount = 5
+#else
     static let stepCount = 4
+#endif
 
     enum StepID {
         static let welcome = "welcome"
         static let tryMinimize = "tryMinimize"
         static let success = "success"
         static let finish = "finish"
+        static let paywall = "paywall"
     }
 
     static var tryMinimizeStepID: String { "custom.\(StepID.tryMinimize)" }
@@ -37,7 +42,7 @@ enum CommandReopenOnboardingFlow {
         onMinimize: @escaping () -> Void,
         onFinished: @escaping @MainActor () -> Void
     ) -> KikiOnboardingCoordinator {
-        let steps: [KikiOnboardingStep] = [
+        var steps: [KikiOnboardingStep] = [
             .custom(id: StepID.welcome) { navigation in
                 AnyView(WelcomeStepView(navigation: navigation))
             },
@@ -51,6 +56,11 @@ enum CommandReopenOnboardingFlow {
                 AnyView(FinishStepView(navigation: navigation))
             }
         ]
+#if APPSTORE
+        steps.append(.custom(id: StepID.paywall) { navigation in
+            AnyView(PaywallStepView(navigation: navigation))
+        })
+#endif
 
         return KikiOnboardingCoordinator(
             configuration: KikiOnboardingConfiguration(
@@ -72,8 +82,8 @@ enum CommandReopenOnboardingFlow {
     }
 }
 
-/// Finishing onboarding always ends on the paywall, shown as a sheet over the
-/// last step, unless the person already owns Pro.
+/// Onboarding ends on the paywall step, where the trial starts, unless the
+/// person already owns Pro.
 enum OnboardingPaywallPolicy {
     static func shouldPresentPaywall(ownsPro: Bool) -> Bool { !ownsPro }
 }
@@ -279,40 +289,38 @@ private struct SuccessStepView: View {
     }
 }
 
-/// The last step, and the only one that changes anything about the machine.
+/// The setup step, and the only one that changes anything about the machine.
 ///
 /// It answers "what happens now": the app keeps running across restarts, and
-/// — for the free build — what it costs and how it gets funded. This is the
-/// last moment the user is looking at a window; after Continue the app has no
-/// Dock icon and lives in the menu bar.
+/// — for the free build — what it costs and how it gets funded. In the App
+/// Store build the paywall step follows; otherwise this is the last moment the
+/// user is looking at a window, and after it the app lives in the menu bar.
 private struct FinishStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
 #if APPSTORE
     @ObservedObject private var accessModel = CommandAccessModel.shared
 #endif
     @StateObject private var launchAtLoginManager = LaunchAtLoginManager()
-    @State private var showsPaywall = false
     let navigation: KikiOnboardingNavigation
 
     var body: some View {
         scaffold
+    }
+
+    private var leadsToPaywall: Bool {
 #if APPSTORE
-            // Closing the sheet, bought or not, is what finishes onboarding.
-            .sheet(isPresented: $showsPaywall, onDismiss: navigation.finish) {
-                PaywallSheetView(accessModel: accessModel, context: .onboarding, source: .onboarding)
-                    .environment(\.locale, appLanguage.locale)
-            }
+        OnboardingPaywallPolicy.shouldPresentPaywall(ownsPro: accessModel.status.isPro)
+#else
+        false
 #endif
     }
 
     private func getStarted() {
-#if APPSTORE
-        if OnboardingPaywallPolicy.shouldPresentPaywall(ownsPro: accessModel.status.isPro) {
-            showsPaywall = true
-            return
+        if leadsToPaywall {
+            navigation.advance()
+        } else {
+            navigation.finish()
         }
-#endif
-        navigation.finish()
     }
 
     private var scaffold: some View {
@@ -322,7 +330,7 @@ private struct FinishStepView: View {
             bodyText: bodyText,
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(
-                title: AppLanguage.shared.string("Get Started"),
+                title: leadsToPaywall ? AppLanguage.shared.string("Continue") : AppLanguage.shared.string("Get Started"),
                 action: getStarted
             ),
             tint: DS.Colors.brandPrimary,
@@ -346,20 +354,10 @@ private struct FinishStepView: View {
         }
     }
 
+    /// Setup only. The trial and the price have their own step after this one.
     private var bodyText: String? {
-#if APPSTORE
-        switch accessModel.status {
-        case .trial:
-            return appLanguage.string("Your free trial is active — 2 days, and nothing is charged until you pick a plan.")
-        case .expired:
-            return appLanguage.string("Upgrade to continue automatic window reopening.")
-        case .notStarted, .free, .pro:
-            return nil
-        }
-#else
-        return appLanguage.string(localized: "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart.",
-            comment: "Subtitle of the final onboarding step in the free build.")
-#endif
+        appLanguage.string(localized: "Command Reopen is running. Turn on Launch at Login to keep it ready after every restart.",
+            comment: "Subtitle of the setup step at the end of onboarding.")
     }
 
     private var launchAtLoginCard: some View {
@@ -418,6 +416,42 @@ private struct FinishStepView: View {
     }
 #endif
 }
+
+#if APPSTORE
+/// The last step: the price, stated before the app has been used, and the
+/// trial that starts here. Starting the trial is the way forward; buying is
+/// one tap away. Every way out — trial, purchase, close — finishes onboarding,
+/// and leaving without a choice starts the trial anyway (D-013).
+private struct PaywallStepView: View {
+    @ObservedObject private var appLanguage = AppLanguage.shared
+    @ObservedObject private var accessModel = CommandAccessModel.shared
+    let navigation: KikiOnboardingNavigation
+
+    var body: some View {
+        VStack(spacing: DS.Spacing.lg) {
+            PaywallSheetView(
+                accessModel: accessModel,
+                context: .onboarding,
+                source: .onboarding,
+                onFinish: navigation.finish
+            )
+            .environment(\.locale, appLanguage.locale)
+            // A sheet window rounds the card; embedded in the step, nothing does.
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.modal, style: .continuous))
+
+            KikiOnboardingProgressDots(
+                count: CommandReopenOnboardingFlow.stepCount,
+                currentIndex: CommandReopenOnboardingFlow.stepCount - 1,
+                tint: DS.Colors.brandPrimary
+            )
+        }
+        .frame(
+            width: CommandReopenOnboardingFlow.windowSize.width,
+            height: CommandReopenOnboardingFlow.windowSize.height
+        )
+    }
+}
+#endif
 
 // MARK: - Product Content
 
@@ -514,6 +548,28 @@ enum OnboardingLaunchRequest {
     static func clear(in defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: AppDefaults.RawKey.pendingOnboardingRelaunch)
         defaults.synchronize()
+    }
+}
+
+/// The process the Debug replay launches runs as a new install without
+/// touching the real one. Its access state lives in a scratch defaults suite,
+/// emptied at launch, so no trial has started and the trial length is the
+/// new-install one. Pro access begins forced to Not Pro, because a new user
+/// owns nothing even when the sandbox account does; it moves to Trial once the
+/// trial starts. Real defaults
+/// keep the developer's own trial, purchase, and override; the next normal
+/// launch is back on them.
+enum DebugNewInstallSession {
+    static let launchArgument = "-CmdReopenDebugNewInstall"
+    private static let suiteName = "CmdReopen.DebugNewInstall"
+
+    static var isActive: Bool {
+        ProcessInfo.processInfo.arguments.contains(launchArgument)
+    }
+
+    static func makeDefaults() -> UserDefaults {
+        UserDefaults.standard.removePersistentDomain(forName: suiteName)
+        return UserDefaults(suiteName: suiteName) ?? .standard
     }
 }
 #endif
@@ -642,7 +698,7 @@ final class OnboardingWindowController {
         installObservers()
     }
 
-    private static let analyticsSteps: [CommandReopenEvent.OnboardingStep] = [.welcome, .tryMinimize, .success, .finish]
+    private static let analyticsSteps: [CommandReopenEvent.OnboardingStep] = [.welcome, .tryMinimize, .success, .finish, .paywall]
 
     private func beginAnalytics(for coordinator: KikiOnboardingCoordinator) {
         let analytics = CommandReopenAnalytics.shared
@@ -672,6 +728,18 @@ final class OnboardingWindowController {
 
     func close() {
         coordinator?.close()
+    }
+
+    /// Onboarding's paywall step starts the trial. Leaving onboarding any other
+    /// way — closing the window early, or closing the paywall — starts it too,
+    /// so Cmd+Tab never silently does nothing after the user has seen it work.
+    private func startTrialIfLeftWithoutChoice() {
+#if APPSTORE
+        let accessModel = CommandAccessModel.shared
+        Task { @MainActor in
+            await accessModel.startTrialIfNeeded()
+        }
+#endif
     }
 
     private var isWaitingForCommandTabReturn: Bool {
@@ -719,6 +787,7 @@ final class OnboardingWindowController {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
         configuration.createsNewApplicationInstance = true
+        configuration.arguments = [DebugNewInstallSession.launchArgument]
 
         NSWorkspace.shared.openApplication(
             at: Bundle.main.bundleURL,
@@ -886,6 +955,7 @@ final class OnboardingWindowController {
 
     private func handleWindowWillClose() {
         reportCompletion(.closed)
+        startTrialIfLeftWithoutChoice()
         removeObservers()
         cancelActivationConfirmation()
         cancelReturnTimeout()
@@ -898,6 +968,14 @@ final class OnboardingWindowController {
 
     private func handleFinished() {
         reportCompletion(.finished)
+        startTrialIfLeftWithoutChoice()
+#if DEBUG && APPSTORE
+        // Kiki records completion in the real defaults; the simulated
+        // install's access state needs it too, or it would still be a first launch.
+        if DebugNewInstallSession.isActive {
+            CommandAccessModel.shared.finishOnboardingWithoutTrial()
+        }
+#endif
         ActivationMonitor.shared.setOnboardingSessionActive(false)
         restoreActivationPolicyIfNeeded()
         coordinator = nil

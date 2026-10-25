@@ -21,6 +21,9 @@ final class CommandAccessModel: ObservableObject {
     private var previousStatus: KikiAccessState
     private var hasPromptedForExpiredStateThisSession = false
     private var hasResolvedInitialReadiness = false
+#if DEBUG
+    private var simulatedTrialStartObservation: NSKeyValueObservation?
+#endif
 
     init(
         defaults: UserDefaults = .standard,
@@ -134,6 +137,13 @@ final class CommandAccessModel: ObservableObject {
         await accessManager.refresh()
     }
 
+    /// Starts the trial unless it already started or cannot. The onboarding
+    /// paywall's "Start free trial" is the way in; this covers leaving
+    /// onboarding without a choice, so Cmd+Tab never silently does nothing.
+    func startTrialIfNeeded() async {
+        await accessManager.startTrial()
+    }
+
     func finishOnboardingWithoutTrial() {
         defaults[AppDefaults.hasSeenOnboarding] = true
         objectWillChange.send()
@@ -178,6 +188,22 @@ final class CommandAccessModel: ObservableObject {
 
     func clearDebugProAccessOverride() {
         accessManager.clearDebugProAccessOverride()
+    }
+
+    /// Holds Pro access at "Not Pro" for the simulated new install, so a
+    /// sandbox purchase cannot hide the paywall. That override would also hide
+    /// the trial the user starts, and Kiki finishes the paywall only once the
+    /// trial is active, so the override moves to Trial at the moment the start
+    /// date is written — inside the same `startTrial` call.
+    func beginSimulatedNewInstall() {
+        setDebugProAccessOverride(.notPro)
+        simulatedTrialStartObservation = defaults.observe(\.cmdreopenTrialStartDate) { [weak self] defaults, _ in
+            MainActor.assumeIsolated {
+                guard let self, defaults.cmdreopenTrialStartDate != nil,
+                      self.debugProAccessOverride == .notPro else { return }
+                self.setDebugProAccessOverride(.trial)
+            }
+        }
     }
 
     /// Whether Debug Settings is holding the win-back window open.
@@ -257,3 +283,13 @@ final class CommandAccessModel: ObservableObject {
 
 @available(*, deprecated, renamed: "CommandAccessModel")
 typealias ProStatusManager = CommandAccessModel
+
+#if DEBUG
+private extension UserDefaults {
+    /// KVO handle for the trial start date; the key has no dots, so it is
+    /// observable under its raw name.
+    @objc dynamic var cmdreopenTrialStartDate: Any? {
+        object(forKey: AppDefaults.RawKey.trialStartDate)
+    }
+}
+#endif

@@ -1,5 +1,34 @@
 # Issue Log
 
+## I-006 — Onboarding paywall close button did not finish onboarding
+
+- Date: 2026-10-26
+- Status: Fixed in 1.5.3; the paywall is now onboarding's last step (D-013), and every way out of it finishes onboarding
+
+The onboarding host presented `PaywallSheetView` without `onFinish`. The shared
+paywall dismisses itself only in Settings; onboarding delegates dismissal to its
+host. Close actions therefore reached an empty callback, leaving the sheet open
+and preventing the sheet's `onDismiss` from finishing onboarding.
+
+Pass `onFinish: { showsPaywall = false }` from `FinishStepView`. The existing
+`onDismiss: navigation.finish` remains the single completion path after the
+sheet closes, including after a successful purchase or free-trial continuation.
+
+Upstream: app-owned presentation state; Kiki's onboarding callback contract is
+unchanged. The Settings caller already uses the component's automatic dismissal.
+No shared package or Starter change is needed for this host wiring correction.
+
+Validation: signed MAS Debug build and artifact configuration/signature checks
+passed; all 30 selected tests in `OnboardingPaywallPolicyTests`,
+`CommandAccessModelTests`, and `CommandReopenAnalyticsTests` passed. Gemini
+3.8 Flash High reviewed the callback chain with no findings after Claude's
+authentication failed. Debug was launched into onboarding with a process-local
+Trial override; the runtime log confirmed the minimize/Cmd+Tab exercise
+completed. Native UI automation timed out, so final manual acceptance remains:
+finish the exercise, click Get Started, close the paywall once, and confirm the
+sheet and onboarding close and Settings opens. Sandbox purchase/restore remain
+manual checks; no transaction was performed during this fix.
+
 ## I-001 — Onboarding icon appears at the end of Cmd+Tab
 
 - Date: 2026-07-25

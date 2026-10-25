@@ -31,9 +31,9 @@
 | 事件 | 触发点 | 频率 | 属性 |
 | --- | --- | --- | --- |
 | `onboarding started` | `OnboardingWindowController` 首次展示 | 每会话 | `session_id` |
-| `onboarding step viewed` | 每一步出现 | 每会话每步 | `session_id`、`step`（`welcome` / `try_minimize` / `success` / `finish`） |
+| `onboarding step viewed` | 每一步出现 | 每会话每步 | `session_id`、`step`（`welcome` / `try_minimize` / `success` / `finish` / `paywall`，`paywall` 仅 App Store 版） |
 | `onboarding demo succeeded` | 演示里真的 Cmd+Tab 回来了（`OnboardingTryMinimizeModel` 成功） | 每装一次 | `duration_ms`（从 started 起） |
-| `onboarding completed` | 点 Get Started 并关闭 paywall sheet（`finished`，每装一次），或窗口被关闭（`closed`，每次） | 每装一次 | `outcome`（`finished` / `closed`）、`last_step`、`launch_at_login`（bool） |
+| `onboarding completed` | 在 paywall 步开始试用、购买或关闭（`finished`，每装一次），或窗口被关闭（`closed`，每次） | 每装一次 | `outcome`（`finished` / `closed`）、`last_step`、`launch_at_login`（bool） |
 | `value day` | 见上面的定义（`ActivationMonitor` → `ReopenStatsStore`） | 每天一次 | `value_bucket`（累计成功重开次数分桶）；Kit 自动附加 `active_day_index`、`days_since_first_open` |
 
 ### 付费
@@ -42,7 +42,7 @@
 | --- | --- | --- | --- |
 | `trial ended` | 本地试用第一次被判定为到期（`CommandAccessModel`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
 | `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`onboarding` / `trial_usage` / `trial_expired` / `status_bar_upgrade` / `settings_about`） |
-| `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `close`）、`plan`（`lifetime` / `winback_lifetime`，仅 purchase） |
+| `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `start_trial` / `close`；`start_trial` 指在 onboarding paywall 点开始试用）、`plan`（`lifetime` / `winback_lifetime`，仅 purchase） |
 | `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`error_category`（`network` / `unavailable` / `not_allowed` / `no_active_purchase` / `other`，不带原文；paywall 里不带 `plan`） |
 | `winback offer shown` | `TrialExitOfferView` 第一次出现（`winbackOfferFirstShownAt` 被写入时） | 每装一次 | `value_bucket` |
 | `winback offer action` | 卡片上的选择，或从 Settings 行重新打开 | 每次 | `action`（`purchase` / `free_build` / `dismiss` / `reopened`）、`days_left` |

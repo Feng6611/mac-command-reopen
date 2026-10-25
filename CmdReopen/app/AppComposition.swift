@@ -1,5 +1,8 @@
 import Foundation
 import KikiAnalytics
+#if APPSTORE
+import KikiCommerceCore
+#endif
 
 /// Owns the long-lived application graph. Compatibility `shared` properties
 /// forward here; they never construct a second mutable service.
@@ -57,9 +60,19 @@ final class AppComposition {
         iconSettings: menuBarIconSettings
     )
 #if APPSTORE
-    lazy var commandAccess = CommandAccessModel(
-        postHogUserID: analytics.installationID.uuidString
-    )
+    lazy var commandAccess: CommandAccessModel = {
+#if DEBUG
+        if DebugNewInstallSession.isActive {
+            let model = CommandAccessModel(
+                defaults: DebugNewInstallSession.makeDefaults(),
+                postHogUserID: analytics.installationID.uuidString
+            )
+            model.beginSimulatedNewInstall()
+            return model
+        }
+#endif
+        return CommandAccessModel(postHogUserID: analytics.installationID.uuidString)
+    }()
     lazy var commerceSource = ProCommerceStateSource(proStatusManager: commandAccess)
 #endif
 }

@@ -59,6 +59,7 @@ enum DS {
     enum Radius {
         static let control: CGFloat = 6
         static let card:    CGFloat = 10
+        static let modal:   CGFloat = 14
     }
 
     // MARK: Semantic Colors
