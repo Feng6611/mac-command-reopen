@@ -7337,74 +7337,74 @@
         }
       }
     },
-    "Every feature, free for 2 days." : {
+    "Every feature, free for 7 days." : {
       "comment" : "Paywall subtitle before the free trial has started, mainly at the end of onboarding. One short line.",
       "extractionState" : "manual",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有功能，免费试用 2 天。"
+            "value" : "所有功能，免费试用 7 天。"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての機能を2日間無料で。"
+            "value" : "すべての機能を7日間無料で。"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Funktionen, 2 Tage kostenlos."
+            "value" : "Alle Funktionen, 7 Tage kostenlos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toutes les fonctionnalités, gratuites pendant 2 jours."
+            "value" : "Toutes les fonctionnalités, gratuites pendant 7 jours."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Todos os recursos, grátis por 2 dias."
+            "value" : "Todos os recursos, grátis por 7 dias."
           }
         }
       }
     },
-    "Start 2-day free trial" : {
+    "Start 7-day free trial" : {
       "comment" : "Starts the free trial; the primary button at the end of onboarding.",
       "extractionState" : "manual",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2日間の無料トライアルを開始"
+            "value" : "7日間の無料トライアルを開始"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2-tägige kostenlose Testphase starten"
+            "value" : "7-tägige kostenlose Testphase starten"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Démarrer l’essai gratuit de 2 jours"
+            "value" : "Démarrer l’essai gratuit de 7 jours"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始 2 天免费试用"
+            "value" : "开始 7 天免费试用"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iniciar teste grátis de 2 dias"
+            "value" : "Iniciar teste grátis de 7 dias"
           }
         }
       }

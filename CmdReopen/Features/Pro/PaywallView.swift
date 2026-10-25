@@ -148,14 +148,14 @@ struct PaywallSheetView: View {
                 trialSubtitle: trialSubtitle,
                 expiredSubtitle: appLanguage.string(localized: "Cmd+Tab has stopped restoring your windows.",
                     comment: "Paywall subtitle after the trial ended, naming what stopped working."),
-                notStartedSubtitle: appLanguage.string(localized: "Every feature, free for 2 days.",
+                notStartedSubtitle: appLanguage.string(localized: "Every feature, free for 7 days.",
                     comment: "Paywall subtitle before the free trial has started, mainly at the end of onboarding. One short line."),
                 // With the user's own figures on the sheet, feature bullets
                 // only push the prices further down. Without them, the
                 // bullets are the only case being made.
                 features: receipt == nil ? features : [],
                 purchaseActionTitle: purchaseActionTitle,
-                trialActionTitle: appLanguage.string(localized: "Start 2-day free trial",
+                trialActionTitle: appLanguage.string(localized: "Start 7-day free trial",
                     comment: "Starts the free trial; the primary button at the end of onboarding."),
                 restoreActionTitle: appLanguage.string(localized: "Restore Purchase"),
                 doneActionTitle: appLanguage.string(localized: "Done"),

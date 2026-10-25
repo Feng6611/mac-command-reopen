@@ -9,7 +9,7 @@
 | --- | --- | --- | --- |
 | Q1 | 装上之后有没有真正用起来？ | 激活率：7 天内至少 2 个价值日 | `app first opened` → `onboarding *` → `value day` |
 | Q2 | 留下来的人还在受益吗？ | 每周受益用户（WBU）、按价值日算的 D1 / D7 / D30 | `value day` |
-| Q3 | 试用结束时（新安装 2 天，1.5.2 之前的安装 14 天），谁付费、谁走了？ | 到期前/后购买率，按使用量分桶 | `trial ended`、`paywall *`、`purchase result`、RevenueCat 事件 |
+| Q3 | 试用结束时（1.5.3 起新安装 7 天，1.5.2 的安装 2 天，更早的 14 天），谁付费、谁走了？ | 到期前/后购买率，按使用量分桶 | `trial ended`、`paywall *`、`purchase result`、RevenueCat 事件 |
 | Q4 | 哪个 paywall 入口在起作用？ | 各 source 的展示 → 点购买 → 成功 | `paywall viewed` / `paywall action` / `purchase result` |
 | Q5 | 挽留卡（D-003 / D-010）值不值？ | 卡片出现率、九折购买率、去免费版的比例 | `winback offer *` |
 | Q6 | 用户在什么情况下关掉它？ | 关闭自动重开的比例、关之前用了多久 | `reopen toggled` |
@@ -23,7 +23,7 @@
 
 ## 事件表
 
-`entitlement_state`（`trial` / `expired` / `pro`）通过 Kit 的 `context` 附在每个事件上。Kit 自动附加的公共属性、
+`entitlement_state`（`not_started` / `trial` / `expired` / `pro`；`not_started` 是 1.5.3 起新用户开始试用前的状态）通过 Kit 的 `context` 附在每个事件上。Kit 自动附加的公共属性、
 `app first opened` 和 SDK 生命周期事件不再列出。
 
 ### 激活与价值

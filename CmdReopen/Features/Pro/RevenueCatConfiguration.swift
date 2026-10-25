@@ -38,8 +38,9 @@ enum RevenueCatConfiguration {
     /// the exact moment they are already leaving.
     nonisolated static let winbackLifetimeProductIdentifier = "com.dev.kkuk.CommandReopen.lifetime20"
     nonisolated static let grandfatheringCutoffVersion = "1.2.0"
-    /// Trial length for installs that first launch on 1.5.2 or later.
-    nonisolated static let trialDuration: TimeInterval = 2 * 24 * 60 * 60
+    /// Trial length for installs that first launch on 1.5.3 or later. Installs
+    /// from 1.5.2 already stored 2 days and keep them.
+    nonisolated static let trialDuration: TimeInterval = 7 * 24 * 60 * 60
     /// Trial length of installs that already had a trial before 1.5.2. They
     /// keep the 14 days they were promised when it started.
     nonisolated static let legacyTrialDuration: TimeInterval = 14 * 24 * 60 * 60
@@ -47,8 +48,9 @@ enum RevenueCatConfiguration {
 
     /// The trial length this install is entitled to, decided once and stored.
     ///
-    /// An install that already has a trial start date predates the 2-day
-    /// trial and keeps 14 days; any other install gets 2. The answer is
+    /// An install that already has a trial start date predates the stored
+    /// decision and keeps 14 days; any other install gets the current length.
+    /// An install that stored a length (2 days on 1.5.2) keeps it. The answer is
     /// written on first resolution so it cannot change when the start date
     /// is written later. Call after legacy key migration.
     nonisolated static func resolveTrialDuration(defaults: UserDefaults) -> TimeInterval {

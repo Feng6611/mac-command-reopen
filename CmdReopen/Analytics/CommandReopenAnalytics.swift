@@ -135,11 +135,29 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
     }
 }
 
-private enum EntitlementLabel: String { case trial, expired, pro, unrestricted }
+enum EntitlementLabel: String {
+    case notStarted = "not_started", trial, expired, pro, unrestricted
+
+    /// A trial that has not started gives no access, so the app treats it as
+    /// expired; analytics must not, or every new user's onboarding would read
+    /// as an expired trial.
+    static func resolve(_ state: AccessEntitlementState, trialNotStarted: Bool) -> EntitlementLabel {
+        if trialNotStarted { return .notStarted }
+        return switch state {
+        case .trial: .trial
+        case .expired: .expired
+        case .pro: .pro
+        case .unrestricted: .unrestricted
+        }
+    }
+}
 
 @MainActor
 enum CommandReopenAnalytics {
-    static func make(entitlementState: @escaping () -> AccessEntitlementState) -> KikiAnalytics {
+    static func make(
+        entitlementState: @escaping () -> AccessEntitlementState,
+        trialNotStarted: @escaping () -> Bool = { false }
+    ) -> KikiAnalytics {
 #if APPSTORE
 #if DEBUG
         let transport = KikiAnalyticsTransportFactory.none
@@ -161,12 +179,7 @@ enum CommandReopenAnalytics {
                     || defaults.object(forKey: AppDefaults.RawKey.trialStartDate) != nil
             },
             context: {
-                let label: EntitlementLabel = switch entitlementState() {
-                case .trial: .trial
-                case .expired: .expired
-                case .pro: .pro
-                case .unrestricted: .unrestricted
-                }
+                let label = EntitlementLabel.resolve(entitlementState(), trialNotStarted: trialNotStarted())
                 return ["entitlement_state": .enum(label)]
             }
         )

@@ -18,8 +18,11 @@ callback (I-006) kept the sheet open and 8 installs pressed close 190 times.
 
 - The trial starts explicitly (`KikiTrialPolicy.time(startsOn: .explicit)`).
   Existing installs keep the start date they already have.
+- New installs get 7 days instead of 2 (owner decision, 2026-10-26). The
+  length is stored per install on first launch, so 1.5.2 installs keep their
+  2 days and older ones their 14.
 - The paywall is onboarding's fifth step, not a sheet. Its primary action is
-  "Start 2-day free trial"; "Buy Lifetime" and "Restore Purchase" are
+  "Start 7-day free trial"; "Buy Lifetime" and "Restore Purchase" are
   secondary (KikiCommerceKit 0.5.2 makes the trial primary in the onboarding
   context while a trial can start). Owners of Pro skip the step.
 - Leaving onboarding without a choice — closing the window at any step, or
@@ -325,9 +328,10 @@ real onboarding already begins during a fresh first launch.
 
 The relaunched process runs as a simulated new install
 (`DebugNewInstallSession`, a launch argument, so it lasts one process only).
-Its access state lives in a scratch defaults suite emptied at launch: the
-2-day trial starts fresh, and Pro access starts forced to Trial, because a new
-user owns nothing even when the sandbox account does. Offerings still load
+Its access state lives in a scratch defaults suite emptied at launch: no
+trial has started, and Pro access starts forced to Not Pro, because a new user
+owns nothing even when the sandbox account does; it moves to Trial when the
+trial starts. Offerings still load
 from RevenueCat, so the final paywall shows real prices. The developer's own
 trial, purchase and override in standard defaults are untouched, and the next
 normal launch uses them again.

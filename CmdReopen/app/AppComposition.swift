@@ -12,8 +12,19 @@ final class AppComposition {
 
     lazy var accessController = AppAccessController.makeDefault()
     lazy var analytics: KikiAnalytics = CommandReopenAnalytics.make(
-        entitlementState: { [weak self] in self?.accessController.entitlementState ?? .expired }
+        entitlementState: { [weak self] in self?.accessController.entitlementState ?? .expired },
+        trialNotStarted: { [weak self] in self?.isTrialNotStarted ?? false }
     )
+
+    /// Read only after commerce has loaded, so tracking an event never
+    /// constructs the access model ahead of the launch order.
+    private var isTrialNotStarted: Bool {
+#if APPSTORE
+        accessController.hasLoadedCommerceStateSource && commandAccess.status == .notStarted
+#else
+        false
+#endif
+    }
     lazy var reopenStats: ReopenStatsStore = {
         let store = ReopenStatsStore(isReviewAudienceEligible: { [weak self] in
             // Only ask someone the app is currently working for.
