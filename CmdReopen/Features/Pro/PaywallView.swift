@@ -60,6 +60,9 @@ struct PaywallSheetView: View {
     /// trial running by then means the user started it here.
     @State private var opensBeforeTrial: Bool?
     @State private var analyticsSession = CommandReopenAnalytics.shared.newSession()
+    @State private var viewedAt: Date?
+    /// One close per sheet: a close that does not dismiss must not count every tap.
+    @State private var hasRecordedClose = false
 
     var body: some View {
         Group {
@@ -73,61 +76,67 @@ struct PaywallSheetView: View {
                     if opensBeforeTrial == nil {
                         opensBeforeTrial = accessModel.status.canStartTrial
                     }
+                    PurchaseResultReporter.activePaywallSession = analyticsSession
+                    // Starting the trial from this sheet is the paywall button;
+                    // closing it clears the claim before any fallback start.
+                    if accessModel.status.canStartTrial {
+                        TrialStartRelay.set(.paywallButton)
+                    }
+                    guard viewedAt == nil else { return }
+                    viewedAt = Date()
+                    let opened = source.map { ($0, PaywallTrigger.user) } ?? PaywallSourceRelay.take()
                     // One viewed event per sheet: the session id dedupes re-appearance.
-                    track(.paywallViewed(session: analyticsSession, source: source ?? PaywallSourceRelay.take()))
+                    track(.paywallViewed(
+                        session: analyticsSession,
+                        source: Self.resolvedSource(opened.0, status: accessModel.status),
+                        trigger: opened.1,
+                        pricesAvailable: pricesAvailable
+                    ))
                 }
             }
         }
         .onChange(of: accessModel.accessManager.purchaseInProgressPlanID) { planID in
             guard let planID else { return }
             hasTransactedInSheet = true
-            track(.paywallAction(session: analyticsSession, action: .purchase, plan: Self.planKind(planID)))
+            trackAction(.purchase, plan: PurchaseResultReporter.planKind(planID))
         }
         .onChange(of: accessModel.accessManager.isRestoringPurchases) { isRestoring in
             guard isRestoring else { return }
             hasTransactedInSheet = true
-            track(.paywallAction(session: analyticsSession, action: .restore, plan: nil))
+            trackAction(.restore)
         }
-        .onChange(of: accessModel.accessManager.commerceFeedback) { feedback in
-            guard let feedback else { return }
-            let (result, error) = Self.outcome(of: feedback)
-            track(.purchaseResult(session: analyticsSession, result: result, plan: nil, error: error))
+        .onDisappear {
+            if PurchaseResultReporter.activePaywallSession == analyticsSession {
+                PurchaseResultReporter.activePaywallSession = nil
+            }
         }
+    }
+
+    /// The expired route also runs before a trial has started, when access
+    /// reads as expired but nothing has ended.
+    static func resolvedSource(_ source: PaywallSource, status: KikiAccessState) -> PaywallSource {
+        if source == .trialExpired, status == .notStarted { return .trialNotStarted }
+        return source
+    }
+
+    private var pricesAvailable: Bool {
+        RevenueCatConfiguration.visiblePaywallPlanIDs.contains {
+            accessModel.accessManager.planProduct(for: $0).isAvailable
+        }
+    }
+
+    private func trackAction(_ action: CommandReopenEvent.PaywallActionKind, plan: CommandReopenEvent.PlanKind? = nil) {
+        track(.paywallAction(
+            session: analyticsSession,
+            action: action,
+            plan: plan,
+            msSinceView: viewedAt.map { Int(max(0, Date().timeIntervalSince($0)) * 1000) },
+            pricesAvailable: pricesAvailable
+        ))
     }
 
     private func track(_ event: CommandReopenEvent) {
         CommandReopenAnalytics.track(event)
-    }
-
-    private func track(_ event: KikiStandardEvent) {
-        CommandReopenAnalytics.track(event)
-    }
-
-    private static func planKind(_ planID: String) -> CommandReopenEvent.PlanKind? {
-        switch CommercePlan(planID) {
-        case .lifetime: .lifetime
-        case .winbackLifetime: .winbackLifetime
-        default: nil
-        }
-    }
-
-    static func outcome(
-        of feedback: KikiCommerceFeedback
-    ) -> (CommandReopenEvent.PurchaseOutcome, CommandReopenEvent.ErrorCategory?) {
-        switch feedback {
-        case .purchaseSucceeded, .restoreSucceeded: (.success, nil)
-        case .noActivePurchase: (.failed, .noActivePurchase)
-        case .error(let error):
-            switch error {
-            case .purchaseCancelled: (.cancelled, nil)
-            case .activationPending: (.pending, nil)
-            case .network: (.failed, .network)
-            case .offeringUnavailable, .productUnavailable, .packageNotFound, .productIdentifierMissing:
-                (.failed, .unavailable)
-            case .purchaseNotAllowed: (.failed, .notAllowed)
-            default: (.failed, .other)
-            }
-        }
     }
 
     private var paywall: some View {
@@ -181,8 +190,14 @@ struct PaywallSheetView: View {
                     } else {
                         didStartTrial = false
                     }
-                    track(.paywallAction(session: analyticsSession, action: didStartTrial ? .startTrial : .close, plan: nil))
+                    if didStartTrial {
+                        trackAction(.startTrial)
+                    } else if !hasRecordedClose {
+                        hasRecordedClose = true
+                        trackAction(.close)
+                    }
                 }
+                TrialStartRelay.set(nil)
                 onFinish()
 
                 guard context == .settings, didCompletePurchase else { return }

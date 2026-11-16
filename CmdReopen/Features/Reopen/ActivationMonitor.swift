@@ -91,6 +91,8 @@ final class ActivationMonitor: ObservableObject {
     private let advancedWindowRestoreSettings: AdvancedWindowRestoreSettings
     private let dockClickIntentCoordinator: DockClickIntentCoordinator
     private let onExpiredReopenNeeded: @MainActor () -> Void
+    /// Analytics counting only; never changes what the monitor does.
+    private let onReopenOpportunity: @MainActor () -> Void
     private var activationObserver: NSObjectProtocol?
     private var foregroundWindowTimer: Timer?
     private var latestForegroundApplication: NSRunningApplication?
@@ -111,7 +113,9 @@ final class ActivationMonitor: ObservableObject {
          accessibilityWindowRestorer: AccessibilityWindowRestoring = WindowRestorerFactory.makeDefault(),
          advancedWindowRestoreSettings: AdvancedWindowRestoreSettings = .shared,
          dockClickIntentCoordinator: DockClickIntentCoordinator = .shared,
-         onExpiredReopenNeeded: @escaping @MainActor () -> Void = {}) {
+         onExpiredReopenNeeded: @escaping @MainActor () -> Void = {},
+         onReopenOpportunity: @escaping @MainActor () -> Void = {},
+         onReopenResult: @escaping @MainActor (WindowReopenExecutor.Result) -> Void = { _ in }) {
         AppDefaults.migrateLegacyKeys(in: defaults)
         self.workspace = workspace
         self.notificationCenter = notificationCenter ?? workspace.notificationCenter
@@ -120,7 +124,9 @@ final class ActivationMonitor: ObservableObject {
             workspace: workspace,
             reopenStatsStore: reopenStatsStore ?? .shared,
             accessibilityWindowRestorer: accessibilityWindowRestorer,
-            advancedWindowRestoreSettings: advancedWindowRestoreSettings
+            advancedWindowRestoreSettings: advancedWindowRestoreSettings,
+            windowInfoProvider: windowInfoProvider,
+            defaults: defaults
         )
         self.accessController = accessController ?? AppAccessController.shared
         self.windowInfoProvider = windowInfoProvider
@@ -128,6 +134,8 @@ final class ActivationMonitor: ObservableObject {
         self.advancedWindowRestoreSettings = advancedWindowRestoreSettings
         self.dockClickIntentCoordinator = dockClickIntentCoordinator
         self.onExpiredReopenNeeded = onExpiredReopenNeeded
+        self.onReopenOpportunity = onReopenOpportunity
+        windowReopenExecutor.onResult = onReopenResult
         let storedValue = defaults[AppDefaults.featureEnabled]
         let storedAutomaticSwitcherReordering = defaults[AppDefaults.automaticSwitcherReordering]
         let storedExcluded = Set(defaults[AppDefaults.excludedBundleIDs])
@@ -512,6 +520,7 @@ final class ActivationMonitor: ObservableObject {
             }
 
             AppLogger.activation.info("Reopen needed for \(bundleID): no visible window found.")
+            self.onReopenOpportunity()
             if presentsExpiredNudge {
                 guard !self.accessController.isCoreFeatureAvailable else {
                     self.reopenApplication(withBundleIdentifier: bundleID, at: now)
@@ -656,26 +665,6 @@ final class ActivationMonitor: ObservableObject {
 #else
         return false
 #endif
-    }
-
-    func handleReopenCompletion(
-        requestedBundleID: String,
-        openedBundleID: String?,
-        localizedName: String?,
-        openedProcessIdentifier: pid_t?,
-        error: Error?,
-        openedBundleURL: URL? = nil,
-        openedActivationPolicy: NSApplication.ActivationPolicy? = nil
-    ) {
-        windowReopenExecutor.handleReopenCompletion(
-            requestedBundleID: requestedBundleID,
-            openedBundleID: openedBundleID,
-            localizedName: localizedName,
-            openedProcessIdentifier: openedProcessIdentifier,
-            error: error,
-            openedBundleURL: openedBundleURL,
-            openedActivationPolicy: openedActivationPolicy
-        )
     }
 
     private func shouldIgnoreSelfTriggeredActivation(bundleID: String) -> Bool {

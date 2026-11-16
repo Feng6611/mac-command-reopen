@@ -21,6 +21,7 @@ final class CommandAccessModel: ObservableObject {
     private var previousStatus: KikiAccessState
     private var hasPromptedForExpiredStateThisSession = false
     private var hasResolvedInitialReadiness = false
+    private var purchaseResultReporter: PurchaseResultReporter?
 #if DEBUG
     private var simulatedTrialStartObservation: NSKeyValueObservation?
 #endif
@@ -234,6 +235,9 @@ final class CommandAccessModel: ObservableObject {
 #endif
 
     private func bindAccessState() {
+        purchaseResultReporter = PurchaseResultReporter(manager: accessManager) { event in
+            CommandReopenAnalytics.track(event)
+        }
         accessManager.objectWillChange
             .sink { [weak self] in self?.objectWillChange.send() }
             .store(in: &cancellables)
@@ -256,6 +260,9 @@ final class CommandAccessModel: ObservableObject {
         if readiness == .ready, status == .expired {
             reportTrialEnded()
         }
+        if previousStatus == .notStarted, case .trial = status {
+            reportTrialStarted()
+        }
         guard readiness == .ready,
               status == .expired,
               !isFirstLaunch,
@@ -266,6 +273,17 @@ final class CommandAccessModel: ObservableObject {
 
         shouldOpenProSettings = true
         hasPromptedForExpiredStateThisSession = true
+    }
+
+    /// Fires on the move out of "not started", so a trial carried over from an
+    /// earlier version is never reported as new.
+    private func reportTrialStarted() {
+        let days = defaults.object(forKey: RevenueCatConfiguration.trialDurationDaysKey) as? Int
+        CommandReopenAnalytics.track(CommandReopenEvent.trialStarted(
+            trigger: TrialStartRelay.take(),
+            durationDays: days,
+            minutesSinceFirstOpen: CommandReopenAnalytics.minutesSinceFirstOpen
+        ))
     }
 
     /// The trial is local, so RevenueCat never sees it end; the Kit sends it

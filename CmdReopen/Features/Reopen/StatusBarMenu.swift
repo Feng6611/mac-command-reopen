@@ -321,6 +321,7 @@ final class StatusBarMenuModel: ObservableObject {
     }
 
     func quit() {
+        CommandReopenAnalytics.track(CommandReopenEvent.appQuit(installDay: CommandReopenAnalytics.installDay))
         applicationPresenter.terminate()
     }
 }

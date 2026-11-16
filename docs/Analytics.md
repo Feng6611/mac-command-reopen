@@ -1,106 +1,96 @@
 # Command Reopen 事件表
 
-状态：**已实现（1.5.2，App Store 版）**，2026-10-21。PostHog `mac-app` 项目（528691）的 token 已写入本地忽略配置；Release App Store 才发送，Debug 始终不发送。没有 token 时 Kit 不初始化 SDK、零请求。决定见 `DecisionLog.md` D-012；
-组件和锁死的隐私配置见 `../../KikiAnalyticsKit/Docs/Design.md`。只有 App Store 版带 PostHog 传输；Direct / Community 版链接 Kit 但用 `.none`，不发送任何数据。
+当前设计覆盖至 **1.5.4（本地实现，待发布）**。1.5.2 / 1.5.3 的历史事件版本见飞书埋点设计表。App Store Release 才发送；Debug、Direct / Community 使用 `.none`。事件与参数统一定义在 `CommandReopenAnalytics.swift`；PostHog 传输封装在 KikiAnalyticsKit。本文不表示生产数据已验证。
 
-## 要回答的问题
+## 安装到付费的分析口径
 
-| # | 问题 | 指标 | 用到的事件 |
+- 首次打开：`app first opened`，按 `first_open_kind` 分开新安装与埋点上线前的已有安装。无法逐用户识别下载后从未打开的人。
+- 激活：首次 `reopen result` 且 `result=success`，衡量实际重开后观察到窗口；引导演示和开始试用都不算激活。
+- 使用留存：按安装 ID 汇总成功事件的时间，以首次打开或首次成功为 cohort，计算 D1 / D2 / D3 和后续使用留存。按固定分析时区的自然日计算；完整 24 小时窗口另按事件时间计算。无事件只表示未观测到成功使用，不能认定卸载。
+- 转化：串联 `trial started`、带来源的 `paywall viewed` / `paywall action`、`purchase result`；实际付费和收入以 RevenueCat 服务端交易为准，恢复购买单列。
+- 试用 cohort 按试用长度与版本分开，只有观察窗口完整的安装才进入对应转化率分母；不能只用客户端实际发出 `trial ended` 的人作为到期分母。
+
+## 重开结果
+
+1.5.4 起停发 `value day`，删除尚未发布的 `daily summary`。替换为 **`reopen result`，每次实际发出的重开尝试恰好一个最终结果，不采样、不限每日数量**。已有窗口、功能关闭、排除应用、helper、引导演示或去抖提前返回均不属于实际指令，不上报结果。
+
+原生打开回调无错误（Direct 为 AX 返回 restored）后，立即及约 0.3 / 1 / 2 秒复用 `WindowInspector` 检查目标 PID：非透明、layer 0、宽高至少 32 的屏幕窗口。看到任意一个即成功，一次尝试不会按窗口数量重复计数。成功使用和本机次数共用 Executor 的确认分支；菜单显示和试用用量逻辑继续使用 `ReopenStatsStore.onReopenRecorded`。
+
+| 参数 | 类型 | 含义 | 起始版本 |
 | --- | --- | --- | --- |
-| Q1 | 装上之后有没有真正用起来？ | 激活率：7 天内至少 2 个价值日 | `app first opened` → `onboarding *` → `value day` |
-| Q2 | 留下来的人还在受益吗？ | 每周受益用户（WBU）、按价值日算的 D1 / D7 / D30 | `value day` |
-| Q3 | 试用结束时（1.5.3 起新安装 7 天，1.5.2 的安装 2 天，更早的 14 天），谁付费、谁走了？ | 到期前/后购买率，按使用量分桶 | `trial ended`、`paywall *`、`purchase result`、RevenueCat 事件 |
-| Q4 | 哪个 paywall 入口在起作用？ | 各 source 的展示 → 点购买 → 成功 | `paywall viewed` / `paywall action` / `purchase result` |
-| Q5 | 挽留卡（D-003 / D-010）值不值？ | 卡片出现率、九折购买率、去免费版的比例 | `winback offer *` |
-| Q6 | 用户在什么情况下关掉它？ | 关闭自动重开的比例、关之前用了多久 | `reopen toggled` |
+| `result` | enum | `success` / `failed` / `unknown` | 1.5.4 |
+| `reason` | enum | 判定原因，见下表 | 1.5.4 |
+| `duration_ms` | int | 发出指令至最终结果的单调时钟耗时，毫秒，≥ 0 | 1.5.4 |
+| `daily_attempt_index` | int | 当天第几次实际重开尝试，从 1 起；持久化跨重启，本地自然日重置；不限量 | 1.5.4 |
 
-**北极星指标：每周受益用户（WBU）**，即本周至少有 1 个价值日的安装数。启动次数和打开设置都不算价值。
+| reason | result | 判定 |
+| --- | --- | --- |
+| `window_observed` | success | 请求被接受后检测到目标进程的合格屏幕窗口 |
+| `no_window_observed` | failed | 四轮检查均可用，但观察期内均没有窗口 |
+| `request_error` | failed | 系统打开回调返回错误；不上传错误原文 |
+| `inspection_unavailable` | unknown | 没有确认窗口，且至少一轮无法读取窗口列表，或观察被取消 |
+| `process_unavailable` | unknown | 缺少目标 PID，或回调应用与请求目标不符 |
+| `superseded` | unknown | 同一应用的新请求替代了尚未结案的旧尝试 |
+| `request_timeout` | unknown | 从发出指令起 5 秒仍未结案，包括系统回调未到或太迟 |
 
-## 价值日的定义
+重复回调、超时后的晚到回调不会再次计数或上报。一次失败不触发额外重开。进程被杀或离线仍可能丢失事件，客户端埋点不保证送达。只读取现有 CG 窗口信息，不新增权限请求。
 
-当天第一次**真实**的成功重开：`ReopenStatsStore.recordSuccessfulReopen` 返回 `true` 之后。
-不算的情况：onboarding 里的 Minimize 演示、helper 进程（已被 `HelperProcessFilter` 过滤）、打开失败的 reopen。
+“有窗口”不代表窗口置顶、用户已经看到、恢复了原窗口或全部窗口，也不能证明窗口由本次指令产生。B 的已有窗口被 A 遮挡时，前置检查通常会跳过重开；同一应用只要有任意一个合格窗口即认为有窗口，不追踪具体窗口。慢于观察期的窗口可能漏计。已有本地历史次数保留，1.5.4 前后口径不可直接混算。成功率按已观测到的 success / (success + failed) 计算，unknown 比例另列。
+
+## 公共参数
+
+Kit 附加安装 `distinct_id`、`app_id`、`app_version`、`build_number`、`distribution_channel`、`os_version`、`app_locale`、`schema_version`。
+App 业务事件附加 `entitlement_state`（`not_started` / `trial` / `expired` / `pro` / `unrestricted`）；1.5.4 起已知时附加 `trial_day`、`trial_duration_days`（2 / 7 / 14）、`days_since_download`。后者来自签名 AppTransaction 原始购买日期，不提供跨设备安装身份。
+`active_day_index` 和 `days_since_first_open` 仍由 Kit 仅为按日事件附加；停发价值日后，本 App 只在 `reopen opportunity` 上使用，不能将其视为成功使用日。
 
 ## 事件表
 
-`entitlement_state`（`not_started` / `trial` / `expired` / `pro`；`not_started` 是 1.5.3 起新用户开始试用前的状态）通过 Kit 的 `context` 附在每个事件上。Kit 自动附加的公共属性、
-`app first opened` 和 SDK 生命周期事件不再列出。
+### 引导与使用
 
-### 激活与价值
-
-| 事件 | 触发点 | 频率 | 属性 |
+| 事件 | 触发点 | 频率 | 参数 |
 | --- | --- | --- | --- |
-| `onboarding started` | `OnboardingWindowController` 首次展示 | 每会话 | `session_id` |
-| `onboarding step viewed` | 每一步出现 | 每会话每步 | `session_id`、`step`（`welcome` / `try_minimize` / `success` / `finish` / `paywall`，`paywall` 仅 App Store 版） |
-| `onboarding demo succeeded` | 演示里真的 Cmd+Tab 回来了（`OnboardingTryMinimizeModel` 成功） | 每装一次 | `duration_ms`（从 started 起） |
-| `onboarding completed` | 在 paywall 步开始试用、购买或关闭（`finished`，每装一次），或窗口被关闭（`closed`，每次） | 每装一次 | `outcome`（`finished` / `closed`）、`last_step`、`launch_at_login`（bool） |
-| `value day` | 见上面的定义（`ActivationMonitor` → `ReopenStatsStore`） | 每天一次 | `value_bucket`（累计成功重开次数分桶）；Kit 自动附加 `active_day_index`、`days_since_first_open` |
+| `app first opened` | Kit 首次初始化 | 每安装一次 | `first_open_kind` |
+| `onboarding started` | 引导开始 | 每会话 | `session_id` |
+| `onboarding step viewed` | 步骤出现 | 每会话每步 | `session_id`、`step` |
+| `onboarding demo succeeded` | 引导演示成功 | 每安装一次 | `duration_ms` |
+| `onboarding completed` | 完成或关闭引导 | finished 每安装一次；closed 每次 | `session_id`、`outcome`、`last_step`、`launch_at_login`、`duration_ms`、`demo_succeeded` |
+| `reopen result` | 实际重开尝试结案 | 每次一次，不限量 | `result`、`reason`、`duration_ms`、`daily_attempt_index` |
+| `reopen opportunity` | 通过前置过滤且未检测到窗口 | 每本地日一次 | 无业务参数；Kit 附加日序 |
+| `app quit` | 菜单栏 Quit | 每次 | `install_day` |
 
-### 付费
+### 试用与付费
 
-| 事件 | 触发点 | 频率 | 属性 |
+| 事件 | 触发点 | 频率 | 参数 |
 | --- | --- | --- | --- |
-| `trial ended` | 本地试用第一次被判定为到期（`CommandAccessModel`） | 每装一次 | `active_days`（int，试用期内的价值日数）、`value_bucket`、`winback_eligible`（bool，`TrialReceipt` 能否成立） |
-| `paywall viewed` | paywall sheet 新建一次会话 | 每会话 | `session_id`、`source`（`onboarding` / `trial_usage` / `trial_expired` / `status_bar_upgrade` / `settings_about`） |
-| `paywall action` | 用户点了按钮，流程开始之前 | 每次 | `session_id`、`action`（`purchase` / `restore` / `start_trial` / `close`；`start_trial` 指在 onboarding paywall 点开始试用）、`plan`（`lifetime` / `winback_lifetime`，仅 purchase） |
-| `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`、`result`（`success` / `cancelled` / `pending` / `failed`）、`error_category`（`network` / `unavailable` / `not_allowed` / `no_active_purchase` / `other`，不带原文；paywall 里不带 `plan`） |
-| `winback offer shown` | `TrialExitOfferView` 第一次出现（`winbackOfferFirstShownAt` 被写入时） | 每装一次 | `value_bucket` |
-| `winback offer action` | 卡片上的选择，或从 Settings 行重新打开 | 每次 | `action`（`purchase` / `free_build` / `dismiss` / `reopened`）、`days_left` |
+| `trial started` | 本地试用实际开始 | 每安装一次 | `trigger`、`trial_duration_days`、`minutes_since_first_open` |
+| `trial ended` | 本地首次观察到期 | 每安装一次 | `active_days`、`value_bucket`、`winback_eligible` |
+| `paywall viewed` | 付费页首次出现 | 每付费页会话 | `session_id`、`source`、`trigger`、`prices_available` |
+| `paywall action` | 购买/恢复进度开始，或开始试用/关闭 | 每次；close 每会话最多一次 | `session_id`、`action`、`plan`、`ms_since_view`、`prices_available` |
+| `purchase result` | 购买或恢复流程结束 | 每次 | `session_id`（页外发起可缺失）、`operation`、`result`、`plan`、`error_category` |
+| `winback offer shown` | 挽留优惠首次出现 | 每安装一次 | `value_bucket` |
+| `winback offer action` | 购买、免费版、关闭或重开卡片 | 每次 | `action`、`days_left` |
 
-`trial` 是 Kiki 的本地时间试用，RevenueCat 看不到，所以 `trial ended` 必须由客户端发。
-实际收入只看 RevenueCat → PostHog 的服务端事件；`purchase result` 只用来看漏斗。
+同一付费页的 viewed / action / purchase result 共用 `session_id`；挽留卡片页外购买不带此 ID。同页多次购买尝试共用会话，当前没有逐次 `attempt_id`。不增加加载结果事件，保留展示及动作时的 `prices_available`；其含义是至少一个在售方案可用。`purchase result` 只诊断客户端流程，`pending` 不能当付款成功，restore 不能算新增付费。
 
-### 使用习惯与流失信号
+### 设置与评分
 
-| 事件 | 触发点 | 频率 | 属性 |
-| --- | --- | --- | --- |
-| `reopen toggled` | 菜单栏或设置里切换"启用 Command Reopen" | 每次 | `enabled`（bool）；不区分入口 |
-| `setting changed` | 设置里改了开关或选项 | 每次 | `setting`（`launch_at_login` / `show_menu_bar_icon` / `return_focus` / `language`）、`enabled`（bool，开关类）或 `language`（App 支持的语言枚举） |
-| `excluded apps changed` | 排除列表增删 | 每次 | `count_bucket`（只有数量分桶，不带任何 App） |
-| `review prompt shown` | `ReviewPromptPolicy` 实际展示或请求 | 每次 | `kind`（`custom` / `system_request`） |
-| `review prompt action` | 自定义评分卡上的选择 | 每次 | `action`（`review` / `not_now`） |
+| 事件 | 频率 | 参数 |
+| --- | --- | --- |
+| `reopen toggled` | 每次 | `enabled` |
+| `setting changed` | 每次 | `setting`、`enabled` 或 `language` |
+| `excluded apps changed` | 每次 | `count_bucket`，不含排除内容 |
+| `review prompt shown` | 每次 | `kind` |
+| `review prompt action` | 每次 | `action` |
 
-Advanced Mode 的三个开关只在 Direct 版存在，App Store 版不采。
-
-## 看板
-
-1. **Activation**：`app first opened`（`fresh_install`）→ `onboarding demo succeeded` → `onboarding completed`（`finished`）
-   → 7 天内 `value day` 的 `active_day_index` ≥ 2。
-2. **Retention**：WBU 周趋势；以首个 `value day` 为起点的 D1 / D7 / D30 留存。
-3. **Trial outcome**：`trial ended` 按 `value_bucket` 拆分 → 之后 7 天内的 `purchase result`（`success`）或
-   RevenueCat initial purchase；再对比试用期内已经购买的人。
-4. **Paywall**：按 `source` 的 viewed → action(purchase) → result(success)。
-5. **Win-back**：`trial ended`（`winback_eligible`）→ `winback offer shown` → `winback offer action` 的分布。
-6. **Health**：`reopen toggled`（`enabled = false`）占活跃安装的比例，以及关闭前的 `active_day_index`。
+SDK 自动生命周期事件为 `Application Installed` / `Application Updated` / `Application Opened` / `Application Backgrounded`，不是业务激活证据。
 
 ## 永不采集
 
-被重开的 App 的名字、bundle ID、URL、窗口标题；激活历史和按 App 的统计；排除列表的内容；
-自由文本、错误原文、文件路径。`ReopenStatsStore` 里的 App 维度数据一律不进事件，只有总数分桶。
+目标 App 的名称、bundle ID、URL、窗口标题、按 App 关联的激活历史与统计、排除列表内容、自由文本、错误原文和文件路径均不上传。本机 `ReopenStatsStore` 的 App 维度数据不进入事件；重开结果只有无目标身份的结果枚举、耗时与当日序号。
 
-## 实现要点
+## 验证
 
-- 老用户判断（`isExistingUser`）：onboarding 已完成，或首次 analytics 初始化前已有试用开始时间，就记 `analytics_rollout`。
-- `RevenueCatConfiguration(postHogUserID: analytics.installationID.uuidString)`。
-- 每个触发点都在 App 的 `CommandReopenAnalytics` 门面里有一个带业务含义的方法；视图不直接拼事件。
-- 单测用 `RecordingAnalyticsTransport` 断言：演示不产生 `value day`；同一天第二次重开不再发；
-  任何事件属性里都不出现被重开 App 的 bundle ID 或名字。
-
-## 待定
-
-- Direct / Community 版是否埋点；如果埋，没有 paywall，只发激活、价值和使用习惯这几组。
-- `onboarding step viewed` 是否值得保留：只有 4 步，可以用 `last_step` 代替。
-- `value_bucket` 用累计次数还是近 7 天次数：累计更简单，近 7 天更能看出流失前的下降。
-
-## 触发 paywall 的入口与 `source`
-
-| `source` | 入口 |
-| --- | --- |
-| `onboarding` | 引导最后一步点 Get Started，paywall 作为 sheet 出现在引导窗口上（Pro 用户跳过） |
-| `trial_usage` | 试用超过 3 天后，当天第 10 次成功恢复 |
-| `trial_expired` | 试用结束后的启动 / 状态变化，或 Cmd+Tab 每日提示 |
-| `status_bar_upgrade` | 菜单栏「Upgrade to Pro…」 |
-| `settings_about` | 设置 › 关于 里的入口（默认值） |
+使用 `RecordingAnalyticsTransport` 验证超过每日 10 次仍全部发送，每个事件字段固定且不含目标身份。Executor 测试覆盖成功窗口、延迟窗口、无窗口、窗口列表不可用、系统错误、重复及晚到回调、被后续请求替代、超时与跨日序号。Debug / Direct 无网络传输；生产 PostHog 回读另行验证。
 
 ## 接入与配置
 

@@ -32,8 +32,6 @@ final class AppComposition {
         })
         store.onReopenRecorded = { [weak self] todayCount in
             guard let self else { return }
-            // A successful, non-helper reopen is the day's value.
-            self.analytics.track(KikiStandardEvent.valueDay(changes: store.totalSuccessfulReopens))
             self.router.handleTrialUsage(todayReopenCount: todayCount)
         }
         return store
@@ -57,7 +55,9 @@ final class AppComposition {
     lazy var activationMonitor: ActivationMonitor = ActivationMonitor(
         reopenStatsStore: reopenStats,
         accessController: accessController,
-        onExpiredReopenNeeded: { [weak self] in self?.router.handleExpiredAccess() }
+        onExpiredReopenNeeded: { [weak self] in self?.router.handleExpiredAccess(trigger: .activation) },
+        onReopenOpportunity: { [weak self] in self?.analytics.track(CommandReopenEvent.reopenOpportunity) },
+        onReopenResult: { [weak self] result in self?.analytics.track(CommandReopenEvent.reopenResult(result)) }
     )
     lazy var menuBarIconSettings = MenuBarIconSettings.shared
     lazy var statusBar = StatusBarMenuController(iconSettings: menuBarIconSettings)

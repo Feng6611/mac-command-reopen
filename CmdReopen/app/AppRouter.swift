@@ -33,9 +33,9 @@ final class AppRouter {
     ///
     /// The visibility guard is what keeps a second paywall from being asked
     /// for on top of the window already showing it.
-    func handleExpiredAccess() {
+    func handleExpiredAccess(trigger: PaywallTrigger) {
         if !isSettingsVisible() {
-            PaywallSourceRelay.set(.trialExpired)
+            PaywallSourceRelay.set(.trialExpired, trigger: trigger)
             open(.about, true)
         }
         accessController.markPromptHandled()
@@ -61,7 +61,7 @@ final class AppRouter {
             return
         }
         defaults.set(now, forKey: Self.lastTrialUsagePaywallDateKey)
-        PaywallSourceRelay.set(.trialUsage)
+        PaywallSourceRelay.set(.trialUsage, trigger: .usage)
         open(.about, true)
 #endif
     }

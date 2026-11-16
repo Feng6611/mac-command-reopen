@@ -195,7 +195,7 @@ final class AppLifecycleCoordinator {
                     return
                 }
 
-                self.router.handleExpiredAccess()
+                self.router.handleExpiredAccess(trigger: .stateChange)
             }
             .store(in: &cancellables)
     }
@@ -203,6 +203,8 @@ final class AppLifecycleCoordinator {
     private func completeInitialCommerceRefresh() async {
         await refreshCommerceStateIfNeeded(force: true, reason: "initialLaunch")
         hasCompletedInitialCommerceRefresh = true
+        // Cache the verified original download date for subsequent event context.
+        OriginalDownload.resolveIfNeeded()
 
 #if APPSTORE
 #if DEBUG
@@ -224,7 +226,7 @@ final class AppLifecycleCoordinator {
         // launch having presented it, so the paywall waits rather than landing
         // on top of the tutorial.
         if accessController.shouldOpenProSettings, !isOnboardingVisible {
-            router.handleExpiredAccess()
+            router.handleExpiredAccess(trigger: .launch)
             // The paywall is this launch's foreground presentation, so the
             // hidden-icon rule below must not ask for Settings a second time.
             didOpenSettingsForLaunch = true

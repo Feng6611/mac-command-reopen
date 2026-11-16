@@ -646,6 +646,10 @@ final class OnboardingWindowController {
     private var analyticsStartedAt = Date()
     private var analyticsStepCancellable: AnyCancellable?
     private var analyticsLastStep: CommandReopenEvent.OnboardingStep = .welcome
+    /// The coordinator publishes the first step twice (subscription, then
+    /// `start()`); each step counts once per session.
+    private var analyticsSentSteps: Set<CommandReopenEvent.OnboardingStep> = []
+    private var analyticsDemoSucceeded = false
     private var hasReportedCompletion = false
 #if DEBUG
     private var isRelaunchingForOnboarding = false
@@ -706,23 +710,29 @@ final class OnboardingWindowController {
         analyticsSession = session
         analyticsStartedAt = Date()
         hasReportedCompletion = false
+        analyticsSentSteps = []
+        analyticsDemoSucceeded = false
         analytics.track(KikiStandardEvent.onboardingStarted(session: session))
         analyticsStepCancellable = coordinator.$currentStepIndex.sink { [weak self] index in
             guard let self, Self.analyticsSteps.indices.contains(index) else { return }
             let step = Self.analyticsSteps[index]
             self.analyticsLastStep = step
+            guard self.analyticsSentSteps.insert(step).inserted else { return }
             CommandReopenAnalytics.track(CommandReopenEvent.onboardingStepViewed(session: session, step: step))
         }
     }
 
     private func reportCompletion(_ outcome: CommandReopenEvent.OnboardingOutcome) {
-        guard !hasReportedCompletion else { return }
+        guard !hasReportedCompletion, let analyticsSession else { return }
         hasReportedCompletion = true
         analyticsStepCancellable = nil
         CommandReopenAnalytics.track(CommandReopenEvent.onboardingCompleted(
+            session: analyticsSession,
             outcome: outcome,
             lastStep: analyticsLastStep,
-            launchAtLogin: LaunchAtLoginManager.currentlyEnabled
+            launchAtLogin: LaunchAtLoginManager.currentlyEnabled,
+            durationMs: Int(max(0, Date().timeIntervalSince(analyticsStartedAt)) * 1000),
+            demoSucceeded: analyticsDemoSucceeded
         ))
     }
 
@@ -733,9 +743,12 @@ final class OnboardingWindowController {
     /// Onboarding's paywall step starts the trial. Leaving onboarding any other
     /// way — closing the window early, or closing the paywall — starts it too,
     /// so Cmd+Tab never silently does nothing after the user has seen it work.
-    private func startTrialIfLeftWithoutChoice() {
+    private func startTrialIfLeftWithoutChoice(trigger: TrialStartRelay.Trigger) {
 #if APPSTORE
         let accessModel = CommandAccessModel.shared
+        if accessModel.status.canStartTrial {
+            TrialStartRelay.setIfUnset(trigger)
+        }
         Task { @MainActor in
             await accessModel.startTrialIfNeeded()
         }
@@ -871,6 +884,7 @@ final class OnboardingWindowController {
             window.deminiaturize(nil)
         }
         window.makeKeyAndOrderFront(nil)
+        analyticsDemoSucceeded = true
         CommandReopenAnalytics.track(CommandReopenEvent.onboardingDemoSucceeded(
             durationMs: Int(Date().timeIntervalSince(analyticsStartedAt) * 1000)
         ))
@@ -955,7 +969,7 @@ final class OnboardingWindowController {
 
     private func handleWindowWillClose() {
         reportCompletion(.closed)
-        startTrialIfLeftWithoutChoice()
+        startTrialIfLeftWithoutChoice(trigger: .onboardingWindowClosed)
         removeObservers()
         cancelActivationConfirmation()
         cancelReturnTimeout()
@@ -968,7 +982,7 @@ final class OnboardingWindowController {
 
     private func handleFinished() {
         reportCompletion(.finished)
-        startTrialIfLeftWithoutChoice()
+        startTrialIfLeftWithoutChoice(trigger: .onboardingFinished)
 #if DEBUG && APPSTORE
         // Kiki records completion in the real defaults; the simulated
         // install's access state needs it too, or it would still be a first launch.
