@@ -41,8 +41,10 @@ Apple Sandbox product.
 
 ## Trial and paywall
 
-New installs get a 2-day trial; an install that already had a trial before 1.5.2 keeps 14 days
-(decided once and stored by `RevenueCatConfiguration.resolveTrialDuration`). Yearly is no longer
+New installs get a 7-day trial that starts explicitly on onboarding's last step; 1.5.2 installs keep
+2 days and installs that already had a trial before 1.5.2 keep 14 (decided once and stored by
+`RevenueCatConfiguration.resolveTrialDuration`). A trial that has not started still restores windows,
+and the first real restore outside onboarding starts it (I-007). Yearly is no longer
 sold; it stays configured only so existing subscribers resolve to their plan.
 
 The paywall opens only for these reasons:

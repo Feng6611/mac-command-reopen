@@ -1,3 +1,4 @@
+import Defaults
 import Foundation
 import KikiAnalytics
 #if APPSTORE
@@ -32,10 +33,17 @@ final class AppComposition {
         })
         store.onReopenRecorded = { [weak self] todayCount in
             guard let self else { return }
+#if APPSTORE
+            Task { await self.commandAccess.recordSuccessfulReopen() }
+#endif
+            self.reopenHints.reopenSucceeded(totalReopens: self.reopenStats.totalSuccessfulReopens)
             self.router.handleTrialUsage(todayReopenCount: todayCount)
         }
         return store
     }()
+    lazy var reopenHints = ReopenHintPresenter(isOnboardingComplete: {
+        Defaults[AppDefaults.hasSeenOnboarding]
+    })
     lazy var settingsNavigation = SettingsNavigationModel()
     lazy var settingsWindow: SettingsWindowController = SettingsWindowController(navigation: settingsNavigation) { [weak self] in
         Task { await self?.lifecycle.refreshCommerceStateForSettings() }
@@ -59,6 +67,10 @@ final class AppComposition {
         onReopenOpportunity: { [weak self] in self?.analytics.track(CommandReopenEvent.reopenOpportunity) },
         onReopenResult: { [weak self] result in self?.analytics.track(CommandReopenEvent.reopenResult(result)) }
     )
+    .withLastWindowHandOff { [weak self] appName in
+        guard let self else { return }
+        self.reopenHints.lastWindowClosed(appName: appName, totalReopens: self.reopenStats.totalSuccessfulReopens)
+    }
     lazy var menuBarIconSettings = MenuBarIconSettings.shared
     lazy var statusBar = StatusBarMenuController(iconSettings: menuBarIconSettings)
     lazy var lifecycle: AppLifecycleCoordinator = AppLifecycleCoordinator(

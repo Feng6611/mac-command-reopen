@@ -42,6 +42,16 @@ final class ActivationMonitor: ObservableObject {
 
     static var shared: ActivationMonitor { AppComposition.shared.activationMonitor }
 
+    /// Called with the app's display name after its last window closed or
+    /// minimized and focus moved to another app — the moment Cmd+Tab back
+    /// would restore it. The name stays on this Mac (it is never tracked).
+    var onLastWindowHandedOff: ((String?) -> Void)?
+
+    func withLastWindowHandOff(_ handler: @escaping (String?) -> Void) -> ActivationMonitor {
+        onLastWindowHandedOff = handler
+        return self
+    }
+
     @Published var isFeatureEnabled: Bool {
         didSet {
             guard self.isFeatureEnabled != oldValue else { return }
@@ -429,6 +439,7 @@ final class ActivationMonitor: ObservableObject {
             "Last visible window disappeared for \(source.bundleIdentifier ?? "unknown"); handing off foreground activation."
         )
         requestActivation(of: returnTarget, from: source)
+        onLastWindowHandedOff?(source.localizedName)
     }
 
     private func resolvedForegroundReturnTarget(

@@ -118,7 +118,11 @@ final class CommandAccessModel: ObservableObject {
         }
 
         switch status {
-        case .notStarted, .free, .expired:
+        // Not started is not expired: Cmd+Tab keeps working, and the first
+        // real restore starts the trial (I-007).
+        case .notStarted:
+            return .trial
+        case .free, .expired:
             return .expired
         case .trial:
             return .trial
@@ -142,6 +146,15 @@ final class CommandAccessModel: ObservableObject {
     /// paywall's "Start free trial" is the way in; this covers leaving
     /// onboarding without a choice, so Cmd+Tab never silently does nothing.
     func startTrialIfNeeded() async {
+        await accessManager.startTrial()
+    }
+
+    /// A window was restored before the trial started: start it now. Only
+    /// reachable outside onboarding, which suppresses reopening and starts
+    /// the trial itself (I-007).
+    func recordSuccessfulReopen() async {
+        guard status == .notStarted else { return }
+        TrialStartRelay.setIfUnset(.firstReopen)
         await accessManager.startTrial()
     }
 

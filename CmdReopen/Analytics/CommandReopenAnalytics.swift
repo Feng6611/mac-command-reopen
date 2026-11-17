@@ -57,6 +57,8 @@ enum TrialStartRelay {
         case paywallButton = "paywall_button"
         case onboardingFinished = "onboarding_finished"
         case onboardingWindowClosed = "onboarding_window_closed"
+        /// Started by the first real restore, when onboarding had not started it.
+        case firstReopen = "first_reopen"
         case other
     }
 
@@ -92,6 +94,7 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
     }
     enum ReviewKind: String { case custom, systemRequest = "system_request" }
     enum ReviewAction: String { case review, notNow = "not_now" }
+    enum HintKind: String { case firstSuccess = "first_success", returnTip = "return_tip" }
 
     case onboardingStepViewed(session: KikiAnalyticsSessionID, step: OnboardingStep)
     case onboardingDemoSucceeded(durationMs: Int)
@@ -121,6 +124,7 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
     case excludedAppsChanged(count: Int)
     case reviewPromptShown(ReviewKind)
     case reviewPromptAction(ReviewAction)
+    case reopenHintShown(HintKind)
 
     var name: String {
         switch self {
@@ -142,6 +146,7 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
         case .excludedAppsChanged: "excluded apps changed"
         case .reviewPromptShown: "review prompt shown"
         case .reviewPromptAction: "review prompt action"
+        case .reopenHintShown: "reopen hint shown"
         }
     }
 
@@ -202,6 +207,8 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
             ["kind": .enum(kind)]
         case let .reviewPromptAction(action):
             ["action": .enum(action)]
+        case let .reopenHintShown(kind):
+            ["kind": .enum(kind)]
         }
     }
 
@@ -223,9 +230,9 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
 enum EntitlementLabel: String {
     case notStarted = "not_started", trial, expired, pro, unrestricted
 
-    /// A trial that has not started gives no access, so the app treats it as
-    /// expired; analytics must not, or every new user's onboarding would read
-    /// as an expired trial.
+    /// A trial that has not started still restores windows, so the app treats
+    /// it as a trial (I-007); analytics keeps it apart, so a new user's
+    /// onboarding is not counted as trial use.
     static func resolve(_ state: AccessEntitlementState, trialNotStarted: Bool) -> EntitlementLabel {
         if trialNotStarted { return .notStarted }
         return switch state {

@@ -1,5 +1,21 @@
 # Changelog / 更新日志
 
+## 1.5.4 — 2026-11-17
+
+### English
+
+- The first time Command Reopen restores a window, a short note at the top right says so. Until then, closing an app's last window shows a tip that Cmd+Tab brings it back, on at most two days.
+- The menu bar's Statistics item shows the restore count from the first restore.
+- Fixed: before the free trial started, Cmd+Tab did not restore windows and could open a purchase sheet saying the trial had ended. Cmd+Tab now works, and the first restore starts the trial.
+- Analytics: each real restore attempt reports success, failure or unknown; cancelled purchases and restores are now reported. No app names or window titles are sent.
+
+### 中文
+
+- Command Reopen 第一次帮你还原窗口时，右上角会有一条简短提示。在那之前，关掉某个 App 的最后一个窗口时会提示用 Cmd+Tab 找回，最多出现两天。
+- 菜单栏的“统计”从第一次还原起就显示次数。
+- 修复：免费试用开始前，Cmd+Tab 不会还原窗口，还可能弹出“试用已结束”的购买页。现在 Cmd+Tab 照常工作，第一次还原时开始试用。
+- 分析：每次实际还原都会上报成功、失败或未知；取消购买和取消恢复也会上报。不发送 App 名称或窗口标题。
+
 ## 1.5.3 — 2026-10-26
 
 ### English

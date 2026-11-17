@@ -55,6 +55,7 @@ App 业务事件附加 `entitlement_state`（`not_started` / `trial` / `expired`
 | `onboarding demo succeeded` | 引导演示成功 | 每安装一次 | `duration_ms` |
 | `onboarding completed` | 完成或关闭引导 | finished 每安装一次；closed 每次 | `session_id`、`outcome`、`last_step`、`launch_at_login`、`duration_ms`、`demo_succeeded` |
 | `reopen result` | 实际重开尝试结案 | 每次一次，不限量 | `result`、`reason`、`duration_ms`、`daily_attempt_index` |
+| `reopen hint shown` | 首次成功提示，或首次成功前关掉最后一个窗口时的用法提示 | 首次成功一次；用法提示最多 2 天、每天 1 次 | `kind`（`first_success` / `return_tip`），不含 App 名称 |
 | `reopen opportunity` | 通过前置过滤且未检测到窗口 | 每本地日一次 | 无业务参数；Kit 附加日序 |
 | `app quit` | 菜单栏 Quit | 每次 | `install_day` |
 
@@ -62,7 +63,7 @@ App 业务事件附加 `entitlement_state`（`not_started` / `trial` / `expired`
 
 | 事件 | 触发点 | 频率 | 参数 |
 | --- | --- | --- | --- |
-| `trial started` | 本地试用实际开始 | 每安装一次 | `trigger`、`trial_duration_days`、`minutes_since_first_open` |
+| `trial started` | 本地试用实际开始；引导外首次真实重开也会开始（I-007） | 每安装一次 | `trigger`（含 `first_reopen`）、`trial_duration_days`、`minutes_since_first_open` |
 | `trial ended` | 本地首次观察到期 | 每安装一次 | `active_days`、`value_bucket`、`winback_eligible` |
 | `paywall viewed` | 付费页首次出现 | 每付费页会话 | `session_id`、`source`、`trigger`、`prices_available` |
 | `paywall action` | 购买/恢复进度开始，或开始试用/关闭 | 每次；close 每会话最多一次 | `session_id`、`action`、`plan`、`ms_since_view`、`prices_available` |

@@ -249,6 +249,150 @@
         }
       }
     },
+    "Cmd+Tab brings it back" : {
+      "comment" : "Title of the tip shown after an app's last window closed, before the first restore.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab holt es zurück"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab le fait revenir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab で戻せます"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab traz de volta"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 Cmd+Tab 就能找回"
+          }
+        }
+      }
+    },
+    "Command Reopen brought it back. It works every time you press Cmd+Tab." : {
+      "comment" : "Body of the one-time hint after the first restored window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen hat es zurückgeholt. Das passiert bei jedem Cmd+Tab."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen l’a fait revenir. Cela fonctionne à chaque Cmd+Tab."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen が元に戻しました。Cmd+Tab を押すたびに働きます。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Command Reopen trouxe a janela de volta. Funciona sempre que você usa Cmd+Tab."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen 把它找回来了。每次按 Cmd+Tab 都会这样。"
+          }
+        }
+      }
+    },
+    "Switch back to %@ with Cmd+Tab and its window reopens." : {
+      "comment" : "Body of the tip after an app's last window closed; %@ is that app's name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wechsle mit Cmd+Tab zurück zu %@, und das Fenster öffnet sich wieder."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revenez à %@ avec Cmd+Tab et sa fenêtre se rouvre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cmd+Tab で %@ に戻ると、ウインドウが再び開きます。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volte para o %@ com Cmd+Tab e a janela reabre."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用 Cmd+Tab 切回 %@，它的窗口会重新出现。"
+          }
+        }
+      }
+    },
+    "Window restored" : {
+      "comment" : "Title of the one-time hint after Command Reopen restores its first window.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster wiederhergestellt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenêtre restaurée"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウを復元しました"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Janela restaurada"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "窗口已还原"
+          }
+        }
+      }
+    },
     "⌘ and the key above Tab" : {
       "comment" : "Names the keys for the window-cycling shortcut, whose second key differs by keyboard layout. Keep ⌘ verbatim.",
       "localizations" : {

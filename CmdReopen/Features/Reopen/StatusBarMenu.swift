@@ -222,9 +222,10 @@ final class StatusBarMenuController {
 
 @MainActor
 final class StatusBarMenuModel: ObservableObject {
-    /// Below this the count is too small to be worth stating, and a menu is the
-    /// wrong place to tell someone the app has barely done anything.
-    static let minimumReopensForMenuCount = 10
+    /// Stated from the first restore: a background utility that never says
+    /// what it did is easy to forget, and the first few are when the user is
+    /// still deciding whether it does anything at all (I-008).
+    static let minimumReopensForMenuCount = 1
 
     @Published private(set) var launchAtLoginEnabled: Bool
     @Published private(set) var totalReopens: Int

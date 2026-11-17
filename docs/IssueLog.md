@@ -1,5 +1,40 @@
 # Issue Log
 
+## I-008 — New users never notice the app working
+
+- Date: 2026-11-17
+- Status: Addressed in 1.5.4
+
+Of 33 new installs in the 1.5.2/1.5.3 sample, about 80% passed the onboarding
+demo, yet most sent no event after the first day. The app is silent when it
+succeeds (the result looks like macOS behaving normally), the menu only showed
+a count from the 10th restore, and a user who rarely closes windows never meets
+the case it fixes.
+
+1.5.4 adds two hints in a non-activating panel at the top right of the screen
+(`ReopenHint.swift`): once, after the first real restore; and, until that
+first restore, after an app's last window closed and focus moved on — at most
+once a day on two days. The menu shows the restore count from the first one.
+No notification permission; the status item stays Kit-owned. The tip shows the
+app's name on screen only; `reopen hint shown` carries just `kind`.
+Launch at Login stays off by default (login-item consent, App Review 2.4.5).
+
+## I-007 — A trial that had not started read as expired
+
+- Date: 2026-11-17
+- Status: Fixed in 1.5.4
+
+`CommandAccessModel.entitlementState` mapped `notStarted` to `expired`. Outside
+onboarding — before it appeared, when automatic presentation was withheld, or
+after quitting mid-onboarding — Cmd+Tab took the expired path: no restore except
+the daily nudge, and a paywall routed as `trial_expired` to someone whose trial
+had never started.
+
+`notStarted` now maps to `trial`, so Cmd+Tab restores windows, and the first
+real restore starts the trial (`trial started`, trigger `first_reopen`).
+Onboarding still suppresses reopening, so its own start path is unchanged. The
+trial length and clock are unchanged.
+
 ## I-006 — Onboarding paywall close button did not finish onboarding
 
 - Date: 2026-10-26
