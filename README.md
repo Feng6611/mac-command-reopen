@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="docs/icon.svg" width="96" height="96" alt="Command Reopen icon">
+  <img src="docs/icon.svg" alt="Command Reopen" width="160">
 </p>
 
 <h1 align="center">Command Reopen</h1>
 
 <p align="center">
-  Bring back minimized and closed windows on Cmd+Tab.
+  <strong>Bring back a window when you switch apps with Cmd+Tab.</strong>
 </p>
 
 <p align="center">
-  <a href="README_CN.md">简体中文</a> | <b>English</b>
+  You Cmd+Tab to an app, it becomes active — and its window stays in the Dock. Command Reopen requests an app reopen when an application activates with no visible windows, using zero permissions inside the native switcher.
 </p>
 
 <p align="center">
@@ -19,18 +19,14 @@
 </p>
 
 <p align="center">
-  <img src="assets/screenshots-en.png" width="800" alt="Command Reopen preview">
+  <sub><a href="https://commandreopen.com">Website</a> · <a href="README_CN.md">中文</a></sub>
 </p>
 
-> **Get Command Reopen on the Mac App Store**
->
-> Command Reopen is available on the [Mac App Store](https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8). It offers a lightweight, simple setup with no Accessibility permission required, includes automatic updates, and buying it supports ongoing development.
->
-> Prefer free and open source? The Direct edition is available via [GitHub Releases](https://github.com/Feng6611/mac-command-reopen/releases/latest). It adds optional Accessibility settings in Settings › Advanced to help restore minimized windows for some apps that ignore standard system reopen events. The current 1.2.1 release ZIP predates these optional settings, which are available in the current source build.
+<p align="center">
+  <img src="assets/screenshots-en.png" alt="Command Reopen: Cmd+Tab restores a minimized window from the Dock; Settings with the excluded apps list; menu bar menu, no Accessibility or Screen Recording permission needed" width="900">
+</p>
 
----
-
-## Why does Cmd+Tab switch to an app without bringing back its window?
+## The Cmd+Tab gap
 
 | Shortcut | What happens | Does Cmd+Tab bring it back? |
 |---|---|---|
@@ -38,28 +34,19 @@
 | `Cmd+M` | Minimizes the window to the Dock | **No** |
 | `Cmd+W` | Closes the window | **No** |
 
-Cmd+Tab switches apps. Minimized windows may stay in the Dock and closed windows stay closed.
+Hide an app and Cmd+Tab brings it back immediately. Minimize or close its window, however, and Cmd+Tab only activates the application — leaving the window in the Dock or closed. The native workaround (Cmd+Tab, hold Option, then release Cmd) restores only one window at a time.
 
-When an app has no visible windows, Command Reopen asks macOS to reopen one. The app decides how it responds.
-
-## Editions
-
-| Edition | Mac App Store | Direct (GitHub) |
-| :--- | :--- | :--- |
-| **Download** | [Download on the Mac App Store](https://apps.apple.com/app/apple-store/id6757333924?pt=128417926&ct=readme&mt=8) | [Latest Release](https://github.com/Feng6611/mac-command-reopen/releases/latest) |
-| **Window Restore Method** | macOS requests the app to reopen windows | New version can restore minimized windows with AX. Falls back to system reopening if disabled or restore fails. |
-| **Permissions** | No Accessibility permission required | Required only when Advanced Window Restore is enabled |
-| **Updates** | Automatic via App Store | Manual download |
+Command Reopen addresses this gap. When you switch to an app that has no visible windows, it requests a standard application reopen.
 
 ## Features
 
-- Restore minimized windows from the Dock when switching via Cmd+Tab.
-- Reopen a default window for apps that closed their last window.
-- Require zero permissions for core operations, using standard system workspace APIs.
-- Return focus to the previous application when closing or minimizing the last window.
-- Preserve standard macOS Cmd+Tab switcher UI and muscle memory completely intact.
-- Exclude specific applications by name or bundle identifier in Settings.
-- Run quietly from the menu bar, with an option to hide the status bar icon.
+- **Restore minimized windows** — Switch to an app and Command Reopen requests a reopen event allowing the app to restore a minimized window from the Dock.
+- **Reopen closed windows** — If an app has no open windows when you switch to it, Command Reopen requests a new default window.
+- **Zero permissions** — Requires neither Accessibility nor Screen Recording permission. Sandboxed, distributed through the Mac App Store, with no advertising or cross-app tracking.
+- **Return focus when the last window closes** — When you close or minimize an app's last window, focus shifts to your previous app so subsequent Cmd+Tab cycles stay natural.
+- **Native switcher remains unchanged** — No custom switcher, overlay, or third-party window manager. You keep the standard Cmd+Tab behavior and muscle memory.
+- **Exclude any app** — Filter apps by name or bundle identifier; excluded apps retain standard macOS Cmd+Tab behavior.
+- **Quiet background utility** — Runs quietly from the menu bar, with the option to hide the menu bar icon.
 
 ## FAQ
 
@@ -69,7 +56,7 @@ macOS treats minimized windows as intentionally set aside. Cmd+Tab activates the
 
 **Does Command Reopen need any permissions?**
 
-Core window reopening requires no Accessibility or Screen Recording permission. It observes application activation using `NSWorkspace.didActivateApplicationNotification`, checks the public CoreGraphics window list (`CGWindowListCopyWindowInfo`) for an existing visible window, and only if none exists sends a reopen request via `NSWorkspace.openApplication(at:configuration:)` — the same request macOS sends when clicking an app's Dock icon. You can inspect the implementation in [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen).
+No. It requires neither Accessibility nor Screen Recording permissions because it uses public window information and the app's standard reopen behavior. It observes application activation using `NSWorkspace.didActivateApplicationNotification`, checks the public CoreGraphics window list (`CGWindowListCopyWindowInfo`) for an existing visible window, and only if none exists sends a reopen request via `NSWorkspace.openApplication(at:configuration:)` — the same request macOS sends when clicking an app's Dock icon. You can inspect the implementation in [CmdReopen/Features/Reopen](CmdReopen/Features/Reopen).
 
 **Does it alter the Cmd+Tab switcher UI?**
 
