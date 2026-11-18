@@ -1,6 +1,6 @@
 # Command Reopen 事件表
 
-当前设计覆盖至 **1.5.4（本地实现，待发布）**。1.5.2 / 1.5.3 的历史事件版本见飞书埋点设计表。App Store Release 才发送；Debug、Direct / Community 使用 `.none`。事件与参数统一定义在 `CommandReopenAnalytics.swift`；PostHog 传输封装在 KikiAnalyticsKit。本文不表示生产数据已验证。
+当前设计覆盖至 **1.5.4（本地实现，待发布）**。1.5.2 / 1.5.3 的历史事件版本见飞书埋点设计表。生产 Release 分发（App Store 及 Release Direct 归档）在配置 token 后发送；Debug 始终使用 `.none`。事件与参数统一定义在 `CommandReopenAnalytics.swift`；PostHog 传输封装在 KikiAnalyticsKit。本文不表示生产数据已验证。
 
 ## 安装到付费的分析口径
 
@@ -91,12 +91,12 @@ SDK 自动生命周期事件为 `Application Installed` / `Application Updated` 
 
 ## 验证
 
-使用 `RecordingAnalyticsTransport` 验证超过每日 10 次仍全部发送，每个事件字段固定且不含目标身份。Executor 测试覆盖成功窗口、延迟窗口、无窗口、窗口列表不可用、系统错误、重复及晚到回调、被后续请求替代、超时与跨日序号。Debug / Direct 无网络传输；生产 PostHog 回读另行验证。
+使用 `RecordingAnalyticsTransport` 验证超过每日 10 次仍全部发送，每个事件字段固定且不含目标身份。Executor 测试覆盖成功窗口、延迟窗口、无窗口、窗口列表不可用、系统错误、重复及晚到回调、被后续请求替代、超时与跨日序号。Debug 模式及未配置 token 的构建无网络传输；生产 PostHog 回读另行验证。
 
 ## 接入与配置
 
 - token：`Config/LocalSecrets.xcconfig` 的 `KIKI_POSTHOG_PROJECT_TOKEN`（`phc_` 开头，公开 token）；
-  `KIKI_POSTHOG_HOST` 留空走默认 host。Release 的 App Store 构建缺 token 会在构建阶段失败（`scripts/check_posthog_config.sh`）。
+  `KIKI_POSTHOG_HOST` 留空走默认 host。Release 的 App Store 构建缺 token 会在构建阶段失败（`scripts/check_posthog_config.sh`）；Release Direct 归档要求配置 token，普通本地源码构建可省略。
 - 收入：RevenueCat 的 PostHog 集成使用 KikiCommerceKit `0.5.1` 的 `postHogUserID`。
   `AppComposition` 将 `analytics.installationID.uuidString` 经 `CommandAccessModel` 传入 provider；
   只设置 `$posthogUserId` 属性，不更改 RevenueCat 的 `app_user_id`。

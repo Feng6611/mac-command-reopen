@@ -386,30 +386,36 @@ private struct FinishStepView: View {
     }
 
 #if !APPSTORE
-    /// What the user actually installed, said once, at the only moment they
-    /// are certain to read it. Stated as a fact and a way to help rather than
-    /// as a limitation: nothing here is locked, so an upsell would be a lie.
     private var communityBuildNote: some View {
         VStack(spacing: DS.Spacing.xs) {
-            Text(appLanguage.string(localized: "This is the free community build",
-                comment: "Heading of the free build's note on the final onboarding step."))
+            Text(appLanguage.string("Support Development"))
                 .font(.callout.weight(.medium))
 
-            Text(appLanguage.string(localized: "Every feature, no limits, for as long as you want it. The Mac App Store version is the same app — buying it is how the work gets paid for.",
-                comment: "Body of the free build's note on the final onboarding step."))
+            Text(appLanguage.string("Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button(appLanguage.string("Get on Mac App Store")) {
-                if let url = URL(string: AppStoreLinks.productURL) {
-                    NSWorkspace.shared.open(url)
+            HStack(spacing: DS.Spacing.md) {
+                Button(appLanguage.string("Mac App Store")) {
+                    if let url = URL(string: AppStoreLinks.productURL) {
+                        NSWorkspace.shared.open(url)
+                    }
                 }
+                .buttonStyle(.plain)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DS.Colors.brandPrimary)
+
+                Button(appLanguage.string("Buy Me a Coffee")) {
+                    if let url = URL(string: ExternalLinks.buyMeACoffeeURL) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .buttonStyle(.plain)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DS.Colors.brandPrimary)
             }
-            .buttonStyle(.plain)
-            .font(.caption.weight(.medium))
-            .foregroundStyle(DS.Colors.brandPrimary)
             .padding(.top, DS.Spacing.xxs)
         }
         .frame(maxWidth: .infinity)

@@ -7,13 +7,8 @@
 import AppKit
 import SwiftUI
 
-/// The support actions the free build makes available in About.
-///
-/// The primary action is the App Store copy because that is the only money
-/// path this app keeps — no tip jar beside it, so a supporter's money lands
-/// where it also buys a review and a ranking. Starring costs nothing and is
-/// the next best thing someone can give, so it rides alongside as a quiet
-/// secondary action rather than a second button competing for the click.
+/// The support actions available in About for the Direct edition:
+/// getting the Mac App Store edition or supporting via Buy Me a Coffee.
 struct DirectSupportCardRow: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
 
@@ -29,40 +24,30 @@ struct DirectSupportCardRow: View {
                             .fill(DS.Colors.accentTint)
                     )
 
-                Text(appLanguage.string(localized: "Same app, paid the other way",
-                    comment: "Title of the support card in the free build's About pane."))
+                Text(appLanguage.string("Support Development"))
                     .font(.headline)
 
                 Spacer(minLength: 0)
             }
 
-            Text(appLanguage.string(localized: "This free build has every feature and always will. The App Store version is identical — buying it funds the work, and you get automatic updates.",
-                comment: "Body of the free build's support card, stating that the paid version unlocks nothing extra."))
+            Text(appLanguage.string("Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: DS.Spacing.md) {
-                Button(appLanguage.string(localized: "Get it on the App Store",
-                    comment: "Primary button of the free build's support card.")) {
+                Button(appLanguage.string("Mac App Store")) {
                     open(AppStoreLinks.productURL)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(DS.Colors.brandPrimary)
 
-                // Brand tint rather than link blue: the pane already spends
-                // its accent on this card, and a second accent colour beside
-                // the purple button reads as two unrelated systems.
-                Button {
-                    open(ExternalLinks.githubURL)
-                } label: {
-                    Label(appLanguage.string(localized: "Star on GitHub",
-                        comment: "Secondary support action in the free build's support card."), systemImage: "star")
-                        .foregroundStyle(DS.Colors.brandPrimary)
-                        .contentShape(Rectangle())
+                Button(appLanguage.string("Buy Me a Coffee")) {
+                    open(ExternalLinks.buyMeACoffeeURL)
                 }
                 .buttonStyle(.plain)
-                .font(.caption)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DS.Colors.brandPrimary)
             }
         }
         .padding(.vertical, DS.Spacing.sm)

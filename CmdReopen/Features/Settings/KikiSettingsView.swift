@@ -145,81 +145,120 @@ struct SettingsView: View {
     }
 
     private var aboutPane: some View {
+#if !APPSTORE
+        KikiSettingsPane {
+            Section {
+                aboutIdentityContent
+            }
+            .listRowBackground(Color(nsColor: .windowBackgroundColor))
+
+            Section {
+                DirectSupportCardRow()
+            }
+            .listRowBackground(Color(nsColor: .controlBackgroundColor))
+
+            Section {
+                aboutStatusContent
+            }
+            .listRowBackground(Color(nsColor: .controlBackgroundColor))
+
+            Section {
+                aboutLinksContent
+            }
+            .listRowBackground(Color(nsColor: .controlBackgroundColor))
+        }
+#else
         KikiStandardAboutPane(metadata: aboutMetadata)
             .statusContent {
-                standardAboutStatusRow
-                KikiSettingsLinkRow(
-                    title: appLanguage.string("Mac window shortcuts"),
-                    value: "",
-                    urlString: "",
-                    systemImage: "keyboard",
-                    trailingSystemImage: "chevron.right",
-                    action: { route.presentMacShortcuts() }
-                )
-#if APPSTORE
-                // The same banner General shows, rather than a second design
-                // for the same state: one offer, one way it looks, wherever
-                // the user meets it.
-                WinbackOfferRow(accessModel: accessModel) {
-                    route.presentTrialExitOffer()
+                aboutStatusContent
+            }
+            .additionalLinks {
+                aboutLinksContent
+            }
+            .additionalSections {
+#if DEBUG && APPSTORE
+                Section {
+                    ProAccessDebugRows(
+                        onPresentOnboarding: {
+                            OnboardingWindowController.shared.replayFromDebugSettings()
+                        },
+                        onPresentPaywall: {
+                            route.presentPaywall()
+                        },
+                        onPresentTrialExitOffer: {
+                            route.presentTrialExitOfferDebugPreview()
+                        },
+                        onPresentReviewPrompt: {
+                            ReopenStatsStore.shared.presentCustomReviewPromptPreview()
+                        }
+                    )
+                } header: {
+                    Text(appLanguage.string("Developer Testing"))
+                } footer: {
+                    KikiSettingsHelperText(appLanguage.string("Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies."))
                 }
 #endif
             }
-            .additionalLinks {
-                SettingsTrailingLinkRow(
-                    title: appLanguage.string("Made by"),
-                    value: ExternalLinks.developerName,
-                    urlString: ExternalLinks.developerURL,
-                    systemImage: "person"
-                )
-                SettingsTrailingLinkRow(
-                    title: appLanguage.string("Website"),
-                    value: ExternalLinks.websiteDisplayName,
-                    urlString: ExternalLinks.officialURL,
-                    systemImage: "globe"
-                )
-                SettingsTrailingCopyRow(
-                    title: appLanguage.string("Email"),
-                    value: ExternalLinks.contactEmailAddress,
-                    systemImage: "envelope"
-                )
-                SettingsTrailingLinkRow(
-                    title: appLanguage.string("Source"),
-                    value: ExternalLinks.repositoryDisplayName,
-                    urlString: ExternalLinks.githubURL,
-                    systemImage: "chevron.left.forwardslash.chevron.right"
-                )
-                KikiSettingsHelperText(
-                    appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
-                )
-            }
-            .additionalSections {
-#if !APPSTORE
-                Section { DirectSupportCardRow() }
 #endif
-#if DEBUG && APPSTORE
-            Section {
-                ProAccessDebugRows(
-                    onPresentOnboarding: {
-                        OnboardingWindowController.shared.replayFromDebugSettings()
-                    },
-                    onPresentPaywall: {
-                        route.presentPaywall()
-                    },
-                    onPresentTrialExitOffer: {
-                        route.presentTrialExitOfferDebugPreview()
-                    },
-                    onPresentReviewPrompt: {
-                        ReopenStatsStore.shared.presentCustomReviewPromptPreview()
-                    }
-                )
-            } header: {
-                Text(appLanguage.string("Developer Testing"))
-            } footer: {
-                KikiSettingsHelperText(appLanguage.string("Debug only. Live clears the Pro access override. The win-back window needs Pro access set to Expired, the same gate the app applies."))
-            }
-#endif
+    }
+
+    private var aboutIdentityContent: some View {
+        KikiAppIdentityView(
+            appName: aboutMetadata.appName,
+            versionText: aboutMetadata.displayVersion
+        )
+        .padding(.vertical, 20)
+    }
+
+    @ViewBuilder
+    private var aboutStatusContent: some View {
+        standardAboutStatusRow
+        KikiSettingsLinkRow(
+            title: appLanguage.string("Mac window shortcuts"),
+            value: "",
+            urlString: "",
+            systemImage: "keyboard",
+            trailingSystemImage: "chevron.right",
+            action: { route.presentMacShortcuts() }
+        )
+#if APPSTORE
+        // The same banner General shows, rather than a second design
+        // for the same state: one offer, one way it looks, wherever
+        // the user meets it.
+        WinbackOfferRow(accessModel: accessModel) {
+            route.presentTrialExitOffer()
         }
+#endif
+    }
+
+    @ViewBuilder
+    private var aboutLinksContent: some View {
+        SettingsTrailingLinkRow(
+            title: appLanguage.string("Made by"),
+            value: ExternalLinks.developerName,
+            urlString: ExternalLinks.developerURL,
+            systemImage: "person"
+        )
+        SettingsTrailingLinkRow(
+            title: appLanguage.string("Website"),
+            value: ExternalLinks.websiteDisplayName,
+            urlString: ExternalLinks.officialURL,
+            systemImage: "globe"
+        )
+        SettingsTrailingCopyRow(
+            title: appLanguage.string("Email"),
+            value: ExternalLinks.contactEmailAddress,
+            systemImage: "envelope"
+        )
+        SettingsTrailingLinkRow(
+            title: appLanguage.string("Source"),
+            value: ExternalLinks.repositoryDisplayName,
+            urlString: ExternalLinks.githubURL,
+            systemImage: "chevron.left.forwardslash.chevron.right"
+        )
+        KikiSettingsHelperText(
+            appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
+        )
     }
 
     private var aboutMetadata: KikiAppMetadata { .bundle() }

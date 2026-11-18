@@ -70,10 +70,12 @@ A trial that is merely running never opens it by itself. These rules are covered
 
 Events are defined in `CmdReopen/Analytics/CommandReopenAnalytics.swift` and listed in
 [docs/Analytics.md](docs/Analytics.md). Call `CommandReopenAnalytics.track(...)`; never import PostHog
-outside that file. Only the App Store build has a transport. The project token goes in
-`Config/LocalSecrets.xcconfig` as `KIKI_POSTHOG_PROJECT_TOKEN`; without it nothing is sent, and a
-Release App Store build fails. Debug builds always use the no-op transport, even when a token
-is configured. The existing PostHog project is `mac-app` (528691); websites use separate projects.
+outside that file. Production release builds share anonymous telemetry when configured.
+Release Direct archives require a token, while normal builds from source can omit it;
+Release App Store archives maintain their existing token check. Debug builds always use
+the no-op transport, even when a token is configured. The project token goes in
+`Config/LocalSecrets.xcconfig` as `KIKI_POSTHOG_PROJECT_TOKEN`. The PostHog project is
+`mac-app` (528691); websites use separate projects.
 
 ## Releasing
 

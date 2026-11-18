@@ -2,15 +2,14 @@
 //  CommandReopenAnalytics.swift
 //  CmdReopen
 //
-//  The event table lives in docs/Analytics.md. Only the App Store build has a
-//  transport; every other build composes the Kit with `.none`, so call sites
-//  never branch on the distribution.
+//  The event table lives in docs/Analytics.md. Both release channels use
+//  the PostHog transport. Debug composes the Kit with `.none`.
 //
 
 import Foundation
 import KikiAnalytics
 import StoreKit
-#if APPSTORE
+#if !DEBUG
 import KikiPostHog
 #endif
 
@@ -251,15 +250,14 @@ enum CommandReopenAnalytics {
         trialNotStarted: @escaping () -> Bool = { false },
         defaults: UserDefaults = .standard
     ) -> KikiAnalytics {
-#if APPSTORE
 #if DEBUG
         let transport = KikiAnalyticsTransportFactory.none
 #else
         let transport = KikiAnalyticsTransportFactory.postHog(.fromInfoPlist())
 #endif
+#if APPSTORE
         let channel = KikiAnalyticsApp.Channel.appStore
 #else
-        let transport = KikiAnalyticsTransportFactory.none
         let channel = KikiAnalyticsApp.Channel.direct
 #endif
         return KikiAnalytics(
@@ -286,17 +284,17 @@ enum CommandReopenAnalytics {
         now: Date
     ) -> KikiAnalyticsProperties {
         var properties: KikiAnalyticsProperties = ["entitlement_state": .enum(entitlement)]
+#if APPSTORE
         if let day = trialDay(defaults: defaults, now: now) {
             properties["trial_day"] = .int(day)
         }
-#if APPSTORE
         if let days = defaults.object(forKey: RevenueCatConfiguration.trialDurationDaysKey) as? Int, days > 0 {
             properties["trial_duration_days"] = .int(days)
         }
-#endif
         if let downloaded = OriginalDownload.date(defaults: defaults) {
             properties["days_since_download"] = .int(wholeDays(from: downloaded, to: now))
         }
+#endif
         return properties
     }
 

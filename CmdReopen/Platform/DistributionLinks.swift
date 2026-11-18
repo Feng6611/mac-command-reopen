@@ -21,6 +21,7 @@ enum ExternalLinks {
     }
     static let contactEmailAddress = "fchen6611@gmail.com"
     static let contactEmail = "mailto:fchen6611@gmail.com"
+    static let buyMeACoffeeURL = "https://buymeacoffee.com/kkuk"
     /// Values come from `sale/brand/identity.md`, which is the single source
     /// for the developer identity across every asset — a buyer checking who
     /// wrote this should meet the same name here, on GitHub and on the site.
