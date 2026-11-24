@@ -321,6 +321,146 @@
         }
       }
     },
+    "Command Reopen sends anonymous usage stats, never app names or window titles." : {
+      "comment" : "Analytics notice in the free GitHub build (About footer and final onboarding step). It never sends the names of other apps or window titles.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen sendet anonyme Nutzungsstatistiken, niemals App-Namen oder Fenstertitel."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen envoie des statistiques d’utilisation anonymes, jamais de noms d’app ni de titres de fenêtres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopenは匿名の利用統計を送信します。アプリ名やウインドウのタイトルは送信しません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen 会发送匿名使用统计，不含 App 名称和窗口标题。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Command Reopen envia estatísticas de uso anônimas, nunca nomes de apps ou títulos de janelas."
+          }
+        }
+      }
+    },
+    "Every feature, nothing locked." : {
+      "comment" : "About status subtitle for the free GitHub build.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Funktionen, nichts gesperrt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes les fonctions, rien de verrouillé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全機能が使え、ロックはありません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能完整，没有任何锁。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos os recursos, nada bloqueado."
+          }
+        }
+      }
+    },
+    "Open source under MIT. Command Reopen asks for Accessibility only when you turn on Advanced Window Restore — and you can check that in the source rather than take our word for it." : {
+      "comment" : "About-pane footer of the free GitHub build: the only permission it can ask for, tied to the public source.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Source unter MIT-Lizenz. Command Reopen fragt nur nach Bedienungshilfen, wenn du die erweiterte Fensterwiederherstellung einschaltest — und du musst uns das nicht glauben, sondern kannst es im Quellcode nachprüfen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open source sous licence MIT. Command Reopen ne demande l’Accessibilité que si vous activez la restauration avancée des fenêtres — et vous pouvez le vérifier dans le code plutôt que nous croire sur parole."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MITライセンスのオープンソースです。Command Reopenがアクセシビリティを求めるのは、高度なウインドウ復元をオンにしたときだけです。その点はソースコードでご確認いただけます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以 MIT 协议开源。只有打开“高级窗口恢复”时，Command Reopen 才会请求辅助功能权限——你可以在源代码里自己核实，不必只听我们说。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código aberto sob licença MIT. O Command Reopen só pede Acessibilidade quando você ativa a restauração avançada de janelas — e você pode verificar isso no código-fonte em vez de apenas confiar na nossa palavra."
+          }
+        }
+      }
+    },
+    "Support Command Reopen" : {
+      "comment" : "Title of the support card in the free GitHub build's About pane, and heading of its note on the final onboarding step.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen unterstützen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soutenir Command Reopen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopenを応援"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持 Command Reopen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoie o Command Reopen"
+          }
+        }
+      }
+    },
     "Switch back to %@ with Cmd+Tab and its window reopens." : {
       "comment" : "Body of the tip after an app's last window closed; %@ is that app's name.",
       "extractionState" : "manual",
@@ -353,6 +493,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "用 Cmd+Tab 切回 %@，它的窗口会重新出现。"
+          }
+        }
+      }
+    },
+    "This free build has every feature and always will. Buying the App Store version pays for the work and adds automatic updates. Advanced Window Restore is only in this build." : {
+      "comment" : "Body of the free GitHub build's support card and onboarding note. The paid App Store version unlocks nothing extra and lacks the opt-in Advanced Window Restore.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser kostenlose Build hat alle Funktionen und behält sie. Mit dem Kauf der App-Store-Version finanzierst du die Entwicklung und bekommst automatische Updates. Die erweiterte Fensterwiederherstellung gibt es nur in diesem Build."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version gratuite a toutes les fonctions et les gardera. Acheter la version App Store finance le travail et ajoute les mises à jour automatiques. La restauration avancée des fenêtres n’existe que dans cette version."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この無料版はすべての機能を使え、今後も変わりません。App Store版を購入すると開発の支援になり、自動アップデートも受けられます。高度なウインドウ復元はこの無料版だけの機能です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "免费版功能完整，并会一直免费。购买 App Store 版可以支持开发，还能自动更新。高级窗口恢复只在这个版本里提供。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta versão gratuita tem todos os recursos e sempre terá. Comprar a versão da App Store financia o desenvolvimento e traz atualizações automáticas. A restauração avançada de janelas existe só nesta versão."
           }
         }
       }
@@ -2067,41 +2242,6 @@
         }
       }
     },
-    "Every feature, no limits, for as long as you want it. The Mac App Store version is the same app — buying it is how the work gets paid for." : {
-      "comment" : "Body of the free build's note on the final onboarding step.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Funktionen ohne Einschränkung. Der Kauf im App Store unterstützt die Entwicklung."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toutes les fonctionnalités sans limite. L'achat sur l'App Store soutient le développement."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての機能を制限なく利用できます。App Store版の購入は開発支援につながります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "功能完整且永久免费。在 App Store 购买可赞助后续开发。"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos os recursos, sem limites e pelo tempo que quiser. A versão da Mac App Store é o mesmo app — comprá-la é a forma de apoiar o desenvolvimento."
-          }
-        }
-      }
-    },
     "Excluded Apps" : {
       "comment" : "Section heading for the list of apps excluded from window reopening.",
       "localizations" : {
@@ -2316,41 +2456,6 @@
         }
       }
     },
-    "Full-featured, nothing locked. Same app as the App Store version." : {
-      "comment" : "About status subtitle for the free GitHub build.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voller Funktionsumfang, nichts gesperrt. Dieselbe App wie im App Store."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toutes les fonctions, rien de verrouillé. La même app que sur l’App Store."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全機能が使え、ロックはありません。App Store版と同じアプリです。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "功能完整，没有任何锁。和 App Store 版是同一个 app。"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recursos completos, nada bloqueado. O mesmo app da versão da App Store."
-          }
-        }
-      }
-    },
     "General" : {
       "localizations" : {
         "de" : {
@@ -2381,41 +2486,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Geral"
-          }
-        }
-      }
-    },
-    "Get it on the App Store" : {
-      "comment" : "Primary button of the free build's support card.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Im App Store holen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Télécharger sur l’App Store"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Storeで入手"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "去 App Store 购买"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obter na App Store"
           }
         }
       }
@@ -4686,41 +4756,6 @@
         }
       }
     },
-    "Same app, paid the other way" : {
-      "comment" : "Title of the support card in the free build's About pane.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieselbe App, andere Unterstützung"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Même app, autre façon de soutenir"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "同じApp、別の応援方法"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "相同的 App，另一种支持方式"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O mesmo app, pago de outra forma"
-          }
-        }
-      }
-    },
     "Search App name or bundle ID…" : {
       "comment" : "Placeholder text for searching apps to exclude.",
       "localizations" : {
@@ -4961,41 +4996,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spaces"
-          }
-        }
-      }
-    },
-    "Star on GitHub" : {
-      "comment" : "Secondary support action in the free build's support card.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf GitHub mit Stern markieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mettre une étoile sur GitHub"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHubでスターする"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 GitHub 点 Star"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dar uma estrela no GitHub"
           }
         }
       }
@@ -5759,76 +5759,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "e depois"
-          }
-        }
-      }
-    },
-    "This free build has every feature and always will. The App Store version is identical — buying it funds the work, and you get automatic updates." : {
-      "comment" : "Body of the free build's support card, stating that the paid version unlocks nothing extra.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser kostenlose Build hat alle Funktionen. Der Kauf im App Store unterstützt die Entwicklung und bringt automatische Updates."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette version gratuite a toutes les fonctions. L’achat sur l’App Store soutient le travail et inclut les mises à jour automatiques."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料版は機能制限なしで永久に使えます。App Store版の購入は開発支援と自動更新になります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "免费版功能完整且永久可用。在 App Store 购买可赞助后续开发并获得自动更新。"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta versão gratuita tem todos os recursos e sempre terá. A versão da App Store é idêntica — comprá-la financia o desenvolvimento e garante atualizações automáticas."
-          }
-        }
-      }
-    },
-    "This is the free community build" : {
-      "comment" : "Heading of the free build's note on the final onboarding step.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dies ist die kostenlose Community-Version"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il s'agit de la version communautaire gratuite"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無料のコミュニティ版です"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这是免费的社区版本"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta é a versão gratuita da comunidade"
           }
         }
       }
@@ -7795,166 +7725,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "Buy Me a Coffee" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buy Me a Coffee"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请喝咖啡"
-          }
-        }
-      }
-    },
-    "Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Direct-Version ist kostenlos und voll funktionsfähig, inklusive optionaler erweiterter Fensterwiederherstellung. Die Mac App Store-Version bietet automatische Updates."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La version Direct est gratuite et complète, avec la restauration avancée des fenêtres en option. La version Mac App Store inclut les mises à jour automatiques."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Direct版は完全無料で全機能を利用でき、任意の高度なウインドウ復元にも対応しています。Mac App Store版は自動アップデートに対応しています。"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A versão Direct é gratuita e completa, com restauração avançada de janelas opcional. A versão da Mac App Store inclui atualizações automáticas."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "直装版完全免费且功能完整，支持可选的高级窗口恢复；Mac App Store 版支持自动更新。"
-          }
-        }
-      }
-    },
-    "Mac App Store" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mac App Store"
-          }
-        }
-      }
-    },
-    "Support Development" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entwicklung unterstützen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Support Development"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Soutenir le développement"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開発を支援"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apoiar o desenvolvimento"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "支持开发"
           }
         }
       }

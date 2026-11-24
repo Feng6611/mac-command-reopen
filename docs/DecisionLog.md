@@ -1,5 +1,59 @@
 # Decision Log
 
+## D-014 — The GitHub build sends the same anonymous analytics, and says so
+
+- Date: 2026-11-18
+- Status: Accepted for the GitHub build 1.5.5; supersedes D-012's "Debug and Direct use `.none`"
+
+### Context
+
+D-012 gave only App Store Release a PostHog transport. The free GitHub build
+had no way to show whether onboarding finished or whether restores worked for
+the people using it, while it now carries the opt-in Advanced Window Restore
+that the App Store build lacks. 1.5.4's Direct alignment (`de4bfc8`) switched
+Direct Release to PostHog but left PRIVACY.md, the README and the app saying
+the GitHub build sends nothing.
+
+### Decision
+
+Every non-Debug build composes `KikiAnalytics` with the PostHog transport and
+tags events with its channel (`appStore` / `direct`). Debug stays `.none`.
+Release Direct archives require the token through the same
+`check_posthog_config.sh` gate; a source build without a token sends nothing.
+The GitHub build sends no trial-day or download-age properties and, having no
+RevenueCat, no purchase events. Events, the installation UUID and the
+no-identity rules are those of D-012.
+
+There is still no consent prompt or toggle. Disclosure replaces the old
+"sends nothing" claim: PRIVACY.md and both READMEs, the CHANGELOG 1.5.5 entry,
+one line on the last onboarding step of the GitHub build, and the GitHub
+build's About footer. The About line exists because people updating from an
+earlier GitHub build never see onboarding again.
+
+The GitHub build keeps `com.dev.kkuk.CommandReopen.direct`. Every public
+GitHub release (1.0.0–1.2.1) used it, while the Direct builds that carried the
+plain ID (1.4.2 to 1.5.x, after `a787ded`) were never published, so keeping
+`.direct` is what lets settings from 1.2.1 carry over. Sharing the App Store app's ID gained nothing: the App Store build is
+sandboxed, so settings never crossed editions anyway, and the same ID risks
+the App Store and macOS treating the GitHub copy as the store app. Only the
+GitHub build ships as 1.5.5; the App Store target stays on 1.5.4 (build 42).
+The shipping `Release-Direct` product is `Command Reopen.app`, which
+`install.sh` expects; the installer also replaces a GitHub build found under
+`Command Reopen Direct.app`. Debug and Release keep the product name
+`Command Reopen Direct` because the Direct scheme's test action builds the App
+Store test host into the same products folder.
+
+The GitHub build's About pane returns to `KikiStandardAboutPane` with one
+support ask (D-005) and a footer that names the Accessibility request instead of the App
+Store build's no-permission claim. The status subtitle no longer says "Same app
+as the App Store version", which stopped being true with Advanced Window
+Restore.
+
+### Verification
+
+See CHANGELOG 1.5.5 and the release check. Production delivery of a Direct
+event has not been read back in PostHog yet.
+
 ## D-013 — Onboarding ends on the trial: a paywall step where starting it is the way forward
 
 - Date: 2026-10-26
@@ -57,7 +111,7 @@ launch price. Its copy was edited against the glossary; unverifiable claims
 ## D-012 — Product analytics comes back, through KikiAnalyticsKit
 
 - Date: 2026-10-18
-- Status: Accepted; implemented and configured on 2026-10-21 for 1.5.2.
+- Status: Accepted; implemented and configured on 2026-10-21 for 1.5.2. The Direct `.none` part is superseded by D-014 (1.5.5).
 
 ### Context and decision
 

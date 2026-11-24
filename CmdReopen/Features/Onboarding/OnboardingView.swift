@@ -386,37 +386,39 @@ private struct FinishStepView: View {
     }
 
 #if !APPSTORE
+    /// What the user installed, said once, at the only moment they are certain
+    /// to read it: the same single ask as About (D-005), and the one-line
+    /// analytics notice this build owes them because it sends usage stats.
     private var communityBuildNote: some View {
         VStack(spacing: DS.Spacing.xs) {
-            Text(appLanguage.string("Support Development"))
+            Text(appLanguage.string(localized: "Support Command Reopen",
+                comment: "Title of the support card in the free GitHub build's About pane, and heading of its note on the final onboarding step."))
                 .font(.callout.weight(.medium))
 
-            Text(appLanguage.string("Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates."))
+            Text(appLanguage.string(localized: "This free build has every feature and always will. Buying the App Store version pays for the work and adds automatic updates. Advanced Window Restore is only in this build.",
+                comment: "Body of the free GitHub build's support card and onboarding note. The paid App Store version unlocks nothing extra and lacks the opt-in Advanced Window Restore."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(spacing: DS.Spacing.md) {
-                Button(appLanguage.string("Mac App Store")) {
-                    if let url = URL(string: AppStoreLinks.productURL) {
-                        NSWorkspace.shared.open(url)
-                    }
+            Button(appLanguage.string("Get on Mac App Store")) {
+                if let url = URL(string: AppStoreLinks.productURL) {
+                    NSWorkspace.shared.open(url)
                 }
-                .buttonStyle(.plain)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(DS.Colors.brandPrimary)
-
-                Button(appLanguage.string("Buy Me a Coffee")) {
-                    if let url = URL(string: ExternalLinks.buyMeACoffeeURL) {
-                        NSWorkspace.shared.open(url)
-                    }
-                }
-                .buttonStyle(.plain)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(DS.Colors.brandPrimary)
             }
+            .buttonStyle(.plain)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(DS.Colors.brandPrimary)
             .padding(.top, DS.Spacing.xxs)
+
+            Text(appLanguage.string(localized: "Command Reopen sends anonymous usage stats, never app names or window titles.",
+                comment: "Analytics notice in the free GitHub build (About footer and final onboarding step). It never sends the names of other apps or window titles."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, DS.Spacing.xs)
         }
         .frame(maxWidth: .infinity)
     }

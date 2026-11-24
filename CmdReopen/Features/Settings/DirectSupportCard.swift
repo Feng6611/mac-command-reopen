@@ -7,8 +7,12 @@
 import AppKit
 import SwiftUI
 
-/// The support actions available in About for the Direct edition:
-/// getting the Mac App Store edition or supporting via Buy Me a Coffee.
+/// The one support ask the free build makes in About (D-005).
+///
+/// The App Store copy is the only money path this app keeps, so it is the
+/// single button — no tip jar beside it, so a supporter's money lands where it
+/// also buys a review and a ranking. The body says plainly what buying adds
+/// (automatic updates) and what it does not have (Advanced Window Restore).
 struct DirectSupportCardRow: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
 
@@ -20,35 +24,28 @@ struct DirectSupportCardRow: View {
                     .foregroundStyle(DS.Colors.brandPrimary)
                     .frame(width: 36, height: 36)
                     .background(
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        RoundedRectangle(cornerRadius: DS.Radius.card, style: .continuous)
                             .fill(DS.Colors.accentTint)
                     )
 
-                Text(appLanguage.string("Support Development"))
+                Text(appLanguage.string(localized: "Support Command Reopen",
+                    comment: "Title of the support card in the free GitHub build's About pane, and heading of its note on the final onboarding step."))
                     .font(.headline)
 
                 Spacer(minLength: 0)
             }
 
-            Text(appLanguage.string("Direct is free and full-featured, with optional Advanced Window Restore. The Mac App Store edition includes automatic updates."))
+            Text(appLanguage.string(localized: "This free build has every feature and always will. Buying the App Store version pays for the work and adds automatic updates. Advanced Window Restore is only in this build.",
+                comment: "Body of the free GitHub build's support card and onboarding note. The paid App Store version unlocks nothing extra and lacks the opt-in Advanced Window Restore."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(spacing: DS.Spacing.md) {
-                Button(appLanguage.string("Mac App Store")) {
-                    open(AppStoreLinks.productURL)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(DS.Colors.brandPrimary)
-
-                Button(appLanguage.string("Buy Me a Coffee")) {
-                    open(ExternalLinks.buyMeACoffeeURL)
-                }
-                .buttonStyle(.plain)
-                .font(.caption.weight(.medium))
-                .foregroundStyle(DS.Colors.brandPrimary)
+            Button(appLanguage.string("Get on Mac App Store")) {
+                open(AppStoreLinks.productURL)
             }
+            .buttonStyle(.borderedProminent)
+            .tint(DS.Colors.brandPrimary)
         }
         .padding(.vertical, DS.Spacing.sm)
     }

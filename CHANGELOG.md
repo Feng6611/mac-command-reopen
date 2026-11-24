@@ -1,5 +1,23 @@
 # Changelog / 更新日志
 
+## 1.5.5 — 2026-11-24
+
+GitHub build only; the Mac App Store version stays on 1.5.4. / 仅 GitHub 版；Mac App Store 版仍为 1.5.4。
+
+### English
+
+- GitHub build: now includes every 1.5.4 change.
+- GitHub build: optional Advanced Window Restore in Settings › Advanced. With Accessibility allowed, Command Reopen restores minimized windows itself.
+- GitHub build: now sends anonymous usage stats, like the Mac App Store version. No app names or window titles; PRIVACY.md lists what is sent.
+- About in the GitHub build: one Mac App Store button for support, and the footer says when Accessibility is requested and that usage stats are sent.
+
+### 中文
+
+- GitHub 版：包含 1.5.4 的全部改动。
+- GitHub 版：新增可选的高级窗口恢复（设置 › 高级）。允许辅助功能后，由 Command Reopen 自己还原最小化的窗口。
+- GitHub 版：开始发送匿名使用统计，与 Mac App Store 版相同；不含 App 名称和窗口标题，PRIVACY.md 列明发送内容。
+- GitHub 版的“关于”：支持只保留一个 Mac App Store 按钮；底部说明何时请求辅助功能权限，以及会发送使用统计。
+
 ## 1.5.4 — 2026-11-17
 
 ### English

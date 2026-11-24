@@ -145,29 +145,6 @@ struct SettingsView: View {
     }
 
     private var aboutPane: some View {
-#if !APPSTORE
-        KikiSettingsPane {
-            Section {
-                aboutIdentityContent
-            }
-            .listRowBackground(Color(nsColor: .windowBackgroundColor))
-
-            Section {
-                DirectSupportCardRow()
-            }
-            .listRowBackground(Color(nsColor: .controlBackgroundColor))
-
-            Section {
-                aboutStatusContent
-            }
-            .listRowBackground(Color(nsColor: .controlBackgroundColor))
-
-            Section {
-                aboutLinksContent
-            }
-            .listRowBackground(Color(nsColor: .controlBackgroundColor))
-        }
-#else
         KikiStandardAboutPane(metadata: aboutMetadata)
             .statusContent {
                 aboutStatusContent
@@ -176,6 +153,9 @@ struct SettingsView: View {
                 aboutLinksContent
             }
             .additionalSections {
+#if !APPSTORE
+                Section { DirectSupportCardRow() }
+#endif
 #if DEBUG && APPSTORE
                 Section {
                     ProAccessDebugRows(
@@ -199,15 +179,6 @@ struct SettingsView: View {
                 }
 #endif
             }
-#endif
-    }
-
-    private var aboutIdentityContent: some View {
-        KikiAppIdentityView(
-            appName: aboutMetadata.appName,
-            versionText: aboutMetadata.displayVersion
-        )
-        .padding(.vertical, 20)
     }
 
     @ViewBuilder
@@ -256,9 +227,23 @@ struct SettingsView: View {
             urlString: ExternalLinks.githubURL,
             systemImage: "chevron.left.forwardslash.chevron.right"
         )
+#if APPSTORE
         KikiSettingsHelperText(
             appLanguage.string("Open source under MIT. Command Reopen needs no system permissions — and you can check that in the source rather than take our word for it.")
         )
+#else
+        // The free build has an opt-in Accessibility mode and sends anonymous
+        // analytics, so its footer states both instead of the App Store
+        // build's no-permission claim.
+        KikiSettingsHelperText(
+            appLanguage.string(localized: "Open source under MIT. Command Reopen asks for Accessibility only when you turn on Advanced Window Restore — and you can check that in the source rather than take our word for it.",
+                comment: "About-pane footer of the free GitHub build: the only permission it can ask for, tied to the public source.")
+        )
+        KikiSettingsHelperText(
+            appLanguage.string(localized: "Command Reopen sends anonymous usage stats, never app names or window titles.",
+                comment: "Analytics notice in the free GitHub build (About footer and final onboarding step). It never sends the names of other apps or window titles.")
+        )
+#endif
     }
 
     private var aboutMetadata: KikiAppMetadata { .bundle() }
@@ -371,7 +356,7 @@ struct SettingsView: View {
         return KikiAccessStatusPresentation(
             tone: .active,
             title: language.string(localized: "Free", comment: "About status value for the free GitHub build."),
-            subtitle: language.string(localized: "Full-featured, nothing locked. Same app as the App Store version.", comment: "About status subtitle for the free GitHub build."),
+            subtitle: language.string(localized: "Every feature, nothing locked.", comment: "About status subtitle for the free GitHub build."),
             actionTitle: nil
         )
 #endif
