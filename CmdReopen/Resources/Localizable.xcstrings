@@ -1465,41 +1465,6 @@
         }
       }
     },
-    "Click below, then press Cmd+Tab once — the window comes right back." : {
-      "comment" : "Onboarding tutorial instruction, single line under the key-cap visual. Keep Cmd+Tab in Latin.",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klicke unten zum Minimieren und drücke dann einmal Cmd+Tab."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cliquez ci-dessous pour réduire, puis appuyez sur Cmd+Tab."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下のボタンで最小化し、Cmd+Tabを1回押すとウインドウが戻ります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "点按下方按钮最小化，再按一次 Cmd+Tab 即可恢复。"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clique abaixo e pressione Cmd+Tab uma vez — a janela volta imediatamente."
-          }
-        }
-      }
-    },
     "Close" : {
       "comment" : "Accessibility label for the sheet's close button.",
       "extractionState" : "manual",
@@ -1717,31 +1682,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen läuft. Aktiviere „Beim Anmelden starten“, damit es nach jedem Neustart bereit ist."
+            "value" : "Command Reopen läuft. Aktiviere „Beim Anmelden öffnen“, damit es nach jedem Neustart bereit ist."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen tourne. Activez « Lancer à l’ouverture de session » pour qu’il soit prêt après chaque redémarrage."
+            "value" : "Command Reopen est actif. Activez « Ouvrir à la session » pour qu’il soit prêt après chaque redémarrage."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopenは起動しています。「ログイン時に起動」をオンにすると、再起動後もすぐに使えます。"
+            "value" : "Command Reopenは起動しています。「ログイン時に開く」をオンにすると、再起動後もすぐに使えます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Command Reopen 正在运行。开启“登录时启动”后，每次重启后都会保持就绪。"
+            "value" : "Command Reopen 正在运行。开启“登录时打开”，每次重启后都能直接使用。"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O Command Reopen está em execução. Ative Abrir no Início de Sessão para mantê-lo pronto após cada reinicialização."
+            "value" : "O Command Reopen está em execução. Ative “Abrir no Início de Sessão” para mantê-lo pronto após cada reinicialização."
           }
         }
       }
@@ -2075,7 +2040,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nicht zurückgekommen? Drücke Cmd+Tab erneut."
+            "value" : "Fenster nicht da? Drück noch einmal Befehlstaste-Tab."
           }
         },
         "fr" : {
@@ -2087,13 +2052,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "戻ってきませんか？ もう一度Cmd+Tabをお試しください。"
+            "value" : "戻ってきませんか？もう一度command + Tabをお試しください。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "窗口没出来？再按一次 Cmd+Tab。"
+            "value" : "窗口没出来？再按一次 Command-Tab。"
           }
         },
         "pt-BR" : {
@@ -3259,7 +3224,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Minimizar Esta Janela"
+            "value" : "Minimizar esta janela"
           }
         }
       }
@@ -7725,6 +7690,251 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Read the Story" : {
+      "comment" : "Link that opens the developer's write-up of why Command Reopen exists and how it works without permissions, on kkuk.dev, in the browser. Onboarding success step and the paywall opened outside onboarding.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "了解开发故事"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発ストーリーを読む"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwickler-Story lesen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire l’histoire"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ler a história"
+          }
+        }
+      }
+    },
+    "Skip This Step" : {
+      "comment" : "Onboarding: skips the minimize-and-Cmd+Tab tutorial and goes on to the next step.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跳过这一步"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このステップをスキップ"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt überspringen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passer cette étape"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pular esta etapa"
+          }
+        }
+      }
+    },
+    "The Story Behind Command Reopen" : {
+      "comment" : "Settings › About row that opens the developer's write-up on kkuk.dev in the browser.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopen 的开发故事"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Command Reopenができるまで"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie Command Reopen entstand"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’histoire de Command Reopen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como o Command Reopen surgiu"
+          }
+        }
+      }
+    },
+    "Built by one developer — open source, with no permissions to grant." : {
+      "comment" : "Line at the bottom of the paywall opened outside onboarding, beside the Read the Story link.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由独立开发者打造——开源，无需任何系统权限。"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個人開発のオープンソースアプリです。許可が必要な権限はありません。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von einem unabhängigen Entwickler entwickelt – Open Source und ohne Berechtigungen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conçue par un seul développeur — open source, sans aucune autorisation à accorder."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Criado por um desenvolvedor independente — código aberto e sem necessidade de permissões."
+          }
+        }
+      }
+    },
+    "Click below, then press Command-Tab once — the window comes right back." : {
+      "comment" : "Onboarding tutorial instruction, single line under the key-cap visual. Keep Cmd+Tab in Latin.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke unten zum Minimieren und drücke dann einmal Befehlstaste-Tab."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cliquez ci-dessous pour réduire, puis appuyez sur Cmd+Tab."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下のボタンで最小化し、command + Tabを1回押すとウインドウが戻ります。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点按下方按钮最小化，再按一次 Command-Tab 即可恢复。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clique abaixo e pressione Command + Tab uma vez — a janela volta imediatamente."
+          }
+        }
+      }
+    },
+    "Try it anytime" : {
+      "comment" : "Onboarding success step title for someone who skipped the minimize tutorial.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "随时可以试试"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いつでも試せます"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probier es jederzeit aus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À essayer quand vous voulez"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Experimente quando quiser"
+          }
+        }
+      }
+    },
+    "Minimize any window, then press Command-Tab — Command Reopen brings it back." : {
+      "comment" : "Onboarding success step subtitle for someone who skipped the minimize tutorial.",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最小化任意窗口后按 Command-Tab，Command Reopen 就会把它找回来。"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウインドウを最小化してcommand + Tabを押すと、Command Reopenが元に戻します。"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimiere ein beliebiges Fenster und drück Befehlstaste-Tab – Command Reopen holt es zurück."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduisez une fenêtre, puis appuyez sur Cmd+Tab : Command Reopen la fait revenir."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimize qualquer janela e pressione Command + Tab — o Command Reopen a traz de volta."
           }
         }
       }

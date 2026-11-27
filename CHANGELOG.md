@@ -1,5 +1,21 @@
 # Changelog / 更新日志
 
+## 1.5.6 — 2026-11-27
+
+Mac App Store release / Mac App Store 版
+
+### English
+
+- Choose "Skip This Step" to continue first-run setup if the Command-Tab demo times out.
+- Read the developer’s story from the walkthrough, Settings › About, or the purchase sheet opened outside setup.
+- Anonymous usage stats now include demo timeouts, skips, and clicks on the developer story. They include the app-switch result when the demo times out.
+
+### 中文
+
+- 首次引导的 Command-Tab 演示超时后，可以点“跳过这一步”继续设置。
+- 可以从引导、“设置 › 关于”或引导之外打开的购买页阅读开发故事。
+- 匿名使用统计新增演示超时、跳过和开发故事入口点击。超时事件也记录切换 App 的结果。
+
 ## 1.5.5 — 2026-11-24
 
 GitHub build only; the Mac App Store version stays on 1.5.4. / 仅 GitHub 版；Mac App Store 版仍为 1.5.4。

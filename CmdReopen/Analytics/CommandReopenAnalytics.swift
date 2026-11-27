@@ -94,9 +94,21 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
     enum ReviewKind: String { case custom, systemRequest = "system_request" }
     enum ReviewAction: String { case review, notNow = "not_now" }
     enum HintKind: String { case firstSuccess = "first_success", returnTip = "return_tip" }
+    /// Whether the tutorial managed to hand the foreground to another app after
+    /// minimizing, so a single Cmd+Tab would come back to Command Reopen.
+    enum DemoHandoff: String {
+        case confirmed
+        case failed
+        case noTarget = "no_target"
+        /// Still waiting for macOS to confirm, or never attempted.
+        case pending
+    }
 
     case onboardingStepViewed(session: KikiAnalyticsSessionID, step: OnboardingStep)
     case onboardingDemoSucceeded(durationMs: Int)
+    case onboardingDemoTimedOut(attempt: Int, handoff: DemoHandoff)
+    case onboardingDemoSkipped(timeouts: Int)
+    case storyOpened(source: DevelopmentStory.Source, language: DevelopmentStory.Language)
     case onboardingCompleted(
         session: KikiAnalyticsSessionID, outcome: OnboardingOutcome, lastStep: OnboardingStep,
         launchAtLogin: Bool, durationMs: Int, demoSucceeded: Bool
@@ -129,6 +141,9 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
         switch self {
         case .onboardingStepViewed: "onboarding step viewed"
         case .onboardingDemoSucceeded: "onboarding demo succeeded"
+        case .onboardingDemoTimedOut: "onboarding demo timed out"
+        case .onboardingDemoSkipped: "onboarding demo skipped"
+        case .storyOpened: "story opened"
         case .onboardingCompleted: "onboarding completed"
         case .trialStarted: "trial started"
         case .trialEnded: "trial ended"
@@ -155,6 +170,12 @@ enum CommandReopenEvent: KikiAnalyticsEvent {
             ["session_id": .sessionID(session), "step": .enum(step)]
         case let .onboardingDemoSucceeded(durationMs):
             ["duration_ms": .int(durationMs)]
+        case let .onboardingDemoTimedOut(attempt, handoff):
+            ["attempt": .int(attempt), "handoff": .enum(handoff)]
+        case let .onboardingDemoSkipped(timeouts):
+            ["timeouts": .int(timeouts)]
+        case let .storyOpened(source, language):
+            ["source": .enum(source), "language": .enum(language)]
         case let .onboardingCompleted(session, outcome, lastStep, launchAtLogin, durationMs, demoSucceeded):
             [
                 "session_id": .sessionID(session), "outcome": .enum(outcome), "last_step": .enum(lastStep),

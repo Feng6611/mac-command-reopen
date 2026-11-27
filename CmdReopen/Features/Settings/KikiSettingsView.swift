@@ -211,6 +211,14 @@ struct SettingsView: View {
             systemImage: "person"
         )
         SettingsTrailingLinkRow(
+            title: appLanguage.string(localized: "The Story Behind Command Reopen",
+                comment: "Settings › About row that opens the developer's write-up on kkuk.dev in the browser."),
+            value: "kkuk.dev",
+            urlString: "",
+            systemImage: "book",
+            action: { DevelopmentStory.open(from: .about) }
+        )
+        SettingsTrailingLinkRow(
             title: appLanguage.string("Website"),
             value: ExternalLinks.websiteDisplayName,
             urlString: ExternalLinks.officialURL,
@@ -386,11 +394,17 @@ private struct SettingsTrailingLinkRow: View {
     let value: String
     let urlString: String
     let systemImage: String
+    /// Replaces opening `urlString`, for links that report where they were opened.
+    var action: (() -> Void)?
 
     var body: some View {
         KikiSettingsValueRow(title, systemImage: systemImage) {
             Button {
-                KikiSettingsActions.openURL(urlString)
+                if let action {
+                    action()
+                } else {
+                    KikiSettingsActions.openURL(urlString)
+                }
             } label: {
                 HStack(spacing: DS.Spacing.xs) {
                     Text(value)

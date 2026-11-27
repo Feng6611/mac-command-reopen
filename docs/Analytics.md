@@ -1,6 +1,6 @@
 # Command Reopen 事件表
 
-当前设计覆盖至 **1.5.4（本地实现，待发布）**。1.5.2 / 1.5.3 的历史事件版本见飞书埋点设计表。生产 Release 分发（App Store 及 Release Direct 归档）在配置 token 后发送；Debug 始终使用 `.none`。事件与参数统一定义在 `CommandReopenAnalytics.swift`；PostHog 传输封装在 KikiAnalyticsKit。本文不表示生产数据已验证。
+当前设计覆盖至 **1.5.4**，另含下一版（本地实现，待发布）的引导演示诊断与开发故事事件。1.5.2 / 1.5.3 的历史事件版本见飞书埋点设计表。生产 Release 分发（App Store 及 Release Direct 归档）在配置 token 后发送；Debug 始终使用 `.none`。事件与参数统一定义在 `CommandReopenAnalytics.swift`；PostHog 传输封装在 KikiAnalyticsKit。本文不表示生产数据已验证。
 
 ## 安装到付费的分析口径
 
@@ -51,8 +51,10 @@ App 业务事件附加 `entitlement_state`（`not_started` / `trial` / `expired`
 | --- | --- | --- | --- |
 | `app first opened` | Kit 首次初始化 | 每安装一次 | `first_open_kind` |
 | `onboarding started` | 引导开始 | 每会话 | `session_id` |
-| `onboarding step viewed` | 步骤出现 | 每会话每步 | `session_id`、`step` |
+| `onboarding step viewed` | 步骤出现；跳过演示的人也会看到 `success`，判断演示是否成功用 `onboarding demo succeeded` | 每会话每步 | `session_id`、`step` |
 | `onboarding demo succeeded` | 引导演示成功 | 每安装一次 | `duration_ms` |
+| `onboarding demo timed out` | 最小化后 10 秒内没有回到 App，窗口被自动拉回 | 每次 | `attempt`（本会话第几次超时）、`handoff`（`confirmed` / `failed` / `no_target` / `pending`：最小化后把前台交给其他 App 是否成功） |
+| `onboarding demo skipped` | 首次超时后出现的“跳过这一步”按钮被点击；进入成功步骤的跳过版（标题“随时可以试试”，不放彩带），不算演示成功 | 每次 | `timeouts` |
 | `onboarding completed` | 完成或关闭引导 | finished 每安装一次；closed 每次 | `session_id`、`outcome`、`last_step`、`launch_at_login`、`duration_ms`、`demo_succeeded` |
 | `reopen result` | 实际重开尝试结案 | 每次一次，不限量 | `result`、`reason`、`duration_ms`、`daily_attempt_index` |
 | `reopen hint shown` | 首次成功提示，或首次成功前关掉最后一个窗口时的用法提示 | 首次成功一次；用法提示最多 2 天、每天 1 次 | `kind`（`first_success` / `return_tip`），不含 App 名称 |
@@ -72,6 +74,14 @@ App 业务事件附加 `entitlement_state`（`not_started` / `trial` / `expired`
 | `winback offer action` | 购买、免费版、关闭或重开卡片 | 每次 | `action`、`days_left` |
 
 同一付费页的 viewed / action / purchase result 共用 `session_id`；挽留卡片页外购买不带此 ID。同页多次购买尝试共用会话，当前没有逐次 `attempt_id`。不增加加载结果事件，保留展示及动作时的 `prices_available`；其含义是至少一个在售方案可用。`purchase result` 只诊断客户端流程，`pending` 不能当付款成功，restore 不能算新增付费。
+
+### 开发故事
+
+| 事件 | 触发点 | 频率 | 参数 |
+| --- | --- | --- | --- |
+| `story opened` | 打开 kkuk.dev 上的开发故事（浏览器） | 每次 | `source`（`onboarding_success` / `paywall` / `about`）、`language`（`zh` / `en`） |
+
+App 语言为中文时打开中文原文，其余语言打开英文版。引导里的入口是成功步骤“零权限”卡片下的文字链接（跳过版同样显示）；`paywall` 只来自引导之外打开的付费页底部的文字链接；`about` 是设置 › 关于里的一行。菜单栏不放入口。链接只带 `utm_source=command_reopen`、`utm_medium=app`、`utm_campaign=story` 和 `utm_content=<source>`。事件只说明点了入口，不代表读完。
 
 ### 设置与评分
 

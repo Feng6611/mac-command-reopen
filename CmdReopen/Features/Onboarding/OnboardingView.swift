@@ -40,6 +40,7 @@ enum CommandReopenOnboardingFlow {
     static func makeCoordinator(
         tryMinimizeModel: OnboardingTryMinimizeModel,
         onMinimize: @escaping () -> Void,
+        onSkipDemo: @escaping () -> Void,
         onFinished: @escaping @MainActor () -> Void
     ) -> KikiOnboardingCoordinator {
         var steps: [KikiOnboardingStep] = [
@@ -47,10 +48,10 @@ enum CommandReopenOnboardingFlow {
                 AnyView(WelcomeStepView(navigation: navigation))
             },
             .custom(id: StepID.tryMinimize) { _ in
-                AnyView(TryMinimizeStepView(model: tryMinimizeModel, onMinimize: onMinimize))
+                AnyView(TryMinimizeStepView(model: tryMinimizeModel, onMinimize: onMinimize, onSkip: onSkipDemo))
             },
             .custom(id: StepID.success) { navigation in
-                AnyView(SuccessStepView(navigation: navigation))
+                AnyView(SuccessStepView(model: tryMinimizeModel, navigation: navigation))
             },
             .custom(id: StepID.finish) { navigation in
                 AnyView(FinishStepView(navigation: navigation))
@@ -119,6 +120,7 @@ private struct TryMinimizeStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
     @ObservedObject var model: OnboardingTryMinimizeModel
     let onMinimize: () -> Void
+    let onSkip: () -> Void
 
     var body: some View {
         KikiOnboardingScaffold(
@@ -145,11 +147,17 @@ private struct TryMinimizeStepView: View {
                 }
                 .padding(.top, DS.Spacing.lg)
 
-                Text(appLanguage.string("Click below, then press Cmd+Tab once — the window comes right back."))
+                Text(appLanguage.string("Click below, then press Command-Tab once — the window comes right back."))
                     .font(.body)
                     .foregroundStyle(.secondary)
+
+                if model.showsStuckOptions {
+                    stuckOptions
+                        .transition(.opacity)
+                }
             }
             .multilineTextAlignment(.center)
+            .animation(.easeInOut(duration: 0.18), value: model.showsStuckOptions)
         }
         .overlay(alignment: .top) {
             if model.showsRetryHint {
@@ -188,6 +196,17 @@ private struct TryMinimizeStepView: View {
         )
     }
 
+    /// After the first time the user does not come back, the step offers a way
+    /// past it. Cmd+Tab keeps working either way.
+    private var stuckOptions: some View {
+        Button(appLanguage.string(localized: "Skip This Step",
+            comment: "Onboarding: skips the minimize-and-Cmd+Tab tutorial and goes on to the next step.")) {
+            onSkip()
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+    }
+
     private var retryHint: some View {
         HStack(spacing: DS.Spacing.sm) {
             Image(systemName: "arrow.uturn.backward")
@@ -205,6 +224,7 @@ private struct TryMinimizeStepView: View {
 private struct SuccessStepView: View {
     @ObservedObject private var appLanguage = AppLanguage.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject var model: OnboardingTryMinimizeModel
     let navigation: KikiOnboardingNavigation
 
     @State private var showsWedge = false
@@ -213,8 +233,16 @@ private struct SuccessStepView: View {
     var body: some View {
         KikiOnboardingScaffold(
             appName: "Command Reopen",
-            title: AppLanguage.shared.string("It works!"),
-            bodyText: AppLanguage.shared.string("Cmd+Tab now brings your windows back."),
+            // Someone who skipped the tutorial has not seen it work: the same
+            // page, without the claim and without the celebration.
+            title: model.demoWasSkipped
+                ? appLanguage.string(localized: "Try it anytime",
+                    comment: "Onboarding success step title for someone who skipped the minimize tutorial.")
+                : AppLanguage.shared.string("It works!"),
+            bodyText: model.demoWasSkipped
+                ? appLanguage.string(localized: "Minimize any window, then press Command-Tab — Command Reopen brings it back.",
+                    comment: "Onboarding success step subtitle for someone who skipped the minimize tutorial.")
+                : AppLanguage.shared.string("Cmd+Tab now brings your windows back."),
             appIcon: NSApp.applicationIconImage,
             primaryAction: KikiOnboardingAction(title: AppLanguage.shared.string("Continue"), action: navigation.advance),
             tint: DS.Colors.brandPrimary,
@@ -254,6 +282,14 @@ private struct SuccessStepView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+
+                // The story explains this card: why and how it needs no permissions.
+                Button(appLanguage.string(localized: "Read the Story",
+                    comment: "Link that opens the developer's write-up of why Command Reopen exists and how it works without permissions, on kkuk.dev, in the browser.")) {
+                    DevelopmentStory.open(from: .onboardingSuccess)
+                }
+                .buttonStyle(.link)
+                .padding(.top, DS.Spacing.xs)
             }
             .padding(.vertical, DS.Spacing.xxl)
             .padding(.horizontal, DS.Spacing.xxl)
@@ -271,6 +307,11 @@ private struct SuccessStepView: View {
             .opacity(showsWedge ? 1 : 0)
         }
         .onAppear {
+            // Nothing to celebrate after a skip: the card appears, nothing else.
+            guard !model.demoWasSkipped else {
+                showsWedge = true
+                return
+            }
             NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
             // Reduce Motion turns the celebration off, not the payoff: the
             // wedge appears at once with no spring, and the confetti — pure
@@ -623,6 +664,12 @@ struct OnboardingMinimizeReturnSession {
 @MainActor
 final class OnboardingTryMinimizeModel: ObservableObject {
     @Published private(set) var showsRetryHint = false
+    /// Set by the first timeout and kept for the rest of the session: once
+    /// someone has not come back, the way out stays visible on every retry.
+    @Published private(set) var showsStuckOptions = false
+    /// The user left the tutorial with Skip; the success step then neither
+    /// claims it worked nor celebrates.
+    @Published private(set) var demoWasSkipped = false
 
     func showRetryHint() {
         showsRetryHint = true
@@ -630,6 +677,22 @@ final class OnboardingTryMinimizeModel: ObservableObject {
 
     func clearRetryHint() {
         showsRetryHint = false
+    }
+
+    func showStuckOptions() {
+        showsStuckOptions = true
+    }
+
+    func markDemoSkipped() {
+        showsRetryHint = false
+        showsStuckOptions = false
+        demoWasSkipped = true
+    }
+
+    func reset() {
+        showsRetryHint = false
+        showsStuckOptions = false
+        demoWasSkipped = false
     }
 }
 
@@ -659,6 +722,11 @@ final class OnboardingWindowController {
     private var analyticsSentSteps: Set<CommandReopenEvent.OnboardingStep> = []
     private var analyticsDemoSucceeded = false
     private var hasReportedCompletion = false
+    /// Tutorial timeouts in this session, and how the latest foreground
+    /// hand-off went; both explain a timeout in `onboarding demo timed out`.
+    private var demoTimeouts = 0
+    private var demoHandoff: CommandReopenEvent.DemoHandoff = .pending
+
 #if DEBUG
     private var isRelaunchingForOnboarding = false
 #endif
@@ -700,6 +768,9 @@ final class OnboardingWindowController {
             onMinimize: { [weak self] in
                 self?.miniaturizeTutorialWindow()
             },
+            onSkipDemo: { [weak self] in
+                self?.skipDemo()
+            },
             onFinished: { [weak self] in
                 self?.handleFinished()
             }
@@ -720,6 +791,9 @@ final class OnboardingWindowController {
         hasReportedCompletion = false
         analyticsSentSteps = []
         analyticsDemoSucceeded = false
+        demoTimeouts = 0
+        demoHandoff = .pending
+        tryMinimizeModel.reset()
         analytics.track(KikiStandardEvent.onboardingStarted(session: session))
         analyticsStepCancellable = coordinator.$currentStepIndex.sink { [weak self] index in
             guard let self, Self.analyticsSteps.indices.contains(index) else { return }
@@ -775,7 +849,8 @@ final class OnboardingWindowController {
     /// minimize animation. That leaves the return target frontmost when the
     /// user presses Cmd+Tab, without hiding the animation.
     private func miniaturizeTutorialWindow() {
-        guard let window = coordinator?.window else { return }
+        // The button delays the minimize; a skip in between has left the step.
+        guard isWaitingForCommandTabReturn, let window = coordinator?.window else { return }
         window.styleMask = Self.styleMaskEnablingMiniaturization(window.styleMask)
         window.miniaturize(nil)
     }
@@ -907,6 +982,7 @@ final class OnboardingWindowController {
 
         tryMinimizeModel.clearRetryHint()
         minimizeReturnSession.recordWindowDidMiniaturize()
+        demoHandoff = .pending
         scheduleReturnTimeout()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
             self?.handOffToReturnTargetAfterMiniaturizing()
@@ -924,6 +1000,7 @@ final class OnboardingWindowController {
         }
 
         guard let target = returnTargetOrFinder() else {
+            demoHandoff = .noTarget
             tryMinimizeModel.showRetryHint()
             AppLogger.lifecycle.error("Onboarding activation hand-off has no eligible return target.")
             return
@@ -931,6 +1008,7 @@ final class OnboardingWindowController {
 
         confirmActivation(of: target) { [weak self] didActivate in
             guard let self else { return }
+            self.demoHandoff = didActivate ? .confirmed : .failed
             guard !didActivate else { return }
             self.tryMinimizeModel.showRetryHint()
             AppLogger.lifecycle.error("Onboarding return-target activation was not confirmed.")
@@ -956,7 +1034,30 @@ final class OnboardingWindowController {
         NSApplication.shared.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
         tryMinimizeModel.showRetryHint()
+        tryMinimizeModel.showStuckOptions()
+        demoTimeouts += 1
+        CommandReopenAnalytics.track(CommandReopenEvent.onboardingDemoTimedOut(
+            attempt: demoTimeouts,
+            handoff: demoHandoff
+        ))
         AppLogger.lifecycle.notice("Onboarding minimize tutorial timed out; recovered window for retry.")
+    }
+
+    /// Leaves the tutorial for the success step in its skipped form, which
+    /// makes no claim that it worked. The real feature is untouched, so the
+    /// first Cmd+Tab after onboarding still restores windows.
+    private func skipDemo() {
+        guard let coordinator, isWaitingForCommandTabReturn else { return }
+        cancelReturnTimeout()
+        cancelActivationConfirmation()
+        minimizeReturnSession.reset()
+        tryMinimizeModel.markDemoSkipped()
+        if let window = coordinator.window, window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
+        CommandReopenAnalytics.track(CommandReopenEvent.onboardingDemoSkipped(timeouts: demoTimeouts))
+        coordinator.advance()
+        AppLogger.lifecycle.notice("Onboarding minimize tutorial skipped after \(self.demoTimeouts) timeouts.")
     }
 
     private func scheduleReturnTimeout() {
@@ -981,7 +1082,7 @@ final class OnboardingWindowController {
         removeObservers()
         cancelActivationConfirmation()
         cancelReturnTimeout()
-        tryMinimizeModel.clearRetryHint()
+        tryMinimizeModel.reset()
         appToReturnToAfterMinimize = nil
         minimizeReturnSession.reset()
         ActivationMonitor.shared.setOnboardingSessionActive(false)
@@ -1003,7 +1104,7 @@ final class OnboardingWindowController {
         coordinator = nil
         cancelActivationConfirmation()
         cancelReturnTimeout()
-        tryMinimizeModel.clearRetryHint()
+        tryMinimizeModel.reset()
         minimizeReturnSession.reset()
 
         NSApp.windows.forEach { window in

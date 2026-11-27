@@ -72,7 +72,7 @@ struct PaywallSheetView: View {
                 // read as "did my purchase go through?".
                 ProAccessStatusView(accessModel: accessModel, onDone: onFinish)
             } else {
-                paywall.onAppear {
+                paywallWithStory.onAppear {
                     if opensBeforeTrial == nil {
                         opensBeforeTrial = accessModel.status.canStartTrial
                     }
@@ -204,6 +204,41 @@ struct PaywallSheetView: View {
                 onPurchaseCompleted()
             }
         )
+    }
+
+    /// Outside onboarding the paywall is met on its own — after the trial, or
+    /// from the menu — with nothing before it saying who made the app. The
+    /// onboarding paywall skips this: its setup step has just offered the story.
+    @ViewBuilder
+    private var paywallWithStory: some View {
+        if context == .settings {
+            VStack(spacing: 0) {
+                paywall
+                Divider()
+                storyFooter
+            }
+        } else {
+            paywall
+        }
+    }
+
+    private var storyFooter: some View {
+        HStack(spacing: DS.Spacing.md) {
+            Text(appLanguage.string(localized: "Built by one developer — open source, with no permissions to grant.",
+                comment: "Line at the bottom of the paywall opened outside onboarding, beside the Read the Story link."))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button(appLanguage.string(localized: "Read the Story",
+                comment: "Link that opens the developer's write-up of why Command Reopen exists and how it works without permissions, on kkuk.dev, in the browser.")) {
+                DevelopmentStory.open(from: .paywall)
+            }
+            .buttonStyle(.link)
+        }
+        .padding(.horizontal, DS.Spacing.xl)
+        .padding(.vertical, DS.Spacing.md)
     }
 
     private var headline: String {
